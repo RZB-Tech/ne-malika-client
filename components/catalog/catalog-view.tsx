@@ -1,63 +1,27 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { SlidersHorizontal, X } from "lucide-react";
+import { SearchX, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import { Badge } from "@/components/ui/badge";
 import { ProductCard } from "@/components/product/product-card";
 import { FilterPanel } from "./filter-panel";
 import { useT } from "@/components/providers/i18n-provider";
-import {
-  publicProducts,
-  getCategory,
-  getStore,
-  type Availability,
-  type Product,
-} from "@/lib/data";
-import { SearchX } from "lucide-react";
+import { publicProducts, type Product } from "@/lib/data";
 
 export interface CatalogFilters {
   q: string;
-  category: string | null;
-  subcategory: string | null;
-  brands: string[];
-  cities: string[];
-  availability: Availability[];
   priceMin: number | null;
   priceMax: number | null;
-  isNew: boolean;
-  isPromo: boolean;
 }
 
-export type SortKey = "popular" | "priceAsc" | "priceDesc" | "newest";
+export type SortKey = "latest" | "oldest" | "priceAsc" | "priceDesc";
+
+export const SORT_KEYS: SortKey[] = ["latest", "oldest", "priceAsc", "priceDesc"];
 
 const EMPTY: CatalogFilters = {
   q: "",
-  category: null,
-  subcategory: null,
-  brands: [],
-  cities: [],
-  availability: [],
   priceMin: null,
   priceMax: null,
-  isNew: false,
-  isPromo: false,
 };
 
 function matches(p: Product, f: CatalogFilters): boolean {
@@ -65,27 +29,15 @@ function matches(p: Product, f: CatalogFilters): boolean {
     const hay = `${p.name} ${p.brand} ${p.model} ${p.sku}`.toLowerCase();
     if (!hay.includes(f.q.toLowerCase())) return false;
   }
-  if (f.category && p.categorySlug !== f.category) return false;
-  if (f.subcategory && p.subcategory !== f.subcategory) return false;
-  if (f.brands.length && !f.brands.includes(p.brand)) return false;
-  if (f.availability.length && !f.availability.includes(p.availability)) return false;
-  if (f.cities.length) {
-    const city = getStore(p.storeId)?.city;
-    if (!city || !f.cities.includes(city)) return false;
-  }
   if (f.priceMin != null && p.price < f.priceMin) return false;
   if (f.priceMax != null && p.price > f.priceMax) return false;
-  if (f.isNew && !p.isNew) return false;
-  if (f.isPromo && !p.isPromo) return false;
   return true;
 }
 
 export function CatalogView({ initial }: { initial: Partial<CatalogFilters> & { sort?: SortKey } }) {
-  const { t, locale } = useT();
-  const router = useRouter();
+  const { t } = useT();
   const [filters, setFilters] = useState<CatalogFilters>({ ...EMPTY, ...initial });
-  const [sort, setSort] = useState<SortKey>(initial.sort ?? "popular");
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const [sort, setSort] = useState<SortKey>(initial.sort ?? "latest");
 
   const results = useMemo(() => {
     const list = publicProducts.filter((p) => matches(p, filters));
@@ -93,96 +45,38 @@ export function CatalogView({ initial }: { initial: Partial<CatalogFilters> & { 
     switch (sort) {
       case "priceAsc": sorted.sort((a, b) => a.price - b.price); break;
       case "priceDesc": sorted.sort((a, b) => b.price - a.price); break;
-      case "newest": sorted.sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt)); break;
-      default: sorted.sort((a, b) => b.telegramClicks - a.telegramClicks);
+      case "oldest": sorted.sort((a, b) => +new Date(a.createdAt) - +new Date(b.createdAt)); break;
+      default: sorted.sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
     }
     return sorted;
   }, [filters, sort]);
 
-  const cat = filters.category ? getCategory(filters.category) : null;
-  const title = cat ? cat.name[locale] : filters.q ? `“${filters.q}”` : t("catalog.allProducts");
+  const title = filters.q ? `“${filters.q}”` : t("catalog.allProducts");
 
   const activeChips = useMemo(() => {
     const chips: { key: string; label: string; clear: () => void }[] = [];
-    if (filters.category) {
-      chips.push({
-        key: "cat",
-        label: getCategory(filters.category)!.name[locale],
-        clear: () => setFilters((f) => ({ ...f, category: null, subcategory: null })),
-      });
-    }
-    filters.brands.forEach((b) =>
-      chips.push({ key: `b-${b}`, label: b, clear: () => setFilters((f) => ({ ...f, brands: f.brands.filter((x) => x !== b) })) }),
-    );
-    filters.availability.forEach((a) =>
-      chips.push({ key: `a-${a}`, label: t(`availability.${a}`), clear: () => setFilters((f) => ({ ...f, availability: f.availability.filter((x) => x !== a) })) }),
-    );
-    filters.cities.forEach((c) =>
-      chips.push({ key: `c-${c}`, label: c, clear: () => setFilters((f) => ({ ...f, cities: f.cities.filter((x) => x !== c) })) }),
-    );
-    if (filters.isNew) chips.push({ key: "new", label: t("catalog.filterNew"), clear: () => setFilters((f) => ({ ...f, isNew: false })) });
-    if (filters.isPromo) chips.push({ key: "promo", label: t("catalog.filterPromo"), clear: () => setFilters((f) => ({ ...f, isPromo: false })) });
     if (filters.priceMin != null || filters.priceMax != null)
-      chips.push({ key: "price", label: `${filters.priceMin ?? 0}–${filters.priceMax ?? "∞"} ${t("common.currency")}`, clear: () => setFilters((f) => ({ ...f, priceMin: null, priceMax: null })) });
+      chips.push({
+        key: "price",
+        label: `${filters.priceMin ?? 0}–${filters.priceMax ?? "∞"} ${t("common.currency")}`,
+        clear: () => setFilters((f) => ({ ...f, priceMin: null, priceMax: null })),
+      });
     return chips;
-  }, [filters, locale, t]);
+  }, [filters, t]);
 
-  const reset = () => {
-    setFilters(EMPTY);
-    router.replace("/catalog");
-  };
+  const reset = () => setFilters(EMPTY);
 
-  const panel = <FilterPanel filters={filters} setFilters={setFilters} />;
+  const panel = (
+    <FilterPanel filters={filters} setFilters={setFilters} sort={sort} setSort={setSort} />
+  );
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
       <div className="mb-6">
-        <nav className="mb-2 flex items-center gap-1.5 text-sm text-muted-foreground">
-          <Link href="/" className="hover:text-foreground">{t("brand.name")}</Link>
-          <span>/</span>
-          <span className="text-foreground">{t("catalog.title")}</span>
-        </nav>
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <h1 className="font-heading text-2xl font-bold tracking-tight sm:text-3xl">{title}</h1>
-            <p className="mt-1 text-sm text-muted-foreground tabular">
-              {t("catalog.results", { count: results.length })}
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-              <SheetTrigger asChild>
-                <Button variant="outline" size="sm" className="gap-2 lg:hidden">
-                  <SlidersHorizontal className="size-4" />
-                  {t("common.filters")}
-                  {activeChips.length > 0 && (
-                    <Badge className="ml-0.5 size-5 justify-center rounded-full p-0 tabular">
-                      {activeChips.length}
-                    </Badge>
-                  )}
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="w-[88vw] max-w-sm overflow-y-auto">
-                <SheetHeader>
-                  <SheetTitle>{t("common.filters")}</SheetTitle>
-                </SheetHeader>
-                <div className="px-4 pb-4">{panel}</div>
-              </SheetContent>
-            </Sheet>
-
-            <Select value={sort} onValueChange={(v) => setSort(v as SortKey)}>
-              <SelectTrigger className="w-[180px]" size="sm">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="popular">{t("catalog.sort.popular")}</SelectItem>
-                <SelectItem value="priceAsc">{t("catalog.sort.priceAsc")}</SelectItem>
-                <SelectItem value="priceDesc">{t("catalog.sort.priceDesc")}</SelectItem>
-                <SelectItem value="newest">{t("catalog.sort.newest")}</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
+        <h1 className="font-heading text-2xl font-bold tracking-tight sm:text-3xl">{title}</h1>
+        <p className="mt-1 text-sm text-muted-foreground tabular">
+          {t("catalog.results", { count: results.length })}
+        </p>
 
         {activeChips.length > 0 && (
           <div className="mt-4 flex flex-wrap items-center gap-2">
@@ -203,9 +97,11 @@ export function CatalogView({ initial }: { initial: Partial<CatalogFilters> & { 
         )}
       </div>
 
-      <div className="flex gap-8">
-        <aside className="hidden w-64 shrink-0 lg:block">
-          <div className="sticky top-32">{panel}</div>
+      <div className="flex flex-col gap-6 lg:flex-row lg:gap-8">
+        <aside className="w-full lg:w-64 lg:shrink-0">
+          <div className="rounded-2xl border border-border p-4 lg:sticky lg:top-32 lg:rounded-none lg:border-0 lg:p-0">
+            {panel}
+          </div>
         </aside>
 
         <div className="min-w-0 flex-1">

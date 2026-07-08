@@ -1,57 +1,34 @@
-"use client";
+import { Suspense } from "react";
+import { CatalogView, type SortKey } from "@/components/catalog/catalog-view";
 
-import { Hero } from "@/components/home/hero";
-import { PromoBanners } from "@/components/home/promo-banners";
-import { CategoriesSection } from "@/components/home/categories-section";
-import { ProductRow } from "@/components/home/product-row";
-import { HowItWorks } from "@/components/home/how-it-works";
-import { SellerCta } from "@/components/home/seller-cta";
-import { useT } from "@/components/providers/i18n-provider";
-import { publicProducts } from "@/lib/data";
+const SORTS: SortKey[] = ["latest", "oldest", "priceAsc", "priceDesc"];
 
-export default function HomePage() {
-  const { t } = useT();
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const sp = await searchParams;
+  const str = (v: string | string[] | undefined) =>
+    Array.isArray(v) ? v[0] : v;
 
-  const popular = [...publicProducts]
-    .sort((a, b) => b.telegramClicks - a.telegramClicks)
-    .slice(0, 10);
+  const num = (v: string | string[] | undefined) => {
+    const n = Number(str(v));
+    return Number.isFinite(n) ? n : null;
+  };
 
-  const fresh = [...publicProducts]
-    .sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt))
-    .slice(0, 5);
-
-  const promo = publicProducts.filter((p) => p.isPromo).slice(0, 10);
+  const sort = str(sp.sort);
 
   return (
-    <>
-      {/*<Hero />*/}
-      {/*<PromoBanners />*/}
-      {/*<CategoriesSection />*/}
-      <ProductRow
-        title={t("home.popularTitle")}
-        subtitle={t("home.popularSubtitle")}
-        href="/catalog"
-        linkLabel={t("home.viewAll")}
-        products={popular}
-        tone="muted"
+    <Suspense>
+      <CatalogView
+        initial={{
+          q: str(sp.q) ?? "",
+          priceMin: num(sp.priceMin),
+          priceMax: num(sp.priceMax),
+          sort: sort && SORTS.includes(sort as SortKey) ? (sort as SortKey) : undefined,
+        }}
       />
-      <ProductRow
-        title={t("home.newTitle")}
-        subtitle={t("home.newSubtitle")}
-        href="/catalog?sort=newest"
-        linkLabel={t("home.viewAll")}
-        products={fresh}
-      />
-      <ProductRow
-        title={t("home.promoTitle")}
-        subtitle={t("home.promoSubtitle")}
-        href="/catalog?promo=1"
-        linkLabel={t("home.viewAll")}
-        products={promo}
-        tone="muted"
-      />
-      <HowItWorks />
-      <SellerCta />
-    </>
+    </Suspense>
   );
 }

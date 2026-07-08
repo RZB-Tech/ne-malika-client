@@ -13,9 +13,8 @@ export function SiteFooter() {
     {
       title: t("footer.buyers"),
       links: [
-        { label: t("footer.catalog"), href: "/catalog" },
-        { label: t("footer.promos"), href: "/catalog?promo=1" },
-        { label: t("footer.stores"), href: "/catalog" },
+        { label: t("footer.catalog"), href: "/" },
+        { label: t("footer.stores"), href: "/" },
       ],
     },
     {

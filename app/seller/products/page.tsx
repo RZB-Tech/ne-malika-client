@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import {
   Eye,
@@ -39,6 +40,7 @@ import { products, CURRENT_STORE_ID, type Product } from "@/lib/data";
 
 export default function SellerProducts() {
   const { t, locale } = useT();
+  const router = useRouter();
   const [rows, setRows] = useState<Product[]>(() =>
     products.filter((p) => p.storeId === CURRENT_STORE_ID),
   );
@@ -103,12 +105,16 @@ export default function SellerProducts() {
             </TableHeader>
             <TableBody>
               {list.map((p) => (
-                <TableRow key={p.id} className={p.hidden ? "opacity-55" : ""}>
+                <TableRow
+                  key={p.id}
+                  onClick={() => router.push(`/seller/products/${p.id}`)}
+                  className={`cursor-pointer ${p.hidden ? "opacity-55" : ""}`}
+                >
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <ProductImage hue={p.hue} categorySlug={p.categorySlug} className="size-10 shrink-0 rounded-lg" iconClassName="size-4" />
                       <div className="min-w-0">
-                        <Link href={`/product/${p.id}`} className="line-clamp-1 text-sm font-medium hover:text-primary">
+                        <Link href={`/seller/products/${p.id}`} className="line-clamp-1 text-sm font-medium hover:text-primary">
                           {p.name}
                         </Link>
                         <div className="text-xs text-muted-foreground">{p.sku}</div>
@@ -122,7 +128,7 @@ export default function SellerProducts() {
                   <TableCell><ModerationBadge status={p.moderation} /></TableCell>
                   <TableCell className="text-right text-sm tabular text-muted-foreground">{formatNumber(p.views, locale)}</TableCell>
                   <TableCell className="text-right text-sm tabular text-muted-foreground">{formatNumber(p.telegramClicks, locale)}</TableCell>
-                  <TableCell>
+                  <TableCell onClick={(e) => e.stopPropagation()}>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="icon" className="size-8">
@@ -131,7 +137,7 @@ export default function SellerProducts() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem asChild>
-                          <Link href={`/product/${p.id}`}><Send className="size-4" /> {t("product.store")}</Link>
+                          <Link href={`/product/${p.id}`}><Send className="size-4" /> {t("seller.products.viewOnSite")}</Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem><Pencil className="size-4" /> {t("common.edit")}</DropdownMenuItem>
                         <DropdownMenuItem onClick={() => toggleHidden(p.id)}>

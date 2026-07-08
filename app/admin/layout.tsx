@@ -1,6 +1,6 @@
 "use client";
 
-import { BarChart3, FolderTree, Images, Package, Settings, Users } from "lucide-react";
+import { BarChart3, Package, Settings, Users } from "lucide-react";
 import { DashboardShell, type NavItem } from "@/components/layout/dashboard-shell";
 import { Badge } from "@/components/ui/badge";
 import { useT } from "@/components/providers/i18n-provider";
@@ -16,8 +16,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { href: "/admin", label: t("admin.nav.dashboard"), icon: BarChart3, exact: true },
     { href: "/admin/sellers", label: t("admin.nav.sellers"), icon: Users },
     { href: "/admin/products", label: t("admin.nav.products"), icon: Package },
-    { href: "/admin/categories", label: t("admin.nav.categories"), icon: FolderTree },
-    { href: "/admin/banners", label: t("admin.nav.banners"), icon: Images },
     { href: "/admin/settings", label: t("admin.nav.settings"), icon: Settings },
   ];
 

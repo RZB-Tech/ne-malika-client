@@ -7,10 +7,10 @@ import { ArrowLeft, Menu, type LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { Logo } from "@/components/shared/logo";
-import { ThemeToggle } from "@/components/shared/theme-toggle";
 import { LanguageSwitch } from "@/components/shared/language-switch";
 import { useT } from "@/components/providers/i18n-provider";
 import { cn } from "@/lib/utils";
+import {AnimatedThemeToggler} from "@/components/ui/animated-theme-toggler";
 
 export interface NavItem {
   href: string;
@@ -27,12 +27,21 @@ function NavLinks({
   onNavigate?: () => void;
 }) {
   const pathname = usePathname();
+
+  // Highlight only the most specific matching item, so e.g. /seller/products/new
+  // activates "Add product" and not the parent "My products".
+  const activeHref = items.reduce<string | null>((best, item) => {
+    const matches = item.exact
+      ? pathname === item.href
+      : pathname === item.href || pathname.startsWith(item.href + "/");
+    if (matches && (best === null || item.href.length > best.length)) return item.href;
+    return best;
+  }, null);
+
   return (
     <nav className="grid gap-1">
       {items.map((item) => {
-        const active = item.exact
-          ? pathname === item.href
-          : pathname === item.href || pathname.startsWith(item.href + "/");
+        const active = item.href === activeHref;
         return (
           <Link
             key={item.href}
@@ -119,7 +128,10 @@ export function DashboardShell({
 
           <div className="ml-auto flex items-center gap-1">
             <LanguageSwitch />
-            <ThemeToggle />
+            <AnimatedThemeToggler
+                aria-label={t("common.theme")}
+                className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors outline-none hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 dark:hover:bg-muted/50 [&_svg]:size-[1.15rem]"
+            />
           </div>
         </header>
 

@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Search } from "lucide-react";
+import { Search, Sparkles } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -26,11 +26,16 @@ export function SearchBar({
   const router = useRouter();
   const { t } = useT();
   const [value, setValue] = useState(defaultValue);
+  const [aiMode, setAiMode] = useState(false);
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     const q = value.trim();
-    router.push(q ? `/catalog?q=${encodeURIComponent(q)}` : "/catalog");
+    const params = new URLSearchParams();
+    if (q) params.set("q", q);
+    if (aiMode) params.set("ai", "1");
+    const query = params.toString();
+    router.push(query ? `/?${query}` : "/");
   };
 
   return (

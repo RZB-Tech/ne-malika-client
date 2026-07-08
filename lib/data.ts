@@ -62,12 +62,12 @@ export interface Product {
 }
 
 export const cities = [
-  "Алматы",
-  "Астана",
-  "Шымкент",
-  "Караганда",
-  "Актобе",
-  "Атырау",
+  "Ташкент",
+  "Самарканд",
+  "Бухара",
+  "Наманган",
+  "Андижан",
+  "Фергана",
 ];
 
 export const categories: Category[] = [
@@ -157,14 +157,14 @@ export const categories: Category[] = [
 ];
 
 export const stores: Store[] = [
-  { id: "s1", slug: "tehnodom", name: "TechnoDom Store", logoHue: 262, description: "Комплектующие и готовые сборки с гарантией. Работаем с 2016 года, официальная гарантия на всю продукцию.", address: "Алматы, ул. Толе би 187", city: "Алматы", phone: "+7 707 214 55 90", telegram: "technodom_kz", workingHours: "Пн–Сб 10:00–20:00", rating: 4.8, ratingCount: 342, joined: "2016-03-11", status: "active", storeViews: 18420 },
-  { id: "s2", slug: "gigabyte-hub", name: "Gigabyte Hub", logoHue: 200, description: "Специализируемся на видеокартах и материнских платах. Тестируем каждое устройство перед продажей.", address: "Астана, пр. Кабанбай батыра 53", city: "Астана", phone: "+7 701 998 12 34", telegram: "gigabyte_hub", workingHours: "Ежедневно 09:00–21:00", rating: 4.6, ratingCount: 208, joined: "2018-07-22", status: "active", storeViews: 12980 },
-  { id: "s3", slug: "corerise", name: "CoreRise", logoHue: 150, description: "Игровые ПК на заказ и апгрейд. Бесплатная сборка при покупке комплектующих.", address: "Шымкент, ул. Байтурсынова 12", city: "Шымкент", phone: "+7 708 445 09 71", telegram: "corerise_pc", workingHours: "Пн–Пт 11:00–19:00", rating: 4.9, ratingCount: 156, joined: "2020-01-15", status: "active", storeViews: 9310 },
-  { id: "s4", slug: "pixelmart", name: "PixelMart", logoHue: 25, description: "Мониторы, периферия и всё для рабочего места. Помогаем подобрать под задачи.", address: "Караганда, пр. Бухар жырау 45", city: "Караганда", phone: "+7 705 331 88 20", telegram: "pixelmart_kz", workingHours: "Пн–Сб 10:00–19:00", rating: 4.5, ratingCount: 97, joined: "2019-11-03", status: "active", storeViews: 7640 },
-  { id: "s5", slug: "chip-and-co", name: "Chip & Co", logoHue: 310, description: "Процессоры, память и накопители. Оптовые цены, доставка по Казахстану.", address: "Алматы, ул. Сатпаева 90", city: "Алматы", phone: "+7 700 612 43 08", telegram: "chip_and_co", workingHours: "Пн–Сб 09:30–20:00", rating: 4.7, ratingCount: 271, joined: "2017-05-30", status: "active", storeViews: 14205 },
-  { id: "s6", slug: "netpro", name: "NetPro Systems", logoHue: 205, description: "Сетевое оборудование и серверные решения для бизнеса и дома.", address: "Актобе, ул. Абилкайыр хана 34", city: "Актобе", phone: "+7 702 774 15 62", telegram: "netpro_systems", workingHours: "Пн–Пт 10:00–18:00", rating: 4.4, ratingCount: 64, joined: "2021-02-18", status: "active", storeViews: 4120 },
-  { id: "s7", slug: "framestore", name: "FrameStore", logoHue: 340, description: "Периферия для геймеров: клавиатуры, мыши, гарнитуры, кресла.", address: "Атырау, пр. Азаттык 17", city: "Атырау", phone: "+7 707 009 27 45", telegram: "framestore_kz", workingHours: "Ежедневно 10:00–22:00", rating: 4.6, ratingCount: 118, joined: "2020-09-09", status: "pending", storeViews: 5330 },
-  { id: "s8", slug: "quadro-tech", name: "Quadro Tech", logoHue: 95, description: "Рабочие станции, СХД и профессиональные видеокарты под задачи студий.", address: "Астана, ул. Достык 5", city: "Астана", phone: "+7 701 356 74 19", telegram: "quadro_tech", workingHours: "Пн–Пт 09:00–18:00", rating: 4.9, ratingCount: 41, joined: "2022-04-01", status: "active", storeViews: 3980 },
+  { id: "s1", slug: "tehnodom", name: "TechnoDom Store", logoHue: 262, description: "Комплектующие и готовые сборки с гарантией. Работаем с 2016 года, официальная гарантия на всю продукцию.", address: "Ташкент, ул. Амира Темура 15", city: "Ташкент", phone: "+998 90 123 45 67", telegram: "technodom_uz", workingHours: "Пн–Сб 10:00–20:00", rating: 4.8, ratingCount: 342, joined: "2016-03-11", status: "active", storeViews: 18420 },
+  { id: "s2", slug: "gigabyte-hub", name: "Gigabyte Hub", logoHue: 200, description: "Специализируемся на видеокартах и материнских платах. Тестируем каждое устройство перед продажей.", address: "Самарканд, ул. Регистан 24", city: "Самарканд", phone: "+998 91 234 56 78", telegram: "gigabyte_hub", workingHours: "Ежедневно 09:00–21:00", rating: 4.6, ratingCount: 208, joined: "2018-07-22", status: "active", storeViews: 12980 },
+  { id: "s3", slug: "corerise", name: "CoreRise", logoHue: 150, description: "Игровые ПК на заказ и апгрейд. Бесплатная сборка при покупке комплектующих.", address: "Бухара, ул. Накшбанди 12", city: "Бухара", phone: "+998 93 345 67 89", telegram: "corerise_pc", workingHours: "Пн–Пт 11:00–19:00", rating: 4.9, ratingCount: 156, joined: "2020-01-15", status: "active", storeViews: 9310 },
+  { id: "s4", slug: "pixelmart", name: "PixelMart", logoHue: 25, description: "Мониторы, периферия и всё для рабочего места. Помогаем подобрать под задачи.", address: "Наманган, ул. Уйчи 45", city: "Наманган", phone: "+998 94 456 78 90", telegram: "pixelmart_uz", workingHours: "Пн–Сб 10:00–19:00", rating: 4.5, ratingCount: 97, joined: "2019-11-03", status: "active", storeViews: 7640 },
+  { id: "s5", slug: "chip-and-co", name: "Chip & Co", logoHue: 310, description: "Процессоры, память и накопители. Оптовые цены, доставка по Узбекистану.", address: "Ташкент, ул. Шота Руставели 90", city: "Ташкент", phone: "+998 95 567 89 01", telegram: "chip_and_co", workingHours: "Пн–Сб 09:30–20:00", rating: 4.7, ratingCount: 271, joined: "2017-05-30", status: "active", storeViews: 14205 },
+  { id: "s6", slug: "netpro", name: "NetPro Systems", logoHue: 205, description: "Сетевое оборудование и серверные решения для бизнеса и дома.", address: "Андижан, ул. Бабура 34", city: "Андижан", phone: "+998 97 678 90 12", telegram: "netpro_systems", workingHours: "Пн–Пт 10:00–18:00", rating: 4.4, ratingCount: 64, joined: "2021-02-18", status: "active", storeViews: 4120 },
+  { id: "s7", slug: "framestore", name: "FrameStore", logoHue: 340, description: "Периферия для геймеров: клавиатуры, мыши, гарнитуры, кресла.", address: "Фергана, ул. Мустакиллик 17", city: "Фергана", phone: "+998 88 789 01 23", telegram: "framestore_uz", workingHours: "Ежедневно 10:00–22:00", rating: 4.6, ratingCount: 118, joined: "2020-09-09", status: "pending", storeViews: 5330 },
+  { id: "s8", slug: "quadro-tech", name: "Quadro Tech", logoHue: 95, description: "Рабочие станции, СХД и профессиональные видеокарты под задачи студий.", address: "Самарканд, ул. Гагарина 5", city: "Самарканд", phone: "+998 99 890 12 34", telegram: "quadro_tech", workingHours: "Пн–Пт 09:00–18:00", rating: 4.9, ratingCount: 41, joined: "2022-04-01", status: "active", storeViews: 3980 },
 ];
 
 function daysAgo(n: number): string {

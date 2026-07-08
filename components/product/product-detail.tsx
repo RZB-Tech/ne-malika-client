@@ -16,11 +16,12 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ProductImage } from "@/components/shared/product-image";
-import { AvailabilityBadge, DiscountBadge } from "@/components/shared/badges";
+import { AvailabilityBadge } from "@/components/shared/badges";
 import { ProductCard } from "@/components/product/product-card";
 import { TelegramButton } from "@/components/product/telegram-button";
+import { RevealPhone } from "@/components/product/reveal-phone";
 import { useT } from "@/components/providers/i18n-provider";
-import { formatPrice, formatNumber, discountPercent } from "@/lib/format";
+import { formatPrice, formatNumber } from "@/lib/format";
 import {
   getCategory,
   getStore,
@@ -33,7 +34,6 @@ export function ProductDetail({ product }: { product: Product }) {
   const { t, locale } = useT();
   const store = getStore(product.storeId)!;
   const category = getCategory(product.categorySlug);
-  const discount = discountPercent(product.price, product.oldPrice);
   const [active, setActive] = useState(0);
 
   // Simulated multi-angle gallery from the deterministic tile.
@@ -55,12 +55,10 @@ export function ProductDetail({ product }: { product: Product }) {
       {/* breadcrumb */}
       <nav className="mb-5 flex flex-wrap items-center gap-1 text-sm text-muted-foreground">
         <Link href="/" className="hover:text-foreground">{t("brand.name")}</Link>
-        <ChevronRight className="size-3.5" />
-        <Link href="/catalog" className="hover:text-foreground">{t("catalog.title")}</Link>
         {category && (
           <>
             <ChevronRight className="size-3.5" />
-            <Link href={`/catalog?category=${category.slug}`} className="hover:text-foreground">
+            <Link href="/" className="hover:text-foreground">
               {category.name[locale]}
             </Link>
           </>
@@ -99,14 +97,13 @@ export function ProductDetail({ product }: { product: Product }) {
                 className="aspect-[4/3] w-full rounded-2xl border border-border"
                 iconClassName="size-32"
               />
-              <div className="absolute left-4 top-4 flex gap-2">
-                {product.isNew && (
+              {product.isNew && (
+                <div className="absolute left-4 top-4 flex gap-2">
                   <span className="rounded-full bg-primary px-2.5 py-1 text-xs font-medium text-primary-foreground">
                     {t("home.newTitle")}
                   </span>
-                )}
-                {discount && <DiscountBadge percent={discount} />}
-              </div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -206,10 +203,7 @@ export function ProductDetail({ product }: { product: Product }) {
                 <MapPin className="mt-0.5 size-3.5 shrink-0" />
                 {store.address}
               </div>
-              <div className="flex items-center gap-2">
-                <Phone className="size-3.5 shrink-0" />
-                {store.phone}
-              </div>
+              <RevealPhone phone={store.phone} productId={product.id} />
             </div>
 
             <div className="mt-5 grid gap-2">

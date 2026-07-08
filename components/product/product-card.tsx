@@ -1,20 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowUpRight, Star } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { ProductImage } from "@/components/shared/product-image";
-import { AvailabilityBadge, DiscountBadge } from "@/components/shared/badges";
+import { AvailabilityBadge } from "@/components/shared/badges";
 import { useT } from "@/components/providers/i18n-provider";
 import { formatPrice } from "@/lib/format";
-import { discountPercent } from "@/lib/format";
-import { getStore, type Product } from "@/lib/data";
+import { type Product } from "@/lib/data";
 import { Badge } from "@/components/ui/badge";
 
 export function ProductCard({ product }: { product: Product }) {
   const { t, locale } = useT();
-  const store = getStore(product.storeId);
-  const discount = discountPercent(product.price, product.oldPrice);
 
   return (
     <Card className="group relative flex flex-col overflow-hidden p-0 gap-0 transition-shadow hover:shadow-md">
@@ -26,14 +22,13 @@ export function ProductCard({ product }: { product: Product }) {
             className="aspect-[4/3] w-full"
             iconClassName="size-16 transition-transform duration-300 group-hover:scale-110"
           />
-          <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">
-            {product.isNew && (
+          {product.isNew && (
+            <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">
               <Badge className="border-transparent bg-primary text-primary-foreground font-medium">
                 {t("home.newTitle")}
               </Badge>
-            )}
-            {discount && <DiscountBadge percent={discount} />}
-          </div>
+            </div>
+          )}
         </div>
 
         <div className="flex flex-1 flex-col gap-2.5 p-4">
@@ -64,26 +59,6 @@ export function ProductCard({ product }: { product: Product }) {
           </div>
         </div>
       </Link>
-
-      {store && (
-        <Link
-          href={`/store/${store.slug}`}
-          className="flex items-center justify-between border-t border-border px-4 py-2.5 text-xs text-muted-foreground transition-colors hover:bg-muted/50"
-        >
-          <span className="flex items-center gap-1.5 truncate">
-            <span
-              className="size-4 shrink-0 rounded-[5px]"
-              style={{ background: `oklch(0.6 0.16 ${store.logoHue})` }}
-            />
-            <span className="truncate font-medium text-foreground/80">{store.name}</span>
-          </span>
-          <span className="flex shrink-0 items-center gap-0.5">
-            <Star className="size-3 fill-warning text-warning" />
-            <span className="tabular">{store.rating.toFixed(1)}</span>
-            <ArrowUpRight className="ml-0.5 size-3 opacity-0 transition-opacity group-hover:opacity-60" />
-          </span>
-        </Link>
-      )}
     </Card>
   );
 }

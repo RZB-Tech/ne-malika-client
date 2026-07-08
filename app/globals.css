@@ -51,6 +51,7 @@
 
 :root {
   --radius: 0.5rem;
+  color-scheme: light;
 
   --background: oklch(0.99 0.002 250);
   --foreground: oklch(0.18 0.01 260);
@@ -94,6 +95,7 @@
 }
 
 .dark {
+  color-scheme: dark;
   --background: oklch(0.16 0.012 264);
   --foreground: oklch(0.95 0.006 260);
   --card: oklch(0.196 0.014 264);
@@ -178,4 +180,9 @@
       linear-gradient(to bottom, color-mix(in oklch, var(--foreground) 6%, transparent) 1px, transparent 1px);
     background-size: 44px 44px;
   }
+}
+
+::view-transition-old(root), ::view-transition-new(root) {
+    animation: none;
+    mix-blend-mode: normal;
 }

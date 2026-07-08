@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Plus, Save, Send, Trash2 } from "lucide-react";
+import { Plus, Send, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -18,7 +18,6 @@ import {
 } from "@/components/ui/select";
 import { PhotoDropzone, type UploadedPhoto } from "./photo-dropzone";
 import { useT } from "@/components/providers/i18n-provider";
-import { categories, getCategory, type Availability } from "@/lib/data";
 
 function SectionTitle({ index, children }: { index: number; children: React.ReactNode }) {
   return (
@@ -32,22 +31,25 @@ function SectionTitle({ index, children }: { index: number; children: React.Reac
 }
 
 export function AddProductForm() {
-  const { t, locale } = useT();
+  const { t } = useT();
   const router = useRouter();
-  const [category, setCategory] = useState<string>("");
   const [specs, setSpecs] = useState<{ name: string; value: string }[]>([
     { name: "", value: "" },
   ]);
   const [photos, setPhotos] = useState<UploadedPhoto[]>([]);
+  const [price, setPrice] = useState("");
 
-  const subcats = category ? getCategory(category)?.subcategories ?? [] : [];
+  // Keep only digits, group thousands with spaces: "419900" → "419 900".
+  const onPriceChange = (raw: string) => {
+    const digits = raw.replace(/\D/g, "");
+    setPrice(digits ? Number(digits).toLocaleString("ru-RU") : "");
+  };
 
-  const submit = (e: React.FormEvent, draft = false) => {
+  const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success(
-      draft ? t("seller.add.saveDraft") : t("seller.add.publish"),
-      { description: t("moderation.moderation") },
-    );
+    toast.success(t("seller.add.publish"), {
+      description: t("moderation.moderation"),
+    });
     router.push("/seller/products");
   };
 
@@ -73,45 +75,12 @@ export function AddProductForm() {
 
           <div className="grid gap-5 sm:grid-cols-2">
             <div className={field}>
-              <Label>{t("seller.add.category")}</Label>
-              <Select value={category} onValueChange={setCategory}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder={t("seller.add.selectCategory")} />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((c) => (
-                    <SelectItem key={c.slug} value={c.slug}>{c.name[locale]}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className={field}>
-              <Label>{t("seller.add.subcategory")}</Label>
-              <Select disabled={!subcats.length}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder={t("seller.add.selectSubcategory")} />
-                </SelectTrigger>
-                <SelectContent>
-                  {subcats.map((s) => (
-                    <SelectItem key={s.slug} value={s.slug}>{s.name[locale]}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="grid gap-5 sm:grid-cols-3">
-            <div className={field}>
               <Label htmlFor="brand">{t("seller.add.brand")}</Label>
               <Input id="brand" placeholder="NVIDIA" />
             </div>
             <div className={field}>
               <Label htmlFor="model">{t("seller.add.model")}</Label>
               <Input id="model" placeholder="RTX 4070" />
-            </div>
-            <div className={field}>
-              <Label htmlFor="sku">{t("seller.add.sku")}</Label>
-              <Input id="sku" placeholder="NV-4070-12G" />
             </div>
           </div>
 
@@ -120,29 +89,28 @@ export function AddProductForm() {
             <Textarea id="desc" rows={4} placeholder={t("seller.add.descriptionPlaceholder")} />
           </div>
 
-          <div className="grid gap-5 sm:grid-cols-4">
+          <div className="grid gap-5 sm:grid-cols-2">
             <div className={field}>
               <Label htmlFor="price">{t("seller.add.price")}, {t("common.currency")}</Label>
-              <Input id="price" type="number" inputMode="numeric" placeholder="419900" className="tabular" />
+              <Input
+                id="price"
+                type="text"
+                inputMode="numeric"
+                value={price}
+                onChange={(e) => onPriceChange(e.target.value)}
+                placeholder="419 900"
+                className="tabular"
+              />
             </div>
             <div className={field}>
-              <Label htmlFor="qty">{t("seller.add.quantity")}</Label>
-              <Input id="qty" type="number" inputMode="numeric" placeholder="5" className="tabular" />
-            </div>
-            <div className={field}>
-              <Label htmlFor="warranty">{t("seller.add.warranty")}</Label>
-              <Input id="warranty" type="number" inputMode="numeric" placeholder="24" className="tabular" />
-            </div>
-            <div className={field}>
-              <Label>{t("seller.add.status")}</Label>
-              <Select defaultValue="in_stock">
-                <SelectTrigger className="w-full">
-                  <SelectValue />
+              <Label>{t("seller.add.condition")}</Label>
+              <Select>
+                <SelectTrigger className="h-8 w-full px-2.5 py-1 text-base font-normal md:text-sm dark:hover:bg-input/30">
+                  <SelectValue placeholder={t("seller.add.conditionPlaceholder")} />
                 </SelectTrigger>
                 <SelectContent>
-                  {(["in_stock", "out_of_stock", "on_order"] as Availability[]).map((a) => (
-                    <SelectItem key={a} value={a}>{t(`availability.${a}`)}</SelectItem>
-                  ))}
+                  <SelectItem value="new">{t("seller.add.conditionNew")}</SelectItem>
+                  <SelectItem value="used">{t("seller.add.conditionUsed")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -200,11 +168,7 @@ export function AddProductForm() {
         <PhotoDropzone photos={photos} onChange={setPhotos} />
       </Card>
 
-      <div className="sticky bottom-4 z-10 flex flex-wrap justify-end gap-3 rounded-xl border border-border bg-background/90 p-3 backdrop-blur">
-        <Button type="button" variant="outline" className="gap-2" onClick={(e) => submit(e, true)}>
-          <Save className="size-4" />
-          {t("seller.add.saveDraft")}
-        </Button>
+      <div className="flex flex-wrap justify-end gap-3 rounded-xl bg-card p-3 ring-1 ring-foreground/10">
         <Button type="submit" className="gap-2">
           <Send className="size-4" />
           {t("seller.add.publish")}

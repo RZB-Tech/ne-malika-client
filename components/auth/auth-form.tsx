@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Logo } from "@/components/shared/logo";
+import { LoginDialog } from "@/components/auth/login-dialog";
 import { useT } from "@/components/providers/i18n-provider";
 
 const LightRays = dynamic(() => import("@/components/magicui/light-rays"), {
@@ -83,13 +84,23 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
           )}
 
           <p className="mt-6 text-center text-sm text-muted-foreground">
-            {t(isLogin ? "auth.noAccount" : "auth.haveAccount")}{" "}
-            <Link
-              href={isLogin ? "/register" : "/login"}
-              className="font-medium text-primary hover:underline"
-            >
-              {t(isLogin ? "nav.register" : "nav.login")}
-            </Link>
+            {isLogin ? (
+              <>
+                {t("auth.noAccount")}{" "}
+                <Link href="/register" className="font-medium text-primary hover:underline">
+                  {t("nav.register")}
+                </Link>
+              </>
+            ) : (
+              <>
+                {t("auth.haveAccount")}{" "}
+                <LoginDialog>
+                  <button className="font-medium text-primary hover:underline">
+                    {t("nav.login")}
+                  </button>
+                </LoginDialog>
+              </>
+            )}
           </p>
         </div>
       </div>
