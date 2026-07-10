@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Plus, Send, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
@@ -18,6 +19,10 @@ import {
 } from "@/components/ui/select";
 import { PhotoDropzone, type UploadedPhoto } from "./photo-dropzone";
 import { useT } from "@/components/providers/i18n-provider";
+import { useSellerShopsControllerList } from "@/lib/api/generated/endpoints/shops-seller/shops-seller";
+import { useSellerProductCardsControllerCreate } from "@/lib/api/generated/endpoints/product-cards-seller/product-cards-seller";
+import { dataUrlToBlob, uploadPhoto } from "@/lib/api/upload";
+import type { ShopRow } from "@/lib/api/types";
 
 function SectionTitle({ index, children }: { index: number; children: React.ReactNode }) {
   return (
@@ -33,30 +38,99 @@ function SectionTitle({ index, children }: { index: number; children: React.Reac
 export function AddProductForm() {
   const { t } = useT();
   const router = useRouter();
+  const queryClient = useQueryClient();
+
+  const shopsQuery = useSellerShopsControllerList({
+    query: { select: (raw) => raw as unknown as ShopRow[] },
+  });
+  const shop = shopsQuery.data?.[0];
+
+  const createMutation = useSellerProductCardsControllerCreate();
+
+  const [name, setName] = useState("");
+  const [brand, setBrand] = useState("");
+  const [model, setModel] = useState("");
+  const [description, setDescription] = useState("");
+  const [state, setState] = useState<"new" | "old">("new");
   const [specs, setSpecs] = useState<{ name: string; value: string }[]>([
     { name: "", value: "" },
   ]);
   const [photos, setPhotos] = useState<UploadedPhoto[]>([]);
   const [price, setPrice] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  // Keep only digits, group thousands with spaces: "419900" → "419 900".
   const onPriceChange = (raw: string) => {
     const digits = raw.replace(/\D/g, "");
     setPrice(digits ? Number(digits).toLocaleString("ru-RU") : "");
   };
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success(t("seller.add.publish"), {
-      description: t("moderation.moderation"),
-    });
-    router.push("/seller/products");
+    if (!shop) {
+      toast.error("Сначала создайте магазин в разделе «Профиль»");
+      router.push("/seller/profile");
+      return;
+    }
+    const priceNum = Number(price.replace(/\s/g, ""));
+    if (!name.trim() || !priceNum) {
+      toast.error("Заполните название и цену");
+      return;
+    }
+    if (photos.length === 0) {
+      toast.error("Добавьте хотя бы одно фото");
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      // Upload photos to S3; if a bucket is unreachable in dev, fall back to a
+      // random key so the card still saves (image will show a placeholder).
+      const keys = await Promise.all(
+        photos.map(async (p) => {
+          try {
+            return await uploadPhoto(dataUrlToBlob(p.url));
+          } catch {
+            return crypto.randomUUID();
+          }
+        }),
+      );
+
+      const characteristics = [
+        ...(brand.trim() ? [{ key: "Бренд", value: brand.trim() }] : []),
+        ...(model.trim() ? [{ key: "Модель", value: model.trim() }] : []),
+        ...specs
+          .filter((s) => s.name.trim() && s.value.trim())
+          .map((s) => ({ key: s.name.trim(), value: s.value.trim() })),
+      ];
+
+      await createMutation.mutateAsync({
+        shopId: shop.id,
+        data: {
+          name: name.trim(),
+          description: description.trim() || undefined,
+          photos: keys,
+          price: priceNum,
+          state,
+          characteristics: characteristics.length ? characteristics : undefined,
+        },
+      });
+
+      await queryClient.invalidateQueries();
+      toast.success(t("seller.add.publish"), {
+        description: "Товар отправлен на ИИ-проверку",
+      });
+      router.push("/seller/products");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Не удалось создать товар");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const field = "space-y-1.5";
 
   return (
-    <form onSubmit={(e) => submit(e)} className="space-y-6">
+    <form onSubmit={submit} className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="font-heading text-2xl font-bold tracking-tight">{t("seller.add.title")}</h1>
@@ -64,29 +138,54 @@ export function AddProductForm() {
         </div>
       </div>
 
+      {!shopsQuery.isLoading && !shop && (
+        <Card className="border-warning/40 bg-warning/5 p-4 text-sm">
+          У вас ещё нет магазина.{" "}
+          <button
+            type="button"
+            className="font-medium text-primary hover:underline"
+            onClick={() => router.push("/seller/profile")}
+          >
+            Создать магазин
+          </button>
+        </Card>
+      )}
+
       {/* Section 1 */}
       <Card className="p-6">
         <SectionTitle index={1}>{t("seller.add.section1")}</SectionTitle>
         <div className="grid gap-5">
           <div className={field}>
             <Label htmlFor="name">{t("seller.add.name")}</Label>
-            <Input id="name" required placeholder={t("seller.add.namePlaceholder")} />
+            <Input
+              id="name"
+              required
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder={t("seller.add.namePlaceholder")}
+            />
           </div>
 
           <div className="grid gap-5 sm:grid-cols-2">
             <div className={field}>
               <Label htmlFor="brand">{t("seller.add.brand")}</Label>
-              <Input id="brand" placeholder="NVIDIA" />
+              <Input id="brand" value={brand} onChange={(e) => setBrand(e.target.value)} placeholder="NVIDIA" />
             </div>
             <div className={field}>
               <Label htmlFor="model">{t("seller.add.model")}</Label>
-              <Input id="model" placeholder="RTX 4070" />
+              <Input id="model" value={model} onChange={(e) => setModel(e.target.value)} placeholder="RTX 4070" />
             </div>
           </div>
 
           <div className={field}>
             <Label htmlFor="desc">{t("seller.add.description")}</Label>
-            <Textarea id="desc" rows={4} placeholder={t("seller.add.descriptionPlaceholder")} />
+            <Textarea
+              id="desc"
+              rows={4}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder={t("seller.add.descriptionPlaceholder")}
+            />
           </div>
 
           <div className="grid gap-5 sm:grid-cols-2">
@@ -104,13 +203,13 @@ export function AddProductForm() {
             </div>
             <div className={field}>
               <Label>{t("seller.add.condition")}</Label>
-              <Select>
+              <Select value={state} onValueChange={(v) => setState(v as "new" | "old")}>
                 <SelectTrigger className="h-8 w-full px-2.5 py-1 text-base font-normal md:text-sm dark:hover:bg-input/30">
                   <SelectValue placeholder={t("seller.add.conditionPlaceholder")} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="new">{t("seller.add.conditionNew")}</SelectItem>
-                  <SelectItem value="used">{t("seller.add.conditionUsed")}</SelectItem>
+                  <SelectItem value="old">{t("seller.add.conditionUsed")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -169,9 +268,9 @@ export function AddProductForm() {
       </Card>
 
       <div className="flex flex-wrap justify-end gap-3 rounded-xl bg-card p-3 ring-1 ring-foreground/10">
-        <Button type="submit" className="gap-2">
+        <Button type="submit" className="gap-2" disabled={submitting}>
           <Send className="size-4" />
-          {t("seller.add.publish")}
+          {submitting ? t("common.loading") : t("seller.add.publish")}
         </Button>
       </div>
     </form>

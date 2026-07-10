@@ -11,7 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useT } from "@/components/providers/i18n-provider";
 import { cn } from "@/lib/utils";
-import type { CatalogFilters, SortKey } from "./catalog-view";
+import type { PriceRange, SortKey } from "./catalog-view";
 import { SORT_KEYS } from "./catalog-view";
 
 export function FilterPanel({
@@ -20,8 +20,8 @@ export function FilterPanel({
   sort,
   setSort,
 }: {
-  filters: CatalogFilters;
-  setFilters: Dispatch<SetStateAction<CatalogFilters>>;
+  filters: PriceRange;
+  setFilters: Dispatch<SetStateAction<PriceRange>>;
   sort: SortKey;
   setSort: (v: SortKey) => void;
 }) {
@@ -34,27 +34,30 @@ export function FilterPanel({
       className="w-full"
     >
       <AccordionItem value="sort">
-        <AccordionTrigger className="text-sm font-semibold">
+        <AccordionTrigger className="text-sm font-semibold hover:no-underline">
           {t("catalog.sortBy")}
         </AccordionTrigger>
         <AccordionContent>
-          <div className="-mx-1 space-y-0.5">
+          {/* Pulled out by the button padding so the labels sit on the same
+              vertical line as the section heading above them. */}
+          <div className="-mx-2 flex flex-col">
             {SORT_KEYS.map((key) => {
               const active = sort === key;
               return (
                 <button
                   key={key}
                   type="button"
+                  aria-pressed={active}
                   onClick={() => setSort(key)}
                   className={cn(
-                    "flex w-full items-center justify-between rounded-md px-2 py-1.5 text-left text-sm transition-colors",
+                    "flex items-center justify-between gap-2 rounded-md px-2 py-1.5 text-left text-sm transition-colors",
                     active
-                      ? "bg-primary/10 font-medium text-primary"
+                      ? "font-medium text-foreground"
                       : "text-muted-foreground hover:bg-muted hover:text-foreground",
                   )}
                 >
                   <span>{t(`catalog.sort.${key}`)}</span>
-                  {active && <Check className="size-4 shrink-0" />}
+                  {active && <Check className="size-4 shrink-0 text-primary" />}
                 </button>
               );
             })}
@@ -62,44 +65,53 @@ export function FilterPanel({
         </AccordionContent>
       </AccordionItem>
 
-      <AccordionItem value="price" className="border-b-0">
-        <AccordionTrigger className="text-sm font-semibold">
-          {t("catalog.filterPrice")}
+      <AccordionItem value="price">
+        <AccordionTrigger className="text-sm font-semibold hover:no-underline">
+          {t("catalog.filterPrice")}, {t("common.currency")}
         </AccordionTrigger>
         <AccordionContent>
           <div className="flex items-center gap-2">
-            <Input
-              type="number"
-              inputMode="numeric"
-              min={0}
+            <PriceInput
               placeholder={t("common.from")}
-              value={filters.priceMin ?? ""}
-              onChange={(e) =>
-                setFilters((f) => ({
-                  ...f,
-                  priceMin: e.target.value ? Number(e.target.value) : null,
-                }))
-              }
-              className="h-9 tabular focus-visible:ring-0!"
+              value={filters.priceMin}
+              onValueChange={(priceMin) => setFilters((f) => ({ ...f, priceMin }))}
             />
-            <span className="text-muted-foreground">—</span>
-            <Input
-              type="number"
-              inputMode="numeric"
-              min={0}
+            <span aria-hidden className="text-muted-foreground">
+              —
+            </span>
+            <PriceInput
               placeholder={t("common.to")}
-              value={filters.priceMax ?? ""}
-              onChange={(e) =>
-                setFilters((f) => ({
-                  ...f,
-                  priceMax: e.target.value ? Number(e.target.value) : null,
-                }))
-              }
-              className="h-9 tabular focus-visible:ring-0!"
+              value={filters.priceMax}
+              onValueChange={(priceMax) => setFilters((f) => ({ ...f, priceMax }))}
             />
           </div>
         </AccordionContent>
       </AccordionItem>
     </Accordion>
+  );
+}
+
+function PriceInput({
+  placeholder,
+  value,
+  onValueChange,
+}: {
+  placeholder: string;
+  value: number | null;
+  onValueChange: (value: number | null) => void;
+}) {
+  return (
+    <Input
+      type="number"
+      inputMode="numeric"
+      min={0}
+      aria-label={placeholder}
+      placeholder={placeholder}
+      value={value ?? ""}
+      onChange={(e) => onValueChange(e.target.value ? Number(e.target.value) : null)}
+      // The spinner arrows crowd an input this narrow and there is nothing
+      // sensible to step by on a price.
+      className="h-9 tabular [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+    />
   );
 }

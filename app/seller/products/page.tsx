@@ -3,9 +3,8 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import {
-  Eye,
-  EyeOff,
   MoreHorizontal,
   Pencil,
   PlusCircle,
@@ -17,6 +16,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -33,40 +33,56 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ProductImage } from "@/components/shared/product-image";
-import { ModerationBadge, AvailabilityBadge } from "@/components/shared/badges";
+import { ModerationBadge } from "@/components/shared/badges";
 import { useT } from "@/components/providers/i18n-provider";
-import { formatNumber, formatPrice } from "@/lib/format";
-import { products, CURRENT_STORE_ID, type Product } from "@/lib/data";
+import { formatPrice } from "@/lib/format";
+import { useSellerShopsControllerList } from "@/lib/api/generated/endpoints/shops-seller/shops-seller";
+import {
+  useSellerProductCardsControllerList,
+  useSellerProductCardsControllerRemove,
+} from "@/lib/api/generated/endpoints/product-cards-seller/product-cards-seller";
+import { mapProductRow } from "@/lib/api/mappers";
+import type { ProductCardRow, ShopRow } from "@/lib/api/types";
 
 export default function SellerProducts() {
   const { t, locale } = useT();
   const router = useRouter();
-  const [rows, setRows] = useState<Product[]>(() =>
-    products.filter((p) => p.storeId === CURRENT_STORE_ID),
-  );
+  const queryClient = useQueryClient();
   const [q, setQ] = useState("");
+
+  const shopsQuery = useSellerShopsControllerList({
+    query: { select: (raw) => raw as unknown as ShopRow[] },
+  });
+  const shop = shopsQuery.data?.[0];
+
+  const productsQuery = useSellerProductCardsControllerList(shop?.id ?? 0, {
+    query: {
+      enabled: Boolean(shop),
+      select: (raw) => raw as unknown as ProductCardRow[],
+    },
+  });
+
+  const removeMutation = useSellerProductCardsControllerRemove();
+
+  const rows = useMemo(
+    () => (productsQuery.data ?? []).map((r) => mapProductRow(r, shop?.name)),
+    [productsQuery.data, shop?.name],
+  );
 
   const list = useMemo(() => {
     const s = q.trim().toLowerCase();
-    const filtered = s
-      ? rows.filter((p) => `${p.name} ${p.brand} ${p.model} ${p.sku}`.toLowerCase().includes(s))
-      : rows;
-    return [...filtered].sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
+    return s ? rows.filter((p) => p.name.toLowerCase().includes(s)) : rows;
   }, [rows, q]);
 
-  const toggleHidden = (id: string) => {
-    setRows((r) => r.map((p) => (p.id === id ? { ...p, hidden: !p.hidden } : p)));
-    const p = rows.find((x) => x.id === id);
-    toast.success(p?.hidden ? t("seller.products.show") : t("seller.products.hide"), {
-      description: p?.name,
-    });
-  };
-
-  const remove = (id: string) => {
-    const p = rows.find((x) => x.id === id);
+  const remove = async (id: string, name: string) => {
     if (!window.confirm(t("seller.products.deleteConfirm"))) return;
-    setRows((r) => r.filter((x) => x.id !== id));
-    toast.success(t("common.delete"), { description: p?.name });
+    try {
+      await removeMutation.mutateAsync({ id: Number(id) });
+      await queryClient.invalidateQueries();
+      toast.success(t("common.delete"), { description: name });
+    } catch {
+      toast.error("Не удалось удалить товар");
+    }
   };
 
   return (
@@ -96,10 +112,7 @@ export default function SellerProducts() {
               <TableRow className="hover:bg-transparent">
                 <TableHead className="min-w-[240px]">{t("seller.products.colName")}</TableHead>
                 <TableHead>{t("seller.products.colPrice")}</TableHead>
-                <TableHead>{t("seller.products.colStatus")}</TableHead>
                 <TableHead>{t("seller.products.colModeration")}</TableHead>
-                <TableHead className="text-right">{t("seller.products.colViews")}</TableHead>
-                <TableHead className="text-right">{t("seller.products.colClicks")}</TableHead>
                 <TableHead className="w-10" />
               </TableRow>
             </TableHeader>
@@ -108,26 +121,32 @@ export default function SellerProducts() {
                 <TableRow
                   key={p.id}
                   onClick={() => router.push(`/seller/products/${p.id}`)}
-                  className={`cursor-pointer ${p.hidden ? "opacity-55" : ""}`}
+                  className="cursor-pointer"
                 >
                   <TableCell>
                     <div className="flex items-center gap-3">
-                      <ProductImage hue={p.hue} categorySlug={p.categorySlug} className="size-10 shrink-0 rounded-lg" iconClassName="size-4" />
+                      <ProductImage
+                        hue={p.hue}
+                        categorySlug={p.categorySlug}
+                        src={p.imageUrl}
+                        alt={p.name}
+                        className="size-10 shrink-0 rounded-lg"
+                        iconClassName="size-4"
+                      />
                       <div className="min-w-0">
                         <Link href={`/seller/products/${p.id}`} className="line-clamp-1 text-sm font-medium hover:text-primary">
                           {p.name}
                         </Link>
-                        <div className="text-xs text-muted-foreground">{p.sku}</div>
+                        <div className="text-xs text-muted-foreground">
+                          {p.isNew ? "Новый" : "Б/у"}
+                        </div>
                       </div>
                     </div>
                   </TableCell>
                   <TableCell className="whitespace-nowrap text-sm font-medium tabular">
                     {formatPrice(p.price, locale)} {t("common.currency")}
                   </TableCell>
-                  <TableCell><AvailabilityBadge status={p.availability} className="px-1.5 text-[11px]" /></TableCell>
                   <TableCell><ModerationBadge status={p.moderation} /></TableCell>
-                  <TableCell className="text-right text-sm tabular text-muted-foreground">{formatNumber(p.views, locale)}</TableCell>
-                  <TableCell className="text-right text-sm tabular text-muted-foreground">{formatNumber(p.telegramClicks, locale)}</TableCell>
                   <TableCell onClick={(e) => e.stopPropagation()}>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -139,13 +158,11 @@ export default function SellerProducts() {
                         <DropdownMenuItem asChild>
                           <Link href={`/product/${p.id}`}><Send className="size-4" /> {t("seller.products.viewOnSite")}</Link>
                         </DropdownMenuItem>
-                        <DropdownMenuItem><Pencil className="size-4" /> {t("common.edit")}</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => toggleHidden(p.id)}>
-                          {p.hidden ? <Eye className="size-4" /> : <EyeOff className="size-4" />}
-                          {p.hidden ? t("seller.products.show") : t("seller.products.hide")}
+                        <DropdownMenuItem asChild>
+                          <Link href={`/seller/products/${p.id}`}><Pencil className="size-4" /> {t("common.edit")}</Link>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem variant="destructive" onClick={() => remove(p.id)}>
+                        <DropdownMenuItem variant="destructive" onClick={() => remove(p.id, p.name)}>
                           <Trash2 className="size-4" /> {t("common.delete")}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -156,7 +173,14 @@ export default function SellerProducts() {
             </TableBody>
           </Table>
         </div>
-        {list.length === 0 && (
+        {(shopsQuery.isLoading || productsQuery.isLoading) && (
+          <div className="space-y-2 p-4">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton key={i} className="h-12 w-full" />
+            ))}
+          </div>
+        )}
+        {!productsQuery.isLoading && !shopsQuery.isLoading && list.length === 0 && (
           <div className="py-16 text-center text-sm text-muted-foreground">{t("seller.products.empty")}</div>
         )}
       </Card>

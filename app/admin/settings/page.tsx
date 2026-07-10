@@ -12,9 +12,9 @@ export default function AdminSettings() {
   const { t } = useT();
 
   const toggles = [
-    { id: "premoderation", label: { ru: "Премодерация товаров", en: "Pre-moderate products" }, on: true },
-    { id: "sellerapprove", label: { ru: "Ручное одобрение продавцов", en: "Manual seller approval" }, on: true },
-    { id: "telegram", label: { ru: "Вход через Telegram", en: "Telegram login" }, on: true },
+    { id: "premoderation", label: { ru: "Премодерация товаров", "uz-Latn": "Mahsulotlarni premoderatsiya", "uz-Cyrl": "Маҳсулотларни премодерация" }, on: true },
+    { id: "sellerapprove", label: { ru: "Ручное одобрение продавцов", "uz-Latn": "Sotuvchilarni qo‘lda tasdiqlash", "uz-Cyrl": "Сотувчиларни қўлда тасдиқлаш" }, on: true },
+    { id: "telegram", label: { ru: "Вход через Telegram", "uz-Latn": "Telegram orqali kirish", "uz-Cyrl": "Телеграм орқали кириш" }, on: true },
   ];
   const { locale } = useT();
 
@@ -33,11 +33,11 @@ export default function AdminSettings() {
         <div className="grid gap-5 sm:max-w-md">
           <div className="space-y-1.5">
             <Label htmlFor="pname">{t("brand.name")}</Label>
-            <Input id="pname" defaultValue="Ядро" />
+            <Input id="pname" defaultValue="neMalika" />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" defaultValue="support@yadro.market" />
+            <Input id="email" type="email" defaultValue="support@nemalika.uz" />
           </div>
         </div>
       </Card>

@@ -8,9 +8,9 @@ import { useT } from "@/components/providers/i18n-provider";
 export function SellerCta() {
   const { t } = useT();
   const perks = [
-    { Icon: Store, label: { ru: "Бесплатное размещение", en: "Free listings" } },
-    { Icon: Send, label: { ru: "Клиенты в Telegram", en: "Customers on Telegram" } },
-    { Icon: BarChart3, label: { ru: "Аналитика переходов", en: "Click analytics" } },
+    { Icon: Store, label: { ru: "Бесплатное размещение", "uz-Latn": "Bepul joylashtirish", "uz-Cyrl": "Бепул жойлаштириш" } },
+    { Icon: Send, label: { ru: "Клиенты в Telegram", "uz-Latn": "Telegramda mijozlar", "uz-Cyrl": "Телеграмда мижозлар" } },
+    { Icon: BarChart3, label: { ru: "Аналитика переходов", "uz-Latn": "O‘tishlar tahlili", "uz-Cyrl": "Ўтишлар таҳлили" } },
   ];
   const { locale } = useT();
   return (

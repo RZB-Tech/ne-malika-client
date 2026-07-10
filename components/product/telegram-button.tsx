@@ -3,6 +3,7 @@
 import { Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useT } from "@/components/providers/i18n-provider";
+import { trackContact } from "@/lib/metrika";
 import { cn } from "@/lib/utils";
 import type { ComponentProps } from "react";
 
@@ -56,7 +57,13 @@ export function TelegramButton({
       className={cn("gap-2", className)}
       {...rest}
     >
-      <a href={url} target="_blank" rel="noreferrer">
+      <a
+        href={url}
+        target="_blank"
+        rel="noreferrer"
+        // Кнопка магазина живёт без товара — привязывать такой переход не к чему.
+        onClick={() => productId && trackContact(productId, "telegram")}
+      >
         <Send className="size-4" />
         {label ?? t("product.contactSeller")}
       </a>

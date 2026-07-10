@@ -19,6 +19,8 @@ export function ProductCard({ product }: { product: Product }) {
           <ProductImage
             hue={product.hue}
             categorySlug={product.categorySlug}
+            src={product.imageUrl}
+            alt={product.name}
             className="aspect-[4/3] w-full"
             iconClassName="size-16 transition-transform duration-300 group-hover:scale-110"
           />

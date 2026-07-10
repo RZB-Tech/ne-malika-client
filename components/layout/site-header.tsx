@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Menu, Store, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,11 +15,14 @@ import { Logo } from "@/components/shared/logo";
 import { SearchBar } from "@/components/shared/search-bar";
 import { LanguageSwitch } from "@/components/shared/language-switch";
 import { LoginDialog } from "@/components/auth/login-dialog";
+import { UserMenu } from "@/components/auth/user-menu";
 import { useT } from "@/components/providers/i18n-provider";
+import { useAuth } from "@/lib/api/auth";
 import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
 
 export function SiteHeader() {
   const { t } = useT();
+  const { isAuthenticated, isAdmin, isHydrated } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
@@ -40,14 +44,25 @@ export function SiteHeader() {
             <div className="p-4">
               <SearchBar className="mb-5" />
               <div className="grid gap-2">
-                <LoginDialog>
-                  <Button className="gap-2">
-                    <UserPlus className="size-4" /> {t("nav.becomeSeller")}
+                {isAuthenticated ? (
+                  <Button asChild className="gap-2">
+                    <Link href={isAdmin ? "/admin" : "/seller"}>
+                      <Store className="size-4" />
+                      {isAdmin ? t("nav.admin") : t("nav.sellerCabinet")}
+                    </Link>
                   </Button>
-                </LoginDialog>
-                <LoginDialog>
-                  <Button variant="outline">{t("nav.login")}</Button>
-                </LoginDialog>
+                ) : (
+                  <>
+                    <LoginDialog>
+                      <Button className="gap-2">
+                        <UserPlus className="size-4" /> {t("nav.becomeSeller")}
+                      </Button>
+                    </LoginDialog>
+                    <LoginDialog>
+                      <Button variant="outline">{t("nav.login")}</Button>
+                    </LoginDialog>
+                  </>
+                )}
               </div>
             </div>
           </SheetContent>
@@ -56,7 +71,7 @@ export function SiteHeader() {
         <Logo />
 
         <div className="mx-2 hidden max-w-xl flex-1 md:block">
-          <SearchBar withAiMode />
+          <SearchBar />
         </div>
 
         <div className="ml-auto flex items-center gap-0.5">
@@ -67,22 +82,25 @@ export function SiteHeader() {
             aria-label={t("common.theme")}
             className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors outline-none hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 dark:hover:bg-muted/50 [&_svg]:size-[1.15rem]"
           />
-          <LoginDialog>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="hidden text-muted-foreground hover:text-foreground lg:inline-flex"
-            >
-              {t("nav.login")}
-            </Button>
-          </LoginDialog>
-          <LoginDialog>
-            <Button size="sm" className="ml-1 hidden gap-1.5 sm:inline-flex">
-              <Store className="size-4" />
-              <span className="hidden lg:inline">{t("nav.becomeSeller")}</span>
-              <span className="lg:hidden">{t("nav.sellerCabinet")}</span>
-            </Button>
-          </LoginDialog>
+          {!isHydrated ? (
+            // Placeholder until auth state is known (avoids logged-out flash).
+            <div
+              className="ml-1 size-8 shrink-0 rounded-full bg-muted"
+              aria-hidden
+            />
+          ) : isAuthenticated ? (
+            <UserMenu />
+          ) : (
+            <>
+              <LoginDialog>
+                <Button size="sm" className="ml-1 hidden gap-1.5 sm:inline-flex">
+                  <Store className="size-4" />
+                  <span className="hidden lg:inline">{t("nav.becomeSeller")}</span>
+                  <span className="lg:hidden">{t("nav.sellerCabinet")}</span>
+                </Button>
+              </LoginDialog>
+            </>
+          )}
         </div>
       </div>
     </header>

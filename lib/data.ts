@@ -27,6 +27,10 @@ export interface Store {
   joined: string; // ISO
   status: SellerStatus;
   storeViews: number;
+  // Populated when the store comes from the backend.
+  telegramLink?: string;
+  photoUrl?: string | null;
+  location?: number[] | null;
 }
 
 export interface Spec {
@@ -59,6 +63,10 @@ export interface Product {
   isPromo?: boolean;
   moderation: ModerationStatus;
   hidden?: boolean;
+  // Populated when the product comes from the backend (real S3 photos).
+  imageUrl?: string | null;
+  photoUrls?: string[];
+  abolishReason?: string | null;
 }
 
 export const cities = [
@@ -71,88 +79,88 @@ export const cities = [
 ];
 
 export const categories: Category[] = [
-  { slug: "computers", icon: "PcCase", name: { ru: "Компьютеры", en: "Desktops" }, subcategories: [
-    { slug: "gaming-pc", name: { ru: "Игровые ПК", en: "Gaming PCs" } },
-    { slug: "office-pc", name: { ru: "Офисные ПК", en: "Office PCs" } },
-    { slug: "workstations", name: { ru: "Рабочие станции", en: "Workstations" } },
+  { slug: "computers", icon: "PcCase", name: { ru: "Компьютеры", "uz-Latn": "Kompyuterlar", "uz-Cyrl": "Компьютерлар" }, subcategories: [
+    { slug: "gaming-pc", name: { ru: "Игровые ПК", "uz-Latn": "O‘yin kompyuterlari", "uz-Cyrl": "Ўйин компьютерлари" } },
+    { slug: "office-pc", name: { ru: "Офисные ПК", "uz-Latn": "Ofis kompyuterlari", "uz-Cyrl": "Офис компьютерлари" } },
+    { slug: "workstations", name: { ru: "Рабочие станции", "uz-Latn": "Ishchi stansiyalar", "uz-Cyrl": "Ишчи станциялар" } },
   ] },
-  { slug: "laptops", icon: "Laptop", name: { ru: "Ноутбуки", en: "Laptops" }, subcategories: [
-    { slug: "gaming", name: { ru: "Игровые", en: "Gaming" } },
-    { slug: "ultrabooks", name: { ru: "Ультрабуки", en: "Ultrabooks" } },
-    { slug: "business", name: { ru: "Для работы", en: "Business" } },
+  { slug: "laptops", icon: "Laptop", name: { ru: "Ноутбуки", "uz-Latn": "Noutbuklar", "uz-Cyrl": "Ноутбуклар" }, subcategories: [
+    { slug: "gaming", name: { ru: "Игровые", "uz-Latn": "O‘yin uchun", "uz-Cyrl": "Ўйин учун" } },
+    { slug: "ultrabooks", name: { ru: "Ультрабуки", "uz-Latn": "Ultrabuklar", "uz-Cyrl": "Ультрабуклар" } },
+    { slug: "business", name: { ru: "Для работы", "uz-Latn": "Ish uchun", "uz-Cyrl": "Иш учун" } },
   ] },
-  { slug: "monitors", icon: "Monitor", name: { ru: "Мониторы", en: "Monitors" }, subcategories: [
-    { slug: "gaming", name: { ru: "Игровые", en: "Gaming" } },
-    { slug: "office", name: { ru: "Офисные", en: "Office" } },
-    { slug: "pro", name: { ru: "Для дизайна", en: "Pro / design" } },
+  { slug: "monitors", icon: "Monitor", name: { ru: "Мониторы", "uz-Latn": "Monitorlar", "uz-Cyrl": "Мониторлар" }, subcategories: [
+    { slug: "gaming", name: { ru: "Игровые", "uz-Latn": "O‘yin uchun", "uz-Cyrl": "Ўйин учун" } },
+    { slug: "office", name: { ru: "Офисные", "uz-Latn": "Ofis uchun", "uz-Cyrl": "Офис учун" } },
+    { slug: "pro", name: { ru: "Для дизайна", "uz-Latn": "Dizayn uchun", "uz-Cyrl": "Дизайн учун" } },
   ] },
-  { slug: "videocards", icon: "CircuitBoard", name: { ru: "Видеокарты", en: "Graphics cards" }, subcategories: [
-    { slug: "nvidia", name: { ru: "NVIDIA GeForce", en: "NVIDIA GeForce" } },
-    { slug: "amd", name: { ru: "AMD Radeon", en: "AMD Radeon" } },
+  { slug: "videocards", icon: "CircuitBoard", name: { ru: "Видеокарты", "uz-Latn": "Videokartalar", "uz-Cyrl": "Видеокарталар" }, subcategories: [
+    { slug: "nvidia", name: { ru: "NVIDIA GeForce", "uz-Latn": "NVIDIA GeForce", "uz-Cyrl": "NVIDIA GeForce" } },
+    { slug: "amd", name: { ru: "AMD Radeon", "uz-Latn": "AMD Radeon", "uz-Cyrl": "AMD Radeon" } },
   ] },
-  { slug: "cpu", icon: "Cpu", name: { ru: "Процессоры", en: "Processors" }, subcategories: [
-    { slug: "intel", name: { ru: "Intel", en: "Intel" } },
-    { slug: "amd", name: { ru: "AMD", en: "AMD" } },
+  { slug: "cpu", icon: "Cpu", name: { ru: "Процессоры", "uz-Latn": "Protsessorlar", "uz-Cyrl": "Процессорлар" }, subcategories: [
+    { slug: "intel", name: { ru: "Intel", "uz-Latn": "Intel", "uz-Cyrl": "Intel" } },
+    { slug: "amd", name: { ru: "AMD", "uz-Latn": "AMD", "uz-Cyrl": "AMD" } },
   ] },
-  { slug: "motherboards", icon: "Server", name: { ru: "Материнские платы", en: "Motherboards" }, subcategories: [
-    { slug: "intel", name: { ru: "Под Intel", en: "For Intel" } },
-    { slug: "amd", name: { ru: "Под AMD", en: "For AMD" } },
+  { slug: "motherboards", icon: "Server", name: { ru: "Материнские платы", "uz-Latn": "Ona platalar", "uz-Cyrl": "Она платалар" }, subcategories: [
+    { slug: "intel", name: { ru: "Под Intel", "uz-Latn": "Intel uchun", "uz-Cyrl": "Intel учун" } },
+    { slug: "amd", name: { ru: "Под AMD", "uz-Latn": "AMD uchun", "uz-Cyrl": "AMD учун" } },
   ] },
-  { slug: "ram", icon: "MemoryStick", name: { ru: "Оперативная память", en: "Memory (RAM)" }, subcategories: [
-    { slug: "ddr4", name: { ru: "DDR4", en: "DDR4" } },
-    { slug: "ddr5", name: { ru: "DDR5", en: "DDR5" } },
+  { slug: "ram", icon: "MemoryStick", name: { ru: "Оперативная память", "uz-Latn": "Operativ xotira (RAM)", "uz-Cyrl": "Оператив хотира (RAM)" }, subcategories: [
+    { slug: "ddr4", name: { ru: "DDR4", "uz-Latn": "DDR4", "uz-Cyrl": "DDR4" } },
+    { slug: "ddr5", name: { ru: "DDR5", "uz-Latn": "DDR5", "uz-Cyrl": "DDR5" } },
   ] },
-  { slug: "ssd", icon: "HardDrive", name: { ru: "SSD", en: "SSD" }, subcategories: [
-    { slug: "nvme", name: { ru: "M.2 NVMe", en: "M.2 NVMe" } },
-    { slug: "sata", name: { ru: "SATA", en: "SATA" } },
+  { slug: "ssd", icon: "HardDrive", name: { ru: "SSD", "uz-Latn": "SSD", "uz-Cyrl": "SSD" }, subcategories: [
+    { slug: "nvme", name: { ru: "M.2 NVMe", "uz-Latn": "M.2 NVMe", "uz-Cyrl": "M.2 NVMe" } },
+    { slug: "sata", name: { ru: "SATA", "uz-Latn": "SATA", "uz-Cyrl": "SATA" } },
   ] },
-  { slug: "hdd", icon: "Database", name: { ru: "HDD", en: "HDD" }, subcategories: [
-    { slug: "desktop", name: { ru: "Для ПК", en: "Desktop" } },
-    { slug: "nas", name: { ru: "Для NAS", en: "NAS" } },
+  { slug: "hdd", icon: "Database", name: { ru: "HDD", "uz-Latn": "HDD", "uz-Cyrl": "HDD" }, subcategories: [
+    { slug: "desktop", name: { ru: "Для ПК", "uz-Latn": "Kompyuter uchun", "uz-Cyrl": "Компьютер учун" } },
+    { slug: "nas", name: { ru: "Для NAS", "uz-Latn": "NAS uchun", "uz-Cyrl": "NAS учун" } },
   ] },
-  { slug: "psu", icon: "Power", name: { ru: "Блоки питания", en: "Power supplies" }, subcategories: [
-    { slug: "atx", name: { ru: "ATX", en: "ATX" } },
-    { slug: "sfx", name: { ru: "SFX", en: "SFX" } },
+  { slug: "psu", icon: "Power", name: { ru: "Блоки питания", "uz-Latn": "Quvvat bloklari", "uz-Cyrl": "Қувват блоклари" }, subcategories: [
+    { slug: "atx", name: { ru: "ATX", "uz-Latn": "ATX", "uz-Cyrl": "ATX" } },
+    { slug: "sfx", name: { ru: "SFX", "uz-Latn": "SFX", "uz-Cyrl": "SFX" } },
   ] },
-  { slug: "cases", icon: "Box", name: { ru: "Корпуса", en: "Cases" }, subcategories: [
-    { slug: "midtower", name: { ru: "Mid-Tower", en: "Mid-Tower" } },
-    { slug: "mini", name: { ru: "Mini-ITX", en: "Mini-ITX" } },
+  { slug: "cases", icon: "Box", name: { ru: "Корпуса", "uz-Latn": "Korpuslar", "uz-Cyrl": "Корпуслар" }, subcategories: [
+    { slug: "midtower", name: { ru: "Mid-Tower", "uz-Latn": "Mid-Tower", "uz-Cyrl": "Mid-Tower" } },
+    { slug: "mini", name: { ru: "Mini-ITX", "uz-Latn": "Mini-ITX", "uz-Cyrl": "Mini-ITX" } },
   ] },
-  { slug: "keyboards", icon: "Keyboard", name: { ru: "Клавиатуры", en: "Keyboards" }, subcategories: [
-    { slug: "mechanical", name: { ru: "Механические", en: "Mechanical" } },
-    { slug: "membrane", name: { ru: "Мембранные", en: "Membrane" } },
+  { slug: "keyboards", icon: "Keyboard", name: { ru: "Клавиатуры", "uz-Latn": "Klaviaturalar", "uz-Cyrl": "Клавиатуралар" }, subcategories: [
+    { slug: "mechanical", name: { ru: "Механические", "uz-Latn": "Mexanik", "uz-Cyrl": "Механик" } },
+    { slug: "membrane", name: { ru: "Мембранные", "uz-Latn": "Membranali", "uz-Cyrl": "Мембранали" } },
   ] },
-  { slug: "mice", icon: "Mouse", name: { ru: "Мышки", en: "Mice" }, subcategories: [
-    { slug: "gaming", name: { ru: "Игровые", en: "Gaming" } },
-    { slug: "office", name: { ru: "Офисные", en: "Office" } },
+  { slug: "mice", icon: "Mouse", name: { ru: "Мышки", "uz-Latn": "Sichqonchalar", "uz-Cyrl": "Сичқончалар" }, subcategories: [
+    { slug: "gaming", name: { ru: "Игровые", "uz-Latn": "O‘yin uchun", "uz-Cyrl": "Ўйин учун" } },
+    { slug: "office", name: { ru: "Офисные", "uz-Latn": "Ofis uchun", "uz-Cyrl": "Офис учун" } },
   ] },
-  { slug: "headphones", icon: "Headphones", name: { ru: "Наушники", en: "Headsets" }, subcategories: [
-    { slug: "gaming", name: { ru: "Игровые", en: "Gaming" } },
-    { slug: "wireless", name: { ru: "Беспроводные", en: "Wireless" } },
+  { slug: "headphones", icon: "Headphones", name: { ru: "Наушники", "uz-Latn": "Quloqchinlar", "uz-Cyrl": "Қулоқчинлар" }, subcategories: [
+    { slug: "gaming", name: { ru: "Игровые", "uz-Latn": "O‘yin uchun", "uz-Cyrl": "Ўйин учун" } },
+    { slug: "wireless", name: { ru: "Беспроводные", "uz-Latn": "Simsiz", "uz-Cyrl": "Симсиз" } },
   ] },
-  { slug: "webcams", icon: "Webcam", name: { ru: "Веб-камеры", en: "Webcams" }, subcategories: [
-    { slug: "fullhd", name: { ru: "Full HD", en: "Full HD" } },
-    { slug: "4k", name: { ru: "4K", en: "4K" } },
+  { slug: "webcams", icon: "Webcam", name: { ru: "Веб-камеры", "uz-Latn": "Veb-kameralar", "uz-Cyrl": "Веб-камералар" }, subcategories: [
+    { slug: "fullhd", name: { ru: "Full HD", "uz-Latn": "Full HD", "uz-Cyrl": "Full HD" } },
+    { slug: "4k", name: { ru: "4K", "uz-Latn": "4K", "uz-Cyrl": "4K" } },
   ] },
-  { slug: "printers", icon: "Printer", name: { ru: "Принтеры", en: "Printers" }, subcategories: [
-    { slug: "laser", name: { ru: "Лазерные", en: "Laser" } },
-    { slug: "inkjet", name: { ru: "Струйные", en: "Inkjet" } },
+  { slug: "printers", icon: "Printer", name: { ru: "Принтеры", "uz-Latn": "Printerlar", "uz-Cyrl": "Принтерлар" }, subcategories: [
+    { slug: "laser", name: { ru: "Лазерные", "uz-Latn": "Lazerli", "uz-Cyrl": "Лазерли" } },
+    { slug: "inkjet", name: { ru: "Струйные", "uz-Latn": "Siyohli", "uz-Cyrl": "Сиёҳли" } },
   ] },
-  { slug: "network", icon: "Wifi", name: { ru: "Сетевое оборудование", en: "Networking" }, subcategories: [
-    { slug: "routers", name: { ru: "Роутеры", en: "Routers" } },
-    { slug: "switches", name: { ru: "Коммутаторы", en: "Switches" } },
+  { slug: "network", icon: "Wifi", name: { ru: "Сетевое оборудование", "uz-Latn": "Tarmoq uskunalari", "uz-Cyrl": "Тармоқ ускуналари" }, subcategories: [
+    { slug: "routers", name: { ru: "Роутеры", "uz-Latn": "Routerlar", "uz-Cyrl": "Роутерлар" } },
+    { slug: "switches", name: { ru: "Коммутаторы", "uz-Latn": "Kommutatorlar", "uz-Cyrl": "Коммутаторлар" } },
   ] },
-  { slug: "gaming", icon: "Gamepad2", name: { ru: "Игровые аксессуары", en: "Gaming gear" }, subcategories: [
-    { slug: "gamepads", name: { ru: "Геймпады", en: "Gamepads" } },
-    { slug: "chairs", name: { ru: "Кресла", en: "Chairs" } },
+  { slug: "gaming", icon: "Gamepad2", name: { ru: "Игровые аксессуары", "uz-Latn": "O‘yin aksessuarlari", "uz-Cyrl": "Ўйин аксессуарлари" }, subcategories: [
+    { slug: "gamepads", name: { ru: "Геймпады", "uz-Latn": "Geympadlar", "uz-Cyrl": "Геймпадлар" } },
+    { slug: "chairs", name: { ru: "Кресла", "uz-Latn": "Kreslolar", "uz-Cyrl": "Креслолар" } },
   ] },
-  { slug: "components", icon: "Fan", name: { ru: "Комплектующие", en: "Components" }, subcategories: [
-    { slug: "cooling", name: { ru: "Охлаждение", en: "Cooling" } },
-    { slug: "fans", name: { ru: "Вентиляторы", en: "Fans" } },
+  { slug: "components", icon: "Fan", name: { ru: "Комплектующие", "uz-Latn": "Butlovchi qismlar", "uz-Cyrl": "Бутловчи қисмлар" }, subcategories: [
+    { slug: "cooling", name: { ru: "Охлаждение", "uz-Latn": "Sovutish", "uz-Cyrl": "Совутиш" } },
+    { slug: "fans", name: { ru: "Вентиляторы", "uz-Latn": "Ventilyatorlar", "uz-Cyrl": "Вентиляторлар" } },
   ] },
-  { slug: "parts", icon: "Wrench", name: { ru: "Запчасти", en: "Spare parts" }, subcategories: [
-    { slug: "cables", name: { ru: "Кабели", en: "Cables" } },
-    { slug: "batteries", name: { ru: "Аккумуляторы", en: "Batteries" } },
+  { slug: "parts", icon: "Wrench", name: { ru: "Запчасти", "uz-Latn": "Ehtiyot qismlar", "uz-Cyrl": "Эҳтиёт қисмлар" }, subcategories: [
+    { slug: "cables", name: { ru: "Кабели", "uz-Latn": "Kabellar", "uz-Cyrl": "Кабеллар" } },
+    { slug: "batteries", name: { ru: "Аккумуляторы", "uz-Latn": "Akkumulyatorlar", "uz-Cyrl": "Аккумуляторлар" } },
   ] },
 ];
 

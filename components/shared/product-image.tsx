@@ -1,28 +1,50 @@
+"use client";
+
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { CategoryIcon } from "./category-icon";
 import { getCategory } from "@/lib/data";
 
 /**
- * Deterministic product artwork. Real photos aren't part of this frontend MVP,
- * so we render a tasteful, brand-tinted tile with the category glyph — stable
- * per product, and it never breaks like a remote image would.
+ * Product artwork. When a real photo URL is available (`src`) we render it and
+ * fall back to a deterministic, brand-tinted category tile if it fails to load
+ * or is absent — so local dev without a live S3 bucket still looks intentional.
  */
 export function ProductImage({
   hue,
   categorySlug,
+  src,
+  alt,
   className,
   iconClassName,
+  fit = "cover",
 }: {
   hue: number;
   categorySlug: string;
+  src?: string | null;
+  alt?: string;
   className?: string;
   iconClassName?: string;
+  /**
+   * "cover" (default) crops to fill — good for thumbnails/tiles.
+   * "contain" shows the whole photo without cropping (letterboxed on a
+   * neutral backdrop) — use for the main product view.
+   * "natural" lets the photo set the height: no crop, no letterbox. The
+   * caller must not impose an aspect ratio. Falls back to a 4:3 tile when
+   * there is no photo, since a flow image is what gave the box its height.
+   */
+  fit?: "cover" | "contain" | "natural";
 }) {
+  const [failed, setFailed] = useState(false);
   const iconName = getCategory(categorySlug)?.icon ?? "Box";
+  const showImage = Boolean(src) && !failed;
+  const natural = fit === "natural";
+
   return (
     <div
       className={cn(
         "relative flex items-center justify-center overflow-hidden text-foreground/55",
+        natural && !showImage && "aspect-[4/3]",
         className,
       )}
       style={{
@@ -44,11 +66,39 @@ export function ProductImage({
           backgroundSize: "14px 14px",
         }}
       />
-      <CategoryIcon
-        name={iconName}
-        className={cn("relative z-10 drop-shadow-sm", iconClassName)}
-        strokeWidth={1.25}
-      />
+      {showImage && natural ? (
+        // In flow, not absolute: the image's own height becomes the box's height.
+        /* eslint-disable-next-line @next/next/no-img-element */
+        <img
+          src={src!}
+          alt={alt ?? ""}
+          className="relative z-10 block h-auto w-full"
+          onError={() => setFailed(true)}
+        />
+      ) : showImage ? (
+        <>
+          {/* Neutral backdrop so letterbox areas don't show the colored tile. */}
+          {fit === "contain" && (
+            <div className="absolute inset-0 z-[5] bg-muted" />
+          )}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={src!}
+            alt={alt ?? ""}
+            className={cn(
+              "absolute inset-0 z-10 h-full w-full",
+              fit === "contain" ? "object-contain" : "object-cover",
+            )}
+            onError={() => setFailed(true)}
+          />
+        </>
+      ) : (
+        <CategoryIcon
+          name={iconName}
+          className={cn("relative z-10 drop-shadow-sm", iconClassName)}
+          strokeWidth={1.25}
+        />
+      )}
     </div>
   );
 }

@@ -6,9 +6,14 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "gen:api": "orval --config ./orval.config.ts",
+    "stats": "node scripts/metrika-contacts.mjs"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.101.2",
+    "@telegram-login-ultimate/react": "^2.0.0",
+    "axios": "^1.18.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^1.23.0",
@@ -29,6 +34,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.10",
+    "orval": "^8.20.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

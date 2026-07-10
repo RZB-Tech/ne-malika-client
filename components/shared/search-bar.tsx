@@ -1,10 +1,9 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { Search, Sparkles } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useT } from "@/components/providers/i18n-provider";
 
@@ -24,19 +23,52 @@ export function SearchBar({
   withButton?: boolean;
 }) {
   const router = useRouter();
+  const pathname = usePathname();
   const { t } = useT();
   const [value, setValue] = useState(defaultValue);
-  const [aiMode, setAiMode] = useState(false);
+
+  // Several search bars are mounted at once (header + mobile sheet). Only the
+  // one the user is actually typing into may drive the URL.
+  const typed = useRef(false);
+  const lastPushed = useRef(defaultValue.trim());
+
+  // Keep whatever else the catalog put in the URL (price bounds, sort) — typing
+  // a query narrows the current search rather than starting a blank one.
+  const catalogUrl = useCallback(
+    (q: string) => {
+      const params = new URLSearchParams(
+        pathname === "/" ? window.location.search : "",
+      );
+      if (q) params.set("q", q);
+      else params.delete("q");
+      const query = params.toString();
+      return query ? `/?${query}` : "/";
+    },
+    [pathname],
+  );
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    const q = value.trim();
-    const params = new URLSearchParams();
-    if (q) params.set("q", q);
-    if (aiMode) params.set("ai", "1");
-    const query = params.toString();
-    router.push(query ? `/?${query}` : "/");
+    typed.current = false;
+    lastPushed.current = value.trim();
+    router.push(catalogUrl(value.trim()));
   };
+
+  // Live search: on the catalog itself, typing updates the URL after a pause.
+  // Elsewhere the bar would yank the user off the page mid-keystroke, so there
+  // it stays submit-driven.
+  useEffect(() => {
+    if (!typed.current || pathname !== "/") return;
+
+    const q = value.trim();
+    if (q === lastPushed.current) return;
+
+    const id = setTimeout(() => {
+      lastPushed.current = q;
+      router.replace(catalogUrl(q), { scroll: false });
+    }, 300);
+    return () => clearTimeout(id);
+  }, [value, pathname, router, catalogUrl]);
 
   return (
     <form onSubmit={submit} className={cn("relative flex w-full items-center", className)}>
@@ -49,7 +81,10 @@ export function SearchBar({
       <Input
         value={value}
         autoFocus={autoFocus}
-        onChange={(e) => setValue(e.target.value)}
+        onChange={(e) => {
+          typed.current = true;
+          setValue(e.target.value);
+        }}
         placeholder={placeholder ?? t("common.searchPlaceholder")}
         className={cn(
           "pl-10",
@@ -57,15 +92,6 @@ export function SearchBar({
           withButton && (size === "lg" ? "pr-32" : "pr-24"),
         )}
       />
-      {withButton && (
-        <Button
-          type="submit"
-          size={size === "lg" ? "default" : "sm"}
-          className={cn("absolute right-1.5", size === "lg" && "right-2 h-10 px-5")}
-        >
-          {t("common.search")}
-        </Button>
-      )}
     </form>
   );
 }

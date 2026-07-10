@@ -1,6 +1,10 @@
 import type { Locale } from "./i18n/config";
 
-const localeTag: Record<Locale, string> = { ru: "ru-RU", en: "en-US" };
+const localeTag: Record<Locale, string> = {
+  ru: "ru-RU",
+  "uz-Latn": "uz-Latn",
+  "uz-Cyrl": "uz-Cyrl",
+};
 
 export function formatPrice(value: number, locale: Locale): string {
   return new Intl.NumberFormat(localeTag[locale], {

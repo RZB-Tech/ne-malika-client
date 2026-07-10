@@ -18,13 +18,20 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ProductCard } from "@/components/product/product-card";
 import { TelegramButton } from "@/components/product/telegram-button";
+import { ReportDialog } from "@/components/shared/report-dialog";
 import { useT } from "@/components/providers/i18n-provider";
 import { formatDate } from "@/lib/format";
-import { productsByStore, type Store } from "@/lib/data";
+import { type Product, type Store } from "@/lib/data";
 
-export function StoreDetail({ store }: { store: Store }) {
+export function StoreDetail({
+  store,
+  products = [],
+}: {
+  store: Store;
+  products?: Product[];
+}) {
   const { t, locale } = useT();
-  const all = useMemo(() => productsByStore(store.id), [store.id]);
+  const all = products;
   const [q, setQ] = useState("");
 
   const list = useMemo(() => {
@@ -74,26 +81,33 @@ export function StoreDetail({ store }: { store: Store }) {
             <div className="flex-1">
               <div className="flex items-center gap-2">
                 <h1 className="font-heading text-2xl font-bold tracking-tight">{store.name}</h1>
-                <Badge variant="secondary" className="gap-1">
-                  <Star className="size-3 fill-warning text-warning" />
-                  <span className="tabular">{store.rating.toFixed(1)}</span>
-                </Badge>
+                {store.rating > 0 && (
+                  <Badge variant="secondary" className="gap-1">
+                    <Star className="size-3 fill-warning text-warning" />
+                    <span className="tabular">{store.rating.toFixed(1)}</span>
+                  </Badge>
+                )}
               </div>
               <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-muted-foreground">
                 {store.description}
               </p>
             </div>
             <div className="flex gap-2">
-              <TelegramButton
-                username={store.telegram}
-                label={t("store.write")}
-                size="default"
-              />
-              <Button asChild variant="outline" size="default" className="gap-2">
-                <a href={`tel:${store.phone.replace(/\s/g, "")}`}>
-                  <Phone className="size-4" />
-                </a>
-              </Button>
+              {store.telegram && (
+                <TelegramButton
+                  username={store.telegram}
+                  label={t("store.write")}
+                  size="default"
+                />
+              )}
+              {store.phone && (
+                <Button asChild variant="outline" size="default" className="gap-2">
+                  <a href={`tel:${store.phone.replace(/\s/g, "")}`}>
+                    <Phone className="size-4" />
+                  </a>
+                </Button>
+              )}
+              <ReportDialog shopId={Number(store.id)} />
             </div>
           </div>
 

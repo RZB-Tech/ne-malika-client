@@ -1,16 +1,18 @@
-export const locales = ["ru", "en"] as const;
+export const locales = ["ru", "uz-Latn", "uz-Cyrl"] as const;
 export type Locale = (typeof locales)[number];
 
 export const defaultLocale: Locale = "ru";
 
 export const localeNames: Record<Locale, string> = {
   ru: "Русский",
-  en: "English",
+  "uz-Latn": "O‘zbekcha",
+  "uz-Cyrl": "Ўзбекча",
 };
 
 export const localeShort: Record<Locale, string> = {
   ru: "RU",
-  en: "EN",
+  "uz-Latn": "UZ",
+  "uz-Cyrl": "ЎЗ",
 };
 
-export const STORAGE_KEY = "yadro.locale";
+export const STORAGE_KEY = "nemalika.locale";

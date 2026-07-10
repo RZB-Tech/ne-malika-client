@@ -1,0 +1,19 @@
+<svg viewBox="0 0 420 120" xmlns="http://www.w3.org/2000/svg" width="420" height="120">
+  <defs>
+    <style>
+      .logo-text { font-family: 'Oswald', 'Montserrat', Arial, sans-serif; font-weight: 900; font-size: 90px; letter-spacing: -2px; font-stretch: condensed; }
+    </style>
+  </defs>
+  
+  <!-- Full brand name -->
+  <text x="10" y="85" class="logo-text" fill="currentColor">
+    NE MALIKA
+  </text>
+  
+  <!-- Accent line under name -->
+  <line x1="10" y1="95" x2="410" y2="95" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+  
+  <!-- Small tech accent dots -->
+  <circle cx="415" cy="20" r="3" fill="currentColor" opacity="0.4"/>
+  <circle cx="415" cy="60" r="2.5" fill="currentColor" opacity="0.6"/>
+</svg>

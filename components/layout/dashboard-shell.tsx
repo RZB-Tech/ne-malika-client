@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { Logo } from "@/components/shared/logo";
 import { LanguageSwitch } from "@/components/shared/language-switch";
+import { UserMenu } from "@/components/auth/user-menu";
 import { useT } from "@/components/providers/i18n-provider";
 import { cn } from "@/lib/utils";
 import {AnimatedThemeToggler} from "@/components/ui/animated-theme-toggler";
@@ -132,6 +133,7 @@ export function DashboardShell({
                 aria-label={t("common.theme")}
                 className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors outline-none hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 dark:hover:bg-muted/50 [&_svg]:size-[1.15rem]"
             />
+            <UserMenu />
           </div>
         </header>
 
