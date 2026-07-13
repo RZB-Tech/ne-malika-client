@@ -11,7 +11,7 @@ export function HowItWorks() {
     { Icon: Handshake, title: t("home.how3Title"), text: t("home.how3Text") },
   ];
   return (
-    <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6">
+    <section className="mx-auto max-w-[1600px] px-5 py-14 sm:px-8 lg:px-10">
       <h2 className="mb-8 text-center font-heading text-2xl font-bold tracking-tight sm:text-3xl">
         {t("home.howTitle")}
       </h2>

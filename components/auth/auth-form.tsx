@@ -109,7 +109,7 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
       <div className="relative hidden overflow-hidden bg-[oklch(0.17_0.02_264)] lg:block">
         <LightRays raysOrigin="right" raysColor="#6f9bff" raysSpeed={0.8} rayLength={2.2} className="opacity-70" />
         <div className="relative flex h-full flex-col justify-between p-12 text-white">
-          <Logo />
+          <Logo className="self-start text-white" />
           <div className="max-w-md">
             <h2 className="font-heading text-3xl font-bold leading-tight tracking-tight">
               {t("home.ctaTitle")}

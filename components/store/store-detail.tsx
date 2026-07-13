@@ -55,7 +55,7 @@ export function StoreDetail({
   ];
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
+    <div className="mx-auto max-w-[1600px] px-5 py-6 sm:px-8 lg:px-10">
       <nav className="mb-5 flex items-center gap-1 text-sm text-muted-foreground">
         <Link href="/" className="hover:text-foreground">{t("brand.name")}</Link>
         <ChevronRight className="size-3.5" />

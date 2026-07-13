@@ -17,7 +17,7 @@ export function StoreDetailConnected({ id }: { id: number }) {
 
   if (isLoading) {
     return (
-      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
+      <div className="mx-auto max-w-[1600px] px-5 py-6 sm:px-8 lg:px-10">
         <Skeleton className="h-48 w-full rounded-2xl" />
         <div className="mt-10 grid grid-cols-2 gap-4 md:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (

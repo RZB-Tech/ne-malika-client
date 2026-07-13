@@ -14,7 +14,7 @@ export function SellerCta() {
   ];
   const { locale } = useT();
   return (
-    <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6">
+    <section className="mx-auto max-w-[1600px] px-5 py-14 sm:px-8 lg:px-10">
       <div className="relative overflow-hidden rounded-3xl border border-border bg-[oklch(0.19_0.02_264)] px-6 py-12 text-white sm:px-12 sm:py-14">
         <div className="bg-grid pointer-events-none absolute inset-0 opacity-40 [mask-image:radial-gradient(80%_80%_at_50%_0%,black,transparent)]" />
         <div className="relative mx-auto max-w-2xl text-center">

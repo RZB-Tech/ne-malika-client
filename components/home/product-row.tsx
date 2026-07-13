@@ -22,7 +22,7 @@ export function ProductRow({
   if (!products.length) return null;
   return (
     <section className={tone === "muted" ? "bg-muted/30 border-y border-border" : ""}>
-      <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6">
+      <div className="mx-auto max-w-[1600px] px-5 py-14 sm:px-8 lg:px-10">
         <SectionHeader
           title={title}
           subtitle={subtitle}

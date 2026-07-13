@@ -28,7 +28,7 @@ export function ProductDetailConnected({ id }: { id: number }) {
 
   if (productQuery.isLoading) {
     return (
-      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
+      <div className="mx-auto max-w-[1600px] px-5 py-6 sm:px-8 lg:px-10">
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
           <Skeleton className="aspect-[4/3] w-full rounded-2xl" />
           <Skeleton className="h-96 w-full rounded-2xl" />

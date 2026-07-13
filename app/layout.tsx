@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Space_Grotesk, JetBrains_Mono } from "next/font/google";
+import NextTopLoader from "nextjs-toploader";
 import "./globals.css";
 import { I18nProvider } from "@/components/providers/i18n-provider";
 import { QueryProvider } from "@/components/providers/query-provider";
@@ -76,6 +77,14 @@ export default function RootLayout({
             />
           </div>
         </noscript>
+        {/* Полоса прогресса при переходах между страницами. Цвет берём из токена
+            темы, поэтому она читается и в светлой, и в тёмной. */}
+        <NextTopLoader
+          color="var(--primary)"
+          height={2}
+          shadow={false}
+          showSpinner={false}
+        />
         <MetrikaPageview />
         <QueryProvider>
           <AuthProvider>

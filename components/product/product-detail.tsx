@@ -2,13 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import {
-  ChevronRight,
-  Eye,
-  MapPin,
-  Store as StoreIcon,
-  Truck,
-} from "lucide-react";
+import { MapPin, Store as StoreIcon, Truck } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -18,12 +12,8 @@ import { TelegramButton } from "@/components/product/telegram-button";
 import { RevealPhone } from "@/components/product/reveal-phone";
 import { ReportDialog } from "@/components/shared/report-dialog";
 import { useT } from "@/components/providers/i18n-provider";
-import { formatPrice, formatNumber } from "@/lib/format";
-import {
-  getCategory,
-  type Product,
-  type Store,
-} from "@/lib/data";
+import { formatPrice } from "@/lib/format";
+import { type Product, type Store } from "@/lib/data";
 import { cn } from "@/lib/utils";
 
 export function ProductDetail({
@@ -34,7 +24,6 @@ export function ProductDetail({
   store: Store;
 }) {
   const { t, locale } = useT();
-  const category = getCategory(product.categorySlug);
   const [active, setActive] = useState(0);
 
   // Prefer real photos; fall back to deterministic tinted tiles.
@@ -55,34 +44,21 @@ export function ProductDetail({
   ];
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
-      {/* breadcrumb */}
-      <nav className="mb-5 flex flex-wrap items-center gap-1 text-sm text-muted-foreground">
-        <Link href="/" className="hover:text-foreground">{t("brand.name")}</Link>
-        {category && (
-          <>
-            <ChevronRight className="size-3.5" />
-            <Link href="/" className="hover:text-foreground">
-              {category.name[locale]}
-            </Link>
-          </>
-        )}
-        <ChevronRight className="size-3.5" />
-        <span className="truncate text-foreground/70">{product.name}</span>
-      </nav>
-
+    <div className="mx-auto max-w-[1600px] px-5 py-6 sm:px-8 lg:px-10">
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
         {/* left: gallery + details */}
         <div className="min-w-0">
-          <div className="grid gap-4 sm:grid-cols-[76px_1fr]">
+          {/* Ограничена по ширине: в широкой колонке 4:3 фото иначе разъезжается
+              на всю строку. */}
+          <div className="grid max-w-4xl gap-4 sm:grid-cols-[76px_1fr]">
             <div className="order-2 flex gap-3 sm:order-1 sm:flex-col">
               {gallery.map((g, i) => (
                 <button
                   key={i}
                   onClick={() => setActive(i)}
                   className={cn(
-                    "aspect-[5/4] w-[72px] shrink-0 overflow-hidden rounded-lg border-2 transition-colors",
-                    active === i ? "border-primary" : "border-border hover:border-primary/40",
+                    "aspect-[5/4] w-[72px] shrink-0 overflow-hidden rounded-lg transition-opacity",
+                    active === i ? "opacity-100" : "opacity-55 hover:opacity-85",
                   )}
                 >
                   <ProductImage
@@ -102,7 +78,7 @@ export function ProductDetail({
                 src={gallery[active]?.src}
                 alt={product.name}
                 categorySlug={product.categorySlug}
-                className="aspect-[4/3] w-full rounded-2xl border border-border"
+                className="aspect-[4/3] w-full rounded-2xl"
                 iconClassName="size-32"
               />
               {product.isNew && (
@@ -148,10 +124,6 @@ export function ProductDetail({
           <Card className="p-5">
             <div className="mb-2 flex items-center gap-2">
               <AvailabilityBadge status={product.availability} />
-              <span className="ml-auto inline-flex items-center gap-1 text-xs text-muted-foreground">
-                <Eye className="size-3.5" />
-                <span className="tabular">{formatNumber(product.views, locale)}</span>
-              </span>
             </div>
 
             <h1 className="font-heading text-xl font-bold leading-snug tracking-tight">

@@ -22,7 +22,7 @@ const ru = {
   },
   common: {
     search: "Поиск",
-    searchPlaceholder: "Название, бренд, артикул или модель…",
+    searchPlaceholder: "Название, бренд или модель…",
     resetAll: "Сбросить всё",
     from: "от",
     to: "до",
@@ -284,7 +284,7 @@ const uzLatn: typeof ru = {
   },
   common: {
     search: "Qidiruv",
-    searchPlaceholder: "Nomi, brendi, artikuli yoki modeli…",
+    searchPlaceholder: "Nomi, brendi yoki modeli…",
     resetAll: "Hammasini tozalash",
     from: "dan",
     to: "gacha",
@@ -546,7 +546,7 @@ const uzCyrl: typeof ru = {
   },
   common: {
     search: "Қидирув",
-    searchPlaceholder: "Номи, бренди, артикули ёки модели…",
+    searchPlaceholder: "Номи, бренди ёки модели…",
     resetAll: "Ҳаммасини тозалаш",
     from: "дан",
     to: "гача",

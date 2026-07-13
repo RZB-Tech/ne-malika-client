@@ -28,11 +28,9 @@ export function FilterPanel({
   const { t } = useT();
 
   return (
-    <Accordion
-      type="multiple"
-      defaultValue={["sort", "price"]}
-      className="w-full"
-    >
+    // Collapsed on load: the catalog opens as a plain grid and the sections
+    // expand on click.
+    <Accordion type="multiple" className="w-full">
       <AccordionItem value="sort">
         <AccordionTrigger className="text-sm font-semibold hover:no-underline">
           {t("catalog.sortBy")}
