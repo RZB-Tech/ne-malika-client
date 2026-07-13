@@ -97,14 +97,14 @@ export function WorkingHoursEditor({
                   type="time"
                   value={d.open}
                   onChange={(e) => update(day, { open: e.target.value })}
-                  className="h-9 w-[7.5rem] tabular"
+                  className="w-[7.5rem] tabular"
                 />
                 <span className="text-muted-foreground">—</span>
                 <Input
                   type="time"
                   value={d.close}
                   onChange={(e) => update(day, { close: e.target.value })}
-                  className="h-9 w-[7.5rem] tabular"
+                  className="w-[7.5rem] tabular"
                 />
               </div>
             )}

@@ -204,7 +204,7 @@ export function AddProductForm() {
             <div className={field}>
               <Label>{t("seller.add.condition")}</Label>
               <Select value={state} onValueChange={(v) => setState(v as "new" | "old")}>
-                <SelectTrigger className="h-8 w-full px-2.5 py-1 text-base font-normal md:text-sm dark:hover:bg-input/30">
+                <SelectTrigger className="w-full text-base font-normal md:text-sm dark:hover:bg-input/30">
                   <SelectValue placeholder={t("seller.add.conditionPlaceholder")} />
                 </SelectTrigger>
                 <SelectContent>

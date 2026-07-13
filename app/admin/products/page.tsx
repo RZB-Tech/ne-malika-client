@@ -103,7 +103,7 @@ export default function AdminProducts() {
                         description="Товар будет скрыт из публичной выдачи. Причина видна продавцу."
                         onConfirm={(reason) => abolish(Number(p.id), reason)}
                       >
-                        <Button size="sm" variant="ghost" className="h-8 gap-1.5 text-muted-foreground hover:text-destructive">
+                        <Button size="sm" variant="ghost" className="gap-1.5 text-muted-foreground hover:text-destructive">
                           <Ban className="size-3.5" /> Упразднить
                         </Button>
                       </AbolishDialog>

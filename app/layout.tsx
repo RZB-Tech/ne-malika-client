@@ -64,7 +64,9 @@ export default function RootLayout({
         <script src="https://telegram.org/js/telegram-web-app.js" async />
         <script dangerouslySetInnerHTML={{ __html: YANDEX_METRIKA }} />
       </head>
-      <body className="flex min-h-full flex-col">
+      {/* Extensions (asbplayer & co.) inject classes/attrs on <body> before
+          hydration — suppress the resulting attribute mismatch. */}
+      <body suppressHydrationWarning className="flex min-h-full flex-col">
         <noscript>
           <div>
             <img

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Menu, Store, UserPlus } from "lucide-react";
+import { Menu, Store } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -16,12 +16,15 @@ import { SearchBar } from "@/components/shared/search-bar";
 import { LanguageSwitch } from "@/components/shared/language-switch";
 import { LoginDialog } from "@/components/auth/login-dialog";
 import { UserMenu } from "@/components/auth/user-menu";
-import { useT } from "@/components/providers/i18n-provider";
+import { useI18n, useT } from "@/components/providers/i18n-provider";
 import { useAuth } from "@/lib/api/auth";
 import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
+import { locales, localeNames, localeShort } from "@/lib/i18n/config";
+import { cn } from "@/lib/utils";
 
 export function SiteHeader() {
   const { t } = useT();
+  const { locale, setLocale } = useI18n();
   const { isAuthenticated, isAdmin, isHydrated } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -43,26 +46,62 @@ export function SiteHeader() {
             </SheetHeader>
             <div className="p-4">
               <SearchBar className="mb-5" />
-              <div className="grid gap-2">
-                {isAuthenticated ? (
-                  <Button asChild className="gap-2">
-                    <Link href={isAdmin ? "/admin" : "/seller"}>
-                      <Store className="size-4" />
-                      {isAdmin ? t("nav.admin") : t("nav.sellerCabinet")}
-                    </Link>
+
+              {isAuthenticated ? (
+                <Button asChild className="w-full gap-2">
+                  <Link
+                    href={isAdmin ? "/admin" : "/seller"}
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    <Store className="size-4" />
+                    {isAdmin ? t("nav.admin") : t("nav.sellerCabinet")}
+                  </Link>
+                </Button>
+              ) : (
+                <LoginDialog>
+                  <Button className="w-full gap-2">
+                    <Store className="size-4" />
+                    {t("nav.becomeSeller")}
                   </Button>
-                ) : (
-                  <>
-                    <LoginDialog>
-                      <Button className="gap-2">
-                        <UserPlus className="size-4" /> {t("nav.becomeSeller")}
-                      </Button>
-                    </LoginDialog>
-                    <LoginDialog>
-                      <Button variant="outline">{t("nav.login")}</Button>
-                    </LoginDialog>
-                  </>
-                )}
+                </LoginDialog>
+              )}
+
+              <div className="mt-6 space-y-4 border-t border-border pt-5">
+                <div>
+                  <p className="mb-2 text-xs font-medium text-muted-foreground">
+                    {t("common.language")}
+                  </p>
+                  <div className="grid grid-cols-3 gap-1 rounded-lg bg-muted p-1">
+                    {locales.map((l) => (
+                      <button
+                        key={l}
+                        type="button"
+                        onClick={() => setLocale(l)}
+                        aria-pressed={l === locale}
+                        title={localeNames[l]}
+                        className={cn(
+                          "rounded-md py-1.5 text-xs font-semibold transition-colors",
+                          l === locale
+                            ? "bg-background text-foreground shadow-sm"
+                            : "text-muted-foreground hover:text-foreground",
+                        )}
+                      >
+                        {localeShort[l]}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <p className="text-xs font-medium text-muted-foreground">
+                    {t("common.theme")}
+                  </p>
+                  <AnimatedThemeToggler
+                    fromCenter
+                    aria-label={t("common.theme")}
+                    className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg border border-border text-muted-foreground transition-colors outline-none hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 [&_svg]:size-[1.15rem]"
+                  />
+                </div>
               </div>
             </div>
           </SheetContent>
@@ -75,12 +114,12 @@ export function SiteHeader() {
         </div>
 
         <div className="ml-auto flex items-center gap-0.5">
-          <div className="hidden sm:block">
+          <div className="hidden md:block">
             <LanguageSwitch />
           </div>
           <AnimatedThemeToggler
             aria-label={t("common.theme")}
-            className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors outline-none hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 dark:hover:bg-muted/50 [&_svg]:size-[1.15rem]"
+            className="hidden size-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors outline-none hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 md:inline-flex dark:hover:bg-muted/50 [&_svg]:size-[1.15rem]"
           />
           {!isHydrated ? (
             // Placeholder until auth state is known (avoids logged-out flash).
@@ -91,15 +130,12 @@ export function SiteHeader() {
           ) : isAuthenticated ? (
             <UserMenu />
           ) : (
-            <>
-              <LoginDialog>
-                <Button size="sm" className="ml-1 hidden gap-1.5 sm:inline-flex">
-                  <Store className="size-4" />
-                  <span className="hidden lg:inline">{t("nav.becomeSeller")}</span>
-                  <span className="lg:hidden">{t("nav.sellerCabinet")}</span>
-                </Button>
-              </LoginDialog>
-            </>
+            <LoginDialog>
+              <Button size="sm" className="ml-1 hidden gap-1.5 md:inline-flex">
+                <Store className="size-4" />
+                {t("nav.becomeSeller")}
+              </Button>
+            </LoginDialog>
           )}
         </div>
       </div>

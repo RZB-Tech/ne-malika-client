@@ -34,6 +34,7 @@ const ru = {
     goods: "товаров",
     currency: "сум",
     theme: "Тема",
+    language: "Язык",
   },
   nav: {
     sellerCabinet: "Кабинет продавца",
@@ -295,6 +296,7 @@ const uzLatn: typeof ru = {
     goods: "mahsulot",
     currency: "so‘m",
     theme: "Mavzu",
+    language: "Til",
   },
   nav: {
     sellerCabinet: "Sotuvchi kabineti",
@@ -556,6 +558,7 @@ const uzCyrl: typeof ru = {
     goods: "маҳсулот",
     currency: "сўм",
     theme: "Мавзу",
+    language: "Тил",
   },
   nav: {
     sellerCabinet: "Сотувчи кабинети",

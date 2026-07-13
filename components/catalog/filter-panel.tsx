@@ -111,7 +111,7 @@ function PriceInput({
       onChange={(e) => onValueChange(e.target.value ? Number(e.target.value) : null)}
       // The spinner arrows crowd an input this narrow and there is nothing
       // sensible to step by on a price.
-      className="h-9 tabular [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+      className="tabular [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
     />
   );
 }
