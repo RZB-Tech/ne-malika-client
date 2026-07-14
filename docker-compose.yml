@@ -1,0 +1,25 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+        NEXT_PUBLIC_S3_PUBLIC_BASE: ${NEXT_PUBLIC_S3_PUBLIC_BASE}
+        NEXT_PUBLIC_YANDEX_SUGGEST_KEY: ${NEXT_PUBLIC_YANDEX_SUGGEST_KEY}
+        NEXT_PUBLIC_TELEGRAM_BOT_ID: ${NEXT_PUBLIC_TELEGRAM_BOT_ID}
+        NEXT_PUBLIC_TELEGRAM_BOT_USERNAME: ${NEXT_PUBLIC_TELEGRAM_BOT_USERNAME}
+        NEXT_PUBLIC_TELEGRAM_BOT_TOKEN: ${NEXT_PUBLIC_TELEGRAM_BOT_TOKEN}
+    image: ne-malika-web
+    container_name: ne-malika-web
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "${WEB_PORT:-3000}:3000"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
