@@ -1,7 +1,10 @@
-onlyBuiltDependencies:
-  - esbuild
-ignoredBuiltDependencies:
-  - sharp
-  - unrs-resolver
+# pnpm 11: onlyBuiltDependencies/ignoredBuiltDependencies удалены, их заменяет
+# карта allowBuilds (пакет -> можно ли выполнять build-скрипты). При
+# strictDepBuilds неупомянутый пакет со скриптом валит `pnpm install`,
+# поэтому перечислены и разрешённые, и явно запрещённые.
 allowBuilds:
   esbuild: true
+  # бинарники ставятся готовыми через optionalDependencies (@img/sharp-*),
+  # собирать из исходников не требуется.
+  sharp: false
+  unrs-resolver: false
