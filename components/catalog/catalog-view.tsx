@@ -135,8 +135,16 @@ export function CatalogView() {
 
   useEffect(() => () => clearTimeout(timerRef.current), []);
 
+  // Сброс страницы при смене фильтров — приведение состояния во время
+  // рендера вместо setState в эффекте: новая страница не успевает
+  // отрисоваться со старым page.
   const [page, setPage] = useState(1);
-  useEffect(() => setPage(1), [q, priceMin, priceMax, sort]);
+  const filterKey = `${q}|${priceMin}|${priceMax}|${sort}`;
+  const [prevFilterKey, setPrevFilterKey] = useState(filterKey);
+  if (filterKey !== prevFilterKey) {
+    setPrevFilterKey(filterKey);
+    setPage(1);
+  }
 
   const price = useMemo<PriceRange>(
     () => ({ priceMin, priceMax }),
@@ -189,16 +197,17 @@ export function CatalogView() {
     setParams({ priceMin: null, priceMax: null, sort: null });
   }, [setParams]);
 
+  // В memo держим только данные: обработчик подставляется в JSX по key.
+  // Замыкание, читающее ref-ы, во время рендера сюда класть нельзя.
   const activeChips = useMemo(() => {
-    const chips: { key: string; label: string; clear: () => void }[] = [];
+    const chips: { key: string; label: string }[] = [];
     if (filters.priceMin != null || filters.priceMax != null)
       chips.push({
         key: "price",
         label: `${filters.priceMin ?? 0}–${filters.priceMax ?? "∞"} ${t("common.currency")}`,
-        clear: clearPrice,
       });
     return chips;
-  }, [filters, t, clearPrice]);
+  }, [filters, t]);
 
   const panel = (
     <FilterPanel
@@ -222,7 +231,7 @@ export function CatalogView() {
             {activeChips.map((c) => (
               <button
                 key={c.key}
-                onClick={c.clear}
+                onClick={c.key === "price" ? clearPrice : undefined}
                 className="inline-flex items-center gap-1 rounded-full border border-border bg-card py-1 pl-3 pr-2 text-xs font-medium text-foreground transition-colors hover:bg-muted"
               >
                 {c.label}

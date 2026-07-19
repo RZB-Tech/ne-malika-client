@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   ArrowLeft,
@@ -84,19 +84,19 @@ export function SellerProductDetail({ id }: { id: number }) {
   const [description, setDescription] = useState("");
   const [state, setState] = useState<"new" | "old">("new");
   const [specs, setSpecs] = useState<Spec[]>([]);
-  const [hydrated, setHydrated] = useState(false);
+  const [hydratedRowId, setHydratedRowId] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    if (row && !hydrated) {
-      setName(row.name);
-      setPrice(String(row.price));
-      setDescription(row.description ?? "");
-      setState(row.state);
-      setSpecs(row.characteristics ?? []);
-      setHydrated(true);
-    }
-  }, [row, hydrated]);
+  // Заполняем форму один раз, когда товар загрузился. Приведение состояния
+  // во время рендера — рекомендованная React альтернатива setState в эффекте.
+  if (row && row.id !== hydratedRowId) {
+    setHydratedRowId(row.id);
+    setName(row.name);
+    setPrice(String(row.price));
+    setDescription(row.description ?? "");
+    setState(row.state);
+    setSpecs(row.characteristics ?? []);
+  }
 
   if (shopsQuery.isLoading || productsQuery.isLoading) {
     return <Skeleton className="h-96 w-full rounded-2xl" />;

@@ -1,0 +1,47 @@
+name: CI (client)
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  lint-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.5.2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Build (dummy env for CI-only build)
+        env:
+          NEXT_PUBLIC_YANDEX_SUGGEST_KEY: ci-placeholder
+        run: pnpm build
+
+      - name: Docker build (sanity check, no push)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          tags: nemalika-client:ci
+          build-args: |
+            NEXT_PUBLIC_API_URL=https://api.nemalika.uz
+            NEXT_PUBLIC_S3_PUBLIC_BASE=https://nemalika.s3.example.com
+            NEXT_PUBLIC_YANDEX_SUGGEST_KEY=ci-placeholder
+            NEXT_PUBLIC_TELEGRAM_BOT_ID=ci-placeholder
+            NEXT_PUBLIC_TELEGRAM_BOT_USERNAME=ci-placeholder
+            NEXT_PUBLIC_TELEGRAM_BOT_TOKEN=ci-placeholder

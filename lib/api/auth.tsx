@@ -5,7 +5,6 @@ import {
   useCallback,
   useContext,
   useEffect,
-  useState,
   useSyncExternalStore,
 } from "react";
 import {
@@ -54,6 +53,9 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+// Флаг гидратации не зависит от внешнего стора, подписка не нужна.
+const subscribeNoop = () => () => {};
+
 function readMiniAppInitData(): string | null {
   if (typeof window === "undefined") return null;
   const wa = (
@@ -65,8 +67,13 @@ function readMiniAppInitData(): string | null {
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const user = useSyncExternalStore(subscribe, getCurrentUser, () => null);
   const token = useSyncExternalStore(subscribe, getAccessToken, () => null);
-  const [hydrated, setHydrated] = useState(false);
-  useEffect(() => setHydrated(true), []);
+  // Серверный снапшот — false, клиентский — true, поэтому значение
+  // становится true сразу после гидратации, без setState в эффекте.
+  const hydrated = useSyncExternalStore(
+    subscribeNoop,
+    () => true,
+    () => false,
+  );
 
   const loginWithInitData = useCallback(async (initData: string) => {
     const res = await authControllerTelegramAuth({ initData });

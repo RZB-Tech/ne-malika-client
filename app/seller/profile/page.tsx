@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Send, Upload } from "lucide-react";
 import { toast } from "sonner";
@@ -52,23 +52,23 @@ export default function SellerProfile() {
   const [logo, setLogo] = useState<string | null>(null); // data URL for new upload
   const [photoKey, setPhotoKey] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
-  const [hydrated, setHydrated] = useState(false);
+  const [hydratedShopId, setHydratedShopId] = useState<number | null>(null);
 
-  // Populate the form once, when the shop loads.
-  useEffect(() => {
-    if (shop && !hydrated) {
-      setName(shop.name);
-      setDescription(shop.description ?? "");
-      setAddress(shop.address ?? "");
-      setPhone(shop.contact ?? "");
-      setTelegram(
-        (shop.telegramLink ?? "").replace(/^https?:\/\/t\.me\//, "").replace(/^@/, ""),
-      );
-      setHours(fromWorkSchedule(shop.workSchedule));
-      setPhotoKey(shop.photo ?? null);
-      setHydrated(true);
-    }
-  }, [shop, hydrated]);
+  // Populate the form once, when the shop loads. Приводим состояние прямо во
+  // время рендера (рекомендованная React альтернатива setState в эффекте):
+  // повторный рендер происходит до отрисовки, без лишнего кадра.
+  if (shop && shop.id !== hydratedShopId) {
+    setHydratedShopId(shop.id);
+    setName(shop.name);
+    setDescription(shop.description ?? "");
+    setAddress(shop.address ?? "");
+    setPhone(shop.contact ?? "");
+    setTelegram(
+      (shop.telegramLink ?? "").replace(/^https?:\/\/t\.me\//, "").replace(/^@/, ""),
+    );
+    setHours(fromWorkSchedule(shop.workSchedule));
+    setPhotoKey(shop.photo ?? null);
+  }
 
   const pickLogo = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
