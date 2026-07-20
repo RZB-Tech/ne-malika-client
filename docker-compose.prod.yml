@@ -24,7 +24,9 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=web"
-      - "traefik.http.routers.nemalika-web.rule=Host(`${WEB_DOMAIN:-nemalika.uz}`, `www.${WEB_DOMAIN:-nemalika.uz}`)"
+      # Traefik v3: матчеры принимают ровно один аргумент, перечисление через
+      # запятую (синтаксис v2) роутер не создаёт — только явное ИЛИ.
+      - "traefik.http.routers.nemalika-web.rule=Host(`${WEB_DOMAIN:-nemalika.uz}`) || Host(`www.${WEB_DOMAIN:-nemalika.uz}`)"
       - "traefik.http.routers.nemalika-web.entrypoints=websecure"
       - "traefik.http.routers.nemalika-web.tls.certresolver=le"
       - "traefik.http.services.nemalika-web.loadbalancer.server.port=3000"
