@@ -1,6 +1,7 @@
 {
   "name": "ne-malika",
   "version": "0.1.0",
+  "author": "RZB Tech company<contact@rzbtech.uz>",
   "private": true,
   "scripts": {
     "dev": "next dev",
