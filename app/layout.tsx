@@ -49,6 +49,9 @@ export const metadata: Metadata = {
   },
   description:
     "Витрина компьютерной техники: комплектующие, готовые сборки и периферия от проверенных магазинов. Поиск, фильтры и связь с продавцом напрямую в Telegram.",
+  // Подтверждение прав в Яндекс.Вебмастере. Next рендерит это как
+  // <meta name="yandex-verification" content="..."> в <head>.
+  verification: { yandex: "f7605f24203c66e8" },
 };
 
 export default function RootLayout({
