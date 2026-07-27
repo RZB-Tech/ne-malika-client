@@ -49,6 +49,7 @@ jobs:
           cache-to: type=gha,mode=max
           build-args: |
             NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL }}
+            NEXT_PUBLIC_SITE_URL=${{ vars.NEXT_PUBLIC_SITE_URL }}
             NEXT_PUBLIC_S3_PUBLIC_BASE=${{ vars.NEXT_PUBLIC_S3_PUBLIC_BASE }}
             NEXT_PUBLIC_YANDEX_SUGGEST_KEY=${{ secrets.NEXT_PUBLIC_YANDEX_SUGGEST_KEY }}
             NEXT_PUBLIC_TELEGRAM_BOT_ID=${{ vars.NEXT_PUBLIC_TELEGRAM_BOT_ID }}

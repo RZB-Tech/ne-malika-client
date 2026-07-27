@@ -28,6 +28,7 @@ import {
 import { dataUrlToBlob, uploadPhoto } from "@/lib/api/upload";
 import { hueFromId } from "@/lib/api/mappers";
 import { photoUrl } from "@/lib/api/photo";
+import { parseTelegramUsername, telegramUrl } from "@/lib/telegram";
 import type { ShopRow } from "@/lib/api/types";
 
 export default function SellerProfile() {
@@ -63,9 +64,7 @@ export default function SellerProfile() {
     setDescription(shop.description ?? "");
     setAddress(shop.address ?? "");
     setPhone(shop.contact ?? "");
-    setTelegram(
-      (shop.telegramLink ?? "").replace(/^https?:\/\/t\.me\//, "").replace(/^@/, ""),
-    );
+    setTelegram(parseTelegramUsername(shop.telegramLink ?? "") ?? "");
     setHours(fromWorkSchedule(shop.workSchedule));
     setPhotoKey(shop.photo ?? null);
   }
@@ -93,6 +92,16 @@ export default function SellerProfile() {
       return;
     }
 
+    // Из ввода (ссылка/@username/tg://…) вытаскиваем чистый username. Пустое
+    // поле допустимо; непустое, но нераспознанное — ошибка, не сохраняем мусор.
+    const tgUsername = telegram.trim()
+      ? parseTelegramUsername(telegram)
+      : null;
+    if (telegram.trim() && !tgUsername) {
+      toast.error("Не удалось распознать Telegram — укажите username или ссылку t.me");
+      return;
+    }
+
     setSaving(true);
     try {
       let photo = photoKey ?? undefined;
@@ -109,9 +118,7 @@ export default function SellerProfile() {
         description: description.trim() || undefined,
         address: address.trim() || undefined,
         contact: phone.trim() || undefined,
-        telegramLink: telegram.trim()
-          ? `https://t.me/${telegram.trim().replace(/^@/, "")}`
-          : undefined,
+        telegramLink: tgUsername ? telegramUrl(tgUsername) : undefined,
         workSchedule: toWorkSchedule(hours),
         photo,
       };
@@ -237,10 +244,32 @@ export default function SellerProfile() {
                   id="stg"
                   value={telegram}
                   onChange={(e) => setTelegram(e.target.value)}
-                  placeholder="username"
+                  // Можно вставить полную ссылку — по уходу из поля оставляем
+                  // только username, кнопка перехода соберётся из него.
+                  onBlur={() => {
+                    const u = parseTelegramUsername(telegram);
+                    if (u) setTelegram(u);
+                  }}
+                  placeholder="username или ссылка t.me/…"
                   className="pl-9"
                 />
               </div>
+              {telegram.trim() &&
+                (parseTelegramUsername(telegram) ? (
+                  <p className="text-xs text-muted-foreground">
+                    Кнопка перехода:{" "}
+                    <span className="font-medium text-foreground">
+                      {telegramUrl(parseTelegramUsername(telegram)!)}
+                    </span>
+                    . Если в настройках приватности аккаунта скрыт username или
+                    ограничены сообщения от незнакомых, переход у покупателя не
+                    сработает.
+                  </p>
+                ) : (
+                  <p className="text-xs text-destructive">
+                    Не похоже на Telegram username или ссылку t.me
+                  </p>
+                ))}
             </div>
             <div className={`${field} sm:col-span-2`}>
               <Label>{t("seller.profile.workingHours")}</Label>

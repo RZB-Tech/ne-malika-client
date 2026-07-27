@@ -40,6 +40,7 @@ jobs:
           tags: nemalika-client:ci
           build-args: |
             NEXT_PUBLIC_API_URL=https://api.nemalika.uz
+            NEXT_PUBLIC_SITE_URL=https://nemalika.uz
             NEXT_PUBLIC_S3_PUBLIC_BASE=https://nemalika.s3.example.com
             NEXT_PUBLIC_YANDEX_SUGGEST_KEY=ci-placeholder
             NEXT_PUBLIC_TELEGRAM_BOT_ID=ci-placeholder

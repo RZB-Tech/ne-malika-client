@@ -7,12 +7,14 @@
 // to the existing hue-gradient placeholder when a key is missing or the image
 // fails to load.
 
-import { API_BASE_URL } from "./mutator";
-
-// `API_BASE_URL` is the origin (generated endpoint paths carry the `/api/v1`
-// prefix themselves). `NEXT_PUBLIC_API_URL` may or may not already include the
-// prefix, so normalise to a bare origin and append the versioned path.
-const ORIGIN = API_BASE_URL.replace(/\/+$/, "").replace(/\/api\/v1$/, "");
+// Читаем NEXT_PUBLIC_API_URL напрямую, а не через ./mutator: там axios и
+// браузерный token-store, из-за которых этот модуль (и mappers, что его
+// импортируют) нельзя было звать в серверных компонентах / generateMetadata.
+// `NEXT_PUBLIC_API_URL` может уже содержать /api/v1 — нормализуем к origin и
+// добавляем версионированный путь сами.
+const ORIGIN = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001")
+  .replace(/\/+$/, "")
+  .replace(/\/api\/v1$/, "");
 const FILES_BASE = `${ORIGIN}/api/v1/files`;
 
 export function photoUrl(key: string | null | undefined): string | null {

@@ -46,7 +46,15 @@ function readNumber(raw: string | null): number | null {
   return Number.isFinite(n) && n >= 0 ? n : null;
 }
 
-export function CatalogView() {
+export function CatalogView({
+  initialData,
+}: {
+  // Первая страница каталога, отрендеренная на сервере (SEO). Используется как
+  // initialData react-query только когда текущие параметры совпадают с теми, под
+  // которые её собрали (page 1, без фильтров, сортировка latest) — иначе
+  // гидратация покажет не тот список.
+  initialData?: Paginated<PublicProductCard>;
+} = {}) {
   const { t } = useT();
   const router = useRouter();
 
@@ -164,10 +172,23 @@ export function CatalogView() {
     [q, price, sort, page],
   );
 
+  // Совпадают ли текущие параметры с серверным первым запросом. Только тогда
+  // отданный сервером initialData валиден для этого ключа.
+  const isInitialParams =
+    page === 1 &&
+    !q &&
+    price.priceMin == null &&
+    price.priceMax == null &&
+    sort === "latest";
+
   const listQuery = useProductCardsControllerFindAll(params, {
     query: {
       select: (raw) => raw as unknown as Paginated<PublicProductCard>,
       placeholderData: (prev) => prev,
+      initialData:
+        isInitialParams && initialData
+          ? (initialData as unknown as void)
+          : undefined,
     },
   });
 

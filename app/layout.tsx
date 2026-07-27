@@ -9,6 +9,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import { METRIKA_COUNTER_ID } from "@/lib/metrika";
 import { MetrikaPageview } from "@/components/analytics/metrika-pageview";
+import { SITE_URL } from "@/lib/seo";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -39,7 +40,10 @@ const YANDEX_METRIKA_ID = METRIKA_COUNTER_ID;
 const YANDEX_METRIKA = `(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();for(var j=0;j<document.scripts.length;j++){if(document.scripts[j].src===r){return;}}k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window,document,'script','https://mc.yandex.ru/metrika/tag.js?id=${YANDEX_METRIKA_ID}','ym');ym(${YANDEX_METRIKA_ID},'init',{ssr:true,webvisor:true,clickmap:true,ecommerce:"dataLayer",referrer:document.referrer,url:location.href,accurateTrackBounce:true,trackLinks:true});`;
 
 export const metadata: Metadata = {
-  title: { 
+  // Без metadataBase Next отдаёт относительные canonical/OG-URL, и краулер их
+  // не может развернуть в абсолютные — соцсети и Яндекс теряют превью.
+  metadataBase: new URL(SITE_URL),
+  title: {
     default: "neMalika — маркетплейс компьютерной техники",
     template: "%s · neMalika",
   },
