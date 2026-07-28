@@ -9,11 +9,19 @@ export interface UploadedPhoto {
   id: string;
   url: string;
   name: string;
-  originalKb: number;
-  compressedKb: number;
+  /** S3-ключ уже сохранённого фото. У выбранных сейчас файлов его нет. */
+  key?: string;
+  /** Размеры знает только свежесжатый файл — у сохранённых фото их нет. */
+  originalKb?: number;
+  compressedKb?: number;
 }
 
 const MAX = 10;
+
+/** Оборачивает сохранённый S3-ключ в элемент дропзоны (для формы редактирования). */
+export function storedPhoto(key: string, url: string, name: string): UploadedPhoto {
+  return { id: key, key, url, name };
+}
 
 /** Resize/compress an image to max 1200px on the long edge via canvas. */
 async function compress(file: File): Promise<UploadedPhoto> {
@@ -121,18 +129,27 @@ export function PhotoDropzone({
           </div>
           <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
             {photos.map((p, i) => (
-              <div key={p.id} className="group relative aspect-square overflow-hidden rounded-lg border border-border">
+              <div key={p.id} className="group relative aspect-square overflow-hidden rounded-lg border border-border bg-muted">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={p.url} alt={p.name} className="size-full object-cover" />
+                <img
+                  src={p.url}
+                  alt={p.name}
+                  className="size-full object-cover"
+                  // Сохранённое фото может не открыться (в дев-бакете нет объекта) —
+                  // прячем «битую» картинку, остаётся ровная плитка.
+                  onError={(e) => e.currentTarget.classList.add("opacity-0")}
+                />
                 {i === 0 && (
                   <span className="absolute left-1.5 top-1.5 inline-flex items-center gap-1 rounded bg-primary px-1.5 py-0.5 text-[10px] font-medium text-primary-foreground">
                     <Star className="size-2.5 fill-current" />
                     {t("seller.add.mainPhoto")}
                   </span>
                 )}
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-1.5 py-1 text-[9px] text-white tabular opacity-0 transition-opacity group-hover:opacity-100">
-                  {p.originalKb}→{p.compressedKb} KB
-                </div>
+                {p.compressedKb != null && (
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-1.5 py-1 text-[9px] text-white tabular opacity-0 transition-opacity group-hover:opacity-100">
+                    {p.originalKb}→{p.compressedKb} KB
+                  </div>
+                )}
                 <div className="absolute right-1.5 top-1.5 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
                   {i !== 0 && (
                     <button

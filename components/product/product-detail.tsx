@@ -11,6 +11,7 @@ import { AvailabilityBadge } from "@/components/shared/badges";
 import { TelegramButton } from "@/components/product/telegram-button";
 import { RevealPhone } from "@/components/product/reveal-phone";
 import { ReportDialog } from "@/components/shared/report-dialog";
+import { StoreAvatar } from "@/components/shared/store-avatar";
 import { useT } from "@/components/providers/i18n-provider";
 import { formatPrice } from "@/lib/format";
 import { type Product, type Store } from "@/lib/data";
@@ -155,12 +156,13 @@ export function ProductDetail({
 
             {/* seller */}
             <Link href={`/store/${store.slug}`} className="group flex items-center gap-3">
-              <span
-                className="grid size-11 shrink-0 place-items-center rounded-xl text-white"
-                style={{ background: `oklch(0.55 0.17 ${store.logoHue})` }}
-              >
-                <StoreIcon className="size-5" />
-              </span>
+              <StoreAvatar
+                name={store.name}
+                hue={store.logoHue}
+                src={store.photoUrl}
+                className="size-11 rounded-xl"
+                fallback={<StoreIcon className="size-5" />}
+              />
               <span className="min-w-0">
                 <span className="flex items-center gap-1.5">
                   <span className="truncate font-medium text-foreground group-hover:text-primary">

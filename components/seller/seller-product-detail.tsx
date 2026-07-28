@@ -32,6 +32,11 @@ import {
 import { ProductImage } from "@/components/shared/product-image";
 import { ModerationBadge } from "@/components/shared/badges";
 import { ProductStatsCard } from "@/components/seller/product-stats";
+import {
+  PhotoDropzone,
+  storedPhoto,
+  type UploadedPhoto,
+} from "@/components/seller/photo-dropzone";
 import { useT } from "@/components/providers/i18n-provider";
 import { useSellerShopsControllerList } from "@/lib/api/generated/endpoints/shops-seller/shops-seller";
 import {
@@ -42,8 +47,9 @@ import {
 } from "@/lib/api/generated/endpoints/product-cards-seller/product-cards-seller";
 import { useAdminReportsControllerFindAll } from "@/lib/api/generated/endpoints/reports/reports";
 import { mapProductRow } from "@/lib/api/mappers";
-import { firstPhotoUrl } from "@/lib/api/photo";
-import { formatDate } from "@/lib/format";
+import { photoUrl } from "@/lib/api/photo";
+import { resolvePhotoKeys } from "@/lib/api/upload";
+import { formatDate, formatPriceInput, parsePriceInput } from "@/lib/format";
 import type {
   AiProductCheck,
   Paginated,
@@ -84,6 +90,7 @@ export function SellerProductDetail({ id }: { id: number }) {
   const [description, setDescription] = useState("");
   const [state, setState] = useState<"new" | "old">("new");
   const [specs, setSpecs] = useState<Spec[]>([]);
+  const [photos, setPhotos] = useState<UploadedPhoto[]>([]);
   const [hydratedRowId, setHydratedRowId] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -92,10 +99,13 @@ export function SellerProductDetail({ id }: { id: number }) {
   if (row && row.id !== hydratedRowId) {
     setHydratedRowId(row.id);
     setName(row.name);
-    setPrice(String(row.price));
+    setPrice(formatPriceInput(Number(row.price)));
     setDescription(row.description ?? "");
     setState(row.state);
     setSpecs(row.characteristics ?? []);
+    setPhotos(
+      (row.photos ?? []).map((key) => storedPhoto(key, photoUrl(key) ?? "", row.name)),
+    );
   }
 
   if (shopsQuery.isLoading || productsQuery.isLoading) {
@@ -115,18 +125,25 @@ export function SellerProductDetail({ id }: { id: number }) {
   const product = mapProductRow(row, shop?.name);
 
   const save = async () => {
-    const priceNum = Number(price.replace(/\s/g, ""));
+    const priceNum = parsePriceInput(price);
     if (name.trim().length < 2 || !priceNum) {
       toast.error("Проверьте название и цену");
       return;
     }
+    if (photos.length === 0) {
+      toast.error("Добавьте хотя бы одно фото");
+      return;
+    }
     setSaving(true);
     try {
+      const photoKeys = await resolvePhotoKeys(photos);
+
       await updateMutation.mutateAsync({
         id,
         data: {
           name: name.trim(),
           description: description.trim() || undefined,
+          photos: photoKeys,
           price: priceNum,
           state,
           characteristics: specs
@@ -135,6 +152,9 @@ export function SellerProductDetail({ id }: { id: number }) {
         },
       });
       await queryClient.invalidateQueries();
+      // Сбрасываем метку — форма перезаполнится с сервера, и свежезагруженные
+      // фото начнут показываться по ключу, а не как локальный data:-URL.
+      setHydratedRowId(null);
       toast.success("Изменения сохранены — товар переотправлен на ИИ-проверку");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Не удалось сохранить");
@@ -169,7 +189,9 @@ export function SellerProductDetail({ id }: { id: number }) {
           <ProductImage
             hue={product.hue}
             categorySlug={product.categorySlug}
-            src={firstPhotoUrl(row.photos)}
+            // Превью берём из редактируемого списка, а не из строки с сервера,
+            // чтобы главное фото менялось сразу при правке галереи.
+            src={photos[0]?.url ?? null}
             alt={product.name}
             // self-start: без него flex растягивает блок по высоте формы.
             // natural: высоту задаёт само фото — ни обрезки, ни полей сверху и снизу.
@@ -197,7 +219,7 @@ export function SellerProductDetail({ id }: { id: number }) {
                   id="pprice"
                   inputMode="numeric"
                   value={price}
-                  onChange={(e) => setPrice(e.target.value.replace(/[^\d.]/g, ""))}
+                  onChange={(e) => setPrice(formatPriceInput(e.target.value))}
                   className="tabular"
                 />
               </div>
@@ -278,6 +300,12 @@ export function SellerProductDetail({ id }: { id: number }) {
           <Plus className="size-4" />
           {t("seller.add.addSpec")}
         </Button>
+      </Card>
+
+      {/* photos editor */}
+      <Card className="p-6">
+        <h2 className="mb-4 font-heading text-lg font-bold tracking-tight">{t("seller.add.section3")}</h2>
+        <PhotoDropzone photos={photos} onChange={setPhotos} />
       </Card>
 
       {/* AI check */}

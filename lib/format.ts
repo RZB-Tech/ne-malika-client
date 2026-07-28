@@ -27,6 +27,27 @@ export function formatDate(iso: string, locale: Locale): string {
   }).format(new Date(iso));
 }
 
+/**
+ * Цена в поле ввода: только целые сомы с разделителями разрядов.
+ * Строку трактуем как пользовательский ввод (выкидываем всё нечисловое),
+ * число — как значение с бэкенда (`price` приходит как "1500000.00",
+ * дробную часть отбрасываем, иначе она попадает в инпут как ".00").
+ */
+export function formatPriceInput(raw: string | number): string {
+  const digits =
+    typeof raw === "number"
+      ? Number.isFinite(raw)
+        ? String(Math.trunc(raw))
+        : ""
+      : raw.replace(/\D/g, "");
+  return digits ? Number(digits).toLocaleString("ru-RU") : "";
+}
+
+/** Обратно: "1 500 000" → 1500000. */
+export function parsePriceInput(value: string): number {
+  return Number(value.replace(/\D/g, "")) || 0;
+}
+
 export function discountPercent(price: number, oldPrice?: number): number | null {
   if (!oldPrice || oldPrice <= price) return null;
   return Math.round((1 - price / oldPrice) * 100);

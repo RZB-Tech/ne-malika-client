@@ -21,6 +21,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { StoreAvatar } from "@/components/shared/store-avatar";
 import { useT } from "@/components/providers/i18n-provider";
 import { formatDate } from "@/lib/format";
 import { stores as initialStores, storeProductCount, type SellerStatus } from "@/lib/data";
@@ -67,12 +68,12 @@ export default function AdminSellers() {
                 <TableRow key={s.id}>
                   <TableCell>
                     <div className="flex items-center gap-3">
-                      <span
-                        className="grid size-9 shrink-0 place-items-center rounded-lg text-sm font-bold text-white"
-                        style={{ background: `oklch(0.55 0.17 ${s.logoHue})` }}
-                      >
-                        {s.name.slice(0, 1)}
-                      </span>
+                      <StoreAvatar
+                        name={s.name}
+                        hue={s.logoHue}
+                        src={s.photoUrl}
+                        className="size-9 rounded-lg text-sm"
+                      />
                       <div className="min-w-0">
                         <Link href={`/store/${s.slug}`} className="text-sm font-medium hover:text-primary">
                           {s.name}

@@ -21,7 +21,8 @@ import { PhotoDropzone, type UploadedPhoto } from "./photo-dropzone";
 import { useT } from "@/components/providers/i18n-provider";
 import { useSellerShopsControllerList } from "@/lib/api/generated/endpoints/shops-seller/shops-seller";
 import { useSellerProductCardsControllerCreate } from "@/lib/api/generated/endpoints/product-cards-seller/product-cards-seller";
-import { dataUrlToBlob, uploadPhoto } from "@/lib/api/upload";
+import { resolvePhotoKeys } from "@/lib/api/upload";
+import { formatPriceInput, parsePriceInput } from "@/lib/format";
 import type { ShopRow } from "@/lib/api/types";
 
 function SectionTitle({ index, children }: { index: number; children: React.ReactNode }) {
@@ -59,10 +60,7 @@ export function AddProductForm() {
   const [price, setPrice] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  const onPriceChange = (raw: string) => {
-    const digits = raw.replace(/\D/g, "");
-    setPrice(digits ? Number(digits).toLocaleString("ru-RU") : "");
-  };
+  const onPriceChange = (raw: string) => setPrice(formatPriceInput(raw));
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -71,7 +69,7 @@ export function AddProductForm() {
       router.push("/seller/profile");
       return;
     }
-    const priceNum = Number(price.replace(/\s/g, ""));
+    const priceNum = parsePriceInput(price);
     if (!name.trim() || !priceNum) {
       toast.error("Заполните название и цену");
       return;
@@ -83,17 +81,7 @@ export function AddProductForm() {
 
     setSubmitting(true);
     try {
-      // Upload photos to S3; if a bucket is unreachable in dev, fall back to a
-      // random key so the card still saves (image will show a placeholder).
-      const keys = await Promise.all(
-        photos.map(async (p) => {
-          try {
-            return await uploadPhoto(dataUrlToBlob(p.url));
-          } catch {
-            return crypto.randomUUID();
-          }
-        }),
-      );
+      const keys = await resolvePhotoKeys(photos);
 
       const characteristics = [
         ...(brand.trim() ? [{ key: "Бренд", value: brand.trim() }] : []),

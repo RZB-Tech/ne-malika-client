@@ -19,6 +19,7 @@ import { Badge } from "@/components/ui/badge";
 import { ProductCard } from "@/components/product/product-card";
 import { TelegramButton } from "@/components/product/telegram-button";
 import { ReportDialog } from "@/components/shared/report-dialog";
+import { StoreAvatar } from "@/components/shared/store-avatar";
 import { useT } from "@/components/providers/i18n-provider";
 import { formatDate } from "@/lib/format";
 import { type Product, type Store } from "@/lib/data";
@@ -72,12 +73,12 @@ export function StoreDetail({
         />
         <div className="px-5 pb-5 sm:px-7 sm:pb-7">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
-            <span
-              className="-mt-12 grid size-24 shrink-0 place-items-center rounded-2xl border-4 border-card text-3xl font-bold text-white shadow-sm"
-              style={{ background: `oklch(0.5 0.17 ${store.logoHue})` }}
-            >
-              {store.name.slice(0, 1)}
-            </span>
+            <StoreAvatar
+              name={store.name}
+              hue={store.logoHue}
+              src={store.photoUrl}
+              className="-mt-12 size-24 rounded-2xl border-4 border-card text-3xl shadow-sm"
+            />
             <div className="flex-1">
               <div className="flex items-center gap-2">
                 <h1 className="font-heading text-2xl font-bold tracking-tight">{store.name}</h1>

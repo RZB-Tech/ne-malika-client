@@ -5,7 +5,9 @@ import { RequireRole } from "@/components/auth/require-role";
 import { DashboardShell, type NavItem } from "@/components/layout/dashboard-shell";
 import { useT } from "@/components/providers/i18n-provider";
 import { useSellerShopsControllerList } from "@/lib/api/generated/endpoints/shops-seller/shops-seller";
+import { StoreAvatar } from "@/components/shared/store-avatar";
 import { hueFromId } from "@/lib/api/mappers";
+import { photoUrl } from "@/lib/api/photo";
 import type { ShopRow } from "@/lib/api/types";
 
 export default function SellerLayout({ children }: { children: React.ReactNode }) {
@@ -36,12 +38,12 @@ function SellerLayoutInner({ children }: { children: React.ReactNode }) {
 
   const badge = (
     <div className="flex items-center gap-3 rounded-xl border border-sidebar-border bg-card p-3">
-      <span
-        className="grid size-9 shrink-0 place-items-center rounded-lg text-sm font-bold text-white"
-        style={{ background: `oklch(0.55 0.17 ${hue})` }}
-      >
-        {name.slice(0, 1)}
-      </span>
+      <StoreAvatar
+        name={name}
+        hue={hue}
+        src={photoUrl(shop?.photo)}
+        className="size-9 rounded-lg text-sm"
+      />
       <div className="min-w-0">
         <div className="truncate text-sm font-medium">{name}</div>
         <div className="text-xs text-muted-foreground">

@@ -46,3 +46,24 @@ export async function uploadPhoto(blob: Blob): Promise<string> {
   }
   return presigned.key;
 }
+
+/**
+ * Приводит смешанный список фото (уже сохранённые + выбранные сейчас) к массиву
+ * S3-ключей для тела запроса. Сохранённые проходят насквозь, новые загружаются;
+ * если бакет недоступен в дев-окружении, подставляем случайный ключ, чтобы
+ * карточка всё же сохранилась (вместо фото будет заглушка).
+ */
+export async function resolvePhotoKeys(
+  photos: { url: string; key?: string }[],
+): Promise<string[]> {
+  return Promise.all(
+    photos.map(async (p) => {
+      if (p.key) return p.key;
+      try {
+        return await uploadPhoto(dataUrlToBlob(p.url));
+      } catch {
+        return crypto.randomUUID();
+      }
+    }),
+  );
+}
