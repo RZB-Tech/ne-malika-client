@@ -150,12 +150,12 @@ export function PhotoDropzone({
                     {p.originalKb}→{p.compressedKb} KB
                   </div>
                 )}
-                <div className="absolute right-1.5 top-1.5 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                <div className="absolute right-1.5 top-1.5 flex items-center gap-1">
                   {i !== 0 && (
                     <button
                       type="button"
                       onClick={() => makeMain(p.id)}
-                      className="grid size-6 place-items-center rounded bg-black/60 text-white hover:bg-black/80"
+                      className="grid size-7 place-items-center rounded bg-black/60 text-white transition-opacity hover:bg-black/80 [@media(hover:hover)]:size-6 [@media(hover:hover)]:opacity-0 group-hover:opacity-100"
                       title={t("seller.add.mainPhoto")}
                     >
                       <Star className="size-3" />
@@ -164,9 +164,11 @@ export function PhotoDropzone({
                   <button
                     type="button"
                     onClick={() => remove(p.id)}
-                    className="grid size-6 place-items-center rounded bg-black/60 text-white hover:bg-destructive"
+                    className="grid size-7 place-items-center rounded-full bg-black/70 text-white shadow-sm transition-colors hover:bg-destructive"
+                    title={t("common.delete")}
+                    aria-label={t("common.delete")}
                   >
-                    <X className="size-3" />
+                    <X className="size-3.5" />
                   </button>
                 </div>
               </div>
