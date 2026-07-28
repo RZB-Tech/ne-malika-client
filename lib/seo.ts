@@ -3,9 +3,11 @@
 
 // Публичный адрес сайта. NEXT_PUBLIC_SITE_URL вшивается при сборке образа
 // (build-arg в cd.yml); дефолт — прод-домен, чтобы sitemap/canonical не
-// оказались с localhost, если переменную забыли передать.
+// оказались с localhost, если переменную забыли передать. Проверяем именно на
+// пустоту, а не на undefined: незаданная переменная в GitHub Actions приезжает
+// в build-arg пустой строкой, и `new URL("")` роняет сборку.
 export const SITE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://nemalika.uz"
+  process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://nemalika.uz"
 ).replace(/\/+$/, "");
 
 export const SITE_NAME = "neMalika";
