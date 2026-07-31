@@ -11,6 +11,13 @@ import { useAdminShopsControllerList } from "@/lib/api/generated/endpoints/shops
 import { useProductCardsControllerFindAll } from "@/lib/api/generated/endpoints/product-cards-public/product-cards-public";
 import { useAdminReportsControllerFindAll } from "@/lib/api/generated/endpoints/reports/reports";
 import { hueFromId } from "@/lib/api/mappers";
+import {
+  devFallback,
+  devFallbackPage,
+  devProducts,
+  devReports,
+  devShops,
+} from "@/lib/api/dev-fixtures";
 import type {
   AdminShopRow,
   Paginated,
@@ -44,7 +51,13 @@ export default function AdminStats() {
     },
   );
 
-  const shops = useMemo(() => shopsQuery.data ?? [], [shopsQuery.data]);
+  const shops = useMemo(
+    () => devFallback(shopsQuery.data, devShops),
+    [shopsQuery.data],
+  );
+  const productsTotal = devFallbackPage(productsQuery.data, devProducts).meta
+    .total;
+  const reportsTotal = devFallbackPage(reportsQuery.data, devReports).meta.total;
   const activeShops = shops.filter((s) => s.status === "active").length;
 
   const topShops = useMemo(
@@ -85,12 +98,12 @@ export default function AdminStats() {
         />
         <StatCard
           label="Товаров в выдаче"
-          value={formatNumber(productsQuery.data?.meta.total ?? 0, locale)}
+          value={formatNumber(productsTotal, locale)}
           icon={Package}
         />
         <StatCard
           label="Жалоб"
-          value={formatNumber(reportsQuery.data?.meta.total ?? 0, locale)}
+          value={formatNumber(reportsTotal, locale)}
           icon={Flag}
         />
       </div>

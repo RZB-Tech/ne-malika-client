@@ -2,10 +2,14 @@
 
 import { LayoutDashboard, Package, PlusCircle, Store } from "lucide-react";
 import { RequireRole } from "@/components/auth/require-role";
-import { DashboardShell, type NavItem } from "@/components/layout/dashboard-shell";
+import {
+  DashboardShell,
+  type NavItem,
+  type ShellBrand,
+} from "@/components/layout/dashboard-shell";
 import { useT } from "@/components/providers/i18n-provider";
-import { useSellerShop } from "@/lib/api/seller";
 import { StoreAvatar } from "@/components/shared/store-avatar";
+import { useSellerShop } from "@/lib/api/seller";
 import { hueFromId } from "@/lib/api/mappers";
 import { photoUrl } from "@/lib/api/photo";
 
@@ -30,27 +34,26 @@ function SellerLayoutInner({ children }: { children: React.ReactNode }) {
   ];
 
   const name = shop?.name ?? "Мой магазин";
-  const hue = shop ? hueFromId(shop.id) : 262;
 
-  const badge = (
-    <div className="flex items-center gap-3 rounded-xl border border-sidebar-border bg-card p-3">
+  const brand: ShellBrand = {
+    avatar: (
       <StoreAvatar
         name={name}
-        hue={hue}
+        hue={shop ? hueFromId(shop.id) : 262}
         src={photoUrl(shop?.photo)}
-        className="size-9 rounded-lg text-sm"
+        className="size-8 shrink-0 rounded-lg text-xs"
       />
-      <div className="min-w-0">
-        <div className="truncate text-sm font-medium">{name}</div>
-        <div className="text-xs text-muted-foreground">
-          {shop ? t("seller.cabinet") : "Магазин не создан"}
-        </div>
-      </div>
-    </div>
-  );
+    ),
+    title: name,
+    subtitle: shop ? t("seller.cabinet") : "Магазин не создан",
+  };
 
   return (
-    <DashboardShell items={items} sectionLabel={t("seller.cabinet")} brandBadge={badge}>
+    <DashboardShell
+      items={items}
+      sectionLabel={t("seller.cabinet")}
+      brand={brand}
+    >
       {children}
     </DashboardShell>
   );

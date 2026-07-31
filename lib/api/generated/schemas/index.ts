@@ -6,8 +6,8 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export * from './abolishProductCardDto';
-export * from './abolishShopDto';
+export * from './adminProductCardsControllerFindAllParams';
+export * from './adminProductCardsControllerFindAllStatus';
 export * from './adminReportsControllerFindAllParams';
 export * from './appSettingsDto';
 export * from './authResponseDto';
@@ -26,6 +26,9 @@ export * from './createUploadUrlDtoContentType';
 export * from './productCardsControllerFindAllParams';
 export * from './productCardsControllerFindAllSort';
 export * from './productCardsControllerFindAllState';
+export * from './reasonDto';
+export * from './setRoleDto';
+export * from './setRoleDtoRole';
 export * from './telegramAuthDto';
 export * from './telegramWidgetDto';
 export * from './updateProductCardDto';

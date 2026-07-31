@@ -15,6 +15,11 @@ import { formatDate } from "@/lib/format";
 import { useAdminReportsControllerFindAll } from "@/lib/api/generated/endpoints/reports/reports";
 import { useAdminProductCardsControllerAbolish } from "@/lib/api/generated/endpoints/product-cards-admin/product-cards-admin";
 import { useAdminShopsControllerAbolish } from "@/lib/api/generated/endpoints/shops-admin/shops-admin";
+import {
+  devFallbackPage,
+  devReports,
+  usingDevData,
+} from "@/lib/api/dev-fixtures";
 import type { Paginated, ReportRow } from "@/lib/api/types";
 
 export default function AdminReports() {
@@ -30,8 +35,10 @@ export default function AdminReports() {
   const abolishProduct = useAdminProductCardsControllerAbolish();
   const abolishShop = useAdminShopsControllerAbolish();
 
-  const reports = useMemo(() => data?.data ?? [], [data]);
-  const totalPages = data?.meta.totalPages ?? 1;
+  const page_ = useMemo(() => devFallbackPage(data, devReports), [data]);
+  const reports = page_.data;
+  const isDevData = usingDevData(data?.data);
+  const totalPages = page_.meta.totalPages;
 
   const onAbolishProduct = async (id: number, reason: string) => {
     await abolishProduct.mutateAsync({ id, data: { reason } });
@@ -53,9 +60,15 @@ export default function AdminReports() {
         </p>
       </div>
 
-      {isError && (
+      {isError && !isDevData && (
         <Card className="border-destructive/40 bg-destructive/5 p-4 text-sm">
           Не удалось загрузить жалобы. Раздел доступен только администраторам.
+        </Card>
+      )}
+      {isDevData && (
+        <Card className="bg-muted/50 p-4 text-sm text-muted-foreground">
+          Показаны тестовые данные: бэкенд недоступен. Запустите его, чтобы
+          увидеть настоящие.
         </Card>
       )}
 
@@ -65,7 +78,7 @@ export default function AdminReports() {
             <Skeleton key={i} className="h-24 w-full rounded-2xl" />
           ))}
         </div>
-      ) : reports.length === 0 && !isError ? (
+      ) : reports.length === 0 && (!isError || isDevData) ? (
         <Card className="py-16 text-center text-sm text-muted-foreground">
           Жалоб пока нет.
         </Card>

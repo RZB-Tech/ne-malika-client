@@ -25,7 +25,7 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
-  AbolishShopDto
+  ReasonDto
 } from '../../schemas';
 
 import { customInstance } from '../../../mutator';
@@ -148,7 +148,7 @@ export function useAdminShopsControllerList<TData = Awaited<ReturnType<typeof ad
  */
 export const adminShopsControllerAbolish = (
     id: number,
-    abolishShopDto: BodyType<AbolishShopDto>,
+    reasonDto: BodyType<ReasonDto>,
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
 
@@ -156,7 +156,7 @@ export const adminShopsControllerAbolish = (
       return customInstance<void>(
       {url: `/api/v1/admin/shops/${id}/abolish`, method: 'PATCH',
       headers: {'Content-Type': 'application/json', },
-      data: abolishShopDto, signal
+      data: reasonDto, signal
     },
       options);
     }
@@ -165,8 +165,8 @@ export const adminShopsControllerAbolish = (
 
 
 export const getAdminShopsControllerAbolishMutationOptions = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminShopsControllerAbolish>>, TError,{id: number;data: BodyType<AbolishShopDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof adminShopsControllerAbolish>>, TError,{id: number;data: BodyType<AbolishShopDto>}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminShopsControllerAbolish>>, TError,{id: number;data: BodyType<ReasonDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof adminShopsControllerAbolish>>, TError,{id: number;data: BodyType<ReasonDto>}, TContext> => {
 
 const mutationKey = ['adminShopsControllerAbolish'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -178,7 +178,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminShopsControllerAbolish>>, {id: number;data: BodyType<AbolishShopDto>}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminShopsControllerAbolish>>, {id: number;data: BodyType<ReasonDto>}> = (props) => {
           const {id,data} = props ?? {};
 
           return  adminShopsControllerAbolish(id,data,requestOptions)
@@ -192,18 +192,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type AdminShopsControllerAbolishMutationResult = NonNullable<Awaited<ReturnType<typeof adminShopsControllerAbolish>>>
-    export type AdminShopsControllerAbolishMutationBody = BodyType<AbolishShopDto>
+    export type AdminShopsControllerAbolishMutationBody = BodyType<ReasonDto>
     export type AdminShopsControllerAbolishMutationError = ErrorType<unknown>
 
     /**
  * @summary Упразднить магазин с обязательной причиной
  */
 export const useAdminShopsControllerAbolish = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminShopsControllerAbolish>>, TError,{id: number;data: BodyType<AbolishShopDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminShopsControllerAbolish>>, TError,{id: number;data: BodyType<ReasonDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof adminShopsControllerAbolish>>,
         TError,
-        {id: number;data: BodyType<AbolishShopDto>},
+        {id: number;data: BodyType<ReasonDto>},
         TContext
       > => {
       return useMutation(getAdminShopsControllerAbolishMutationOptions(options), queryClient);

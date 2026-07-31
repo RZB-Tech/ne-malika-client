@@ -6,10 +6,10 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export interface AbolishProductCardDto {
-  /**
-     * Причина упразднения — видна продавцу
-     * @minLength 5
-     */
-  reason: string;
-}
+export type SetRoleDtoRole = typeof SetRoleDtoRole[keyof typeof SetRoleDtoRole];
+
+
+export const SetRoleDtoRole = {
+  seller: 'seller',
+  admin: 'admin',
+} as const;

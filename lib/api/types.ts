@@ -63,6 +63,15 @@ export interface ProductCardRow {
   updatedAt: string;
 }
 
+/** GET /admin/product-cards — товар со статусом модерации, все статусы. */
+export interface AdminProductRow extends PublicProductCard {
+  status: EntityStatus;
+  abolishReason: string | null;
+  abolishedAt: string | null;
+  updatedAt: string;
+  shopStatus: EntityStatus;
+}
+
 /** Full shop row (seller cabinet + admin). */
 export interface ShopRow {
   id: number;
@@ -99,6 +108,12 @@ export interface AdminShopRow {
   abolishReason: string | null;
   createdAt: string;
   productCount: number;
+  /** Владелец магазина: блокируется отдельно от самого магазина. */
+  ownerId: number;
+  ownerName: string;
+  ownerUsername: string | null;
+  ownerBlockedAt: string | null;
+  ownerBlockReason: string | null;
 }
 
 export interface AiCheckDetail {
@@ -124,6 +139,57 @@ export interface AiProductCheck {
   createdAt: string;
   /** Приходит вместо проверки, когда её ещё не было. */
   message?: string;
+}
+
+/** GET /admin/users — пользователь, его магазин и активность. */
+export interface AdminUserRow {
+  id: number;
+  fullname: string;
+  role: UserRole;
+  telegramId: number;
+  telegramUsername: string | null;
+  telegramPhoto: string | null;
+  phoneNumber: string | null;
+  blockedAt: string | null;
+  blockReason: string | null;
+  createdAt: string;
+  shopId: number | null;
+  shopName: string | null;
+  shopStatus: EntityStatus | null;
+  productCount: number;
+  lastProductAt: string | null;
+}
+
+/** Товар из «недавних действий» пользователя. */
+export interface AdminUserActivity {
+  id: number;
+  name: string;
+  status: EntityStatus;
+  price: string;
+  createdAt: string;
+  updatedAt: string;
+  shopName: string;
+}
+
+/** GET /admin/users/:id */
+export interface AdminUserDetail extends AdminUserRow {
+  recentProducts: AdminUserActivity[];
+}
+
+/** GET /admin/product-cards/ai-review — очередь ручной модерации. */
+export interface AiReviewRow {
+  checkId: number;
+  productCardId: number;
+  verdict: AiVerdict;
+  summary: string | null;
+  error: string | null;
+  checkedAt: string;
+  name: string;
+  price: string;
+  photos: string[];
+  status: EntityStatus;
+  description: string | null;
+  shopName: string;
 }
 
 export interface ReportRow {

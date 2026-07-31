@@ -1,0 +1,519 @@
+// Тестовые данные для локальной разработки без бэкенда.
+//
+// Подставляются ТОЛЬКО когда `NODE_ENV === "development"` и API ничего не вернул
+// (не запущен, база пустая). В прод-сборке константа ниже равна false, ветка с
+// фикстурами вырезается сборщиком — выдуманные магазины на бой не попадут.
+//
+// Даты зашиты строками, а не считаются от текущего момента: иначе список
+// «прыгал» бы при каждом рендере и ломал сравнение снапшотов.
+
+import type {
+  AdminProductRow,
+  AdminShopRow,
+  AdminUserActivity,
+  AdminUserRow,
+  AiReviewRow,
+  Paginated,
+  PublicProductCard,
+  ReportRow,
+} from "./types";
+
+export const IS_DEV = process.env.NODE_ENV === "development";
+
+/**
+ * Фиктивная роль для входа в кабинет без бэкенда: `NEXT_PUBLIC_DEV_ROLE=admin`
+ * в `.env.local`. Переменная опциональна — без неё вход работает как обычно,
+ * через Telegram.
+ */
+export const DEV_ROLE = IS_DEV
+  ? (process.env.NEXT_PUBLIC_DEV_ROLE as "admin" | "seller" | undefined)
+  : undefined;
+
+export const devShops: AdminShopRow[] = [
+  {
+    id: 1,
+    name: "TechnoDom",
+    photo: null,
+    telegramLink: "https://t.me/technodom_uz",
+    contact: "+998901234567",
+    address: "Ташкент, рынок Малика, павильон 12",
+    status: "active",
+    abolishReason: null,
+    createdAt: "2026-01-14T09:20:00.000Z",
+    productCount: 8,
+    ownerId: 1,
+    ownerName: "Азиз Рахимов",
+    ownerUsername: "aziz_rahimov",
+    ownerBlockedAt: null,
+    ownerBlockReason: null,
+  },
+  {
+    id: 2,
+    name: "Malika Computers",
+    photo: null,
+    telegramLink: "https://t.me/malika_pc",
+    contact: "+998935558812",
+    address: "Ташкент, рынок Малика, ряд 3",
+    status: "active",
+    abolishReason: null,
+    createdAt: "2026-02-02T11:05:00.000Z",
+    productCount: 5,
+    ownerId: 2,
+    ownerName: "Шерзод Каримов",
+    ownerUsername: "sherzod_k",
+    ownerBlockedAt: null,
+    ownerBlockReason: null,
+  },
+  {
+    id: 3,
+    name: "Grand Notebook",
+    photo: null,
+    telegramLink: "https://t.me/grand_notebook",
+    contact: "+998977771020",
+    address: "Ташкент, Чиланзар, ТЦ «Компьютер»",
+    status: "active",
+    abolishReason: null,
+    createdAt: "2026-03-18T15:40:00.000Z",
+    productCount: 3,
+    ownerId: 3,
+    ownerName: "Дилшод Юсупов",
+    ownerUsername: "dilshod_y",
+    ownerBlockedAt: null,
+    ownerBlockReason: null,
+  },
+  {
+    id: 4,
+    name: "Pixel Store",
+    photo: null,
+    telegramLink: "https://t.me/pixel_store_uz",
+    contact: "+998909998877",
+    address: "Ташкент, Юнусабад, 4 квартал",
+    status: "hidden",
+    abolishReason: null,
+    createdAt: "2026-04-07T08:15:00.000Z",
+    productCount: 2,
+    ownerId: 4,
+    ownerName: "Отабек Назаров",
+    ownerUsername: "otabek_n",
+    ownerBlockedAt: null,
+    ownerBlockReason: null,
+  },
+  {
+    id: 5,
+    name: "Sardor Tech",
+    photo: null,
+    telegramLink: "https://t.me/sardor_tech",
+    contact: "+998944443322",
+    address: "Ташкент, рынок Малика, павильон 47",
+    status: "abolished",
+    abolishReason: "Продажа техники без гарантии под видом новой",
+    createdAt: "2026-04-22T13:00:00.000Z",
+    productCount: 1,
+    ownerId: 5,
+    ownerName: "Сардор Тошматов",
+    ownerUsername: "sardor_t",
+    ownerBlockedAt: "2026-04-23T10:00:00.000Z",
+    ownerBlockReason: "Повторные жалобы на обман покупателей",
+  },
+  {
+    id: 6,
+    name: "Комп Сервис",
+    photo: null,
+    telegramLink: "https://t.me/komp_servis",
+    contact: "+998911112233",
+    address: "Ташкент, Сергели, 7 квартал",
+    status: "active",
+    abolishReason: null,
+    createdAt: "2026-05-30T10:10:00.000Z",
+    productCount: 0,
+    ownerId: 6,
+    ownerName: "Бекзод Алиев",
+    ownerUsername: "bekzod_a",
+    ownerBlockedAt: null,
+    ownerBlockReason: null,
+  },
+];
+
+export const devProducts: PublicProductCard[] = [
+  {
+    id: 101,
+    shopId: 1,
+    name: 'MacBook Air 13" M2, 8/256 ГБ',
+    description: "Полный комплект, циклов 42, гарантия магазина 6 месяцев.",
+    photos: [],
+    price: "12400000.00",
+    state: "new",
+    createdAt: "2026-06-11T09:00:00.000Z",
+    shopName: "TechnoDom",
+    characteristics: [
+      { key: "Процессор", value: "Apple M2" },
+      { key: "ОЗУ", value: "8 ГБ" },
+      { key: "Накопитель", value: "256 ГБ SSD" },
+    ],
+  },
+  {
+    id: 102,
+    shopId: 1,
+    name: "Видеокарта RTX 4070 Super 12 ГБ",
+    description: "Palit Dual, чек и коробка на месте.",
+    photos: [],
+    price: "9150000.00",
+    state: "new",
+    createdAt: "2026-06-14T12:30:00.000Z",
+    shopName: "TechnoDom",
+    characteristics: [
+      { key: "Память", value: "12 ГБ GDDR6X" },
+      { key: "Интерфейс", value: "PCIe 4.0" },
+    ],
+  },
+  {
+    id: 103,
+    shopId: 2,
+    name: "Сборка: Ryzen 5 7600 + RTX 4060",
+    description: "Собрано и протестировано, 16 ГБ DDR5, SSD 1 ТБ.",
+    photos: [],
+    price: "14700000.00",
+    state: "new",
+    createdAt: "2026-06-18T16:45:00.000Z",
+    shopName: "Malika Computers",
+    characteristics: [
+      { key: "Процессор", value: "AMD Ryzen 5 7600" },
+      { key: "Видеокарта", value: "RTX 4060 8 ГБ" },
+      { key: "ОЗУ", value: "16 ГБ DDR5" },
+    ],
+  },
+  {
+    id: 104,
+    shopId: 2,
+    name: "Монитор Dell S2721DGF 27″ 165 Гц",
+    description: "Б/у, состояние отличное, без битых пикселей.",
+    photos: [],
+    price: "4300000.00",
+    state: "old",
+    createdAt: "2026-06-20T10:05:00.000Z",
+    shopName: "Malika Computers",
+    characteristics: [
+      { key: "Диагональ", value: "27″" },
+      { key: "Частота", value: "165 Гц" },
+    ],
+  },
+  {
+    id: 105,
+    shopId: 3,
+    name: "Lenovo ThinkPad T14 Gen 3",
+    description: "Корпоративная серия, i5-1235U, 16/512.",
+    photos: [],
+    price: "8900000.00",
+    state: "old",
+    createdAt: "2026-06-25T14:20:00.000Z",
+    shopName: "Grand Notebook",
+    characteristics: [
+      { key: "Процессор", value: "Intel Core i5-1235U" },
+      { key: "ОЗУ", value: "16 ГБ" },
+    ],
+  },
+  {
+    id: 106,
+    shopId: 3,
+    name: "Клавиатура Keychron K2 Pro",
+    description: "Механическая, свитчи Brown, беспроводная.",
+    photos: [],
+    price: "1250000.00",
+    state: "new",
+    createdAt: "2026-07-01T08:40:00.000Z",
+    shopName: "Grand Notebook",
+    characteristics: [{ key: "Переключатели", value: "Gateron Brown" }],
+  },
+  {
+    id: 107,
+    shopId: 4,
+    name: "SSD Samsung 990 Pro 2 ТБ",
+    description: "Новый, запечатан.",
+    photos: [],
+    price: "2980000.00",
+    state: "new",
+    createdAt: "2026-07-05T11:55:00.000Z",
+    shopName: "Pixel Store",
+    characteristics: [{ key: "Объём", value: "2 ТБ" }],
+  },
+  {
+    id: 108,
+    shopId: 6,
+    name: "Процессор Intel Core i7-13700K",
+    description: "Без кулера, гарантия 12 месяцев.",
+    photos: [],
+    price: "5400000.00",
+    state: "new",
+    createdAt: "2026-07-09T13:15:00.000Z",
+    shopName: "Комп Сервис",
+    characteristics: [{ key: "Ядер", value: "16" }],
+  },
+];
+
+/**
+ * Те же товары для админки плюс заблокированные — иначе фильтр по статусу
+ * локально не на чем проверить.
+ */
+export const devAdminProducts: AdminProductRow[] = [
+  ...devProducts.map((p) => ({
+    ...p,
+    status: "active" as const,
+    abolishReason: null,
+    abolishedAt: null,
+    updatedAt: p.createdAt,
+    shopStatus: "active" as const,
+  })),
+  {
+    id: 201,
+    shopId: 4,
+    name: "iPhone 15 Pro Max 256 ГБ — реплика",
+    description: "Оригинал 1:1, не отличить.",
+    photos: [],
+    price: "4200000.00",
+    state: "new",
+    createdAt: "2026-07-02T10:00:00.000Z",
+    shopName: "Pixel Store",
+    characteristics: [{ key: "Память", value: "256 ГБ" }],
+    status: "abolished",
+    abolishReason: "Продажа реплики под видом оригинала",
+    abolishedAt: "2026-07-03T09:15:00.000Z",
+    updatedAt: "2026-07-03T09:15:00.000Z",
+    shopStatus: "hidden",
+  },
+  {
+    id: 202,
+    shopId: 5,
+    name: "Ноутбук игровой ТОП ЦЕНА ЗВОНИТЕ",
+    description: "Пишите в телеграм @spam_seller, цена договорная!!!",
+    photos: [],
+    price: "1000.00",
+    state: "old",
+    createdAt: "2026-07-08T18:30:00.000Z",
+    shopName: "Sardor Tech",
+    characteristics: [],
+    status: "hidden",
+    abolishReason: null,
+    abolishedAt: null,
+    updatedAt: "2026-07-08T18:35:00.000Z",
+    shopStatus: "abolished",
+  },
+  {
+    id: 203,
+    shopId: 1,
+    name: "Видеокарта RTX 3080 (майнинг)",
+    description: "Работала в ферме два года, состояние рабочее.",
+    photos: [],
+    price: "3900000.00",
+    state: "old",
+    createdAt: "2026-06-28T11:20:00.000Z",
+    shopName: "TechnoDom",
+    characteristics: [{ key: "Память", value: "10 ГБ" }],
+    status: "hidden",
+    abolishReason: null,
+    abolishedAt: null,
+    updatedAt: "2026-06-28T12:00:00.000Z",
+    shopStatus: "active",
+  },
+];
+
+export const devUsers: AdminUserRow[] = [
+  {
+    id: 1,
+    fullname: "Азиз Рахимов",
+    role: "seller",
+    telegramId: 501234567,
+    telegramUsername: "aziz_rahimov",
+    telegramPhoto: null,
+    phoneNumber: "+998901234567",
+    blockedAt: null,
+    blockReason: null,
+    createdAt: "2026-01-14T09:10:00.000Z",
+    shopId: 1,
+    shopName: "TechnoDom",
+    shopStatus: "active",
+    productCount: 8,
+    lastProductAt: "2026-06-14T12:30:00.000Z",
+  },
+  {
+    id: 2,
+    fullname: "Шерзод Каримов",
+    role: "seller",
+    telegramId: 502234567,
+    telegramUsername: "sherzod_k",
+    telegramPhoto: null,
+    phoneNumber: "+998935558812",
+    blockedAt: null,
+    blockReason: null,
+    createdAt: "2026-02-02T10:55:00.000Z",
+    shopId: 2,
+    shopName: "Malika Computers",
+    shopStatus: "active",
+    productCount: 5,
+    lastProductAt: "2026-06-20T10:05:00.000Z",
+  },
+  {
+    id: 5,
+    fullname: "Сардор Тошматов",
+    role: "seller",
+    telegramId: 505234567,
+    telegramUsername: "sardor_t",
+    telegramPhoto: null,
+    phoneNumber: "+998944443322",
+    blockedAt: "2026-04-23T10:00:00.000Z",
+    blockReason: "Повторные жалобы на обман покупателей",
+    createdAt: "2026-04-22T12:50:00.000Z",
+    shopId: 5,
+    shopName: "Sardor Tech",
+    shopStatus: "abolished",
+    productCount: 1,
+    lastProductAt: "2026-07-08T18:35:00.000Z",
+  },
+  {
+    id: 7,
+    fullname: "Нигора Абдуллаева",
+    role: "admin",
+    telegramId: 507234567,
+    telegramUsername: "nigora_admin",
+    telegramPhoto: null,
+    phoneNumber: "+998901110022",
+    blockedAt: null,
+    blockReason: null,
+    createdAt: "2025-12-01T08:00:00.000Z",
+    shopId: null,
+    shopName: null,
+    shopStatus: null,
+    productCount: 0,
+    lastProductAt: null,
+  },
+];
+
+export const devUserActivity: AdminUserActivity[] = [
+  {
+    id: 102,
+    name: "Видеокарта RTX 4070 Super 12 ГБ",
+    status: "active",
+    price: "9150000.00",
+    createdAt: "2026-06-14T12:30:00.000Z",
+    updatedAt: "2026-06-14T12:30:00.000Z",
+    shopName: "TechnoDom",
+  },
+  {
+    id: 203,
+    name: "Видеокарта RTX 3080 (майнинг)",
+    status: "hidden",
+    price: "3900000.00",
+    createdAt: "2026-06-28T11:20:00.000Z",
+    updatedAt: "2026-06-28T12:00:00.000Z",
+    shopName: "TechnoDom",
+  },
+  {
+    id: 101,
+    name: 'MacBook Air 13" M2, 8/256 ГБ',
+    status: "active",
+    price: "12400000.00",
+    createdAt: "2026-06-11T09:00:00.000Z",
+    updatedAt: "2026-06-11T09:00:00.000Z",
+    shopName: "TechnoDom",
+  },
+];
+
+export const devAiReview: AiReviewRow[] = [
+  {
+    checkId: 9001,
+    productCardId: 202,
+    verdict: "fail",
+    summary:
+      "В описании контакты стороннего продавца и нет сведений о самом товаре.",
+    error: null,
+    checkedAt: "2026-07-08T18:35:00.000Z",
+    name: "Ноутбук игровой ТОП ЦЕНА ЗВОНИТЕ",
+    price: "1000.00",
+    photos: [],
+    status: "hidden",
+    description: "Пишите в телеграм @spam_seller, цена договорная!!!",
+    shopName: "Sardor Tech",
+  },
+  {
+    checkId: 9002,
+    productCardId: 203,
+    verdict: "warn",
+    summary: "Проверка не выполнена — сервис проверки недоступен",
+    error: "Connection error: OpenAI timeout after 60000ms",
+    checkedAt: "2026-06-28T12:00:00.000Z",
+    name: "Видеокарта RTX 3080 (майнинг)",
+    price: "3900000.00",
+    photos: [],
+    status: "hidden",
+    description: "Работала в ферме два года, состояние рабочее.",
+    shopName: "TechnoDom",
+  },
+];
+
+export const devReports: ReportRow[] = [
+  {
+    id: 1,
+    context: "В описании указана гарантия 12 месяцев, в магазине говорят про 3.",
+    shopId: 1,
+    productCardId: 101,
+    createdAt: "2026-07-12T09:30:00.000Z",
+    updatedAt: "2026-07-12T09:30:00.000Z",
+  },
+  {
+    id: 2,
+    context: "Товар давно продан, но объявление висит.",
+    shopId: 2,
+    productCardId: 104,
+    createdAt: "2026-07-14T17:10:00.000Z",
+    updatedAt: "2026-07-14T17:10:00.000Z",
+  },
+  {
+    id: 3,
+    context: "Продавец не отвечает в Telegram уже неделю.",
+    shopId: 3,
+    productCardId: null,
+    createdAt: "2026-07-19T12:00:00.000Z",
+    updatedAt: "2026-07-19T12:00:00.000Z",
+  },
+  {
+    id: 4,
+    context: "Цена на месте выше, чем на сайте, почти в полтора раза.",
+    shopId: 5,
+    productCardId: null,
+    createdAt: "2026-07-23T15:45:00.000Z",
+    updatedAt: "2026-07-23T15:45:00.000Z",
+  },
+];
+
+/**
+ * true, когда на экране фикстуры, а не ответ API. Нужен, чтобы не показывать
+ * поверх тестовых данных красное «не удалось загрузить» — это сбивает с толку.
+ */
+export function usingDevData(data: { length: number } | undefined): boolean {
+  return IS_DEV && !data?.length;
+}
+
+/** Список: отдаём фикстуры, когда API промолчал, и только в dev. */
+export function devFallback<T>(data: T[] | undefined, fixtures: T[]): T[] {
+  if (data && data.length > 0) return data;
+  return IS_DEV ? fixtures : (data ?? []);
+}
+
+/** То же для страничного ответа — meta собираем из длины фикстур. */
+export function devFallbackPage<T>(
+  data: Paginated<T> | undefined,
+  fixtures: T[],
+): Paginated<T> {
+  if (data && data.data.length > 0) return data;
+  if (!IS_DEV) {
+    return data ?? { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 1 } };
+  }
+  return {
+    data: fixtures,
+    meta: {
+      page: 1,
+      limit: Math.max(fixtures.length, 1),
+      total: fixtures.length,
+      totalPages: 1,
+    },
+  };
+}

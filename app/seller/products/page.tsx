@@ -33,6 +33,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ProductImage } from "@/components/shared/product-image";
+import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { ModerationBadge } from "@/components/shared/badges";
 import { useT } from "@/components/providers/i18n-provider";
 import { formatPrice } from "@/lib/format";
@@ -61,7 +62,6 @@ export default function SellerProducts() {
   }, [rows, q]);
 
   const remove = async (id: string, name: string) => {
-    if (!window.confirm(t("seller.products.deleteConfirm"))) return;
     try {
       await removeMutation.mutateAsync({ id: Number(id) });
       await queryClient.invalidateQueries();
@@ -148,9 +148,20 @@ export default function SellerProducts() {
                           <Link href={`/seller/products/${p.id}`}><Pencil className="size-4" /> {t("common.edit")}</Link>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem variant="destructive" onClick={() => remove(p.id, p.name)}>
+                        <ConfirmDialog
+                          title={t("common.delete")}
+                          description={t("seller.products.deleteConfirm")}
+                          confirmLabel={t("common.delete")}
+                          destructive
+                          onConfirm={() => remove(p.id, p.name)}
+                        >
+                        <DropdownMenuItem
+                          variant="destructive"
+                          onSelect={(e) => e.preventDefault()}
+                        >
                           <Trash2 className="size-4" /> {t("common.delete")}
                         </DropdownMenuItem>
+                        </ConfirmDialog>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>

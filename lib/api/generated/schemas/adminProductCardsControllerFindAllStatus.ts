@@ -6,10 +6,11 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export interface AbolishShopDto {
-  /**
-     * Причина упразднения — видна продавцу
-     * @minLength 5
-     */
-  reason: string;
-}
+export type AdminProductCardsControllerFindAllStatus = typeof AdminProductCardsControllerFindAllStatus[keyof typeof AdminProductCardsControllerFindAllStatus];
+
+
+export const AdminProductCardsControllerFindAllStatus = {
+  active: 'active',
+  hidden: 'hidden',
+  abolished: 'abolished',
+} as const;

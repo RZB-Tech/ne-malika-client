@@ -29,6 +29,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ProductImage } from "@/components/shared/product-image";
+import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { ModerationBadge } from "@/components/shared/badges";
 import { ProductStatsCard } from "@/components/seller/product-stats";
 import {
@@ -145,7 +146,6 @@ export function SellerProductDetail({ id }: { id: number }) {
   };
 
   const remove = async () => {
-    if (!window.confirm(t("seller.products.deleteConfirm"))) return;
     try {
       await removeMutation.mutateAsync({ id });
       await queryClient.invalidateQueries();
@@ -232,10 +232,18 @@ export function SellerProductDetail({ id }: { id: number }) {
                   {t("seller.products.viewOnSite")}
                 </Link>
               </Button>
-              <Button variant="outline" className="ml-auto gap-2 text-destructive" onClick={remove}>
-                <Trash2 className="size-4" />
-                {t("common.delete")}
-              </Button>
+              <ConfirmDialog
+                title={t("common.delete")}
+                description={t("seller.products.deleteConfirm")}
+                confirmLabel={t("common.delete")}
+                destructive
+                onConfirm={remove}
+              >
+                <Button variant="outline" className="ml-auto gap-2 text-destructive">
+                  <Trash2 className="size-4" />
+                  {t("common.delete")}
+                </Button>
+              </ConfirmDialog>
             </div>
           </div>
         </div>

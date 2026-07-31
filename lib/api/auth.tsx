@@ -14,6 +14,7 @@ import {
   authControllerWidgetAuth,
 } from "./generated/endpoints/auth/auth";
 import type { AuthResponseDto, TelegramWidgetDto } from "./generated/schemas";
+import { DEV_ROLE } from "./dev-fixtures";
 import {
   clearAuth,
   getAccessToken,
@@ -99,6 +100,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     wa?.expand?.();
 
     if (getAccessToken()) return;
+
+    // Локальная разработка без бэкенда: фиктивная сессия, чтобы открывался
+    // кабинет. Токен ненастоящий — все запросы к API всё равно упадут, и
+    // страницы покажут тестовые данные из dev-fixtures. В прод-сборке
+    // DEV_ROLE всегда undefined, ветка вырезается сборщиком.
+    if (DEV_ROLE) {
+      setAuth("dev-token", {
+        id: 0,
+        fullname: DEV_ROLE === "admin" ? "Локальный админ" : "Локальный продавец",
+        role: DEV_ROLE,
+        telegramUsername: null,
+        telegramPhoto: null,
+        phoneNumber: null,
+        hasContact: false,
+      });
+      return;
+    }
 
     // Inside Telegram — auto-authenticate with the injected initData.
     const initData = readMiniAppInitData();

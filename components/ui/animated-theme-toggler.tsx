@@ -239,27 +239,29 @@ export const AnimatedThemeToggler = ({
       flushSync(applyTheme)
     })
     if (typeof transition?.finished?.finally === "function") {
-      transition.finished.finally(cleanup)
+      transition.finished.finally(cleanup).catch(() => { })
     } else {
       cleanup()
     }
 
     const ready = transition?.ready
     if (ready && typeof ready.then === "function") {
-      ready.then(() => {
-        document.documentElement.animate(
-          {
-            clipPath,
-          },
-          {
-            duration,
-            // Star: linear avoids easing overshoot that fights polygon interpolation at t→1; VT group duration is synced above.
-            easing: shape === "star" ? "linear" : "ease-in-out",
-            fill: "forwards",
-            pseudoElement: "::view-transition-new(root)",
-          }
-        )
-      })
+      ready
+        .then(() => {
+          document.documentElement.animate(
+            {
+              clipPath,
+            },
+            {
+              duration,
+              // Star: linear avoids easing overshoot that fights polygon interpolation at t→1; VT group duration is synced above.
+              easing: shape === "star" ? "linear" : "ease-in-out",
+              fill: "forwards",
+              pseudoElement: "::view-transition-new(root)",
+            }
+          )
+        })
+        .catch(() => { })
     }
   }, [shape, fromCenter, duration, isDark, isControlled, onThemeChange])
 

@@ -6,17 +6,29 @@
  * OpenAPI spec version: 1.0.0
  */
 import {
-  useMutation
+  useMutation,
+  useQuery
 } from '@tanstack/react-query';
 import type {
+  DataTag,
+  DefinedInitialDataOptions,
+  DefinedUseQueryResult,
   MutationFunction,
   QueryClient,
+  QueryFunction,
+  QueryKey,
+  UndefinedInitialDataOptions,
   UseMutationOptions,
-  UseMutationResult
+  UseMutationResult,
+  UseQueryOptions,
+  UseQueryResult
 } from '@tanstack/react-query';
 
 import type {
-  AbolishProductCardDto
+  AdminProductCardsControllerFindAllParams,
+  CreateProductCardDto,
+  ReasonDto,
+  UpdateProductCardDto
 } from '../../schemas';
 
 import { customInstance } from '../../../mutator';
@@ -27,12 +39,466 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
+const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKey: K } => {
+  const result = { queryKey } as T & { queryKey: K };
+  for (const key of Object.keys(query)) {
+    // The explicit queryKey always wins, matching the previous
+    // `{ ...query, queryKey }` spread where it was set last.
+    if (key === 'queryKey') continue;
+    Object.defineProperty(result, key, {
+      enumerable: true,
+      configurable: true,
+      get: () => (query as Record<string, unknown>)[key],
+    });
+  }
+  return result;
+};
+
 /**
+ * @summary Все товары с фильтром по статусу — включая скрытые и упразднённые
+ */
+export const adminProductCardsControllerFindAll = (
+    params?: AdminProductCardsControllerFindAllParams,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<void>(
+      {url: `/api/v1/admin/product-cards`, method: 'GET',
+        params, signal
+    },
+      options);
+    }
+
+
+
+
+export const getAdminProductCardsControllerFindAllQueryKey = (params?: AdminProductCardsControllerFindAllParams,) => {
+    return [
+    `/api/v1/admin/product-cards`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getAdminProductCardsControllerFindAllQueryOptions = <TData = Awaited<ReturnType<typeof adminProductCardsControllerFindAll>>, TError = ErrorType<unknown>>(params?: AdminProductCardsControllerFindAllParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminProductCardsControllerFindAll>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getAdminProductCardsControllerFindAllQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof adminProductCardsControllerFindAll>>> = ({ signal }) => adminProductCardsControllerFindAll(params, requestOptions, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof adminProductCardsControllerFindAll>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type AdminProductCardsControllerFindAllQueryResult = NonNullable<Awaited<ReturnType<typeof adminProductCardsControllerFindAll>>>
+export type AdminProductCardsControllerFindAllQueryError = ErrorType<unknown>
+
+
+export function useAdminProductCardsControllerFindAll<TData = Awaited<ReturnType<typeof adminProductCardsControllerFindAll>>, TError = ErrorType<unknown>>(
+ params: undefined |  AdminProductCardsControllerFindAllParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminProductCardsControllerFindAll>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof adminProductCardsControllerFindAll>>,
+          TError,
+          Awaited<ReturnType<typeof adminProductCardsControllerFindAll>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAdminProductCardsControllerFindAll<TData = Awaited<ReturnType<typeof adminProductCardsControllerFindAll>>, TError = ErrorType<unknown>>(
+ params?: AdminProductCardsControllerFindAllParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminProductCardsControllerFindAll>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof adminProductCardsControllerFindAll>>,
+          TError,
+          Awaited<ReturnType<typeof adminProductCardsControllerFindAll>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAdminProductCardsControllerFindAll<TData = Awaited<ReturnType<typeof adminProductCardsControllerFindAll>>, TError = ErrorType<unknown>>(
+ params?: AdminProductCardsControllerFindAllParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminProductCardsControllerFindAll>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Все товары с фильтром по статусу — включая скрытые и упразднённые
+ */
+
+export function useAdminProductCardsControllerFindAll<TData = Awaited<ReturnType<typeof adminProductCardsControllerFindAll>>, TError = ErrorType<unknown>>(
+ params?: AdminProductCardsControllerFindAllParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminProductCardsControllerFindAll>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getAdminProductCardsControllerFindAllQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+/**
+ * @summary Очередь ручной модерации: проверки со сбоем сервиса или вердиктом fail
+ */
+export const adminProductCardsControllerAiReview = (
+
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<void>(
+      {url: `/api/v1/admin/product-cards/ai-review`, method: 'GET', signal
+    },
+      options);
+    }
+
+
+
+
+export const getAdminProductCardsControllerAiReviewQueryKey = () => {
+    return [
+    `/api/v1/admin/product-cards/ai-review`
+    ] as const;
+    }
+
+
+export const getAdminProductCardsControllerAiReviewQueryOptions = <TData = Awaited<ReturnType<typeof adminProductCardsControllerAiReview>>, TError = ErrorType<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminProductCardsControllerAiReview>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getAdminProductCardsControllerAiReviewQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof adminProductCardsControllerAiReview>>> = ({ signal }) => adminProductCardsControllerAiReview(requestOptions, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof adminProductCardsControllerAiReview>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type AdminProductCardsControllerAiReviewQueryResult = NonNullable<Awaited<ReturnType<typeof adminProductCardsControllerAiReview>>>
+export type AdminProductCardsControllerAiReviewQueryError = ErrorType<unknown>
+
+
+export function useAdminProductCardsControllerAiReview<TData = Awaited<ReturnType<typeof adminProductCardsControllerAiReview>>, TError = ErrorType<unknown>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminProductCardsControllerAiReview>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof adminProductCardsControllerAiReview>>,
+          TError,
+          Awaited<ReturnType<typeof adminProductCardsControllerAiReview>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAdminProductCardsControllerAiReview<TData = Awaited<ReturnType<typeof adminProductCardsControllerAiReview>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminProductCardsControllerAiReview>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof adminProductCardsControllerAiReview>>,
+          TError,
+          Awaited<ReturnType<typeof adminProductCardsControllerAiReview>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAdminProductCardsControllerAiReview<TData = Awaited<ReturnType<typeof adminProductCardsControllerAiReview>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminProductCardsControllerAiReview>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Очередь ручной модерации: проверки со сбоем сервиса или вердиктом fail
+ */
+
+export function useAdminProductCardsControllerAiReview<TData = Awaited<ReturnType<typeof adminProductCardsControllerAiReview>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminProductCardsControllerAiReview>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getAdminProductCardsControllerAiReviewQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+/**
+ * @summary Создать товар в любом магазине
+ */
+export const adminProductCardsControllerCreate = (
+    shopId: number,
+    createProductCardDto: BodyType<CreateProductCardDto>,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<void>(
+      {url: `/api/v1/admin/product-cards/shops/${shopId}`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createProductCardDto, signal
+    },
+      options);
+    }
+
+
+
+
+export const getAdminProductCardsControllerCreateMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminProductCardsControllerCreate>>, TError,{shopId: number;data: BodyType<CreateProductCardDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof adminProductCardsControllerCreate>>, TError,{shopId: number;data: BodyType<CreateProductCardDto>}, TContext> => {
+
+const mutationKey = ['adminProductCardsControllerCreate'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminProductCardsControllerCreate>>, {shopId: number;data: BodyType<CreateProductCardDto>}> = (props) => {
+          const {shopId,data} = props ?? {};
+
+          return  adminProductCardsControllerCreate(shopId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AdminProductCardsControllerCreateMutationResult = NonNullable<Awaited<ReturnType<typeof adminProductCardsControllerCreate>>>
+    export type AdminProductCardsControllerCreateMutationBody = BodyType<CreateProductCardDto>
+    export type AdminProductCardsControllerCreateMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Создать товар в любом магазине
+ */
+export const useAdminProductCardsControllerCreate = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminProductCardsControllerCreate>>, TError,{shopId: number;data: BodyType<CreateProductCardDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof adminProductCardsControllerCreate>>,
+        TError,
+        {shopId: number;data: BodyType<CreateProductCardDto>},
+        TContext
+      > => {
+      return useMutation(getAdminProductCardsControllerCreateMutationOptions(options), queryClient);
+    }
+    /**
+ * @summary Отредактировать любой товар
+ */
+export const adminProductCardsControllerUpdate = (
+    id: number,
+    updateProductCardDto: BodyType<UpdateProductCardDto>,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<void>(
+      {url: `/api/v1/admin/product-cards/${id}`, method: 'PUT',
+      headers: {'Content-Type': 'application/json', },
+      data: updateProductCardDto, signal
+    },
+      options);
+    }
+
+
+
+
+export const getAdminProductCardsControllerUpdateMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminProductCardsControllerUpdate>>, TError,{id: number;data: BodyType<UpdateProductCardDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof adminProductCardsControllerUpdate>>, TError,{id: number;data: BodyType<UpdateProductCardDto>}, TContext> => {
+
+const mutationKey = ['adminProductCardsControllerUpdate'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminProductCardsControllerUpdate>>, {id: number;data: BodyType<UpdateProductCardDto>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  adminProductCardsControllerUpdate(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AdminProductCardsControllerUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof adminProductCardsControllerUpdate>>>
+    export type AdminProductCardsControllerUpdateMutationBody = BodyType<UpdateProductCardDto>
+    export type AdminProductCardsControllerUpdateMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Отредактировать любой товар
+ */
+export const useAdminProductCardsControllerUpdate = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminProductCardsControllerUpdate>>, TError,{id: number;data: BodyType<UpdateProductCardDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof adminProductCardsControllerUpdate>>,
+        TError,
+        {id: number;data: BodyType<UpdateProductCardDto>},
+        TContext
+      > => {
+      return useMutation(getAdminProductCardsControllerUpdateMutationOptions(options), queryClient);
+    }
+    /**
+ * @summary Удалить товар безвозвратно. Для обратимой блокировки — abolish
+ */
+export const adminProductCardsControllerRemove = (
+    id: number,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<void>(
+      {url: `/api/v1/admin/product-cards/${id}`, method: 'DELETE', signal
+    },
+      options);
+    }
+
+
+
+
+export const getAdminProductCardsControllerRemoveMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminProductCardsControllerRemove>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof adminProductCardsControllerRemove>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['adminProductCardsControllerRemove'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminProductCardsControllerRemove>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  adminProductCardsControllerRemove(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AdminProductCardsControllerRemoveMutationResult = NonNullable<Awaited<ReturnType<typeof adminProductCardsControllerRemove>>>
+
+    export type AdminProductCardsControllerRemoveMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Удалить товар безвозвратно. Для обратимой блокировки — abolish
+ */
+export const useAdminProductCardsControllerRemove = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminProductCardsControllerRemove>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof adminProductCardsControllerRemove>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getAdminProductCardsControllerRemoveMutationOptions(options), queryClient);
+    }
+    /**
+ * @summary Отправить товар на ИИ-проверку заново
+ */
+export const adminProductCardsControllerRecheck = (
+    id: number,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<void>(
+      {url: `/api/v1/admin/product-cards/${id}/recheck`, method: 'POST', signal
+    },
+      options);
+    }
+
+
+
+
+export const getAdminProductCardsControllerRecheckMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminProductCardsControllerRecheck>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof adminProductCardsControllerRecheck>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['adminProductCardsControllerRecheck'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminProductCardsControllerRecheck>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  adminProductCardsControllerRecheck(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AdminProductCardsControllerRecheckMutationResult = NonNullable<Awaited<ReturnType<typeof adminProductCardsControllerRecheck>>>
+
+    export type AdminProductCardsControllerRecheckMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Отправить товар на ИИ-проверку заново
+ */
+export const useAdminProductCardsControllerRecheck = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminProductCardsControllerRecheck>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof adminProductCardsControllerRecheck>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getAdminProductCardsControllerRecheckMutationOptions(options), queryClient);
+    }
+    /**
  * @summary Упразднить товар с обязательной причиной
  */
 export const adminProductCardsControllerAbolish = (
     id: number,
-    abolishProductCardDto: BodyType<AbolishProductCardDto>,
+    reasonDto: BodyType<ReasonDto>,
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
 
@@ -40,7 +506,7 @@ export const adminProductCardsControllerAbolish = (
       return customInstance<void>(
       {url: `/api/v1/admin/product-cards/${id}/abolish`, method: 'PATCH',
       headers: {'Content-Type': 'application/json', },
-      data: abolishProductCardDto, signal
+      data: reasonDto, signal
     },
       options);
     }
@@ -49,8 +515,8 @@ export const adminProductCardsControllerAbolish = (
 
 
 export const getAdminProductCardsControllerAbolishMutationOptions = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminProductCardsControllerAbolish>>, TError,{id: number;data: BodyType<AbolishProductCardDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof adminProductCardsControllerAbolish>>, TError,{id: number;data: BodyType<AbolishProductCardDto>}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminProductCardsControllerAbolish>>, TError,{id: number;data: BodyType<ReasonDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof adminProductCardsControllerAbolish>>, TError,{id: number;data: BodyType<ReasonDto>}, TContext> => {
 
 const mutationKey = ['adminProductCardsControllerAbolish'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -62,7 +528,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminProductCardsControllerAbolish>>, {id: number;data: BodyType<AbolishProductCardDto>}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminProductCardsControllerAbolish>>, {id: number;data: BodyType<ReasonDto>}> = (props) => {
           const {id,data} = props ?? {};
 
           return  adminProductCardsControllerAbolish(id,data,requestOptions)
@@ -76,18 +542,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type AdminProductCardsControllerAbolishMutationResult = NonNullable<Awaited<ReturnType<typeof adminProductCardsControllerAbolish>>>
-    export type AdminProductCardsControllerAbolishMutationBody = BodyType<AbolishProductCardDto>
+    export type AdminProductCardsControllerAbolishMutationBody = BodyType<ReasonDto>
     export type AdminProductCardsControllerAbolishMutationError = ErrorType<unknown>
 
     /**
  * @summary Упразднить товар с обязательной причиной
  */
 export const useAdminProductCardsControllerAbolish = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminProductCardsControllerAbolish>>, TError,{id: number;data: BodyType<AbolishProductCardDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminProductCardsControllerAbolish>>, TError,{id: number;data: BodyType<ReasonDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof adminProductCardsControllerAbolish>>,
         TError,
-        {id: number;data: BodyType<AbolishProductCardDto>},
+        {id: number;data: BodyType<ReasonDto>},
         TContext
       > => {
       return useMutation(getAdminProductCardsControllerAbolishMutationOptions(options), queryClient);

@@ -122,6 +122,162 @@
         ]
       }
     },
+    "/api/v1/admin/users": {
+      "get": {
+        "operationId": "AdminUsersController_list",
+        "summary": "Все пользователи с их магазином и числом товаров",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "users-admin"
+        ],
+        "security": [
+          {
+            "access-token": []
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/users/{id}": {
+      "get": {
+        "operationId": "AdminUsersController_getOne",
+        "summary": "Карточка пользователя и его последние изменённые товары",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "users-admin"
+        ],
+        "security": [
+          {
+            "access-token": []
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/users/{id}/role": {
+      "patch": {
+        "operationId": "AdminUsersController_setRole",
+        "summary": "Выдать или снять права администратора",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetRoleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "users-admin"
+        ],
+        "security": [
+          {
+            "access-token": []
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/users/{id}/block": {
+      "patch": {
+        "operationId": "AdminUsersController_block",
+        "summary": "Заблокировать продавца. В отличие от упразднения магазина закрывает вход в кабинет",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReasonDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "users-admin"
+        ],
+        "security": [
+          {
+            "access-token": []
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/users/{id}/unblock": {
+      "patch": {
+        "operationId": "AdminUsersController_unblock",
+        "summary": "Снять блокировку с продавца",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "users-admin"
+        ],
+        "security": [
+          {
+            "access-token": []
+          }
+        ]
+      }
+    },
     "/api/v1/shops/{id}": {
       "get": {
         "operationId": "ShopsController_getPublic",
@@ -335,7 +491,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/AbolishShopDto"
+                "$ref": "#/components/schemas/ReasonDto"
               }
             }
           }
@@ -688,6 +844,237 @@
         ]
       }
     },
+    "/api/v1/admin/product-cards": {
+      "get": {
+        "operationId": "AdminProductCardsController_findAll",
+        "summary": "Все товары с фильтром по статусу — включая скрытые и упразднённые",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Номер страницы",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Размер страницы",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "description": "Поиск по названию",
+            "schema": {
+              "example": "ноутбук",
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "Без параметра возвращаются товары во всех статусах",
+            "schema": {
+              "enum": [
+                "active",
+                "hidden",
+                "abolished"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "shop_id",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": 1,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "product-cards-admin"
+        ],
+        "security": [
+          {
+            "access-token": []
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/product-cards/ai-review": {
+      "get": {
+        "operationId": "AdminProductCardsController_aiReview",
+        "summary": "Очередь ручной модерации: проверки со сбоем сервиса или вердиктом fail",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "product-cards-admin"
+        ],
+        "security": [
+          {
+            "access-token": []
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/product-cards/shops/{shopId}": {
+      "post": {
+        "operationId": "AdminProductCardsController_create",
+        "summary": "Создать товар в любом магазине",
+        "parameters": [
+          {
+            "name": "shopId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateProductCardDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "product-cards-admin"
+        ],
+        "security": [
+          {
+            "access-token": []
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/product-cards/{id}": {
+      "put": {
+        "operationId": "AdminProductCardsController_update",
+        "summary": "Отредактировать любой товар",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProductCardDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "product-cards-admin"
+        ],
+        "security": [
+          {
+            "access-token": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "AdminProductCardsController_remove",
+        "summary": "Удалить товар безвозвратно. Для обратимой блокировки — abolish",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "product-cards-admin"
+        ],
+        "security": [
+          {
+            "access-token": []
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/product-cards/{id}/recheck": {
+      "post": {
+        "operationId": "AdminProductCardsController_recheck",
+        "summary": "Отправить товар на ИИ-проверку заново",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "product-cards-admin"
+        ],
+        "security": [
+          {
+            "access-token": []
+          }
+        ]
+      }
+    },
     "/api/v1/admin/product-cards/{id}/abolish": {
       "patch": {
         "operationId": "AdminProductCardsController_abolish",
@@ -707,7 +1094,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/AbolishProductCardDto"
+                "$ref": "#/components/schemas/ReasonDto"
               }
             }
           }
@@ -1209,6 +1596,36 @@
           "hash"
         ]
       },
+      "SetRoleDto": {
+        "type": "object",
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": [
+              "seller",
+              "admin"
+            ],
+            "example": "admin"
+          }
+        },
+        "required": [
+          "role"
+        ]
+      },
+      "ReasonDto": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "minLength": 5,
+            "description": "Причина — видна продавцу",
+            "example": "Множественные жалобы на мошенничество"
+          }
+        },
+        "required": [
+          "reason"
+        ]
+      },
       "WorkScheduleEntryDto": {
         "type": "object",
         "properties": {
@@ -1348,20 +1765,6 @@
           }
         }
       },
-      "AbolishShopDto": {
-        "type": "object",
-        "properties": {
-          "reason": {
-            "type": "string",
-            "minLength": 5,
-            "description": "Причина упразднения — видна продавцу",
-            "example": "Множественные жалобы на мошенничество"
-          }
-        },
-        "required": [
-          "reason"
-        ]
-      },
       "CharacteristicDto": {
         "type": "object",
         "properties": {
@@ -1496,20 +1899,6 @@
             }
           }
         }
-      },
-      "AbolishProductCardDto": {
-        "type": "object",
-        "properties": {
-          "reason": {
-            "type": "string",
-            "minLength": 5,
-            "description": "Причина упразднения — видна продавцу",
-            "example": "Товар не соответствует описанию"
-          }
-        },
-        "required": [
-          "reason"
-        ]
       },
       "AppSettingsDto": {
         "type": "object",

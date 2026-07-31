@@ -1,0 +1,168 @@
+"use client";
+
+import Link from "next/link";
+import { Ban, ExternalLink, Pencil, RotateCcw, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ProductImage } from "@/components/shared/product-image";
+import { AbolishDialog } from "@/components/admin/abolish-dialog";
+import { EntityStatusBadge } from "@/components/admin/entity-status-badge";
+import {
+  DetailDrawer,
+  DetailNote,
+  DetailRow,
+  DetailSection,
+  drawerAction,
+} from "@/components/admin/detail-drawer";
+import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { useT } from "@/components/providers/i18n-provider";
+import { formatDate, formatPrice } from "@/lib/format";
+import { hueFromId } from "@/lib/api/mappers";
+import { photoUrl } from "@/lib/api/photo";
+import type { AdminProductRow } from "@/lib/api/types";
+
+export function ProductDrawer({
+  product,
+  onOpenChange,
+  onAbolish,
+  onRestore,
+  onRemove,
+  onEdit,
+}: {
+  product: AdminProductRow | null;
+  onOpenChange: (open: boolean) => void;
+  onAbolish: (id: number, reason: string) => Promise<void>;
+  onRestore: (id: number) => Promise<void>;
+  onRemove: (id: number, name: string) => Promise<void>;
+  onEdit: (product: AdminProductRow) => void;
+}) {
+  const { t, locale } = useT();
+
+  return (
+    <DetailDrawer
+      open={product !== null}
+      onOpenChange={onOpenChange}
+      title={product?.name ?? ""}
+      badges={product && <EntityStatusBadge status={product.status} />}
+      description={
+        product &&
+        `${product.shopName} · ${formatDate(product.createdAt, locale)} · ${
+          product.state === "new" ? "новый" : "б/у"
+        }`
+      }
+      footer={
+        product && (
+          <>
+            <Button
+              variant="ghost"
+              className={drawerAction.primary}
+              onClick={() => onEdit(product)}
+            >
+              <Pencil className="size-4" /> Изменить
+            </Button>
+
+            <Button asChild variant="ghost" className={drawerAction.neutral}>
+              <Link href={`/product/${product.id}`}>
+                <ExternalLink className="size-4" /> На сайте
+              </Link>
+            </Button>
+
+            {product.status === "active" ? (
+              <AbolishDialog
+                title="Упразднить товар"
+                description="Товар скроется из публичной выдачи. Причина видна продавцу."
+                onConfirm={(reason) => onAbolish(product.id, reason)}
+              >
+                <Button variant="ghost" className={drawerAction.warning}>
+                  <Ban className="size-4" /> Упразднить
+                </Button>
+              </AbolishDialog>
+            ) : (
+              <Button
+                variant="ghost"
+                className={drawerAction.success}
+                onClick={() => onRestore(product.id)}
+              >
+                <RotateCcw className="size-4" /> Вернуть
+              </Button>
+            )}
+
+            <ConfirmDialog
+              title="Удалить товар?"
+              description={`«${product.name}» исчезнет навсегда. Если нужна обратимая блокировка — используйте «Упразднить».`}
+              confirmLabel="Удалить"
+              destructive
+              onConfirm={() => onRemove(product.id, product.name)}
+            >
+              <Button variant="ghost" className={drawerAction.danger}>
+                <Trash2 className="size-4" /> Удалить
+              </Button>
+            </ConfirmDialog>
+          </>
+        )
+      }
+    >
+      {product && (
+        <>
+          <div className="flex items-center gap-4">
+            <ProductImage
+              hue={hueFromId(product.id)}
+              categorySlug=""
+              src={photoUrl(product.photos?.[0])}
+              alt={product.name}
+              className="size-20 shrink-0 rounded-xl"
+              iconClassName="size-6"
+            />
+            <div className="tabular text-xl font-bold">
+              {formatPrice(Number(product.price), locale)}{" "}
+              <span className="text-sm font-normal text-muted-foreground">
+                {t("common.currency")}
+              </span>
+            </div>
+          </div>
+
+          {product.description && (
+            <DetailSection title="Описание">
+              <p className="text-sm text-muted-foreground">
+                {product.description}
+              </p>
+            </DetailSection>
+          )}
+
+          {product.characteristics && product.characteristics.length > 0 && (
+            <DetailSection title="Характеристики">
+              {product.characteristics.map((c) => (
+                <DetailRow key={c.key} label={c.key} value={c.value} />
+              ))}
+            </DetailSection>
+          )}
+
+          {product.status === "abolished" && product.abolishReason && (
+            <DetailNote
+              tone="danger"
+              title={`Упразднён${
+                product.abolishedAt
+                  ? ` ${formatDate(product.abolishedAt, locale)}`
+                  : ""
+              }`}
+            >
+              {product.abolishReason}
+            </DetailNote>
+          )}
+
+          {product.status === "hidden" && (
+            <DetailNote tone="warning" title="Скрыт ИИ-проверкой">
+              Причина видна продавцу в карточке товара.
+            </DetailNote>
+          )}
+
+          {product.shopStatus !== "active" && (
+            <DetailNote>
+              Магазин «{product.shopName}» не активен — товар не появится в
+              выдаче, даже если вернуть его.
+            </DetailNote>
+          )}
+        </>
+      )}
+    </DetailDrawer>
+  );
+}

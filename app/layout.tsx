@@ -63,6 +63,7 @@ export default function RootLayout({
     <html
       lang="ru"
       suppressHydrationWarning
+      data-scroll-behavior="smooth"
       className={`${inter.variable} ${spaceGrotesk.variable} ${jetbrains.variable} h-full antialiased`}
     >
       <head>
