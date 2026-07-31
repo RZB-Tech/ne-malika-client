@@ -49,21 +49,15 @@ export async function uploadPhoto(blob: Blob): Promise<string> {
 
 /**
  * Приводит смешанный список фото (уже сохранённые + выбранные сейчас) к массиву
- * S3-ключей для тела запроса. Сохранённые проходят насквозь, новые загружаются;
- * если бакет недоступен в дев-окружении, подставляем случайный ключ, чтобы
- * карточка всё же сохранилась (вместо фото будет заглушка).
+ * S3-ключей для тела запроса. Сохранённые проходят насквозь, новые загружаются.
+ * Ошибка загрузки пробрасывается наверх: подставить случайный ключ значило бы
+ * сохранить товар со ссылкой на несуществующий файл — фото не появится никогда,
+ * а продавец увидит «сохранено».
  */
-export async function resolvePhotoKeys(
+export function resolvePhotoKeys(
   photos: { url: string; key?: string }[],
 ): Promise<string[]> {
   return Promise.all(
-    photos.map(async (p) => {
-      if (p.key) return p.key;
-      try {
-        return await uploadPhoto(dataUrlToBlob(p.url));
-      } catch {
-        return crypto.randomUUID();
-      }
-    }),
+    photos.map((p) => p.key ?? uploadPhoto(dataUrlToBlob(p.url))),
   );
 }

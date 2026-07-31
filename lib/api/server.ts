@@ -68,20 +68,17 @@ export function getPublicProducts(
   return getJson<Paginated<PublicProductCard>>(`/product-cards?${qs}`, 120);
 }
 
-/** Все id товаров для sitemap. Обходит пагинацию до конца. */
+/**
+ * Все id товаров для sitemap. Один запрос к специальному эндпоинту: раньше
+ * здесь была последовательная пагинация до сотни запросов подряд.
+ */
 export async function getAllProductIds(): Promise<
   { id: number; updatedAt: string }[]
 > {
-  const out: { id: number; updatedAt: string }[] = [];
-  const limit = 100;
-  for (let page = 1; page <= 100; page++) {
-    const res = await getJson<Paginated<PublicProductCard>>(
-      `/product-cards?page=${page}&limit=${limit}`,
+  return (
+    (await getJson<{ id: number; updatedAt: string }[]>(
+      "/product-cards/sitemap",
       3600,
-    );
-    if (!res?.data?.length) break;
-    for (const p of res.data) out.push({ id: p.id, updatedAt: p.createdAt });
-    if (page >= (res.meta?.totalPages ?? 1)) break;
-  }
-  return out;
+    )) ?? []
+  );
 }

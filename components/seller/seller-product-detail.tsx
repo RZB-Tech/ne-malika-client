@@ -7,7 +7,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import {
   ArrowLeft,
   CheckCircle2,
-  Flag,
   Plus,
   Send,
   Sparkles,
@@ -38,25 +37,17 @@ import {
   type UploadedPhoto,
 } from "@/components/seller/photo-dropzone";
 import { useT } from "@/components/providers/i18n-provider";
-import { useSellerShopsControllerList } from "@/lib/api/generated/endpoints/shops-seller/shops-seller";
 import {
   useSellerAiChecksControllerGetCheck,
-  useSellerProductCardsControllerList,
   useSellerProductCardsControllerRemove,
   useSellerProductCardsControllerUpdate,
 } from "@/lib/api/generated/endpoints/product-cards-seller/product-cards-seller";
-import { useAdminReportsControllerFindAll } from "@/lib/api/generated/endpoints/reports/reports";
+import { useSellerProducts } from "@/lib/api/seller";
 import { mapProductRow } from "@/lib/api/mappers";
 import { photoUrl } from "@/lib/api/photo";
 import { resolvePhotoKeys } from "@/lib/api/upload";
-import { formatDate, formatPriceInput, parsePriceInput } from "@/lib/format";
-import type {
-  AiProductCheck,
-  Paginated,
-  ProductCardRow,
-  ReportRow,
-  ShopRow,
-} from "@/lib/api/types";
+import { formatPriceInput, parsePriceInput } from "@/lib/format";
+import type { AiProductCheck } from "@/lib/api/types";
 
 type Spec = { key: string; value: string };
 
@@ -65,18 +56,8 @@ export function SellerProductDetail({ id }: { id: number }) {
   const router = useRouter();
   const queryClient = useQueryClient();
 
-  const shopsQuery = useSellerShopsControllerList({
-    query: { select: (raw) => raw as unknown as ShopRow[] },
-  });
-  const shop = shopsQuery.data?.[0];
-
-  const productsQuery = useSellerProductCardsControllerList(shop?.id ?? 0, {
-    query: {
-      enabled: Boolean(shop),
-      select: (raw) => raw as unknown as ProductCardRow[],
-    },
-  });
-  const row = productsQuery.data?.find((p) => p.id === id);
+  const { shop, rows, isLoading } = useSellerProducts();
+  const row = rows.find((p) => p.id === id);
 
   const aiCheckQuery = useSellerAiChecksControllerGetCheck(id, {
     query: { select: (raw) => raw as unknown as AiProductCheck, retry: false },
@@ -108,7 +89,7 @@ export function SellerProductDetail({ id }: { id: number }) {
     );
   }
 
-  if (shopsQuery.isLoading || productsQuery.isLoading) {
+  if (isLoading) {
     return <Skeleton className="h-96 w-full rounded-2xl" />;
   }
   if (!row) {
@@ -155,7 +136,7 @@ export function SellerProductDetail({ id }: { id: number }) {
       // Сбрасываем метку — форма перезаполнится с сервера, и свежезагруженные
       // фото начнут показываться по ключу, а не как локальный data:-URL.
       setHydratedRowId(null);
-      toast.success("Изменения сохранены — товар переотправлен на ИИ-проверку");
+      toast.success("Изменения сохранены — товар отправлен на ИИ-проверку");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Не удалось сохранить");
     } finally {
@@ -302,64 +283,16 @@ export function SellerProductDetail({ id }: { id: number }) {
         </Button>
       </Card>
 
+      {/* AI check */}
+      <AiCheckPanel check={aiCheckQuery.data} loading={aiCheckQuery.isLoading} />
+
       {/* photos editor */}
       <Card className="p-6">
         <h2 className="mb-4 font-heading text-lg font-bold tracking-tight">{t("seller.add.section3")}</h2>
         <PhotoDropzone photos={photos} onChange={setPhotos} />
       </Card>
 
-      {/* AI check */}
-      <AiCheckPanel check={aiCheckQuery.data} loading={aiCheckQuery.isLoading} />
-
-      {/* Reports on this product */}
-      <ReportsPanel productCardId={id} />
     </div>
-  );
-}
-
-function ReportsPanel({ productCardId }: { productCardId: number }) {
-  const { locale } = useT();
-  const { data, isLoading } = useAdminReportsControllerFindAll(
-    { product_card_id: productCardId, limit: 50 },
-    {
-      query: {
-        select: (raw) => raw as unknown as Paginated<ReportRow>,
-        retry: false,
-      },
-    },
-  );
-
-  const reports = data?.data ?? [];
-
-  return (
-    <Card className="p-6">
-      <div className="mb-4 flex items-center gap-2">
-        <Flag className="size-5 text-destructive" />
-        <h2 className="font-heading text-lg font-bold tracking-tight">Жалобы</h2>
-        {reports.length > 0 && (
-          <span className="rounded-full bg-destructive/10 px-2 py-0.5 text-xs font-medium text-destructive tabular">
-            {reports.length}
-          </span>
-        )}
-      </div>
-
-      {isLoading ? (
-        <Skeleton className="h-20 w-full" />
-      ) : reports.length === 0 ? (
-        <p className="text-sm text-muted-foreground">Жалоб на этот товар нет.</p>
-      ) : (
-        <div className="space-y-3">
-          {reports.map((r) => (
-            <div key={r.id} className="rounded-lg border border-border p-3">
-              <div className="text-xs text-muted-foreground">
-                {formatDate(r.createdAt, locale)}
-              </div>
-              <p className="mt-1 text-sm text-foreground">{r.context}</p>
-            </div>
-          ))}
-        </div>
-      )}
-    </Card>
   );
 }
 
@@ -369,6 +302,13 @@ const VERDICT_UI = {
   fail: { Icon: XCircle, cls: "text-destructive", label: "Не пройдена" },
 } as const;
 
+const ASPECT_LABELS: Record<string, string> = {
+  description: "Описание",
+  dataConsistency: "Согласованность данных",
+  photos: "Фотографии",
+  photoMatch: "Фото и описание",
+};
+
 function AiCheckPanel({
   check,
   loading,
@@ -376,44 +316,50 @@ function AiCheckPanel({
   check: AiProductCheck | undefined;
   loading: boolean;
 }) {
+  const ui = check?.verdict ? VERDICT_UI[check.verdict] : null;
+
   return (
     <Card className="p-6">
       <div className="mb-4 flex items-center gap-2">
         <Sparkles className="size-5 text-primary" />
-        <h2 className="font-heading text-lg font-bold tracking-tight">ИИ-проверка</h2>
+        <h2 className="font-heading text-lg font-bold tracking-tight">
+          ИИ-проверка
+        </h2>
       </div>
 
       {loading ? (
         <Skeleton className="h-24 w-full" />
-      ) : !check || !check.verdict ? (
+      ) : !ui ? (
         <p className="text-sm text-muted-foreground">
           {check?.message ?? "Проверка ещё не выполнялась."}
         </p>
       ) : (
         <div className="space-y-4">
-          {(() => {
-            const ui = VERDICT_UI[check.verdict];
-            return (
-              <div className={`flex items-center gap-2 font-medium ${ui.cls}`}>
-                <ui.Icon className="size-5" />
-                {ui.label}
-              </div>
-            );
-          })()}
-          {check.summary && (
+          <div className={`flex items-center gap-2 font-medium ${ui.cls}`}>
+            <ui.Icon className="size-5" />
+            {ui.label}
+          </div>
+          {check?.summary && (
             <p className="text-sm text-muted-foreground">{check.summary}</p>
           )}
           <div className="grid gap-2 sm:grid-cols-2">
-            {Object.entries(check.checks ?? {}).map(([key, detail]) => {
+            {Object.entries(check?.checks ?? {}).map(([key, detail]) => {
               if (!detail) return null;
-              const ui = VERDICT_UI[detail.verdict];
+              const aspect = VERDICT_UI[detail.verdict];
               return (
-                <div key={key} className="rounded-lg border border-border p-3 text-sm">
-                  <div className={`flex items-center gap-1.5 font-medium ${ui.cls}`}>
-                    <ui.Icon className="size-4" />
-                    {key}
+                <div
+                  key={key}
+                  className="rounded-lg border border-border p-3 text-sm"
+                >
+                  <div
+                    className={`flex items-center gap-1.5 font-medium ${aspect.cls}`}
+                  >
+                    <aspect.Icon className="size-4" />
+                    {ASPECT_LABELS[key] ?? key}
                   </div>
-                  <p className="mt-1 text-xs text-muted-foreground">{detail.notes}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {detail.notes}
+                  </p>
                 </div>
               );
             })}

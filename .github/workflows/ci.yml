@@ -45,4 +45,3 @@ jobs:
             NEXT_PUBLIC_YANDEX_SUGGEST_KEY=ci-placeholder
             NEXT_PUBLIC_TELEGRAM_BOT_ID=ci-placeholder
             NEXT_PUBLIC_TELEGRAM_BOT_USERNAME=ci-placeholder
-            NEXT_PUBLIC_TELEGRAM_BOT_TOKEN=ci-placeholder

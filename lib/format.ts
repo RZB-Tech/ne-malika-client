@@ -47,8 +47,3 @@ export function formatPriceInput(raw: string | number): string {
 export function parsePriceInput(value: string): number {
   return Number(value.replace(/\D/g, "")) || 0;
 }
-
-export function discountPercent(price: number, oldPrice?: number): number | null {
-  if (!oldPrice || oldPrice <= price) return null;
-  return Math.round((1 - price / oldPrice) * 100);
-}

@@ -87,28 +87,42 @@ export interface PublicShop extends ShopRow {
   productCards: ProductCardRow[];
 }
 
+/** GET /admin/shops — магазин + число товаров, одним запросом для админки. */
+export interface AdminShopRow {
+  id: number;
+  name: string;
+  photo: string | null;
+  telegramLink: string;
+  contact: string;
+  address: string | null;
+  status: EntityStatus;
+  abolishReason: string | null;
+  createdAt: string;
+  productCount: number;
+}
+
 export interface AiCheckDetail {
   verdict: AiVerdict;
   notes: string;
 }
 
-/** GET /seller/product-cards/:id/ai-check */
+/** GET /seller/product-cards/:id/ai-check — последняя проверка либо заглушка. */
 export interface AiProductCheck {
   id: number;
   productCardId: number;
-  verdict: AiVerdict | null;
-  checks: {
-    description?: AiCheckDetail;
-    dataConsistency?: AiCheckDetail;
-    photos?: AiCheckDetail;
-    photoMatch?: AiCheckDetail;
-  };
+  verdict: AiVerdict;
+  checks: Partial<
+    Record<
+      "description" | "dataConsistency" | "photos" | "photoMatch",
+      AiCheckDetail
+    >
+  >;
   summary: string | null;
   model: string;
   tokensUsed: number | null;
   error: string | null;
   createdAt: string;
-  /** Present when no check has run yet. */
+  /** Приходит вместо проверки, когда её ещё не было. */
   message?: string;
 }
 
@@ -119,10 +133,4 @@ export interface ReportRow {
   productCardId: number | null;
   createdAt: string;
   updatedAt: string;
-}
-
-/** POST /search/prompt — data are public product cards; searchStage extra. */
-export interface PromptSearchResult extends Paginated<PublicProductCard> {
-  searchStage?: string;
-  usedFallback?: boolean;
 }

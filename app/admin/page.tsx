@@ -1,68 +1,108 @@
 "use client";
 
-import { BarChart3, Eye, Package, Store, Target, Users } from "lucide-react";
-import { TelegramIcon } from "@/components/icons/telegram-icon";
+import { useMemo } from "react";
+import { Flag, Package, Store } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { StatCard } from "@/components/shared/stat-card";
-import { ColumnChart, BarList } from "@/components/shared/charts";
+import { BarList } from "@/components/shared/charts";
 import { useT } from "@/components/providers/i18n-provider";
 import { formatNumber } from "@/lib/format";
-import { publicProducts, stores, categories, categoryProductCount } from "@/lib/data";
-
-function daySeries(seed: number, base: number) {
-  return Array.from({ length: 30 }, (_, i) => {
-    const wave = Math.sin((i + seed) * 0.6) * 0.22 + Math.sin(i * 0.25) * 0.12;
-    const value = Math.round(base * (0.55 + i / 40) * (1 + wave));
-    const label = i % 5 === 0 ? String(30 - i) : "";
-    return { label, value };
-  });
-}
+import { useAdminShopsControllerList } from "@/lib/api/generated/endpoints/shops-admin/shops-admin";
+import { useProductCardsControllerFindAll } from "@/lib/api/generated/endpoints/product-cards-public/product-cards-public";
+import { useAdminReportsControllerFindAll } from "@/lib/api/generated/endpoints/reports/reports";
+import { hueFromId } from "@/lib/api/mappers";
+import type {
+  AdminShopRow,
+  Paginated,
+  PublicProductCard,
+  ReportRow,
+} from "@/lib/api/types";
 
 export default function AdminStats() {
   const { t, locale } = useT();
 
-  const clicks = publicProducts.reduce((s, p) => s + p.telegramClicks, 0);
-  const views = publicProducts.reduce((s, p) => s + p.views, 0);
-  const storeViews = stores.reduce((s, x) => s + x.storeViews, 0);
-  const avgCtr = views ? Math.round((clicks / views) * 1000) / 10 : 0;
-  const activeSellers = stores.filter((s) => s.status === "active").length;
+  const shopsQuery = useAdminShopsControllerList({
+    query: { select: (raw) => raw as unknown as AdminShopRow[], retry: false },
+  });
 
-  const byCategory = categories
-    .map((c) => ({ label: c.name[locale], value: categoryProductCount(c.slug), hue: 262 }))
-    .filter((c) => c.value > 0)
-    .sort((a, b) => b.value - a.value)
-    .slice(0, 8);
+  // limit: 1 — нужны только счётчики из meta, сами строки не читаем.
+  const productsQuery = useProductCardsControllerFindAll(
+    { limit: 1 },
+    {
+      query: {
+        select: (raw) => raw as unknown as Paginated<PublicProductCard>,
+      },
+    },
+  );
+  const reportsQuery = useAdminReportsControllerFindAll(
+    { limit: 1 },
+    {
+      query: {
+        select: (raw) => raw as unknown as Paginated<ReportRow>,
+        retry: false,
+      },
+    },
+  );
+
+  const shops = useMemo(() => shopsQuery.data ?? [], [shopsQuery.data]);
+  const activeShops = shops.filter((s) => s.status === "active").length;
+
+  const topShops = useMemo(
+    () =>
+      [...shops]
+        .sort((a, b) => b.productCount - a.productCount)
+        .slice(0, 8)
+        .map((s) => ({
+          label: s.name,
+          value: s.productCount,
+          hue: hueFromId(s.id),
+        })),
+    [shops],
+  );
 
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="font-heading text-2xl font-bold tracking-tight">{t("admin.stats.title")}</h1>
-        <p className="mt-1 text-sm text-muted-foreground">{t("admin.stats.subtitle")}</p>
+        <h1 className="font-heading text-2xl font-bold tracking-tight">
+          {t("admin.stats.title")}
+        </h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Данные из базы. Просмотры и переходы в Telegram считает
+          Яндекс.Метрика — они видны в карточке товара у продавца.
+        </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <StatCard label={t("admin.stats.telegramClicks")} value={formatNumber(clicks, locale)} icon={TelegramIcon} delta={18} hint="30 дн." />
-        <StatCard label={t("admin.stats.productViews")} value={formatNumber(views, locale)} icon={Eye} delta={11} hint="30 дн." />
-        <StatCard label={t("admin.stats.storeViews")} value={formatNumber(storeViews, locale)} icon={Store} delta={7} hint="30 дн." />
-        <StatCard label={t("admin.stats.productsAdded")} value={formatNumber(publicProducts.length + 240, locale)} icon={Package} delta={5} hint="30 дн." />
-        <StatCard label={t("admin.stats.activeSellers")} value={String(activeSellers + 44)} icon={Users} delta={12} hint="30 дн." />
-        <StatCard label={t("admin.stats.avgCtr")} value={`${avgCtr}%`} icon={Target} delta={2} hint="> 20%" />
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <StatCard
+          label="Магазинов"
+          value={formatNumber(shops.length, locale)}
+          icon={Store}
+        />
+        <StatCard
+          label="Активных магазинов"
+          value={formatNumber(activeShops, locale)}
+          icon={Store}
+        />
+        <StatCard
+          label="Товаров в выдаче"
+          value={formatNumber(productsQuery.data?.meta.total ?? 0, locale)}
+          icon={Package}
+        />
+        <StatCard
+          label="Жалоб"
+          value={formatNumber(reportsQuery.data?.meta.total ?? 0, locale)}
+          icon={Flag}
+        />
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[1.5fr_1fr]">
-        <Card className="p-5">
-          <div className="mb-5 flex items-center gap-2">
-            <BarChart3 className="size-4 text-primary" />
-            <h2 className="font-medium">{t("admin.stats.clicksDynamics")}</h2>
-          </div>
-          <ColumnChart data={daySeries(1, 420)} height={200} />
-        </Card>
-
-        <Card className="p-5">
-          <h2 className="mb-5 font-medium">{t("admin.stats.byCategory")}</h2>
-          <BarList data={byCategory} formatValue={(v) => String(v)} />
-        </Card>
-      </div>
+      <Card className="p-5">
+        <h2 className="mb-5 font-medium">Магазины по числу товаров</h2>
+        {topShops.length === 0 ? (
+          <p className="text-sm text-muted-foreground">Данных пока нет.</p>
+        ) : (
+          <BarList data={topShops} formatValue={(v) => String(v)} />
+        )}
+      </Card>
     </div>
   );
 }

@@ -5,9 +5,8 @@
  * Маркетплейс компьютерной техники — REST API для веб-витрины (Next.js) и Telegram mini-app. Покупатель работает без авторизации; продавец и администратор авторизуются через Telegram.
  * OpenAPI spec version: 1.0.0
  */
-import type { CreateUploadUrlDtoContentType } from './createUploadUrlDtoContentType';
 
-export interface CreateUploadUrlDto {
-  /** MIME-тип загружаемого файла */
-  contentType: CreateUploadUrlDtoContentType;
+export interface AppSettingsDto {
+  /** Автоматическая ИИ-проверка товаров при создании и редактировании */
+  aiChecksEnabled: boolean;
 }

@@ -36,13 +36,9 @@ import { ProductImage } from "@/components/shared/product-image";
 import { ModerationBadge } from "@/components/shared/badges";
 import { useT } from "@/components/providers/i18n-provider";
 import { formatPrice } from "@/lib/format";
-import { useSellerShopsControllerList } from "@/lib/api/generated/endpoints/shops-seller/shops-seller";
-import {
-  useSellerProductCardsControllerList,
-  useSellerProductCardsControllerRemove,
-} from "@/lib/api/generated/endpoints/product-cards-seller/product-cards-seller";
+import { useSellerProductCardsControllerRemove } from "@/lib/api/generated/endpoints/product-cards-seller/product-cards-seller";
+import { useSellerProducts } from "@/lib/api/seller";
 import { mapProductRow } from "@/lib/api/mappers";
-import type { ProductCardRow, ShopRow } from "@/lib/api/types";
 
 export default function SellerProducts() {
   const { t, locale } = useT();
@@ -50,23 +46,13 @@ export default function SellerProducts() {
   const queryClient = useQueryClient();
   const [q, setQ] = useState("");
 
-  const shopsQuery = useSellerShopsControllerList({
-    query: { select: (raw) => raw as unknown as ShopRow[] },
-  });
-  const shop = shopsQuery.data?.[0];
-
-  const productsQuery = useSellerProductCardsControllerList(shop?.id ?? 0, {
-    query: {
-      enabled: Boolean(shop),
-      select: (raw) => raw as unknown as ProductCardRow[],
-    },
-  });
+  const { shop, rows: productRows, isLoading } = useSellerProducts();
 
   const removeMutation = useSellerProductCardsControllerRemove();
 
   const rows = useMemo(
-    () => (productsQuery.data ?? []).map((r) => mapProductRow(r, shop?.name)),
-    [productsQuery.data, shop?.name],
+    () => productRows.map((r) => mapProductRow(r, shop?.name)),
+    [productRows, shop?.name],
   );
 
   const list = useMemo(() => {
@@ -173,14 +159,14 @@ export default function SellerProducts() {
             </TableBody>
           </Table>
         </div>
-        {(shopsQuery.isLoading || productsQuery.isLoading) && (
+        {isLoading && (
           <div className="space-y-2 p-4">
             {Array.from({ length: 3 }).map((_, i) => (
               <Skeleton key={i} className="h-12 w-full" />
             ))}
           </div>
         )}
-        {!productsQuery.isLoading && !shopsQuery.isLoading && list.length === 0 && (
+        {!isLoading && list.length === 0 && (
           <div className="py-16 text-center text-sm text-muted-foreground">{t("seller.products.empty")}</div>
         )}
       </Card>

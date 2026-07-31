@@ -19,11 +19,10 @@ import {
 } from "@/components/ui/select";
 import { PhotoDropzone, type UploadedPhoto } from "./photo-dropzone";
 import { useT } from "@/components/providers/i18n-provider";
-import { useSellerShopsControllerList } from "@/lib/api/generated/endpoints/shops-seller/shops-seller";
+import { useSellerShop } from "@/lib/api/seller";
 import { useSellerProductCardsControllerCreate } from "@/lib/api/generated/endpoints/product-cards-seller/product-cards-seller";
 import { resolvePhotoKeys } from "@/lib/api/upload";
 import { formatPriceInput, parsePriceInput } from "@/lib/format";
-import type { ShopRow } from "@/lib/api/types";
 
 function SectionTitle({ index, children }: { index: number; children: React.ReactNode }) {
   return (
@@ -41,10 +40,7 @@ export function AddProductForm() {
   const router = useRouter();
   const queryClient = useQueryClient();
 
-  const shopsQuery = useSellerShopsControllerList({
-    query: { select: (raw) => raw as unknown as ShopRow[] },
-  });
-  const shop = shopsQuery.data?.[0];
+  const { shop, isLoading: shopLoading } = useSellerShop();
 
   const createMutation = useSellerProductCardsControllerCreate();
 
@@ -126,7 +122,7 @@ export function AddProductForm() {
         </div>
       </div>
 
-      {!shopsQuery.isLoading && !shop && (
+      {!shopLoading && !shop && (
         <Card className="border-warning/40 bg-warning/5 p-4 text-sm">
           У вас ещё нет магазина.{" "}
           <button

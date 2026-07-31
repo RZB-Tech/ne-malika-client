@@ -11,8 +11,9 @@ import {
   authControllerLogout,
   authControllerRefresh,
   authControllerTelegramAuth,
+  authControllerWidgetAuth,
 } from "./generated/endpoints/auth/auth";
-import type { AuthResponseDto } from "./generated/schemas";
+import type { AuthResponseDto, TelegramWidgetDto } from "./generated/schemas";
 import {
   clearAuth,
   getAccessToken,
@@ -21,15 +22,8 @@ import {
   subscribe,
 } from "./token-store";
 
-/** Shape shared by Telegram Mini App `user` and the Login Widget callback. */
-export interface TelegramUser {
-  id: number;
-  first_name?: string;
-  last_name?: string;
-  username?: string;
-  language_code?: string;
-  photo_url?: string;
-}
+/** Ответ Telegram Login Widget — подпись проверяет бэкенд, токен бота живёт только там. */
+export type TelegramUser = TelegramWidgetDto;
 
 interface AuthContextValue {
   user: ReturnType<typeof getCurrentUser>;
@@ -45,9 +39,8 @@ interface AuthContextValue {
   /** True while running inside the Telegram client (Mini App). */
   isTelegramMiniApp: boolean;
   loginWithInitData: (initData: string) => Promise<AuthResponseDto>;
-  /** Browser (Login Widget) flow — signs initData client-side. */
+  /** Браузерный вход через официальный Login Widget. */
   loginWithTelegramUser: (user: TelegramUser) => Promise<AuthResponseDto>;
-  devLogin: (opts?: { id?: number; firstName?: string }) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -81,25 +74,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return res;
   }, []);
 
-  const loginWithTelegramUser = useCallback(
-    async (tgUser: TelegramUser) => {
-      const initData = await buildInitData(tgUser);
-      return loginWithInitData(initData);
-    },
-    [loginWithInitData],
-  );
-
-  const devLogin = useCallback(
-    async (opts?: { id?: number; firstName?: string }) => {
-      await loginWithTelegramUser({
-        id: opts?.id ?? 123456789,
-        first_name: opts?.firstName ?? "Local",
-        username: "local_seller",
-        language_code: "ru",
-      });
-    },
-    [loginWithTelegramUser],
-  );
+  const loginWithTelegramUser = useCallback(async (tgUser: TelegramUser) => {
+    const res = await authControllerWidgetAuth(tgUser);
+    setAuth(res.accessToken, res.user);
+    return res;
+  }, []);
 
   const logout = useCallback(async () => {
     try {
@@ -132,10 +111,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Plain browser — try a silent refresh from the cookie.
     authControllerRefresh()
-      .then((res) => {
-        const data = res as unknown as AuthResponseDto;
-        if (data?.accessToken) setAuth(data.accessToken, data.user ?? null);
-      })
+      .then((res) => setAuth(res.accessToken, res.user))
       .catch(() => {
         /* no active session */
       });
@@ -150,7 +126,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     isTelegramMiniApp: readMiniAppInitData() !== null,
     loginWithInitData,
     loginWithTelegramUser,
-    devLogin,
     logout,
   };
 
@@ -161,60 +136,4 @@ export function useAuth(): AuthContextValue {
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error("useAuth must be used within <AuthProvider>");
   return ctx;
-}
-
-// --- Client-side initData signing --------------------------------------------
-// The backend only validates Telegram Mini App `initData` (WebAppData HMAC).
-// For the browser (Login Widget / dev) flow we forge an equivalent initData
-// signed with NEXT_PUBLIC_TELEGRAM_BOT_TOKEN.
-//
-// SECURITY: this exposes the bot token to the browser, so a client can forge
-// any identity. Acceptable for local/demo only. The production-safe fix is to
-// validate the Login Widget payload on the backend instead.
-async function buildInitData(user: TelegramUser): Promise<string> {
-  const botToken = process.env.NEXT_PUBLIC_TELEGRAM_BOT_TOKEN;
-  if (!botToken) {
-    throw new Error(
-      "Вход через Telegram в браузере недоступен: не задан NEXT_PUBLIC_TELEGRAM_BOT_TOKEN",
-    );
-  }
-
-  const authDate = Math.floor(Date.now() / 1000).toString();
-  const pairs = [
-    `auth_date=${authDate}`,
-    `user=${JSON.stringify(user)}`,
-  ].sort();
-  const dataCheckString = pairs.join("\n");
-
-  const secretKey = await hmacSha256(
-    new TextEncoder().encode("WebAppData"),
-    botToken,
-  );
-  const hash = toHex(await hmacSha256(secretKey, dataCheckString));
-
-  return `${pairs.join("&")}&hash=${hash}`;
-}
-
-async function hmacSha256(
-  key: ArrayBuffer | Uint8Array,
-  message: string,
-): Promise<ArrayBuffer> {
-  const cryptoKey = await crypto.subtle.importKey(
-    "raw",
-    key as BufferSource,
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign"],
-  );
-  return crypto.subtle.sign(
-    "HMAC",
-    cryptoKey,
-    new TextEncoder().encode(message),
-  );
-}
-
-function toHex(buf: ArrayBuffer): string {
-  return Array.from(new Uint8Array(buf))
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
 }

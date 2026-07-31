@@ -23,9 +23,3 @@ export function photoUrl(key: string | null | undefined): string | null {
   if (/^https?:\/\//.test(key)) return key;
   return `${FILES_BASE}/${encodeURIComponent(key)}`;
 }
-
-export function firstPhotoUrl(
-  photos: string[] | null | undefined,
-): string | null {
-  return photoUrl(photos?.[0]);
-}

@@ -28,31 +28,17 @@ function toPhotoUrls(photos: string[] | null | undefined): string[] {
     .filter((u): u is string => Boolean(u));
 }
 
-function statusToModeration(status: EntityStatus): ModerationStatus {
-  switch (status) {
-    case "active":
-      return "published";
-    case "hidden":
-      return "moderation";
-    case "abolished":
-      return "rejected";
-    default:
-      return "published";
-  }
-}
+const MODERATION_BY_STATUS: Record<EntityStatus, ModerationStatus> = {
+  active: "published",
+  hidden: "moderation",
+  abolished: "rejected",
+};
 
-function statusToSellerStatus(status: EntityStatus): SellerStatus {
-  switch (status) {
-    case "active":
-      return "active";
-    case "abolished":
-      return "blocked";
-    case "hidden":
-      return "pending";
-    default:
-      return "active";
-  }
-}
+const SELLER_STATUS_BY_STATUS: Record<EntityStatus, SellerStatus> = {
+  active: "active",
+  hidden: "pending",
+  abolished: "blocked",
+};
 
 function telegramUsername(link: string | null | undefined): string {
   if (!link) return "";
@@ -86,41 +72,12 @@ export function formatWorkSchedule(
   return `${label} ${first.start}–${first.end}`;
 }
 
-/** Public catalog / product-detail projection → Product. */
-export function mapPublicProductCard(pc: PublicProductCard): Product {
-  const photoUrls = toPhotoUrls(pc.photos);
-  return {
-    id: String(pc.id),
-    slug: String(pc.id),
-    name: pc.name,
-    categorySlug: "",
-    subcategory: "",
-    brand: pc.shopName ?? "",
-    model: "",
-    sku: "",
-    price: Number(pc.price),
-    description: pc.description ?? "",
-    specs: (pc.characteristics ?? []).map((c) => ({
-      name: c.key,
-      value: c.value,
-    })),
-    warrantyMonths: 0,
-    availability: "in_stock",
-    quantity: 1,
-    storeId: String(pc.shopId),
-    hue: hueFromId(pc.id),
-    views: 0,
-    telegramClicks: 0,
-    createdAt: pc.createdAt,
-    isNew: pc.state === "new",
-    moderation: "published",
-    imageUrl: photoUrls[0] ?? null,
-    photoUrls,
-  };
-}
-
-/** Full product row (seller cabinet / inside a public shop) → Product. */
-export function mapProductRow(pc: ProductCardRow, shopName = ""): Product {
+/** Общая часть обеих проекций товара — публичной и полной строки таблицы. */
+function toProduct(
+  pc: PublicProductCard | ProductCardRow,
+  shopName: string,
+  status: EntityStatus,
+): Product {
   const photoUrls = toPhotoUrls(pc.photos);
   return {
     id: String(pc.id),
@@ -146,11 +103,23 @@ export function mapProductRow(pc: ProductCardRow, shopName = ""): Product {
     telegramClicks: 0,
     createdAt: pc.createdAt,
     isNew: pc.state === "new",
-    moderation: statusToModeration(pc.status),
-    hidden: pc.status === "hidden",
-    abolishReason: pc.abolishReason,
+    moderation: MODERATION_BY_STATUS[status] ?? "published",
     imageUrl: photoUrls[0] ?? null,
     photoUrls,
+  };
+}
+
+/** Публичная выдача: бэкенд отдаёт только активные товары. */
+export function mapPublicProductCard(pc: PublicProductCard): Product {
+  return toProduct(pc, pc.shopName ?? "", "active");
+}
+
+/** Полная строка товара (кабинет продавца, товары внутри магазина). */
+export function mapProductRow(pc: ProductCardRow, shopName = ""): Product {
+  return {
+    ...toProduct(pc, shopName, pc.status),
+    hidden: pc.status === "hidden",
+    abolishReason: pc.abolishReason,
   };
 }
 
@@ -170,7 +139,7 @@ export function mapShop(s: ShopRow | PublicShop): Store {
     rating: 0,
     ratingCount: 0,
     joined: s.createdAt,
-    status: statusToSellerStatus(s.status),
+    status: SELLER_STATUS_BY_STATUS[s.status] ?? "active",
     storeViews: 0,
     photoUrl: photoUrl(s.photo),
     location: s.location ?? null,

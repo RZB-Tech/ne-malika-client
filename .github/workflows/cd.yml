@@ -37,7 +37,7 @@ jobs:
 
       # NEXT_PUBLIC_* вшиваются в JS на этапе сборки — задаём их здесь,
       # значения берутся из Repository Variables (публичные) и Secrets
-      # (чувствительные, напр. TELEGRAM_BOT_TOKEN).
+      # (чувствительные, напр. ключ Яндекс.Подсказок).
       - uses: docker/build-push-action@v6
         with:
           context: .
@@ -54,7 +54,6 @@ jobs:
             NEXT_PUBLIC_YANDEX_SUGGEST_KEY=${{ secrets.NEXT_PUBLIC_YANDEX_SUGGEST_KEY }}
             NEXT_PUBLIC_TELEGRAM_BOT_ID=${{ vars.NEXT_PUBLIC_TELEGRAM_BOT_ID }}
             NEXT_PUBLIC_TELEGRAM_BOT_USERNAME=${{ vars.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME }}
-            NEXT_PUBLIC_TELEGRAM_BOT_TOKEN=${{ secrets.NEXT_PUBLIC_TELEGRAM_BOT_TOKEN }}
 
   deploy:
     needs: build-and-push

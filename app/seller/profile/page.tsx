@@ -23,24 +23,20 @@ import { useT } from "@/components/providers/i18n-provider";
 import { BASE_CITY } from "@/lib/geo-suggest";
 import {
   useSellerShopsControllerCreate,
-  useSellerShopsControllerList,
   useSellerShopsControllerUpdate,
 } from "@/lib/api/generated/endpoints/shops-seller/shops-seller";
+import { useSellerShop } from "@/lib/api/seller";
 import { dataUrlToBlob, uploadPhoto } from "@/lib/api/upload";
 import { hueFromId } from "@/lib/api/mappers";
 import { photoUrl } from "@/lib/api/photo";
 import { parseTelegramUsername, telegramUrl } from "@/lib/telegram";
-import type { ShopRow } from "@/lib/api/types";
 
 export default function SellerProfile() {
   const { t } = useT();
   const queryClient = useQueryClient();
   const logoInput = useRef<HTMLInputElement>(null);
 
-  const shopsQuery = useSellerShopsControllerList({
-    query: { select: (raw) => raw as unknown as ShopRow[] },
-  });
-  const shop = shopsQuery.data?.[0];
+  const { shop, isLoading: shopLoading } = useSellerShop();
 
   const createMutation = useSellerShopsControllerCreate();
   const updateMutation = useSellerShopsControllerUpdate();
@@ -148,7 +144,7 @@ export default function SellerProfile() {
   const logoSrc = logo ?? photoUrl(photoKey);
   const hue = shop ? hueFromId(shop.id) : 262;
 
-  if (shopsQuery.isLoading) {
+  if (shopLoading) {
     return (
       <div className="space-y-6">
         <Skeleton className="h-24 w-full rounded-2xl" />

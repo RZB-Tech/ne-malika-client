@@ -4,11 +4,10 @@ import { LayoutDashboard, Package, PlusCircle, Store } from "lucide-react";
 import { RequireRole } from "@/components/auth/require-role";
 import { DashboardShell, type NavItem } from "@/components/layout/dashboard-shell";
 import { useT } from "@/components/providers/i18n-provider";
-import { useSellerShopsControllerList } from "@/lib/api/generated/endpoints/shops-seller/shops-seller";
+import { useSellerShop } from "@/lib/api/seller";
 import { StoreAvatar } from "@/components/shared/store-avatar";
 import { hueFromId } from "@/lib/api/mappers";
 import { photoUrl } from "@/lib/api/photo";
-import type { ShopRow } from "@/lib/api/types";
 
 export default function SellerLayout({ children }: { children: React.ReactNode }) {
   // Гард снаружи: иначе хуки ниже успеют сходить за данными магазина от анонима.
@@ -21,10 +20,7 @@ export default function SellerLayout({ children }: { children: React.ReactNode }
 
 function SellerLayoutInner({ children }: { children: React.ReactNode }) {
   const { t } = useT();
-  const { data } = useSellerShopsControllerList({
-    query: { select: (raw) => raw as unknown as ShopRow[] },
-  });
-  const shop = data?.[0];
+  const { shop } = useSellerShop();
 
   const items: NavItem[] = [
     { href: "/seller", label: t("seller.nav.dashboard"), icon: LayoutDashboard, exact: true },

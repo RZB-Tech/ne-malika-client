@@ -11,29 +11,17 @@ import { ProductImage } from "@/components/shared/product-image";
 import { ModerationBadge } from "@/components/shared/badges";
 import { useT } from "@/components/providers/i18n-provider";
 import { formatPrice } from "@/lib/format";
-import { useSellerShopsControllerList } from "@/lib/api/generated/endpoints/shops-seller/shops-seller";
-import { useSellerProductCardsControllerList } from "@/lib/api/generated/endpoints/product-cards-seller/product-cards-seller";
+import { useSellerProducts } from "@/lib/api/seller";
 import { mapProductRow } from "@/lib/api/mappers";
-import type { ProductCardRow, ShopRow } from "@/lib/api/types";
 
 export default function SellerDashboard() {
   const { t, locale } = useT();
 
-  const shopsQuery = useSellerShopsControllerList({
-    query: { select: (raw) => raw as unknown as ShopRow[] },
-  });
-  const shop = shopsQuery.data?.[0];
-
-  const productsQuery = useSellerProductCardsControllerList(shop?.id ?? 0, {
-    query: {
-      enabled: Boolean(shop),
-      select: (raw) => raw as unknown as ProductCardRow[],
-    },
-  });
+  const { shop, rows: productRows, isLoading } = useSellerProducts();
 
   const rows = useMemo(
-    () => (productsQuery.data ?? []).map((r) => mapProductRow(r, shop?.name)),
-    [productsQuery.data, shop?.name],
+    () => productRows.map((r) => mapProductRow(r, shop?.name)),
+    [productRows, shop?.name],
   );
 
   const total = rows.length;
@@ -41,7 +29,7 @@ export default function SellerDashboard() {
   const newCount = rows.filter((p) => p.isNew).length;
   const recent = rows.slice(0, 6);
 
-  if (shopsQuery.isLoading) {
+  if (isLoading) {
     return (
       <div className="space-y-6">
         <Skeleton className="h-8 w-64" />
@@ -102,7 +90,7 @@ export default function SellerDashboard() {
           </Button>
         </div>
 
-        {productsQuery.isLoading ? (
+        {isLoading ? (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {Array.from({ length: 3 }).map((_, i) => (
               <Skeleton key={i} className="h-20 w-full rounded-xl" />
