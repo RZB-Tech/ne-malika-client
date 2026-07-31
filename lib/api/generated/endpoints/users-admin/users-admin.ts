@@ -25,6 +25,7 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  AdminUsersControllerListParams,
   ReasonDto,
   SetRoleDto
 } from '../../schemas';
@@ -56,13 +57,14 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
  * @summary Все пользователи с их магазином и числом товаров
  */
 export const adminUsersControllerList = (
-
+    params?: AdminUsersControllerListParams,
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
 
 
       return customInstance<void>(
-      {url: `/api/v1/admin/users`, method: 'GET', signal
+      {url: `/api/v1/admin/users`, method: 'GET',
+        params, signal
     },
       options);
     }
@@ -70,23 +72,23 @@ export const adminUsersControllerList = (
 
 
 
-export const getAdminUsersControllerListQueryKey = () => {
+export const getAdminUsersControllerListQueryKey = (params?: AdminUsersControllerListParams,) => {
     return [
-    `/api/v1/admin/users`
+    `/api/v1/admin/users`, ...(params ? [params] : [])
     ] as const;
     }
 
 
-export const getAdminUsersControllerListQueryOptions = <TData = Awaited<ReturnType<typeof adminUsersControllerList>>, TError = ErrorType<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminUsersControllerList>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getAdminUsersControllerListQueryOptions = <TData = Awaited<ReturnType<typeof adminUsersControllerList>>, TError = ErrorType<unknown>>(params?: AdminUsersControllerListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminUsersControllerList>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getAdminUsersControllerListQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getAdminUsersControllerListQueryKey(params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof adminUsersControllerList>>> = ({ signal }) => adminUsersControllerList(requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof adminUsersControllerList>>> = ({ signal }) => adminUsersControllerList(params, requestOptions, signal);
 
 
 
@@ -100,7 +102,7 @@ export type AdminUsersControllerListQueryError = ErrorType<unknown>
 
 
 export function useAdminUsersControllerList<TData = Awaited<ReturnType<typeof adminUsersControllerList>>, TError = ErrorType<unknown>>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminUsersControllerList>>, TError, TData>> & Pick<
+ params: undefined |  AdminUsersControllerListParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminUsersControllerList>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof adminUsersControllerList>>,
           TError,
@@ -110,7 +112,7 @@ export function useAdminUsersControllerList<TData = Awaited<ReturnType<typeof ad
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useAdminUsersControllerList<TData = Awaited<ReturnType<typeof adminUsersControllerList>>, TError = ErrorType<unknown>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminUsersControllerList>>, TError, TData>> & Pick<
+ params?: AdminUsersControllerListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminUsersControllerList>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof adminUsersControllerList>>,
           TError,
@@ -120,7 +122,7 @@ export function useAdminUsersControllerList<TData = Awaited<ReturnType<typeof ad
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useAdminUsersControllerList<TData = Awaited<ReturnType<typeof adminUsersControllerList>>, TError = ErrorType<unknown>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminUsersControllerList>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ params?: AdminUsersControllerListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminUsersControllerList>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
@@ -128,11 +130,11 @@ export function useAdminUsersControllerList<TData = Awaited<ReturnType<typeof ad
  */
 
 export function useAdminUsersControllerList<TData = Awaited<ReturnType<typeof adminUsersControllerList>>, TError = ErrorType<unknown>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminUsersControllerList>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ params?: AdminUsersControllerListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminUsersControllerList>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getAdminUsersControllerListQueryOptions(options)
+  const queryOptions = getAdminUsersControllerListQueryOptions(params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

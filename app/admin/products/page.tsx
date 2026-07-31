@@ -26,6 +26,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ProductImage } from "@/components/shared/product-image";
+import { Pagination } from "@/components/shared/pagination";
 import { EntityStatusBadge } from "@/components/admin/entity-status-badge";
 import {
   RowActionsMenu,
@@ -50,7 +51,6 @@ import { photoUrl } from "@/lib/api/photo";
 import { useAdminShopsControllerList } from "@/lib/api/generated/endpoints/shops-admin/shops-admin";
 import {
   devAdminProducts,
-  devFallback,
   devFallbackPage,
   devShops,
   usingDevData,
@@ -75,13 +75,14 @@ export default function AdminProducts() {
   const queryClient = useQueryClient();
   const [q, setQ] = useState("");
   const [tab, setTab] = useState("all");
+  const [page, setPage] = useState(1);
   const [opened, setOpened] = useState<AdminProductRow | null>(null);
   const [form, setForm] = useState<ProductFormTarget | null>(null);
 
   const status = TABS.find((x) => x.value === tab)?.status;
 
   const { data, isLoading } = useAdminProductCardsControllerFindAll(
-    { limit: 100, q: q.trim() || undefined, status },
+    { page, limit: 20, q: q.trim() || undefined, status },
     {
       query: {
         select: (raw) => raw as unknown as Paginated<AdminProductRow>,
@@ -90,24 +91,33 @@ export default function AdminProducts() {
     },
   );
 
-  const shopsQuery = useAdminShopsControllerList({
-    query: { select: (raw) => raw as unknown as AdminShopRow[], retry: false },
-  });
-  const shops = devFallback(shopsQuery.data, devShops);
+  // Магазины нужны только для выпадающего списка в форме — берём одной пачкой.
+  const shopsQuery = useAdminShopsControllerList(
+    { limit: 100 },
+    {
+      query: {
+        select: (raw) => raw as unknown as Paginated<AdminShopRow>,
+        retry: false,
+      },
+    },
+  );
+  const shops = devFallbackPage(shopsQuery.data, devShops).data;
 
   const abolishMutation = useAdminProductCardsControllerAbolish();
   const restoreMutation = useAdminProductCardsControllerRestore();
   const removeMutation = useAdminProductCardsControllerRemove();
 
-  const rows = useMemo(() => {
+  const pageData = useMemo(() => {
     // Фикстуры фильтруем на клиенте — иначе вкладки локально не проверить.
     const fixtures = devAdminProducts.filter(
       (p) =>
         (!status || p.status === status) &&
         (!q.trim() || p.name.toLowerCase().includes(q.trim().toLowerCase())),
     );
-    return devFallbackPage(data, fixtures).data;
+    return devFallbackPage(data, fixtures);
   }, [data, status, q]);
+
+  const rows = pageData.data;
 
   const isDevData = usingDevData(data?.data);
 
@@ -191,7 +201,13 @@ export default function AdminProducts() {
           <Plus className="size-4" /> Новый товар
         </Button>
 
-        <Tabs value={tab} onValueChange={setTab}>
+        <Tabs
+          value={tab}
+          onValueChange={(v) => {
+            setTab(v);
+            setPage(1);
+          }}
+        >
           <TabsList>
             {TABS.map((x) => (
               <TabsTrigger key={x.value} value={x.value}>
@@ -205,7 +221,10 @@ export default function AdminProducts() {
           <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             value={q}
-            onChange={(e) => setQ(e.target.value)}
+            onChange={(e) => {
+              setQ(e.target.value);
+              setPage(1);
+            }}
             placeholder="Поиск по товару или магазину"
             className="pl-9"
           />
@@ -294,6 +313,13 @@ export default function AdminProducts() {
           </div>
         )}
       </Card>
+
+      <Pagination
+        page={pageData.meta.page}
+        totalPages={pageData.meta.totalPages}
+        total={pageData.meta.total}
+        onChange={setPage}
+      />
 
       <ProductDrawer
         product={opened}

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { CheckCircle2, RefreshCw, TriangleAlert, XCircle } from "lucide-react";
 import { toast } from "sonner";
@@ -8,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ProductImage } from "@/components/shared/product-image";
 import { EntityStatusBadge } from "@/components/admin/entity-status-badge";
+import { Pagination } from "@/components/shared/pagination";
 import { useT } from "@/components/providers/i18n-provider";
 import { formatDate, formatPrice } from "@/lib/format";
 import {
@@ -17,22 +19,35 @@ import {
 } from "@/lib/api/generated/endpoints/product-cards-admin/product-cards-admin";
 import { hueFromId } from "@/lib/api/mappers";
 import { photoUrl } from "@/lib/api/photo";
-import { devAiReview, devFallback, usingDevData } from "@/lib/api/dev-fixtures";
-import type { AiReviewRow } from "@/lib/api/types";
+import {
+  devAiReview,
+  devFallbackPage,
+  usingDevData,
+} from "@/lib/api/dev-fixtures";
+import type { AiReviewRow, Paginated } from "@/lib/api/types";
 
 export default function AdminAiReview() {
   const { t, locale } = useT();
   const queryClient = useQueryClient();
 
-  const { data, isLoading, isError } = useAdminProductCardsControllerAiReview({
-    query: { select: (raw) => raw as unknown as AiReviewRow[], retry: false },
-  });
+  const [page, setPage] = useState(1);
+
+  const { data, isLoading, isError } = useAdminProductCardsControllerAiReview(
+    { page, limit: 20 },
+    {
+      query: {
+        select: (raw) => raw as unknown as Paginated<AiReviewRow>,
+        retry: false,
+      },
+    },
+  );
 
   const restoreMutation = useAdminProductCardsControllerRestore();
   const recheckMutation = useAdminProductCardsControllerRecheck();
 
-  const rows = devFallback(data, devAiReview);
-  const isDevData = usingDevData(data);
+  const pageData = devFallbackPage(data, devAiReview);
+  const rows = pageData.data;
+  const isDevData = usingDevData(data?.data);
 
   const approve = async (id: number) => {
     await restoreMutation.mutateAsync({ id });
@@ -148,6 +163,13 @@ export default function AdminAiReview() {
           </Card>
         ))}
       </div>
+
+      <Pagination
+        page={pageData.meta.page}
+        totalPages={pageData.meta.totalPages}
+        total={pageData.meta.total}
+        onChange={setPage}
+      />
     </div>
   );
 }

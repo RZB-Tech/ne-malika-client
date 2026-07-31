@@ -17,6 +17,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { UserDrawer } from "@/components/admin/user-drawer";
+import { Pagination } from "@/components/shared/pagination";
 import {
   RowActionsMenu,
   RowContextMenu,
@@ -30,8 +31,12 @@ import {
   useAdminUsersControllerSetRole,
   useAdminUsersControllerUnblock,
 } from "@/lib/api/generated/endpoints/users-admin/users-admin";
-import { devFallback, devUsers, usingDevData } from "@/lib/api/dev-fixtures";
-import type { AdminUserRow } from "@/lib/api/types";
+import {
+  devFallbackPage,
+  devUsers,
+  usingDevData,
+} from "@/lib/api/dev-fixtures";
+import type { AdminUserRow, Paginated } from "@/lib/api/types";
 
 export function initials(name: string): string {
   return (
@@ -48,17 +53,25 @@ export default function AdminUsers() {
   const { locale } = useT();
   const queryClient = useQueryClient();
   const [opened, setOpened] = useState<AdminUserRow | null>(null);
+  const [page, setPage] = useState(1);
 
-  const { data, isLoading, isError } = useAdminUsersControllerList({
-    query: { select: (raw) => raw as unknown as AdminUserRow[], retry: false },
-  });
+  const { data, isLoading, isError } = useAdminUsersControllerList(
+    { page, limit: 20 },
+    {
+      query: {
+        select: (raw) => raw as unknown as Paginated<AdminUserRow>,
+        retry: false,
+      },
+    },
+  );
 
   const blockMutation = useAdminUsersControllerBlock();
   const unblockMutation = useAdminUsersControllerUnblock();
   const roleMutation = useAdminUsersControllerSetRole();
 
-  const rows = devFallback(data, devUsers);
-  const isDevData = usingDevData(data);
+  const pageData = devFallbackPage(data, devUsers);
+  const rows = pageData.data;
+  const isDevData = usingDevData(data?.data);
 
   const done = async (message: string) => {
     await queryClient.invalidateQueries();
@@ -233,6 +246,13 @@ export default function AdminUsers() {
           </div>
         )}
       </Card>
+
+      <Pagination
+        page={pageData.meta.page}
+        totalPages={pageData.meta.totalPages}
+        total={pageData.meta.total}
+        onChange={setPage}
+      />
 
       <UserDrawer
         user={opened}

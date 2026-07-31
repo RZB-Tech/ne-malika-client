@@ -25,6 +25,7 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  AdminShopsControllerListParams,
   ReasonDto
 } from '../../schemas';
 
@@ -55,13 +56,14 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
  * @summary Все магазины с числом товаров
  */
 export const adminShopsControllerList = (
-
+    params?: AdminShopsControllerListParams,
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
 
 
       return customInstance<void>(
-      {url: `/api/v1/admin/shops`, method: 'GET', signal
+      {url: `/api/v1/admin/shops`, method: 'GET',
+        params, signal
     },
       options);
     }
@@ -69,23 +71,23 @@ export const adminShopsControllerList = (
 
 
 
-export const getAdminShopsControllerListQueryKey = () => {
+export const getAdminShopsControllerListQueryKey = (params?: AdminShopsControllerListParams,) => {
     return [
-    `/api/v1/admin/shops`
+    `/api/v1/admin/shops`, ...(params ? [params] : [])
     ] as const;
     }
 
 
-export const getAdminShopsControllerListQueryOptions = <TData = Awaited<ReturnType<typeof adminShopsControllerList>>, TError = ErrorType<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminShopsControllerList>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getAdminShopsControllerListQueryOptions = <TData = Awaited<ReturnType<typeof adminShopsControllerList>>, TError = ErrorType<unknown>>(params?: AdminShopsControllerListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminShopsControllerList>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getAdminShopsControllerListQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getAdminShopsControllerListQueryKey(params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof adminShopsControllerList>>> = ({ signal }) => adminShopsControllerList(requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof adminShopsControllerList>>> = ({ signal }) => adminShopsControllerList(params, requestOptions, signal);
 
 
 
@@ -99,7 +101,7 @@ export type AdminShopsControllerListQueryError = ErrorType<unknown>
 
 
 export function useAdminShopsControllerList<TData = Awaited<ReturnType<typeof adminShopsControllerList>>, TError = ErrorType<unknown>>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminShopsControllerList>>, TError, TData>> & Pick<
+ params: undefined |  AdminShopsControllerListParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminShopsControllerList>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof adminShopsControllerList>>,
           TError,
@@ -109,7 +111,7 @@ export function useAdminShopsControllerList<TData = Awaited<ReturnType<typeof ad
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useAdminShopsControllerList<TData = Awaited<ReturnType<typeof adminShopsControllerList>>, TError = ErrorType<unknown>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminShopsControllerList>>, TError, TData>> & Pick<
+ params?: AdminShopsControllerListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminShopsControllerList>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof adminShopsControllerList>>,
           TError,
@@ -119,7 +121,7 @@ export function useAdminShopsControllerList<TData = Awaited<ReturnType<typeof ad
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useAdminShopsControllerList<TData = Awaited<ReturnType<typeof adminShopsControllerList>>, TError = ErrorType<unknown>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminShopsControllerList>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ params?: AdminShopsControllerListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminShopsControllerList>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
@@ -127,11 +129,11 @@ export function useAdminShopsControllerList<TData = Awaited<ReturnType<typeof ad
  */
 
 export function useAdminShopsControllerList<TData = Awaited<ReturnType<typeof adminShopsControllerList>>, TError = ErrorType<unknown>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminShopsControllerList>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ params?: AdminShopsControllerListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminShopsControllerList>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getAdminShopsControllerListQueryOptions(options)
+  const queryOptions = getAdminShopsControllerListQueryOptions(params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

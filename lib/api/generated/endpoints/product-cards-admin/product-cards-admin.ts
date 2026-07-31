@@ -25,6 +25,7 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  AdminProductCardsControllerAiReviewParams,
   AdminProductCardsControllerFindAllParams,
   CreateProductCardDto,
   ReasonDto,
@@ -151,13 +152,14 @@ export function useAdminProductCardsControllerFindAll<TData = Awaited<ReturnType
  * @summary Очередь ручной модерации: проверки со сбоем сервиса или вердиктом fail
  */
 export const adminProductCardsControllerAiReview = (
-
+    params?: AdminProductCardsControllerAiReviewParams,
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
 
 
       return customInstance<void>(
-      {url: `/api/v1/admin/product-cards/ai-review`, method: 'GET', signal
+      {url: `/api/v1/admin/product-cards/ai-review`, method: 'GET',
+        params, signal
     },
       options);
     }
@@ -165,23 +167,23 @@ export const adminProductCardsControllerAiReview = (
 
 
 
-export const getAdminProductCardsControllerAiReviewQueryKey = () => {
+export const getAdminProductCardsControllerAiReviewQueryKey = (params?: AdminProductCardsControllerAiReviewParams,) => {
     return [
-    `/api/v1/admin/product-cards/ai-review`
+    `/api/v1/admin/product-cards/ai-review`, ...(params ? [params] : [])
     ] as const;
     }
 
 
-export const getAdminProductCardsControllerAiReviewQueryOptions = <TData = Awaited<ReturnType<typeof adminProductCardsControllerAiReview>>, TError = ErrorType<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminProductCardsControllerAiReview>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getAdminProductCardsControllerAiReviewQueryOptions = <TData = Awaited<ReturnType<typeof adminProductCardsControllerAiReview>>, TError = ErrorType<unknown>>(params?: AdminProductCardsControllerAiReviewParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminProductCardsControllerAiReview>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getAdminProductCardsControllerAiReviewQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getAdminProductCardsControllerAiReviewQueryKey(params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof adminProductCardsControllerAiReview>>> = ({ signal }) => adminProductCardsControllerAiReview(requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof adminProductCardsControllerAiReview>>> = ({ signal }) => adminProductCardsControllerAiReview(params, requestOptions, signal);
 
 
 
@@ -195,7 +197,7 @@ export type AdminProductCardsControllerAiReviewQueryError = ErrorType<unknown>
 
 
 export function useAdminProductCardsControllerAiReview<TData = Awaited<ReturnType<typeof adminProductCardsControllerAiReview>>, TError = ErrorType<unknown>>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminProductCardsControllerAiReview>>, TError, TData>> & Pick<
+ params: undefined |  AdminProductCardsControllerAiReviewParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminProductCardsControllerAiReview>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof adminProductCardsControllerAiReview>>,
           TError,
@@ -205,7 +207,7 @@ export function useAdminProductCardsControllerAiReview<TData = Awaited<ReturnTyp
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useAdminProductCardsControllerAiReview<TData = Awaited<ReturnType<typeof adminProductCardsControllerAiReview>>, TError = ErrorType<unknown>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminProductCardsControllerAiReview>>, TError, TData>> & Pick<
+ params?: AdminProductCardsControllerAiReviewParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminProductCardsControllerAiReview>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof adminProductCardsControllerAiReview>>,
           TError,
@@ -215,7 +217,7 @@ export function useAdminProductCardsControllerAiReview<TData = Awaited<ReturnTyp
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useAdminProductCardsControllerAiReview<TData = Awaited<ReturnType<typeof adminProductCardsControllerAiReview>>, TError = ErrorType<unknown>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminProductCardsControllerAiReview>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ params?: AdminProductCardsControllerAiReviewParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminProductCardsControllerAiReview>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
@@ -223,11 +225,11 @@ export function useAdminProductCardsControllerAiReview<TData = Awaited<ReturnTyp
  */
 
 export function useAdminProductCardsControllerAiReview<TData = Awaited<ReturnType<typeof adminProductCardsControllerAiReview>>, TError = ErrorType<unknown>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminProductCardsControllerAiReview>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ params?: AdminProductCardsControllerAiReviewParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminProductCardsControllerAiReview>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getAdminProductCardsControllerAiReviewQueryOptions(options)
+  const queryOptions = getAdminProductCardsControllerAiReviewQueryOptions(params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

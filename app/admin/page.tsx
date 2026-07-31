@@ -12,7 +12,6 @@ import { useProductCardsControllerFindAll } from "@/lib/api/generated/endpoints/
 import { useAdminReportsControllerFindAll } from "@/lib/api/generated/endpoints/reports/reports";
 import { hueFromId } from "@/lib/api/mappers";
 import {
-  devFallback,
   devFallbackPage,
   devProducts,
   devReports,
@@ -28,9 +27,16 @@ import type {
 export default function AdminStats() {
   const { t, locale } = useT();
 
-  const shopsQuery = useAdminShopsControllerList({
-    query: { select: (raw) => raw as unknown as AdminShopRow[], retry: false },
-  });
+  // limit побольше: на дашборде нужен весь список для графика, не страница.
+  const shopsQuery = useAdminShopsControllerList(
+    { limit: 100 },
+    {
+      query: {
+        select: (raw) => raw as unknown as Paginated<AdminShopRow>,
+        retry: false,
+      },
+    },
+  );
 
   // limit: 1 — нужны только счётчики из meta, сами строки не читаем.
   const productsQuery = useProductCardsControllerFindAll(
@@ -52,7 +58,7 @@ export default function AdminStats() {
   );
 
   const shops = useMemo(
-    () => devFallback(shopsQuery.data, devShops),
+    () => devFallbackPage(shopsQuery.data, devShops).data,
     [shopsQuery.data],
   );
   const productsTotal = devFallbackPage(productsQuery.data, devProducts).meta

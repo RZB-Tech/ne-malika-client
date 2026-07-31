@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/table";
 import { StoreAvatar } from "@/components/shared/store-avatar";
 import { EntityStatusBadge } from "@/components/admin/entity-status-badge";
+import { Pagination } from "@/components/shared/pagination";
 import { ShopDrawer } from "@/components/admin/shop-drawer";
 import {
   RowActionsMenu,
@@ -36,28 +37,37 @@ import {
 } from "@/lib/api/generated/endpoints/users-admin/users-admin";
 import { hueFromId } from "@/lib/api/mappers";
 import { photoUrl } from "@/lib/api/photo";
-import { devFallback, devShops, usingDevData } from "@/lib/api/dev-fixtures";
-import type { AdminShopRow } from "@/lib/api/types";
+import {
+  devFallbackPage,
+  devShops,
+  usingDevData,
+} from "@/lib/api/dev-fixtures";
+import type { AdminShopRow, Paginated } from "@/lib/api/types";
 
 export default function AdminSellers() {
   const { t, locale } = useT();
   const queryClient = useQueryClient();
   const [opened, setOpened] = useState<AdminShopRow | null>(null);
+  const [page, setPage] = useState(1);
 
-  const { data, isLoading, isError } = useAdminShopsControllerList({
-    query: {
-      select: (raw) => raw as unknown as AdminShopRow[],
-      retry: false,
+  const { data, isLoading, isError } = useAdminShopsControllerList(
+    { page, limit: 20 },
+    {
+      query: {
+        select: (raw) => raw as unknown as Paginated<AdminShopRow>,
+        retry: false,
+      },
     },
-  });
+  );
 
   const abolishMutation = useAdminShopsControllerAbolish();
   const restoreMutation = useAdminShopsControllerRestore();
   const blockMutation = useAdminUsersControllerBlock();
   const unblockMutation = useAdminUsersControllerUnblock();
 
-  const rows = devFallback(data, devShops);
-  const isDevData = usingDevData(data);
+  const pageData = devFallbackPage(data, devShops);
+  const rows = pageData.data;
+  const isDevData = usingDevData(data?.data);
 
   const done = async (message: string) => {
     await queryClient.invalidateQueries();
@@ -236,6 +246,13 @@ export default function AdminSellers() {
           </div>
         )}
       </Card>
+
+      <Pagination
+        page={pageData.meta.page}
+        totalPages={pageData.meta.totalPages}
+        total={pageData.meta.total}
+        onChange={setPage}
+      />
 
       <ShopDrawer
         shop={opened}
