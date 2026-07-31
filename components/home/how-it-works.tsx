@@ -1,13 +1,14 @@
 "use client";
 
-import { Search, Send, Handshake } from "lucide-react";
+import { Search, Handshake } from "lucide-react";
+import { TelegramIcon } from "@/components/icons/telegram-icon";
 import { useT } from "@/components/providers/i18n-provider";
 
 export function HowItWorks() {
   const { t } = useT();
   const steps = [
     { Icon: Search, title: t("home.how1Title"), text: t("home.how1Text") },
-    { Icon: Send, title: t("home.how2Title"), text: t("home.how2Text") },
+    { Icon: TelegramIcon, title: t("home.how2Title"), text: t("home.how2Text") },
     { Icon: Handshake, title: t("home.how3Title"), text: t("home.how3Text") },
   ];
   return (

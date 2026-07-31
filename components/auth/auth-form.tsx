@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
-import { Send } from "lucide-react";
+import { TelegramIcon } from "@/components/icons/telegram-icon";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -42,7 +42,7 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
           </p>
 
           <Button variant="outline" className="mt-7 w-full gap-2" onClick={() => router.push("/seller")}>
-            <Send className="size-4 text-primary" />
+            <TelegramIcon className="size-4 text-primary" />
             {t("auth.telegramLogin")}
           </Button>
 

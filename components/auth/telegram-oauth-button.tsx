@@ -7,7 +7,7 @@ import {
   useTelegramLogin,
   type TelegramUserData,
 } from "@telegram-login-ultimate/react";
-import { Send } from "lucide-react";
+import { TelegramIcon } from "@/components/icons/telegram-icon";
 import { Button } from "@/components/ui/button";
 
 /**
@@ -74,7 +74,7 @@ function OAuthButton({
       className="h-12 w-full gap-2 text-base"
       onClick={start}
     >
-      <Send className="size-4" />
+      <TelegramIcon className="size-4" />
       {label}
     </Button>
   );

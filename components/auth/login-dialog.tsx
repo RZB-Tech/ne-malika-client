@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Send } from "lucide-react";
+import { TelegramIcon } from "@/components/icons/telegram-icon";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -80,7 +80,7 @@ export function LoginDialog({ children }: { children: React.ReactNode }) {
             className="mt-2 h-12 w-full gap-2 text-base"
             onClick={loginMiniApp}
           >
-            <Send className="size-4" />
+            <TelegramIcon className="size-4" />
             {t("auth.telegramLogin")}
           </Button>
         ) : (

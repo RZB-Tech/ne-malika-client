@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, BarChart3, Send, Store } from "lucide-react";
+import { ArrowRight, BarChart3, Store } from "lucide-react";
+import { TelegramIcon } from "@/components/icons/telegram-icon";
 import { Button } from "@/components/ui/button";
 import { useT } from "@/components/providers/i18n-provider";
 
@@ -9,7 +10,7 @@ export function SellerCta() {
   const { t } = useT();
   const perks = [
     { Icon: Store, label: { ru: "Бесплатное размещение", "uz-Latn": "Bepul joylashtirish", "uz-Cyrl": "Бепул жойлаштириш" } },
-    { Icon: Send, label: { ru: "Клиенты в Telegram", "uz-Latn": "Telegramda mijozlar", "uz-Cyrl": "Телеграмда мижозлар" } },
+    { Icon: TelegramIcon, label: { ru: "Клиенты в Telegram", "uz-Latn": "Telegramda mijozlar", "uz-Cyrl": "Телеграмда мижозлар" } },
     { Icon: BarChart3, label: { ru: "Аналитика переходов", "uz-Latn": "O‘tishlar tahlili", "uz-Cyrl": "Ўтишлар таҳлили" } },
   ];
   const { locale } = useT();

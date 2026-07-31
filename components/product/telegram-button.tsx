@@ -1,6 +1,6 @@
 "use client";
 
-import { Send } from "lucide-react";
+import { TelegramIcon } from "@/components/icons/telegram-icon";
 import { Button } from "@/components/ui/button";
 import { useT } from "@/components/providers/i18n-provider";
 import { trackContact } from "@/lib/metrika";
@@ -67,7 +67,7 @@ export function TelegramButton({
         // Кнопка магазина живёт без товара — привязывать такой переход не к чему.
         onClick={() => productId && trackContact(productId, "telegram")}
       >
-        <Send className="size-4" />
+        <TelegramIcon className="size-4" />
         {label ?? t("product.contactSeller")}
       </a>
     </Button>

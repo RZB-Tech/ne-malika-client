@@ -1,6 +1,7 @@
 "use client";
 
-import { ArrowDownRight, ArrowUpRight, type LucideIcon } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import { ArrowDownRight, ArrowUpRight } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
@@ -13,7 +14,7 @@ export function StatCard({
 }: {
   label: string;
   value: string;
-  icon: LucideIcon;
+  icon: React.ComponentType<{ className?: string }> | LucideIcon;
   delta?: number;
   hint?: string;
 }) {

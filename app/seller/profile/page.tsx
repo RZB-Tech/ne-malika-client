@@ -2,7 +2,8 @@
 
 import { useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Send, Upload } from "lucide-react";
+import { Upload } from "lucide-react";
+import { TelegramIcon } from "@/components/icons/telegram-icon";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -239,7 +240,7 @@ export default function SellerProfile() {
             <div className={field}>
               <Label htmlFor="stg">{t("seller.profile.telegram")}</Label>
               <div className="relative">
-                <Send className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                <TelegramIcon className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
                   id="stg"
                   value={telegram}

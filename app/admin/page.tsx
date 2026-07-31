@@ -1,6 +1,7 @@
 "use client";
 
-import { BarChart3, Eye, Package, Send, Store, Target, Users } from "lucide-react";
+import { BarChart3, Eye, Package, Store, Target, Users } from "lucide-react";
+import { TelegramIcon } from "@/components/icons/telegram-icon";
 import { Card } from "@/components/ui/card";
 import { StatCard } from "@/components/shared/stat-card";
 import { ColumnChart, BarList } from "@/components/shared/charts";
@@ -40,7 +41,7 @@ export default function AdminStats() {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <StatCard label={t("admin.stats.telegramClicks")} value={formatNumber(clicks, locale)} icon={Send} delta={18} hint="30 дн." />
+        <StatCard label={t("admin.stats.telegramClicks")} value={formatNumber(clicks, locale)} icon={TelegramIcon} delta={18} hint="30 дн." />
         <StatCard label={t("admin.stats.productViews")} value={formatNumber(views, locale)} icon={Eye} delta={11} hint="30 дн." />
         <StatCard label={t("admin.stats.storeViews")} value={formatNumber(storeViews, locale)} icon={Store} delta={7} hint="30 дн." />
         <StatCard label={t("admin.stats.productsAdded")} value={formatNumber(publicProducts.length + 240, locale)} icon={Package} delta={5} hint="30 дн." />
