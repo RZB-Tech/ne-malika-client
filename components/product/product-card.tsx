@@ -46,10 +46,17 @@ export function ProductCard({ product }: { product: Product }) {
         </div>
 
         <div className="flex flex-1 flex-col gap-2.5 p-4 pb-3">
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <span className="font-medium text-foreground/70">{product.brand}</span>
-            <span className="size-0.5 rounded-full bg-muted-foreground/50" />
-            <AvailabilityBadge status={product.availability} className="px-1.5 py-0 text-[11px]" />
+          {/* Переносится, а не ужимается: в узкой карточке на телефоне бейдж
+              съедал половину строки, и от названия магазина оставалось «Те…».
+              Точку-разделитель показываем только пока строка одна. */}
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
+            <span className="min-w-0 max-w-full truncate font-medium text-foreground/70">
+              {product.brand}
+            </span>
+            <AvailabilityBadge
+              status={product.availability}
+              className="shrink-0 px-1.5 py-0 text-[11px]"
+            />
           </div>
 
           <h3 className="line-clamp-2 text-sm font-medium leading-snug text-foreground group-hover:text-primary">
@@ -77,7 +84,11 @@ export function ProductCard({ product }: { product: Product }) {
       {/* Вне <Link>: кнопка внутри ссылки — вложенная интерактивность, да и
           клик по карточке не должен уводить в Telegram. */}
       <div className="px-4 pb-4">
-        <ContactSellerButton productId={product.id} className="w-full" />
+        <ContactSellerButton
+          productId={product.id}
+          label={t("product.contactShort")}
+          className="w-full"
+        />
       </div>
     </Card>
   );

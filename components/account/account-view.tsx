@@ -15,6 +15,8 @@ import { ViewHistory } from "./view-history";
  * Вход не обязателен — история и избранное копятся и у анонима, поэтому
  * страница открыта всем, а вкладка «Профиль» у гостя предлагает войти.
  */
+const tab = "px-2 text-xs sm:px-3.5 sm:text-sm";
+
 export function AccountView({
   defaultTab = "history",
 }: {
@@ -32,17 +34,20 @@ export function AccountView({
       </p>
 
       <Tabs defaultValue={defaultTab} className="mt-6 gap-6">
-        {/* На телефоне три вкладки в строку не помещаются — список едет вбок. */}
-        <TabsList className="max-w-full overflow-x-auto">
-          <TabsTrigger value="history">
+        {/* Во всю ширину: три вкладки делят её поровну и помещаются на телефоне.
+            overflow-x-auto — страховка на случай длинных переводов. */}
+        <TabsList className="w-full max-w-md overflow-x-auto">
+          {/* Отступы по умолчанию (px-3.5) на телефоне съедают лишние ~35px,
+              и третья вкладка уезжает за край. */}
+          <TabsTrigger value="history" className={tab}>
             <History />
             {t("account.tabs.history")}
           </TabsTrigger>
-          <TabsTrigger value="favorites">
+          <TabsTrigger value="favorites" className={tab}>
             <Heart />
             {t("account.tabs.favorites")}
           </TabsTrigger>
-          <TabsTrigger value="profile">
+          <TabsTrigger value="profile" className={tab}>
             <UserRound />
             {t("account.tabs.profile")}
           </TabsTrigger>

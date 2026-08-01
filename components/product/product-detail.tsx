@@ -55,8 +55,13 @@ export function ProductDetail({
         <div className="min-w-0">
           {/* Ограничена по ширине: в широкой колонке 4:3 фото иначе разъезжается
               на всю строку. */}
-          <div className="grid max-w-4xl gap-4 sm:grid-cols-[76px_1fr]">
-            <div className="order-2 flex gap-3 sm:order-1 sm:flex-col">
+          {/* min-w-0 на треках обязателен: у элементов грида ширина по
+              умолчанию `auto`, и лента миниатюр ниже растягивала колонку под
+              себя — страница уезжала вбок на телефоне. */}
+          <div className="grid max-w-4xl grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-[76px_minmax(0,1fr)]">
+            {/* На телефоне это горизонтальная лента со своей прокруткой,
+                на планшете и шире — колонка слева от фото. */}
+            <div className="order-2 flex min-w-0 gap-3 overflow-x-auto pb-1 sm:order-1 sm:flex-col sm:overflow-x-visible sm:pb-0">
               {gallery.map((g, i) => (
                 <button
                   key={i}
@@ -77,7 +82,7 @@ export function ProductDetail({
                 </button>
               ))}
             </div>
-            <div className="relative order-1 sm:order-2">
+            <div className="relative order-1 min-w-0 sm:order-2">
               <ProductImage
                 hue={gallery[active]?.hue ?? product.hue}
                 src={gallery[active]?.src}

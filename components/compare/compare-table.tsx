@@ -134,16 +134,21 @@ export function CompareTable() {
       </div>
 
       {/* Таблица прокручивается внутри себя: четыре колонки не влезают в
-          телефон, но страница из-за этого ездить вбок не должна. */}
+          телефон, но страница из-за этого ездить вбок не должна.
+          Без min-w на самой таблице: при двух товарах она должна помещаться
+          целиком, а не заставлять скроллить пустоту. */}
       <div className="overflow-x-auto rounded-2xl border border-border">
-        <table className="w-full min-w-[640px] border-collapse text-sm">
+        <table className="w-full border-collapse text-sm">
           <thead>
             <tr>
-              <th className="sticky left-0 z-10 w-40 bg-card p-4 text-left align-top" />
+              {/* Ширину колонки задаёт только эта ячейка — у остальных её нет,
+                  иначе шапка и тело разъезжаются. Фон непрозрачный и
+                  border-r: под липкую колонку уезжают значения соседних. */}
+              <th className="sticky left-0 z-20 w-24 border-r border-border bg-card p-3 text-left align-top sm:w-40 sm:p-4" />
               {items.map((item) => (
                 <th
                   key={item.id}
-                  className="min-w-[180px] border-l border-border p-4 text-left align-top font-normal"
+                  className="min-w-[148px] border-l border-border p-3 text-left align-top font-normal sm:min-w-[200px] sm:p-4"
                 >
                   <div className="relative">
                     <button
@@ -181,15 +186,14 @@ export function CompareTable() {
 
           <tbody>
             {rows.map((row, i) => (
-              <tr
-                key={row.label}
-                className={cn("border-t border-border", i % 2 === 0 && "bg-muted/30")}
-              >
+              <tr key={row.label} className="border-t border-border">
+                {/* Чередование фона — только на значениях: колонка подписей
+                    остаётся сплошной, иначе полупрозрачная полоска просвечивает
+                    уезжающими под неё цифрами. */}
                 <th
                   scope="row"
                   className={cn(
-                    "sticky left-0 z-10 p-4 text-left align-top font-medium",
-                    i % 2 === 0 ? "bg-muted/30" : "bg-card",
+                    "sticky left-0 z-20 border-r border-border bg-card p-3 text-left align-top font-medium sm:p-4",
                     // Различающиеся строки — то, ради чего таблицу открыли.
                     row.differs ? "text-foreground" : "text-muted-foreground",
                   )}
@@ -200,7 +204,8 @@ export function CompareTable() {
                   <td
                     key={j}
                     className={cn(
-                      "border-l border-border p-4 align-top",
+                      "border-l border-border p-3 align-top sm:p-4",
+                      i % 2 === 0 && "bg-muted/30",
                       row.differs && "font-medium",
                     )}
                   >
@@ -212,16 +217,17 @@ export function CompareTable() {
 
             {isPending && (
               <tr className="border-t border-border">
-                <th className="sticky left-0 z-10 bg-card p-4">
-                  <Skeleton className="h-4 w-24" />
+                <th className="sticky left-0 z-20 border-r border-border bg-card p-3 sm:p-4">
+                  <Skeleton className="h-4 w-16" />
                 </th>
                 {items.map((item) => (
-                  <td key={item.id} className="border-l border-border p-4">
+                  <td key={item.id} className="border-l border-border p-3 sm:p-4">
                     <Skeleton className="h-4 w-full" />
                   </td>
                 ))}
               </tr>
             )}
+
           </tbody>
         </table>
       </div>

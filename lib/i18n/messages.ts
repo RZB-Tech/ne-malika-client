@@ -89,6 +89,8 @@ const ru = {
     warranty: "Гарантия",
     brand: "Бренд",
     contactSeller: "Написать продавцу",
+    /** Для узкой карточки каталога: полная подпись там не помещается. */
+    contactShort: "Написать",
     openTelegram: "Написать в Telegram",
     showPhone: "Показать номер",
     store: "Магазин",
@@ -271,7 +273,8 @@ const ru = {
     title: "Личный кабинет",
     subtitle: "История просмотров и данные профиля",
     tabs: {
-      history: "История просмотров",
+      // Коротко: три вкладки с полными подписями не влезают в ширину телефона.
+      history: "История",
       favorites: "Избранное",
       profile: "Профиль",
     },
@@ -423,6 +426,7 @@ const uzLatn: typeof ru = {
     warranty: "Kafolat",
     brand: "Brend",
     contactSeller: "Sotuvchiga yozish",
+    contactShort: "Yozish",
     openTelegram: "Telegramda yozish",
     showPhone: "Raqamni ko‘rsatish",
     store: "Do‘kon",
@@ -605,7 +609,7 @@ const uzLatn: typeof ru = {
     title: "Shaxsiy kabinet",
     subtitle: "Ko‘rilgan mahsulotlar tarixi va profil ma’lumotlari",
     tabs: {
-      history: "Ko‘rishlar tarixi",
+      history: "Tarix",
       favorites: "Sevimlilar",
       profile: "Profil",
     },
@@ -760,6 +764,7 @@ const uzCyrl: typeof ru = {
     warranty: "Кафолат",
     brand: "Бренд",
     contactSeller: "Сотувчига ёзиш",
+    contactShort: "Ёзиш",
     openTelegram: "Телеграмда ёзиш",
     showPhone: "Рақамни кўрсатиш",
     store: "Дўкон",
@@ -942,7 +947,7 @@ const uzCyrl: typeof ru = {
     title: "Шахсий кабинет",
     subtitle: "Кўрилган маҳсулотлар тарихи ва профил маълумотлари",
     tabs: {
-      history: "Кўришлар тарихи",
+      history: "Тарих",
       favorites: "Севимлилар",
       profile: "Профил",
     },

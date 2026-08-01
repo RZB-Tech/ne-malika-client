@@ -36,8 +36,13 @@ export function ContactSellerButton({
         rel="noreferrer"
         onClick={() => trackContact(productId, "telegram")}
       >
-        <TelegramIcon className="size-4" />
-        {label ?? t("product.contactSeller")}
+        <TelegramIcon className="size-4 shrink-0" />
+        {/* В карточке каталога на телефоне ширины на всю подпись нет — она
+            должна аккуратно оборваться многоточием, а не обрезаться краем
+            карточки посреди буквы. */}
+        <span className="min-w-0 truncate">
+          {label ?? t("product.contactSeller")}
+        </span>
       </a>
     </Button>
   );
