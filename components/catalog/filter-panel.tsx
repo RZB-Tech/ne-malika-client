@@ -11,26 +11,31 @@ import {
 import { Input } from "@/components/ui/input";
 import { useT } from "@/components/providers/i18n-provider";
 import { cn } from "@/lib/utils";
-import type { PriceRange, SortKey } from "./catalog-view";
-import { SORT_KEYS } from "./catalog-view";
+import type { PriceRange, SortKey } from "./use-catalog-filters";
+import { SORT_KEYS } from "./use-catalog-filters";
 
 export function FilterPanel({
   filters,
   setFilters,
   sort,
   setSort,
+  // В шторке панель — единственное содержимое, там секции сразу раскрыты.
+  defaultOpen,
 }: {
   filters: PriceRange;
   setFilters: Dispatch<SetStateAction<PriceRange>>;
   sort: SortKey;
   setSort: (v: SortKey) => void;
+  defaultOpen?: boolean;
 }) {
   const { t } = useT();
 
   return (
-    // Collapsed on load: the catalog opens as a plain grid and the sections
-    // expand on click.
-    <Accordion type="multiple" className="w-full">
+    <Accordion
+      type="multiple"
+      defaultValue={defaultOpen ? ["sort", "price"] : undefined}
+      className="w-full"
+    >
       <AccordionItem value="sort">
         <AccordionTrigger className="text-sm font-semibold hover:no-underline">
           {t("catalog.sortBy")}

@@ -23,6 +23,7 @@ const ru = {
   common: {
     search: "Поиск",
     searchPlaceholder: "Название, бренд или модель…",
+    menu: "Меню",
     resetAll: "Сбросить всё",
     from: "от",
     to: "до",
@@ -68,6 +69,7 @@ const ru = {
       priceAsc: "Сначала дешёвые",
       priceDesc: "Сначала дорогие",
     },
+    filters: "Фильтры",
     filterPrice: "Цена",
     emptyTitle: "Ничего не нашлось",
     emptyText: "Попробуйте изменить запрос или сбросить фильтры.",
@@ -285,6 +287,7 @@ const uzLatn: typeof ru = {
   common: {
     search: "Qidiruv",
     searchPlaceholder: "Nomi, brendi yoki modeli…",
+    menu: "Menyu",
     resetAll: "Hammasini tozalash",
     from: "dan",
     to: "gacha",
@@ -330,6 +333,7 @@ const uzLatn: typeof ru = {
       priceAsc: "Avval arzonlari",
       priceDesc: "Avval qimmatlari",
     },
+    filters: "Filtrlar",
     filterPrice: "Narx",
     emptyTitle: "Hech narsa topilmadi",
     emptyText: "So‘rovni o‘zgartirib ko‘ring yoki filtrlarni tozalang.",
@@ -547,6 +551,7 @@ const uzCyrl: typeof ru = {
   common: {
     search: "Қидирув",
     searchPlaceholder: "Номи, бренди ёки модели…",
+    menu: "Меню",
     resetAll: "Ҳаммасини тозалаш",
     from: "дан",
     to: "гача",
@@ -592,6 +597,7 @@ const uzCyrl: typeof ru = {
       priceAsc: "Аввал арзонлари",
       priceDesc: "Аввал қимматлари",
     },
+    filters: "Филтрлар",
     filterPrice: "Нарх",
     emptyTitle: "Ҳеч нарса топилмади",
     emptyText: "Сўровни ўзгартириб кўринг ёки филтрларни тозаланг.",

@@ -4,28 +4,9 @@ import { TelegramIcon } from "@/components/icons/telegram-icon";
 import { Button } from "@/components/ui/button";
 import { useT } from "@/components/providers/i18n-provider";
 import { trackContact } from "@/lib/metrika";
-import { absoluteUrl } from "@/lib/seo";
+import { buildTelegramUrl } from "@/lib/telegram";
 import { cn } from "@/lib/utils";
 import type { ComponentProps } from "react";
-
-export function buildTelegramUrl(
-  username: string,
-  opts?: { productName?: string; productId?: string; greeting?: string },
-) {
-  const base = `https://t.me/${username.replace(/^@/, "")}`;
-  if (!opts?.productName) return base;
-  // Ссылку, а не «ID 42»: продавцу по ней сразу видно карточку, а покупателю
-  // не приходится диктовать номер.
-  const lines = [
-    opts.greeting ?? "",
-    "",
-    opts.productName,
-    opts.productId ? absoluteUrl(`/product/${opts.productId}`) : "",
-  ]
-    .filter(Boolean)
-    .join("\n");
-  return `${base}?text=${encodeURIComponent(lines)}`;
-}
 
 export function TelegramButton({
   username,

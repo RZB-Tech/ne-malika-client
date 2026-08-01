@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { ProductImage } from "@/components/shared/product-image";
+import { ContactSellerButton } from "@/components/product/contact-seller-button";
 import { AvailabilityBadge } from "@/components/shared/badges";
 import { useT } from "@/components/providers/i18n-provider";
 import { formatPrice } from "@/lib/format";
@@ -33,7 +34,7 @@ export function ProductCard({ product }: { product: Product }) {
           )}
         </div>
 
-        <div className="flex flex-1 flex-col gap-2.5 p-4">
+        <div className="flex flex-1 flex-col gap-2.5 p-4 pb-3">
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <span className="font-medium text-foreground/70">{product.brand}</span>
             <span className="size-0.5 rounded-full bg-muted-foreground/50" />
@@ -61,6 +62,12 @@ export function ProductCard({ product }: { product: Product }) {
           </div>
         </div>
       </Link>
+
+      {/* Вне <Link>: кнопка внутри ссылки — вложенная интерактивность, да и
+          клик по карточке не должен уводить в Telegram. */}
+      <div className="px-4 pb-4">
+        <ContactSellerButton productId={product.id} className="w-full" />
+      </div>
     </Card>
   );
 }
