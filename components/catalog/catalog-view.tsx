@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
-import { SearchX, SlidersHorizontal, X } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { Loader2, SearchX, SlidersHorizontal, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ProductCard } from "@/components/product/product-card";
@@ -9,7 +10,7 @@ import { useCatalogFilters } from "./use-catalog-filters";
 import type { SortKey } from "./use-catalog-filters";
 import { useT } from "@/components/providers/i18n-provider";
 import { openHeaderMenu } from "@/components/layout/header-menu-bus";
-import { useProductCardsControllerFindAll } from "@/lib/api/generated/endpoints/product-cards-public/product-cards-public";
+import { productCardsControllerFindAll } from "@/lib/api/generated/endpoints/product-cards-public/product-cards-public";
 import type { ProductCardsControllerFindAllParams } from "@/lib/api/generated/schemas";
 import { mapPublicProductCard } from "@/lib/api/mappers";
 import type { Paginated, PublicProductCard } from "@/lib/api/types";
@@ -17,6 +18,16 @@ import type { Paginated, PublicProductCard } from "@/lib/api/types";
 export type { CatalogFilters, PriceRange, SortKey } from "./use-catalog-filters";
 
 const PAGE_SIZE = 24;
+
+/**
+ * Сколько страниц догружается само по скроллу, прежде чем спросить кнопкой.
+ * Бесконечная лента без потолка — это и обход всей базы одним долгим скроллом,
+ * и тысячи карточек в DOM: вкладка начинает тормозить на ровном месте.
+ */
+const MAX_AUTO_PAGES = 4;
+
+/** Насколько заранее, не доходя до низа, начинать подгрузку. */
+const PRELOAD_MARGIN = "600px 0px";
 
 const SORT_MAP: Record<SortKey, ProductCardsControllerFindAllParams["sort"]> = {
   latest: "newest",
@@ -40,60 +51,102 @@ export function CatalogView({
   const { q, sort, price, filters, setSort, clearPrice, resetFilters } =
     useCatalogFilters();
 
-  // Сброс страницы при смене фильтров — приведение состояния во время
-  // рендера вместо setState в эффекте: новая страница не успевает
-  // отрисоваться со старым page.
-  const [page, setPage] = useState(1);
-  const filterKey = `${q}|${price.priceMin}|${price.priceMax}|${sort}`;
-  const [prevFilterKey, setPrevFilterKey] = useState(filterKey);
-  if (filterKey !== prevFilterKey) {
-    setPrevFilterKey(filterKey);
-    setPage(1);
-  }
-
   const params: ProductCardsControllerFindAllParams = useMemo(
     () => ({
-      page,
       limit: PAGE_SIZE,
       q: q || undefined,
       price_min: price.priceMin ?? undefined,
       price_max: price.priceMax ?? undefined,
       sort: SORT_MAP[sort],
     }),
-    [q, price, sort, page],
+    [q, price, sort],
   );
 
   // Совпадают ли текущие параметры с серверным первым запросом. Только тогда
   // отданный сервером initialData валиден для этого ключа.
   const isInitialParams =
-    page === 1 &&
-    !q &&
-    price.priceMin == null &&
-    price.priceMax == null &&
-    sort === "latest";
+    !q && price.priceMin == null && price.priceMax == null && sort === "latest";
 
-  const listQuery = useProductCardsControllerFindAll(params, {
-    query: {
-      select: (raw) => raw as unknown as Paginated<PublicProductCard>,
-      placeholderData: (prev) => prev,
-      initialData:
-        isInitialParams && initialData
-          ? (initialData as unknown as void)
-          : undefined,
-    },
+  const listQuery = useInfiniteQuery({
+    // Фильтры в ключе: их смена — это другой кеш, а не дозагрузка к текущему.
+    // Лента при этом сбрасывается сама, без ручного reset.
+    queryKey: ["/api/v1/product-cards", "infinite", params] as const,
+    queryFn: ({ pageParam, signal }) =>
+      productCardsControllerFindAll(
+        { ...params, page: pageParam },
+        undefined,
+        signal,
+      ) as unknown as Promise<Paginated<PublicProductCard>>,
+    initialPageParam: 1,
+    getNextPageParam: (last) =>
+      last.meta.page < last.meta.totalPages ? last.meta.page + 1 : undefined,
+    // Главный предохранитель для бэкенда: у infinite-запроса любой refetch
+    // перезапрашивает ВСЕ загруженные страницы разом. Без этого возврат на
+    // вкладку после десяти подгрузок бил бы десятью запросами сразу.
+    staleTime: 2 * 60_000,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    initialData:
+      isInitialParams && initialData
+        ? { pages: [initialData], pageParams: [1] }
+        : undefined,
   });
 
-  const data = listQuery.data as Paginated<PublicProductCard> | undefined;
-  const isLoading = listQuery.isLoading;
-  const isError = listQuery.isError;
-  const isFetching = listQuery.isFetching;
+  const {
+    data,
+    isLoading,
+    isError,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  } = listQuery;
 
   const results = useMemo(
-    () => (data?.data ?? []).map(mapPublicProductCard),
+    () =>
+      (data?.pages ?? []).flatMap((p) => p.data.map(mapPublicProductCard)),
     [data],
   );
-  const total = data?.meta.total ?? 0;
-  const totalPages = data?.meta.totalPages ?? 1;
+  const total = data?.pages[0]?.meta.total ?? 0;
+
+  // Сколько страниц уже подтянулось само. Сбрасывается вместе с фильтрами —
+  // приведение состояния во время рендера, чтобы новая выдача не отрисовалась
+  // со счётчиком от предыдущей.
+  const filterKey = `${q}|${price.priceMin}|${price.priceMax}|${sort}`;
+  const [autoLoads, setAutoLoads] = useState(0);
+  const [prevFilterKey, setPrevFilterKey] = useState(filterKey);
+  if (filterKey !== prevFilterKey) {
+    setPrevFilterKey(filterKey);
+    setAutoLoads(0);
+  }
+
+  const canAutoLoad = hasNextPage && autoLoads < MAX_AUTO_PAGES;
+
+  // IntersectionObserver, а не обработчик scroll: браузер сам считает пересечение
+  // вне основного потока — на скролле ничего не пересчитывается и не дёргается.
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el || !canAutoLoad || isFetchingNextPage) return;
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        // Одна подгрузка на одно появление: пока страница летит, наблюдатель
+        // отключён, иначе дрожание на пиксель слало бы запросы пачками.
+        io.disconnect();
+        setAutoLoads((n) => n + 1);
+        fetchNextPage();
+      },
+      { rootMargin: PRELOAD_MARGIN },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [canAutoLoad, isFetchingNextPage, fetchNextPage]);
+
+  const loadMore = useCallback(() => {
+    setAutoLoads(0);
+    fetchNextPage();
+  }, [fetchNextPage]);
 
   const title = filters.q ? `“${filters.q}”` : t("catalog.allProducts");
 
@@ -182,33 +235,41 @@ export function CatalogView({
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+          {/* content-visibility: карточки за пределами экрана браузер не
+              раскладывает и не рисует. Именно это держит длинную ленту
+              отзывчивой, когда в DOM уже несколько сотен товаров.
+              contain-intrinsic-size: auto — высота запоминается после первой
+              отрисовки, поэтому полоса прокрутки не прыгает. */}
+          <div className="grid grid-cols-2 gap-4 [&>*]:[content-visibility:auto] [&>*]:[contain-intrinsic-size:auto_380px] sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
             {results.map((p) => (
               <ProductCard key={p.id} product={p} />
             ))}
           </div>
 
-          {totalPages > 1 && (
-            <div className="mt-8 flex items-center justify-center gap-3">
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={page <= 1 || isFetching}
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-              >
-                Назад
-              </Button>
-              <span className="text-sm text-muted-foreground tabular">
-                {page} / {totalPages}
-              </span>
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={page >= totalPages || isFetching}
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              >
-                Вперёд
-              </Button>
+          {isFetchingNextPage && (
+            <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Skeleton key={i} className="aspect-[3/4] w-full rounded-2xl" />
+              ))}
+            </div>
+          )}
+
+          {hasNextPage && (
+            <div className="mt-8 flex justify-center">
+              {/* Пустой маркер, за которым следит IntersectionObserver. Пока
+                  автодогрузка не исчерпана, до кнопки дело не доходит. */}
+              <div ref={sentinelRef} aria-hidden className="h-px w-px" />
+              {!canAutoLoad && !isFetchingNextPage && (
+                <Button variant="outline" onClick={loadMore}>
+                  {t("catalog.loadMore")}
+                </Button>
+              )}
+              {isFetchingNextPage && (
+                <span className="inline-flex items-center gap-2 text-sm text-muted-foreground">
+                  <Loader2 className="size-4 animate-spin" />
+                  {t("common.loading")}
+                </span>
+              )}
             </div>
           )}
         </>
