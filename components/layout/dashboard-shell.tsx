@@ -139,11 +139,6 @@ export function DashboardShell({
           </div>
         </header>
 
-        {/*
-          Страница — белая панель, вложенная в рамку. Скругляем только угол
-          на стыке с меню и шапкой; на мобильном меню уезжает за экран,
-          и скругление там не к чему прижиматься.
-        */}
         <div
           ref={scrollRef}
           className="flex-1 overflow-y-auto bg-card md:rounded-tl-2xl"
