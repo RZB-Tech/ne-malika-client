@@ -9,7 +9,7 @@ export function SiteFooter() {
   return (
     <footer className="mt-auto border-t border-border bg-muted/30">
       {/* На узком экране строки идут друг под другом, на широком — через точку. */}
-      <div className="mx-auto flex max-w-[1600px] flex-col gap-1 px-5 py-8 text-xs text-muted-foreground sm:flex-row sm:items-center sm:gap-2 sm:px-8 lg:px-10">
+      <div className="mx-auto flex max-w-[1600px] flex-col items-center justify-center text-center gap-1 px-5 py-8 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-center sm:gap-2 sm:px-8 lg:px-10">
         <span>
           © {year} {t("brand.name")}. {t("footer.rights")}
         </span>
