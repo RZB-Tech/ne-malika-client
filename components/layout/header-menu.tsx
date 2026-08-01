@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
-import { Menu, SlidersHorizontal, Store } from "lucide-react";
+import { History, Menu, SlidersHorizontal, Store } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -29,7 +29,7 @@ import { onOpenHeaderMenu } from "./header-menu-bus";
  */
 export function HeaderMenu() {
   const { t } = useT();
-  const { isAuthenticated, isAdmin } = useAuth();
+  const { isAuthenticated, isAdmin, isSeller } = useAuth();
   const [open, setOpen] = useState(false);
 
   useEffect(() => onOpenHeaderMenu(() => setOpen(true)), []);
@@ -40,8 +40,6 @@ export function HeaderMenu() {
         <Button
           variant="ghost"
           size="icon-sm"
-          // На больших экранах бургера нет: фильтры открываются кнопкой над
-          // сеткой каталога, остальное меню и так разложено по шапке.
           className="relative shrink-0 lg:hidden"
           aria-label={t("common.menu")}
         >
@@ -66,6 +64,14 @@ export function HeaderMenu() {
         </div>
 
         <SheetFooter className="gap-3 border-t border-border">
+          {/* Виден и анониму: история просмотров копится без входа. */}
+          <Button asChild variant="outline" className="w-full gap-2">
+            <Link href="/account" onClick={() => setOpen(false)}>
+              <History className="size-4" />
+              {t("nav.account")}
+            </Link>
+          </Button>
+
           {isAuthenticated ? (
             <Button asChild className="w-full gap-2">
               <Link
@@ -73,7 +79,11 @@ export function HeaderMenu() {
                 onClick={() => setOpen(false)}
               >
                 <Store className="size-4" />
-                {isAdmin ? t("nav.admin") : t("nav.sellerCabinet")}
+                {isAdmin
+                  ? t("nav.admin")
+                  : isSeller
+                    ? t("nav.sellerCabinet")
+                    : t("nav.becomeSeller")}
               </Link>
             </Button>
           ) : (
@@ -85,7 +95,6 @@ export function HeaderMenu() {
             </LoginDialog>
           )}
 
-          {/* Дубли шапки: на узких экранах там для них нет места. */}
           <div className="flex items-center justify-between sm:hidden">
             <LanguageSwitch />
             <AnimatedThemeToggler

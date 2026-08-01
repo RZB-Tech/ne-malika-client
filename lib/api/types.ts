@@ -4,7 +4,8 @@
 
 export type ProductState = "new" | "old";
 export type EntityStatus = "active" | "abolished" | "hidden";
-export type UserRole = "seller" | "admin";
+/** `user` — покупатель; продавцом становятся, создав магазин. */
+export type UserRole = "user" | "seller" | "admin";
 export type AiVerdict = "pass" | "warn" | "fail";
 
 export interface PaginationMeta {

@@ -26,7 +26,7 @@ export const IS_DEV = process.env.NODE_ENV === "development";
  * через Telegram.
  */
 export const DEV_ROLE = IS_DEV
-  ? (process.env.NEXT_PUBLIC_DEV_ROLE as "admin" | "seller" | undefined)
+  ? (process.env.NEXT_PUBLIC_DEV_ROLE as "admin" | "seller" | "user" | undefined)
   : undefined;
 
 export const devShops: AdminShopRow[] = [

@@ -350,7 +350,7 @@
       },
       "post": {
         "operationId": "SellerShopsController_create",
-        "summary": "Создать магазин",
+        "summary": "Создать магазин (покупатель при этом становится продавцом)",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -1317,6 +1317,162 @@
         ]
       }
     },
+    "/api/v1/me/product-views": {
+      "get": {
+        "operationId": "ProductViewsController_findMine",
+        "summary": "История просмотров, свежие сверху",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Номер страницы",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Размер страницы",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedProductViewsDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "me-product-views"
+        ],
+        "security": [
+          {
+            "access-token": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "ProductViewsController_record",
+        "summary": "Отметить просмотр карточки товара",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecordProductViewDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "404": {
+            "description": "Товар не найден или недоступен"
+          }
+        },
+        "tags": [
+          "me-product-views"
+        ],
+        "security": [
+          {
+            "access-token": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "ProductViewsController_clear",
+        "summary": "Очистить историю целиком",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "me-product-views"
+        ],
+        "security": [
+          {
+            "access-token": []
+          }
+        ]
+      }
+    },
+    "/api/v1/me/product-views/sync": {
+      "post": {
+        "operationId": "ProductViewsController_sync",
+        "summary": "Перенести историю, накопленную до входа (localStorage)",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SyncProductViewsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "me-product-views"
+        ],
+        "security": [
+          {
+            "access-token": []
+          }
+        ]
+      }
+    },
+    "/api/v1/me/product-views/{productCardId}": {
+      "delete": {
+        "operationId": "ProductViewsController_remove",
+        "summary": "Убрать один товар из истории",
+        "parameters": [
+          {
+            "name": "productCardId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "Товара нет в истории"
+          }
+        },
+        "tags": [
+          "me-product-views"
+        ],
+        "security": [
+          {
+            "access-token": []
+          }
+        ]
+      }
+    },
     "/api/v1/seller/uploads": {
       "post": {
         "operationId": "SellerFilesController_createUploadUrl",
@@ -1499,7 +1655,7 @@
   },
   "info": {
     "title": "НеМалика API",
-    "description": "Маркетплейс компьютерной техники — REST API для веб-витрины (Next.js) и Telegram mini-app. Покупатель работает без авторизации; продавец и администратор авторизуются через Telegram.",
+    "description": "Маркетплейс компьютерной техники — REST API для веб-витрины (Next.js) и Telegram mini-app. Покупать можно без авторизации; вход через Telegram нужен продавцу, администратору и покупателю, который хочет видеть историю просмотров на всех своих устройствах.",
     "version": "1.0.0",
     "contact": {}
   },
@@ -1531,6 +1687,10 @@
     {
       "name": "product-cards-admin",
       "description": "Упразднение и обслуживание товаров (администратор)"
+    },
+    {
+      "name": "me-product-views",
+      "description": "Личный кабинет покупателя: история просмотренных товаров"
     },
     {
       "name": "files",
@@ -1579,10 +1739,11 @@
           "role": {
             "type": "string",
             "enum": [
+              "user",
               "seller",
               "admin"
             ],
-            "example": "seller"
+            "example": "user"
           },
           "telegramUsername": {
             "type": "object",
@@ -1674,6 +1835,7 @@
           "role": {
             "type": "string",
             "enum": [
+              "user",
               "seller",
               "admin"
             ],
@@ -1983,6 +2145,162 @@
         },
         "required": [
           "aiChecksEnabled"
+        ]
+      },
+      "ProductViewDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "Идентификатор товара",
+            "example": 10
+          },
+          "shopId": {
+            "type": "number",
+            "example": 1
+          },
+          "shopName": {
+            "type": "string",
+            "example": "TechnoDom"
+          },
+          "name": {
+            "type": "string",
+            "example": "Ноутбук Lenovo IdeaPad 3"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "photos": {
+            "description": "Ключи файлов в S3",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "price": {
+            "type": "string",
+            "example": "5400000.00",
+            "description": "numeric приходит строкой"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "new",
+              "old"
+            ]
+          },
+          "viewedAt": {
+            "type": "string",
+            "description": "Последний просмотр"
+          },
+          "viewCount": {
+            "type": "number",
+            "description": "Сколько раз открывали карточку",
+            "example": 3
+          }
+        },
+        "required": [
+          "id",
+          "shopId",
+          "shopName",
+          "name",
+          "description",
+          "photos",
+          "price",
+          "state",
+          "viewedAt",
+          "viewCount"
+        ]
+      },
+      "PaginationMetaDto": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "number",
+            "example": 1
+          },
+          "limit": {
+            "type": "number",
+            "example": 20
+          },
+          "total": {
+            "type": "number",
+            "example": 42
+          },
+          "totalPages": {
+            "type": "number",
+            "example": 3
+          }
+        },
+        "required": [
+          "page",
+          "limit",
+          "total",
+          "totalPages"
+        ]
+      },
+      "PaginatedProductViewsDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductViewDto"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PaginationMetaDto"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "RecordProductViewDto": {
+        "type": "object",
+        "properties": {
+          "product_card_id": {
+            "type": "number",
+            "description": "Товар, карточку которого открыли",
+            "example": 10
+          }
+        },
+        "required": [
+          "product_card_id"
+        ]
+      },
+      "SyncProductViewItemDto": {
+        "type": "object",
+        "properties": {
+          "product_card_id": {
+            "type": "number",
+            "example": 10
+          },
+          "viewed_at": {
+            "type": "string",
+            "description": "Когда товар смотрели на устройстве, ISO-8601",
+            "example": "2026-07-30T14:05:00.000Z"
+          }
+        },
+        "required": [
+          "product_card_id"
+        ]
+      },
+      "SyncProductViewsDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "description": "Локальная история устройства; лишнее клиент отсекает сам",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SyncProductViewItemDto"
+            }
+          }
+        },
+        "required": [
+          "items"
         ]
       },
       "CreateUploadUrlDto": {

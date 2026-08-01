@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AbolishDialog } from "@/components/admin/abolish-dialog";
 import { EntityStatusBadge } from "@/components/admin/entity-status-badge";
+import { RoleBadge } from "@/components/shared/badges";
 import {
   DetailDrawer,
   DetailNote,
@@ -19,7 +20,7 @@ import { useT } from "@/components/providers/i18n-provider";
 import { formatDate, formatPrice } from "@/lib/format";
 import { useAdminUsersControllerGetOne } from "@/lib/api/generated/endpoints/users-admin/users-admin";
 import { devUserActivity, IS_DEV } from "@/lib/api/dev-fixtures";
-import type { AdminUserDetail, AdminUserRow } from "@/lib/api/types";
+import type { AdminUserDetail, AdminUserRow, UserRole } from "@/lib/api/types";
 
 function initials(name: string): string {
   return (
@@ -43,7 +44,7 @@ export function UserDrawer({
   onOpenChange: (open: boolean) => void;
   onBlock: (id: number, reason: string) => Promise<void>;
   onUnblock: (id: number) => Promise<void>;
-  onSetRole: (id: number, role: "admin" | "seller") => Promise<void>;
+  onSetRole: (id: number, role: UserRole) => Promise<void>;
 }) {
   const { t, locale } = useT();
 
@@ -66,16 +67,7 @@ export function UserDrawer({
       badges={
         user && (
           <>
-            <Badge
-              variant="outline"
-              className={
-                user.role === "admin"
-                  ? "border-transparent bg-primary/12 font-medium text-primary"
-                  : "border-transparent bg-muted font-medium text-muted-foreground"
-              }
-            >
-              {user.role === "admin" ? "Администратор" : "Продавец"}
-            </Badge>
+            <RoleBadge role={user.role} />
             {user.blockedAt && (
               <Badge
                 variant="outline"
@@ -95,7 +87,9 @@ export function UserDrawer({
               <Button
                 variant="ghost"
                 className={drawerAction.warning}
-                onClick={() => void onSetRole(user.id, "seller")}
+                onClick={() =>
+                  void onSetRole(user.id, user.shopId ? "seller" : "user")
+                }
               >
                 <ShieldOff className="size-4" /> Снять админа
               </Button>

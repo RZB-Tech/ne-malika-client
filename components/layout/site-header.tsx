@@ -1,6 +1,7 @@
 "use client";
 
-import { Store } from "lucide-react";
+import Link from "next/link";
+import { History, Store } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/shared/logo";
 import { SearchBar } from "@/components/shared/search-bar";
@@ -39,6 +40,23 @@ export function SiteHeader() {
               className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors outline-none hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 dark:hover:bg-muted/50 [&_svg]:size-[1.15rem]"
             />
           </div>
+
+          {/* Гостю кабинет иначе недоступен: бургер с этой ссылкой прячется на
+              широких экранах, а меню аватара есть только у вошедших. */}
+          {isHydrated && !isAuthenticated && (
+            <Button
+              asChild
+              variant="ghost"
+              size="icon-sm"
+              className="hidden lg:inline-flex"
+              aria-label={t("nav.account")}
+              title={t("nav.account")}
+            >
+              <Link href="/account">
+                <History className="size-[1.15rem]" />
+              </Link>
+            </Button>
+          )}
 
           {!isHydrated ? (
             // Placeholder until auth state is known (avoids logged-out flash).

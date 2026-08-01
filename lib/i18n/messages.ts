@@ -38,6 +38,7 @@ const ru = {
     language: "Язык",
   },
   nav: {
+    account: "Личный кабинет",
     sellerCabinet: "Кабинет продавца",
     admin: "Админ-панель",
     login: "Войти",
@@ -266,6 +267,42 @@ const ru = {
     orEmail: "или через email",
     agree: "Регистрируясь, вы принимаете условия оферты",
   },
+  account: {
+    title: "Личный кабинет",
+    subtitle: "История просмотров и данные профиля",
+    tabs: {
+      history: "История просмотров",
+      profile: "Профиль",
+    },
+    history: {
+      count: "{count} товаров в истории",
+      empty: "Здесь пока пусто",
+      emptyText: "Откройте карточку любого товара — он появится в этом списке.",
+      toCatalog: "Перейти в каталог",
+      clear: "Очистить историю",
+      clearTitle: "Очистить историю просмотров?",
+      clearText: "Список просмотренных товаров будет удалён без возможности вернуть.",
+      remove: "Убрать из истории",
+      viewedAt: "Просмотрено {date}",
+      localTitle: "История хранится только в этом браузере",
+      localText: "Войдите через Telegram — и она будет с вами на всех устройствах.",
+      syncedTitle: "История синхронизирована",
+      syncedText: "Вы видите её на любом устройстве, где вошли в аккаунт.",
+    },
+    profile: {
+      guestTitle: "Вы не вошли",
+      guestText:
+        "Вход через Telegram переносит историю просмотров на все ваши устройства.",
+      name: "Имя",
+      username: "Telegram",
+      phone: "Телефон",
+      phoneMissing: "не указан",
+      role: "Роль",
+      roleUser: "Покупатель",
+      roleSeller: "Продавец",
+      roleAdmin: "Администратор",
+    },
+  },
   footer: {
     rights: "Все права защищены.",
     disclaimer: "Платформа не участвует в оплате и доставке товаров.",
@@ -303,6 +340,7 @@ const uzLatn: typeof ru = {
     language: "Til",
   },
   nav: {
+    account: "Shaxsiy kabinet",
     sellerCabinet: "Sotuvchi kabineti",
     admin: "Admin panel",
     login: "Kirish",
@@ -531,6 +569,45 @@ const uzLatn: typeof ru = {
     orEmail: "yoki email orqali",
     agree: "Ro‘yxatdan o‘tish orqali siz oferta shartlarini qabul qilasiz",
   },
+  account: {
+    title: "Shaxsiy kabinet",
+    subtitle: "Ko‘rilgan mahsulotlar tarixi va profil ma’lumotlari",
+    tabs: {
+      history: "Ko‘rishlar tarixi",
+      profile: "Profil",
+    },
+    history: {
+      count: "Tarixda {count} ta mahsulot",
+      empty: "Bu yerda hozircha bo‘sh",
+      emptyText:
+        "Istalgan mahsulot kartasini oching — u shu ro‘yxatda paydo bo‘ladi.",
+      toCatalog: "Katalogga o‘tish",
+      clear: "Tarixni tozalash",
+      clearTitle: "Ko‘rishlar tarixi tozalansinmi?",
+      clearText: "Ko‘rilgan mahsulotlar ro‘yxati butunlay o‘chiriladi.",
+      remove: "Tarixdan olib tashlash",
+      viewedAt: "{date} da ko‘rilgan",
+      localTitle: "Tarix faqat shu brauzerda saqlanadi",
+      localText:
+        "Telegram orqali kiring — u barcha qurilmalaringizda ko‘rinadi.",
+      syncedTitle: "Tarix sinxronlangan",
+      syncedText:
+        "Hisobingizga kirgan har qanday qurilmada uni ko‘rasiz.",
+    },
+    profile: {
+      guestTitle: "Siz kirmagansiz",
+      guestText:
+        "Telegram orqali kirish ko‘rishlar tarixini barcha qurilmalaringizga ko‘chiradi.",
+      name: "Ism",
+      username: "Telegram",
+      phone: "Telefon",
+      phoneMissing: "ko‘rsatilmagan",
+      role: "Rol",
+      roleUser: "Xaridor",
+      roleSeller: "Sotuvchi",
+      roleAdmin: "Administrator",
+    },
+  },
   footer: {
     rights: "Barcha huquqlar himoyalangan.",
     disclaimer: "Platforma mahsulotlar to‘lovi va yetkazib berishda ishtirok etmaydi.",
@@ -568,6 +645,7 @@ const uzCyrl: typeof ru = {
     language: "Тил",
   },
   nav: {
+    account: "Шахсий кабинет",
     sellerCabinet: "Сотувчи кабинети",
     admin: "Админ панел",
     login: "Кириш",
@@ -795,6 +873,44 @@ const uzCyrl: typeof ru = {
     haveAccount: "Ҳисобингиз борми?",
     orEmail: "ёки email орқали",
     agree: "Рўйхатдан ўтиш орқали сиз оферта шартларини қабул қиласиз",
+  },
+  account: {
+    title: "Шахсий кабинет",
+    subtitle: "Кўрилган маҳсулотлар тарихи ва профил маълумотлари",
+    tabs: {
+      history: "Кўришлар тарихи",
+      profile: "Профил",
+    },
+    history: {
+      count: "Тарихда {count} та маҳсулот",
+      empty: "Бу ерда ҳозирча бўш",
+      emptyText:
+        "Исталган маҳсулот картасини очинг — у шу рўйхатда пайдо бўлади.",
+      toCatalog: "Каталогга ўтиш",
+      clear: "Тарихни тозалаш",
+      clearTitle: "Кўришлар тарихи тозалансинми?",
+      clearText: "Кўрилган маҳсулотлар рўйхати бутунлай ўчирилади.",
+      remove: "Тарихдан олиб ташлаш",
+      viewedAt: "{date} да кўрилган",
+      localTitle: "Тарих фақат шу браузерда сақланади",
+      localText:
+        "Телеграм орқали киринг — у барча қурилмаларингизда кўринади.",
+      syncedTitle: "Тарих синхронланган",
+      syncedText: "Ҳисобингизга кирган ҳар қандай қурилмада уни кўрасиз.",
+    },
+    profile: {
+      guestTitle: "Сиз кирмагансиз",
+      guestText:
+        "Телеграм орқали кириш кўришлар тарихини барча қурилмаларингизга кўчиради.",
+      name: "Исм",
+      username: "Телеграм",
+      phone: "Телефон",
+      phoneMissing: "кўрсатилмаган",
+      role: "Рол",
+      roleUser: "Харидор",
+      roleSeller: "Сотувчи",
+      roleAdmin: "Администратор",
+    },
   },
   footer: {
     rights: "Барча ҳуқуқлар ҳимояланган.",

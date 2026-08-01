@@ -4,8 +4,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/lib/api/auth";
-
-type Role = "seller" | "admin";
+import type { UserRole } from "@/lib/api/types";
 
 /**
  * Закрывает раздел от чужих. Проверка только клиентская: сессия лежит в
@@ -18,13 +17,15 @@ export function RequireRole({
   role,
   children,
 }: {
-  role: Role;
+  /** Одна роль или список: в кабинет продавца пускаем и покупателя — создать магазин. */
+  role: UserRole | UserRole[];
   children: React.ReactNode;
 }) {
-  const { isAuthenticated, isHydrated, isSeller, isAdmin } = useAuth();
+  const { user, isAuthenticated, isHydrated } = useAuth();
   const router = useRouter();
 
-  const allowed = role === "admin" ? isAdmin : isSeller;
+  const roles = Array.isArray(role) ? role : [role];
+  const allowed = Boolean(user && roles.includes(user.role as UserRole));
 
   useEffect(() => {
     // До гидратации состояние всегда «разлогинен» — редиректить рано.

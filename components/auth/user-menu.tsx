@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { LayoutDashboard, LogOut } from "lucide-react";
+import { History, LayoutDashboard, LogOut, Store } from "lucide-react";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -30,7 +30,7 @@ function initials(name: string): string {
 export function UserMenu() {
   const { t } = useT();
   const router = useRouter();
-  const { user, isAdmin, logout } = useAuth();
+  const { user, isAdmin, isSeller, logout } = useAuth();
 
   if (!user) return null;
 
@@ -38,8 +38,14 @@ export function UserMenu() {
   // the generated schema but are really strings (or null) coming from Telegram.
   const photo = user.telegramPhoto as string | null;
   const username = user.telegramUsername as string | null;
+  // Покупателя ведём тем же путём, но зовём его иначе: магазина у него ещё
+  // нет, и «Кабинет продавца» обещал бы не то.
   const cabinetHref = isAdmin ? "/admin" : "/seller";
-  const cabinetLabel = isAdmin ? t("nav.admin") : t("nav.sellerCabinet");
+  const cabinetLabel = isAdmin
+    ? t("nav.admin")
+    : isSeller
+      ? t("nav.sellerCabinet")
+      : t("nav.becomeSeller");
 
   const onLogout = async () => {
     try {
@@ -69,8 +75,18 @@ export function UserMenu() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
+          <Link href="/account">
+            <History className="size-4" />
+            {t("nav.account")}
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
           <Link href={cabinetHref}>
-            <LayoutDashboard className="size-4" />
+            {isSeller || isAdmin ? (
+              <LayoutDashboard className="size-4" />
+            ) : (
+              <Store className="size-4" />
+            )}
             {cabinetLabel}
           </Link>
         </DropdownMenuItem>

@@ -26,6 +26,7 @@ import {
   useSellerShopsControllerUpdate,
 } from "@/lib/api/generated/endpoints/shops-seller/shops-seller";
 import { useSellerShop } from "@/lib/api/seller";
+import { useAuth } from "@/lib/api/auth";
 import { dataUrlToBlob, uploadPhoto } from "@/lib/api/upload";
 import { hueFromId } from "@/lib/api/mappers";
 import { photoUrl } from "@/lib/api/photo";
@@ -37,6 +38,7 @@ export default function SellerProfile() {
   const logoInput = useRef<HTMLInputElement>(null);
 
   const { shop, isLoading: shopLoading } = useSellerShop();
+  const { refreshSession } = useAuth();
 
   const createMutation = useSellerShopsControllerCreate();
   const updateMutation = useSellerShopsControllerUpdate();
@@ -124,6 +126,10 @@ export default function SellerProfile() {
         await updateMutation.mutateAsync({ id: shop.id, data: payload });
       } else {
         await createMutation.mutateAsync({ data: payload });
+        // Создание магазина повышает покупателя до продавца, но роль зашита в
+        // выданный токен — без перевыпуска разделы товаров остались бы
+        // закрытыми до следующего входа.
+        await refreshSession();
       }
 
       await queryClient.invalidateQueries();

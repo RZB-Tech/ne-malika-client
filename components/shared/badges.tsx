@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useT } from "@/components/providers/i18n-provider";
 import type { Availability, ModerationStatus } from "@/lib/data";
+import type { UserRole } from "@/lib/api/types";
 import { CheckCircle2, Clock, Package, XCircle } from "lucide-react";
 
 export function AvailabilityBadge({
@@ -56,6 +57,31 @@ export function ModerationBadge({
     <Badge variant="outline" className={cn("gap-1 border-transparent font-medium", cls, className)}>
       <Icon className="size-3" />
       {t(`moderation.${status}`)}
+    </Badge>
+  );
+}
+
+/** Роль пользователя в админке. Она без локализации — как и вся панель. */
+export function RoleBadge({
+  role,
+  className,
+}: {
+  role: UserRole;
+  className?: string;
+}) {
+  const cfg: Record<UserRole, { label: string; cls: string }> = {
+    user: { label: "Покупатель", cls: "bg-muted text-muted-foreground" },
+    seller: { label: "Продавец", cls: "bg-success/12 text-success" },
+    admin: { label: "Администратор", cls: "bg-primary/12 text-primary" },
+  };
+  const { label, cls } = cfg[role] ?? cfg.user;
+
+  return (
+    <Badge
+      variant="outline"
+      className={cn("border-transparent font-medium", cls, className)}
+    >
+      {label}
     </Badge>
   );
 }

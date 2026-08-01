@@ -17,6 +17,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { UserDrawer } from "@/components/admin/user-drawer";
+import { RoleBadge } from "@/components/shared/badges";
 import { Pagination } from "@/components/shared/pagination";
 import {
   RowActionsMenu,
@@ -36,7 +37,7 @@ import {
   devUsers,
   usingDevData,
 } from "@/lib/api/dev-fixtures";
-import type { AdminUserRow, Paginated } from "@/lib/api/types";
+import type { AdminUserRow, Paginated, UserRole } from "@/lib/api/types";
 
 export function initials(name: string): string {
   return (
@@ -87,10 +88,15 @@ export default function AdminUsers() {
     await unblockMutation.mutateAsync({ id });
     await done("Блокировка снята");
   };
-  const setRole = async (id: number, role: "admin" | "seller") => {
+  const setRole = async (id: number, role: UserRole) => {
     await roleMutation.mutateAsync({ id, data: { role } });
     await done(role === "admin" ? "Выданы права админа" : "Права админа сняты");
   };
+
+  // Снимая админа, возвращаем ту роль, которой человек соответствует: продавец
+  // без магазина — это просто покупатель.
+  const demotedRole = (u: { shopId: number | null }): UserRole =>
+    u.shopId ? "seller" : "user";
 
   const actionsFor = (u: AdminUserRow): RowAction[] => [
     ...(u.shopId
@@ -106,7 +112,7 @@ export default function AdminUsers() {
       ? {
           label: "Снять права админа",
           icon: ShieldOff,
-          onSelect: () => void setRole(u.id, "seller"),
+          onSelect: () => void setRole(u.id, demotedRole(u)),
         }
       : {
           label: "Сделать администратором",
@@ -207,16 +213,7 @@ export default function AdminUsers() {
                       {u.shopName ?? "—"}
                     </TableCell>
                     <TableCell>
-                      <Badge
-                        variant="outline"
-                        className={
-                          u.role === "admin"
-                            ? "border-transparent bg-primary/12 font-medium text-primary"
-                            : "border-transparent bg-muted font-medium text-muted-foreground"
-                        }
-                      >
-                        {u.role === "admin" ? "Администратор" : "Продавец"}
-                      </Badge>
+                      <RoleBadge role={u.role} />
                     </TableCell>
                     <TableCell className="tabular text-right text-sm">
                       {u.productCount}

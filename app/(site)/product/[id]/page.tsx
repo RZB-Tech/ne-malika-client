@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ProductDetail } from "@/components/product/product-detail";
+import { TrackProductView } from "@/components/product/track-product-view";
 import { getPublicProduct, getPublicShop } from "@/lib/api/server";
 import { mapPublicProductCard, mapShop } from "@/lib/api/mappers";
 import { photoUrl } from "@/lib/api/photo";
@@ -137,6 +138,18 @@ export default async function ProductPage({
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      {/* Снимок для истории просмотров — из уже загруженных данных страницы. */}
+      <TrackProductView
+        product={{
+          id: raw.id,
+          shopId: raw.shopId,
+          shopName: raw.shopName ?? store.name,
+          name: raw.name,
+          price: raw.price,
+          photo: raw.photos?.[0] ?? null,
+          state: raw.state,
+        }}
       />
       <ProductDetail product={product} store={store} />
     </>

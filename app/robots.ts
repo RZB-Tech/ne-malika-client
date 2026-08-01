@@ -7,7 +7,7 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: "*",
       allow: "/",
       // Кабинеты и служебные разделы индексировать незачем.
-      disallow: ["/admin", "/seller", "/register", "/api/"],
+      disallow: ["/admin", "/seller", "/account", "/register", "/api/"],
     },
     sitemap: absoluteUrl("/sitemap.xml"),
     host: absoluteUrl("/"),

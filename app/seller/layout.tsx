@@ -15,8 +15,10 @@ import { photoUrl } from "@/lib/api/photo";
 
 export default function SellerLayout({ children }: { children: React.ReactNode }) {
   // Гард снаружи: иначе хуки ниже успеют сходить за данными магазина от анонима.
+  // Покупателя пускаем — этот раздел и есть путь «стать продавцом»: он создаёт
+  // здесь магазин, и роль меняется сама.
   return (
-    <RequireRole role="seller">
+    <RequireRole role={["user", "seller"]}>
       <SellerLayoutInner>{children}</SellerLayoutInner>
     </RequireRole>
   );
@@ -26,10 +28,16 @@ function SellerLayoutInner({ children }: { children: React.ReactNode }) {
   const { t } = useT();
   const { shop } = useSellerShop();
 
+  // Пока магазина нет, разделы товаров ведут в тупик — оставляем только обзор
+  // и форму магазина.
   const items: NavItem[] = [
     { href: "/seller", label: t("seller.nav.dashboard"), icon: LayoutDashboard, exact: true },
-    { href: "/seller/products", label: t("seller.nav.products"), icon: Package },
-    { href: "/seller/products/new", label: t("seller.nav.addProduct"), icon: PlusCircle },
+    ...(shop
+      ? [
+          { href: "/seller/products", label: t("seller.nav.products"), icon: Package },
+          { href: "/seller/products/new", label: t("seller.nav.addProduct"), icon: PlusCircle },
+        ]
+      : []),
     { href: "/seller/profile", label: t("seller.nav.profile"), icon: Store },
   ];
 

@@ -42,6 +42,12 @@ interface AuthContextValue {
   loginWithInitData: (initData: string) => Promise<AuthResponseDto>;
   /** Браузерный вход через официальный Login Widget. */
   loginWithTelegramUser: (user: TelegramUser) => Promise<AuthResponseDto>;
+  /**
+   * Перевыпускает токены по refresh-cookie. Нужен там, где роль изменилась на
+   * бэкенде: она зашита в access-токен, и без этого «продавец» до конца сессии
+   * остаётся покупателем.
+   */
+  refreshSession: () => Promise<AuthResponseDto | null>;
   logout: () => Promise<void>;
 }
 
@@ -81,6 +87,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return res;
   }, []);
 
+  const refreshSession = useCallback(async () => {
+    try {
+      const res = await authControllerRefresh();
+      setAuth(res.accessToken, res.user);
+      return res;
+    } catch {
+      // Сессия могла истечь — молча оставляем прежний токен, вызывающий код
+      // не должен из-за этого падать.
+      return null;
+    }
+  }, []);
+
   const logout = useCallback(async () => {
     try {
       await authControllerLogout();
@@ -106,9 +124,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // страницы покажут тестовые данные из dev-fixtures. В прод-сборке
     // DEV_ROLE всегда undefined, ветка вырезается сборщиком.
     if (DEV_ROLE) {
+      const devNames = {
+        admin: "Локальный админ",
+        seller: "Локальный продавец",
+        user: "Локальный покупатель",
+      };
       setAuth("dev-token", {
         id: 0,
-        fullname: DEV_ROLE === "admin" ? "Локальный админ" : "Локальный продавец",
+        fullname: devNames[DEV_ROLE],
         role: DEV_ROLE,
         telegramUsername: null,
         telegramPhoto: null,
@@ -144,6 +167,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     isTelegramMiniApp: readMiniAppInitData() !== null,
     loginWithInitData,
     loginWithTelegramUser,
+    refreshSession,
     logout,
   };
 

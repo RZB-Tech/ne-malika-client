@@ -17,7 +17,19 @@ import { useT } from "@/components/providers/i18n-provider";
 import { useAuth, type TelegramUser } from "@/lib/api/auth";
 import { TelegramOAuthButton } from "@/components/auth/telegram-oauth-button";
 
-export function LoginDialog({ children }: { children: React.ReactNode }) {
+export function LoginDialog({
+  children,
+  redirectTo,
+}: {
+  children: React.ReactNode;
+  /**
+   * Куда уйти после входа. По умолчанию — в кабинет по роли: так вход
+   * работает из шапки, где кнопка зовёт стать продавцом. `null` оставляет
+   * пользователя на месте — это нужно покупателю, который вошёл ради истории
+   * просмотров и ждёт её здесь же.
+   */
+  redirectTo?: string | null;
+}) {
   const { t } = useT();
   const router = useRouter();
   const { isTelegramMiniApp, loginWithInitData, loginWithTelegramUser } = useAuth();
@@ -28,7 +40,8 @@ export function LoginDialog({ children }: { children: React.ReactNode }) {
 
   const finish = (role?: string) => {
     setOpen(false);
-    router.push(role === "admin" ? "/admin" : "/seller");
+    if (redirectTo === null) return;
+    router.push(redirectTo ?? (role === "admin" ? "/admin" : "/seller"));
   };
 
   const loginMiniApp = async () => {
