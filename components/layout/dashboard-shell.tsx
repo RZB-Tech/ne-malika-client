@@ -160,8 +160,6 @@ export function DashboardShell({
 function NavMenu({ items }: { items: NavItem[] }) {
   const pathname = usePathname();
 
-  // Подсвечиваем только самый точный совпавший пункт: /seller/products/new
-  // активирует «Добавить товар», а не родительские «Мои товары».
   const activeHref = items.reduce<string | null>((best, item) => {
     const matches = item.exact
       ? pathname === item.href
@@ -173,7 +171,6 @@ function NavMenu({ items }: { items: NavItem[] }) {
   }, null);
 
   return (
-    // gap-1: у SidebarMenu по умолчанию gap-0, пункты слипаются в сплошной блок.
     <SidebarMenu className="gap-1">
       {items.map((item) => (
         <SidebarMenuItem key={item.href}>
