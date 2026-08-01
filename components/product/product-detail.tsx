@@ -9,11 +9,14 @@ import { Separator } from "@/components/ui/separator";
 import { ProductImage } from "@/components/shared/product-image";
 import { AvailabilityBadge } from "@/components/shared/badges";
 import { TelegramButton } from "@/components/product/telegram-button";
+import { FavoriteButton } from "@/components/product/favorite-button";
+import { CompareButton } from "@/components/product/compare-button";
 import { RevealPhone } from "@/components/product/reveal-phone";
 import { ReportDialog } from "@/components/shared/report-dialog";
 import { StoreAvatar } from "@/components/shared/store-avatar";
 import { useT } from "@/components/providers/i18n-provider";
 import { formatPrice } from "@/lib/format";
+import { productToSnapshot } from "@/lib/product-snapshot";
 import { type Product, type Store } from "@/lib/data";
 import { cn } from "@/lib/utils";
 
@@ -26,6 +29,7 @@ export function ProductDetail({
 }) {
   const { t, locale } = useT();
   const [active, setActive] = useState(0);
+  const snapshot = productToSnapshot(product);
 
   // Prefer real photos; fall back to deterministic tinted tiles.
   const photos = product.photoUrls ?? [];
@@ -205,6 +209,11 @@ export function ProductDetail({
                   {t("product.store")}
                 </Link>
               </Button>
+
+              <div className="grid grid-cols-2 gap-2">
+                <FavoriteButton product={snapshot} variant="full" />
+                <CompareButton product={snapshot} variant="full" />
+              </div>
             </div>
 
             <div className="mt-4 flex items-center gap-2 rounded-lg bg-primary/5 px-3 py-2 text-xs text-muted-foreground">

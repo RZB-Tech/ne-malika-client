@@ -617,6 +617,18 @@
             }
           },
           {
+            "name": "ids",
+            "required": false,
+            "in": "query",
+            "description": "Выбрать конкретные товары по id, через запятую (?ids=10,12,15). Нужен таблице сравнения: список товаров она держит у себя и тянет их одним запросом.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
             "name": "q",
             "required": false,
             "in": "query",
@@ -1473,6 +1485,162 @@
         ]
       }
     },
+    "/api/v1/me/favorites": {
+      "get": {
+        "operationId": "FavoritesController_findMine",
+        "summary": "Избранное, недавно добавленные сверху",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Номер страницы",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Размер страницы",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedFavoritesDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "me-favorites"
+        ],
+        "security": [
+          {
+            "access-token": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "FavoritesController_add",
+        "summary": "Добавить товар в избранное",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddFavoriteDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "404": {
+            "description": "Товар не найден или недоступен"
+          }
+        },
+        "tags": [
+          "me-favorites"
+        ],
+        "security": [
+          {
+            "access-token": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "FavoritesController_clear",
+        "summary": "Очистить избранное целиком",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "me-favorites"
+        ],
+        "security": [
+          {
+            "access-token": []
+          }
+        ]
+      }
+    },
+    "/api/v1/me/favorites/sync": {
+      "post": {
+        "operationId": "FavoritesController_sync",
+        "summary": "Перенести избранное, накопленное до входа (localStorage)",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SyncFavoritesDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "me-favorites"
+        ],
+        "security": [
+          {
+            "access-token": []
+          }
+        ]
+      }
+    },
+    "/api/v1/me/favorites/{productCardId}": {
+      "delete": {
+        "operationId": "FavoritesController_remove",
+        "summary": "Убрать товар из избранного",
+        "parameters": [
+          {
+            "name": "productCardId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "Товара нет в избранном"
+          }
+        },
+        "tags": [
+          "me-favorites"
+        ],
+        "security": [
+          {
+            "access-token": []
+          }
+        ]
+      }
+    },
     "/api/v1/seller/uploads": {
       "post": {
         "operationId": "SellerFilesController_createUploadUrl",
@@ -1691,6 +1859,10 @@
     {
       "name": "me-product-views",
       "description": "Личный кабинет покупателя: история просмотренных товаров"
+    },
+    {
+      "name": "me-favorites",
+      "description": "Личный кабинет покупателя: избранные товары"
     },
     {
       "name": "files",
@@ -2296,6 +2468,129 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/SyncProductViewItemDto"
+            }
+          }
+        },
+        "required": [
+          "items"
+        ]
+      },
+      "FavoriteDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "Идентификатор товара",
+            "example": 10
+          },
+          "shopId": {
+            "type": "number",
+            "example": 1
+          },
+          "shopName": {
+            "type": "string",
+            "example": "TechnoDom"
+          },
+          "name": {
+            "type": "string",
+            "example": "Ноутбук Lenovo IdeaPad 3"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "photos": {
+            "description": "Ключи файлов в S3",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "price": {
+            "type": "string",
+            "example": "5400000.00",
+            "description": "numeric приходит строкой"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "new",
+              "old"
+            ]
+          },
+          "addedAt": {
+            "type": "string",
+            "description": "Когда товар добавили в избранное"
+          }
+        },
+        "required": [
+          "id",
+          "shopId",
+          "shopName",
+          "name",
+          "description",
+          "photos",
+          "price",
+          "state",
+          "addedAt"
+        ]
+      },
+      "PaginatedFavoritesDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FavoriteDto"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PaginationMetaDto"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "AddFavoriteDto": {
+        "type": "object",
+        "properties": {
+          "product_card_id": {
+            "type": "number",
+            "description": "Товар, добавляемый в избранное",
+            "example": 10
+          }
+        },
+        "required": [
+          "product_card_id"
+        ]
+      },
+      "SyncFavoriteItemDto": {
+        "type": "object",
+        "properties": {
+          "product_card_id": {
+            "type": "number",
+            "example": 10
+          },
+          "added_at": {
+            "type": "string",
+            "description": "Когда товар добавили в избранное на устройстве, ISO-8601",
+            "example": "2026-07-30T14:05:00.000Z"
+          }
+        },
+        "required": [
+          "product_card_id"
+        ]
+      },
+      "SyncFavoritesDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "description": "Локальное избранное устройства; лишнее клиент отсекает сам",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SyncFavoriteItemDto"
             }
           }
         },

@@ -4,17 +4,28 @@ import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { ProductImage } from "@/components/shared/product-image";
 import { ContactSellerButton } from "@/components/product/contact-seller-button";
+import { FavoriteButton } from "@/components/product/favorite-button";
+import { CompareButton } from "@/components/product/compare-button";
 import { AvailabilityBadge } from "@/components/shared/badges";
 import { useT } from "@/components/providers/i18n-provider";
 import { formatPrice } from "@/lib/format";
+import { productToSnapshot } from "@/lib/product-snapshot";
 import { type Product } from "@/lib/data";
 import { Badge } from "@/components/ui/badge";
 
 export function ProductCard({ product }: { product: Product }) {
   const { t, locale } = useT();
+  const snapshot = productToSnapshot(product);
 
   return (
     <Card className="group relative flex flex-col overflow-hidden p-0 gap-0 transition-shadow hover:shadow-md">
+      {/* Вне <Link>: это переключатели, а не переход к товару. Поверх картинки
+          и с своим z-index, иначе ссылка карточки перехватывает клик. */}
+      <div className="absolute top-3 right-3 z-10 flex flex-col gap-1.5">
+        <FavoriteButton product={snapshot} />
+        <CompareButton product={snapshot} />
+      </div>
+
       <Link href={`/product/${product.id}`} className="flex flex-1 flex-col">
         <div className="relative">
           <ProductImage

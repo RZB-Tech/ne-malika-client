@@ -66,6 +66,8 @@ export interface Product {
   // Populated when the product comes from the backend (real S3 photos).
   imageUrl?: string | null;
   photoUrls?: string[];
+  /** Сырые ключи S3. Личные списки хранят их, а не собранные URL. */
+  photoKeys?: string[];
   abolishReason?: string | null;
 }
 

@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
-import { History, Menu, SlidersHorizontal, Store } from "lucide-react";
+import { History, Menu, Scale, SlidersHorizontal, Store } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -64,13 +64,21 @@ export function HeaderMenu() {
         </div>
 
         <SheetFooter className="gap-3 border-t border-border">
-          {/* Виден и анониму: история просмотров копится без входа. */}
-          <Button asChild variant="outline" className="w-full gap-2">
-            <Link href="/account" onClick={() => setOpen(false)}>
-              <History className="size-4" />
-              {t("nav.account")}
-            </Link>
-          </Button>
+          {/* Видны и анониму: история, избранное и сравнение копятся без входа. */}
+          <div className="grid grid-cols-2 gap-2">
+            <Button asChild variant="outline" className="gap-2">
+              <Link href="/account" onClick={() => setOpen(false)}>
+                <History className="size-4" />
+                {t("nav.account")}
+              </Link>
+            </Button>
+            <Button asChild variant="outline" className="gap-2">
+              <Link href="/compare" onClick={() => setOpen(false)}>
+                <Scale className="size-4" />
+                {t("compare.open")}
+              </Link>
+            </Button>
+          </div>
 
           {isAuthenticated ? (
             <Button asChild className="w-full gap-2">

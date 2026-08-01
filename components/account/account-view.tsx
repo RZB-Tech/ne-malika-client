@@ -1,20 +1,25 @@
 "use client";
 
-import { History, UserRound } from "lucide-react";
+import { Heart, History, UserRound } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useT } from "@/components/providers/i18n-provider";
 import { AccountProfile } from "./account-profile";
+import { FavoritesList } from "./favorites-list";
 import { ViewHistory } from "./view-history";
 
 /**
  * Кабинет покупателя. Живёт внутри витрины (шапка + подвал), а не в
- * DashboardShell: покупателю нужны две вкладки, ради них боковое меню
+ * DashboardShell: покупателю нужны несколько вкладок, ради них боковое меню
  * продавца было бы лишним.
  *
- * Вход не обязателен — история копится и у анонима, поэтому страница открыта
- * всем, а вкладка «Профиль» у гостя предлагает войти.
+ * Вход не обязателен — история и избранное копятся и у анонима, поэтому
+ * страница открыта всем, а вкладка «Профиль» у гостя предлагает войти.
  */
-export function AccountView() {
+export function AccountView({
+  defaultTab = "history",
+}: {
+  defaultTab?: string;
+}) {
   const { t } = useT();
 
   return (
@@ -26,11 +31,16 @@ export function AccountView() {
         {t("account.subtitle")}
       </p>
 
-      <Tabs defaultValue="history" className="mt-6 gap-6">
-        <TabsList>
+      <Tabs defaultValue={defaultTab} className="mt-6 gap-6">
+        {/* На телефоне три вкладки в строку не помещаются — список едет вбок. */}
+        <TabsList className="max-w-full overflow-x-auto">
           <TabsTrigger value="history">
             <History />
             {t("account.tabs.history")}
+          </TabsTrigger>
+          <TabsTrigger value="favorites">
+            <Heart />
+            {t("account.tabs.favorites")}
           </TabsTrigger>
           <TabsTrigger value="profile">
             <UserRound />
@@ -40,6 +50,9 @@ export function AccountView() {
 
         <TabsContent value="history">
           <ViewHistory />
+        </TabsContent>
+        <TabsContent value="favorites">
+          <FavoritesList />
         </TabsContent>
         <TabsContent value="profile">
           <AccountProfile />

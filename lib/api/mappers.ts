@@ -106,6 +106,7 @@ function toProduct(
     moderation: MODERATION_BY_STATUS[status] ?? "published",
     imageUrl: photoUrls[0] ?? null,
     photoUrls,
+    photoKeys: pc.photos ?? [],
   };
 }
 

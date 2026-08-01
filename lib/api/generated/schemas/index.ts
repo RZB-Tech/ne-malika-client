@@ -6,6 +6,7 @@
  * OpenAPI spec version: 1.0.0
  */
 
+export * from './addFavoriteDto';
 export * from './adminProductCardsControllerAiReviewParams';
 export * from './adminProductCardsControllerFindAllParams';
 export * from './adminProductCardsControllerFindAllStatus';
@@ -26,6 +27,10 @@ export * from './createReportDto';
 export * from './createShopDto';
 export * from './createUploadUrlDto';
 export * from './createUploadUrlDtoContentType';
+export * from './favoriteDto';
+export * from './favoriteDtoState';
+export * from './favoritesControllerFindMineParams';
+export * from './paginatedFavoritesDto';
 export * from './paginatedProductViewsDto';
 export * from './paginationMetaDto';
 export * from './productCardsControllerFindAllParams';
@@ -38,6 +43,8 @@ export * from './reasonDto';
 export * from './recordProductViewDto';
 export * from './setRoleDto';
 export * from './setRoleDtoRole';
+export * from './syncFavoriteItemDto';
+export * from './syncFavoritesDto';
 export * from './syncProductViewItemDto';
 export * from './syncProductViewsDto';
 export * from './telegramAuthDto';

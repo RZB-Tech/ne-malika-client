@@ -7,6 +7,17 @@ export const metadata: Metadata = {
   robots: { index: false, follow: true },
 };
 
-export default function AccountPage() {
-  return <AccountView />;
+const TABS = ["history", "favorites", "profile"];
+
+export default async function AccountPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ tab?: string }>;
+}) {
+  // ?tab= нужен ссылкам из шапки: сердце должно открывать сразу избранное.
+  const { tab } = await searchParams;
+
+  return (
+    <AccountView defaultTab={tab && TABS.includes(tab) ? tab : "history"} />
+  );
 }

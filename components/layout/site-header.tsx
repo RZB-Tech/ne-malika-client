@@ -9,6 +9,7 @@ import { LanguageSwitch } from "@/components/shared/language-switch";
 import { LoginDialog } from "@/components/auth/login-dialog";
 import { UserMenu } from "@/components/auth/user-menu";
 import { HeaderMenu } from "./header-menu";
+import { FavoritesLink } from "./favorites-link";
 import { useT } from "@/components/providers/i18n-provider";
 import { useAuth } from "@/lib/api/auth";
 import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
@@ -33,6 +34,10 @@ export function SiteHeader() {
         </div>
 
         <div className="flex shrink-0 items-center gap-0.5">
+          {/* Избранное есть и у анонима, поэтому сердце видно всегда. Ждём
+              гидратации: до неё счётчик из localStorage ещё не прочитан. */}
+          {isHydrated && <FavoritesLink />}
+
           <div className="hidden sm:contents">
             <LanguageSwitch />
             <AnimatedThemeToggler
