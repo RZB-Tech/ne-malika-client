@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/lib/api/auth";
@@ -21,8 +21,11 @@ export function RequireRole({
   role: UserRole | UserRole[];
   children: React.ReactNode;
 }) {
-  const { user, isAuthenticated, isHydrated } = useAuth();
+  const { user, isAuthenticated, isHydrated, refreshSession } = useAuth();
   const router = useRouter();
+  /** Одна попытка перевыпустить токен, прежде чем выставлять за дверь. */
+  const refreshTried = useRef(false);
+  const [refreshDone, setRefreshDone] = useState(false);
 
   const roles = Array.isArray(role) ? role : [role];
   const allowed = Boolean(user && roles.includes(user.role as UserRole));
@@ -30,8 +33,23 @@ export function RequireRole({
   useEffect(() => {
     // До гидратации состояние всегда «разлогинен» — редиректить рано.
     if (!isHydrated) return;
-    if (!isAuthenticated || !allowed) router.replace("/");
-  }, [isHydrated, isAuthenticated, allowed, router]);
+    if (!isAuthenticated) {
+      router.replace("/");
+      return;
+    }
+    if (allowed) return;
+
+    // Роль зашита в выданный access-токен: администратор мог выдать права уже
+    // после входа, и локально они появятся только после перевыпуска. Раньше
+    // это чинилось лишь созданием магазина — единственным местом, которое
+    // дёргало refresh.
+    if (!refreshTried.current) {
+      refreshTried.current = true;
+      void refreshSession().finally(() => setRefreshDone(true));
+      return;
+    }
+    if (refreshDone) router.replace("/");
+  }, [isHydrated, isAuthenticated, allowed, refreshDone, refreshSession, router]);
 
   if (!isHydrated || !isAuthenticated || !allowed) {
     return (

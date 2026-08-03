@@ -479,7 +479,7 @@
     "/api/v1/admin/shops": {
       "get": {
         "operationId": "AdminShopsController_list",
-        "summary": "Все магазины с числом товаров",
+        "summary": "Все магазины с числом товаров, с поиском по магазину и владельцу",
         "parameters": [
           {
             "name": "page",
@@ -502,6 +502,16 @@
               "maximum": 100,
               "default": 20,
               "type": "number"
+            }
+          },
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "description": "Поиск по названию, контакту, адресу магазина или владельцу",
+            "schema": {
+              "example": "техно",
+              "type": "string"
             }
           }
         ],
@@ -563,6 +573,35 @@
       "patch": {
         "operationId": "AdminShopsController_restore",
         "summary": "Вернуть упразднённый магазин в работу",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "shops-admin"
+        ],
+        "security": [
+          {
+            "access-token": []
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/shops/{id}": {
+      "delete": {
+        "operationId": "AdminShopsController_remove",
+        "summary": "Удалить магазин навсегда (каскадом удаляет товары, владелец снова покупатель)",
         "parameters": [
           {
             "name": "id",

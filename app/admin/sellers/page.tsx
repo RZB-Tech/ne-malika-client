@@ -1,11 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Ban, ExternalLink, RotateCcw, UserX } from "lucide-react";
+import {
+  Ban,
+  ExternalLink,
+  RotateCcw,
+  Search,
+  Trash2,
+  UserX,
+} from "lucide-react";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
@@ -29,6 +37,7 @@ import { formatDate } from "@/lib/format";
 import {
   useAdminShopsControllerAbolish,
   useAdminShopsControllerList,
+  useAdminShopsControllerRemove,
   useAdminShopsControllerRestore,
 } from "@/lib/api/generated/endpoints/shops-admin/shops-admin";
 import {
@@ -49,9 +58,10 @@ export default function AdminSellers() {
   const queryClient = useQueryClient();
   const [opened, setOpened] = useState<AdminShopRow | null>(null);
   const [page, setPage] = useState(1);
+  const [q, setQ] = useState("");
 
   const { data, isLoading, isError } = useAdminShopsControllerList(
-    { page, limit: 20 },
+    { page, limit: 20, q: q.trim() || undefined },
     {
       query: {
         select: (raw) => raw as unknown as Paginated<AdminShopRow>,
@@ -62,10 +72,22 @@ export default function AdminSellers() {
 
   const abolishMutation = useAdminShopsControllerAbolish();
   const restoreMutation = useAdminShopsControllerRestore();
+  const removeMutation = useAdminShopsControllerRemove();
   const blockMutation = useAdminUsersControllerBlock();
   const unblockMutation = useAdminUsersControllerUnblock();
 
-  const pageData = devFallbackPage(data, devShops);
+  const pageData = useMemo(() => {
+    // Фикстуры фильтруем на клиенте — иначе поиск локально не проверить.
+    const needle = q.trim().toLowerCase();
+    const fixtures = needle
+      ? devShops.filter((s) =>
+          [s.name, s.ownerName, s.contact, s.address ?? ""].some((v) =>
+            v.toLowerCase().includes(needle),
+          ),
+        )
+      : devShops;
+    return devFallbackPage(data, fixtures);
+  }, [data, q]);
   const rows = pageData.data;
   const isDevData = usingDevData(data?.data);
 
@@ -90,6 +112,11 @@ export default function AdminSellers() {
   const unblockOwner = async (ownerId: number) => {
     await unblockMutation.mutateAsync({ id: ownerId });
     await done("Блокировка снята");
+  };
+  // Переспрашивает вызывающая сторона — ConfirmDialog в меню и в карточке.
+  const remove = async (id: number) => {
+    await removeMutation.mutateAsync({ id });
+    await done("Магазин удалён, владелец снова покупатель");
   };
 
   /** Один набор действий и для трёх точек, и для правой кнопки мыши. */
@@ -129,6 +156,17 @@ export default function AdminSellers() {
             onConfirm: (reason) => blockOwner(shop.ownerId, reason),
           },
         },
+    {
+      label: "Удалить магазин",
+      icon: Trash2,
+      destructive: true,
+      withConfirm: {
+        title: "Удалить магазин?",
+        description: `«${shop.name}» и все его товары (${shop.productCount}) исчезнут навсегда, владелец снова станет покупателем. Если нужна обратимая блокировка — используйте «Упразднить».`,
+        confirmLabel: "Удалить",
+        onConfirm: () => remove(shop.id),
+      },
+    },
   ];
 
   return (
@@ -141,6 +179,19 @@ export default function AdminSellers() {
           Нажмите на строку, чтобы открыть карточку. Правая кнопка мыши —
           быстрые действия.
         </p>
+      </div>
+
+      <div className="relative max-w-sm">
+        <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          value={q}
+          onChange={(e) => {
+            setQ(e.target.value);
+            setPage(1);
+          }}
+          placeholder="Поиск по магазину или владельцу"
+          className="pl-9"
+        />
       </div>
 
       {isError && !isDevData && (
@@ -242,7 +293,7 @@ export default function AdminSellers() {
         )}
         {!isLoading && rows.length === 0 && (
           <div className="py-16 text-center text-sm text-muted-foreground">
-            Магазинов пока нет.
+            {q.trim() ? "Ничего не нашлось." : "Магазинов пока нет."}
           </div>
         )}
       </Card>
@@ -261,6 +312,7 @@ export default function AdminSellers() {
         onRestore={restore}
         onBlockOwner={blockOwner}
         onUnblockOwner={unblockOwner}
+        onRemove={remove}
       />
     </div>
   );

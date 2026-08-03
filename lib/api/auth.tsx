@@ -117,7 +117,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     wa?.ready?.();
     wa?.expand?.();
 
-    if (getAccessToken()) return;
+    // Сессия уже есть — но роль зашита в выданный токен, а её могли изменить
+    // (админ выдал права, продавец удалил магазин). Тихо перевыпускаем токены,
+    // иначе интерфейс до следующего входа показывает старую роль.
+    if (getAccessToken()) {
+      void refreshSession();
+      return;
+    }
 
     // Локальная разработка без бэкенда: фиктивная сессия, чтобы открывался
     // кабинет. Токен ненастоящий — все запросы к API всё равно упадут, и
@@ -156,7 +162,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .catch(() => {
         /* no active session */
       });
-  }, [loginWithInitData]);
+  }, [loginWithInitData, refreshSession]);
 
   const value: AuthContextValue = {
     user,

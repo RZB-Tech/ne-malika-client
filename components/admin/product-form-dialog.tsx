@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
@@ -27,6 +27,7 @@ import {
   storedPhoto,
   type UploadedPhoto,
 } from "@/components/seller/photo-dropzone";
+import { ShopPicker } from "@/components/admin/shop-picker";
 import {
   useAdminProductCardsControllerCreate,
   useAdminProductCardsControllerUpdate,
@@ -88,8 +89,15 @@ function FormBody({
   const createMutation = useAdminProductCardsControllerCreate();
   const updateMutation = useAdminProductCardsControllerUpdate();
 
-  const [shopId, setShopId] = useState<string>(
-    String(editing?.shopId ?? target.shopId ?? shops[0]?.id ?? ""),
+  // Упразднённый магазин товаров не принимает — бэкенд вернёт 403, поэтому и
+  // в списке его быть не должно.
+  const activeShops = useMemo(
+    () => shops.filter((s) => s.status === "active"),
+    [shops],
+  );
+
+  const [shopId, setShopId] = useState<number | null>(
+    editing?.shopId ?? target.shopId ?? activeShops[0]?.id ?? null,
   );
   const [name, setName] = useState(editing?.name ?? "");
   const [price, setPrice] = useState(
@@ -116,6 +124,10 @@ function FormBody({
       toast.error("Добавьте хотя бы одно фото");
       return;
     }
+    if (!editing && !shopId) {
+      toast.error("Выберите магазин");
+      return;
+    }
 
     setSaving(true);
     try {
@@ -131,7 +143,7 @@ function FormBody({
       if (editing) {
         await updateMutation.mutateAsync({ id: editing.id, data });
       } else {
-        await createMutation.mutateAsync({ shopId: Number(shopId), data });
+        await createMutation.mutateAsync({ shopId: shopId!, data });
       }
 
       await queryClient.invalidateQueries();
@@ -160,18 +172,17 @@ function FormBody({
       {!editing && (
         <div className="flex flex-col gap-1.5">
           <Label>Магазин</Label>
-          <Select value={shopId} onValueChange={setShopId}>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Выберите магазин" />
-            </SelectTrigger>
-            <SelectContent>
-              {shops.map((s) => (
-                <SelectItem key={s.id} value={String(s.id)}>
-                  {s.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <ShopPicker
+            shops={activeShops}
+            value={shopId}
+            onChange={setShopId}
+            emptyHint="Активных магазинов нет"
+          />
+          {activeShops.length === 0 && (
+            <p className="text-xs text-destructive">
+              Все магазины упразднены — добавлять товары некуда.
+            </p>
+          )}
         </div>
       )}
 

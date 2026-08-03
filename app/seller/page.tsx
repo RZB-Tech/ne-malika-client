@@ -68,13 +68,29 @@ export default function SellerDashboard() {
             {t("seller.nav.dashboard")}
           </p>
         </div>
-        <Button asChild className="gap-2">
-          <Link href="/seller/products/new">
-            <PlusCircle className="size-4" />
-            {t("seller.products.addNew")}
-          </Link>
-        </Button>
+        {shop.status === "active" && (
+          <Button asChild className="gap-2">
+            <Link href="/seller/products/new">
+              <PlusCircle className="size-4" />
+              {t("seller.products.addNew")}
+            </Link>
+          </Button>
+        )}
       </div>
+
+      {shop.status !== "active" && (
+        <Card className="border-destructive/40 bg-destructive/5 p-4 text-sm">
+          <p className="font-medium text-destructive">
+            Магазин упразднён администратором: он и его товары скрыты из выдачи,
+            добавлять новые товары нельзя.
+          </p>
+          {shop.abolishReason && (
+            <p className="mt-1 text-muted-foreground">
+              Причина: {shop.abolishReason}
+            </p>
+          )}
+        </Card>
+      )}
 
       <div className="grid gap-4 sm:grid-cols-3">
         <StatCard label={t("seller.nav.products")} value={String(total)} icon={Package} />

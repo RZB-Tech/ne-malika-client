@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { Ban, ExternalLink, RotateCcw, UserX } from "lucide-react";
+import { Ban, ExternalLink, RotateCcw, Trash2, UserX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { StoreAvatar } from "@/components/shared/store-avatar";
 import { AbolishDialog } from "@/components/admin/abolish-dialog";
+import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { EntityStatusBadge } from "@/components/admin/entity-status-badge";
 import {
   DetailDrawer,
@@ -27,6 +28,7 @@ export function ShopDrawer({
   onRestore,
   onBlockOwner,
   onUnblockOwner,
+  onRemove,
 }: {
   shop: AdminShopRow | null;
   onOpenChange: (open: boolean) => void;
@@ -34,6 +36,7 @@ export function ShopDrawer({
   onRestore: (id: number) => Promise<void>;
   onBlockOwner: (ownerId: number, reason: string) => Promise<void>;
   onUnblockOwner: (ownerId: number) => Promise<void>;
+  onRemove: (id: number) => Promise<void>;
 }) {
   const { locale } = useT();
 
@@ -112,6 +115,21 @@ export function ShopDrawer({
                 </Button>
               </AbolishDialog>
             )}
+
+            <ConfirmDialog
+              title="Удалить магазин?"
+              description={`«${shop.name}» и все его товары (${shop.productCount}) исчезнут навсегда, владелец снова станет покупателем. Если нужна обратимая блокировка — используйте «Упразднить».`}
+              confirmLabel="Удалить"
+              destructive
+              onConfirm={() => onRemove(shop.id)}
+            >
+              <Button
+                variant="ghost"
+                className={`col-span-2 ${drawerAction.danger}`}
+              >
+                <Trash2 className="size-4" /> Удалить магазин
+              </Button>
+            </ConfirmDialog>
           </>
         )
       }

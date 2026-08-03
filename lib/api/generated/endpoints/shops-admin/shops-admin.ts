@@ -53,7 +53,7 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
 };
 
 /**
- * @summary Все магазины с числом товаров
+ * @summary Все магазины с числом товаров, с поиском по магазину и владельцу
  */
 export const adminShopsControllerList = (
     params?: AdminShopsControllerListParams,
@@ -125,7 +125,7 @@ export function useAdminShopsControllerList<TData = Awaited<ReturnType<typeof ad
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
- * @summary Все магазины с числом товаров
+ * @summary Все магазины с числом товаров, с поиском по магазину и владельцу
  */
 
 export function useAdminShopsControllerList<TData = Awaited<ReturnType<typeof adminShopsControllerList>>, TError = ErrorType<unknown>>(
@@ -271,4 +271,66 @@ export const useAdminShopsControllerRestore = <TError = ErrorType<unknown>,
         TContext
       > => {
       return useMutation(getAdminShopsControllerRestoreMutationOptions(options), queryClient);
+    }
+    /**
+ * @summary Удалить магазин навсегда (каскадом удаляет товары, владелец снова покупатель)
+ */
+export const adminShopsControllerRemove = (
+    id: number,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<void>(
+      {url: `/api/v1/admin/shops/${id}`, method: 'DELETE', signal
+    },
+      options);
+    }
+
+
+
+
+export const getAdminShopsControllerRemoveMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminShopsControllerRemove>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof adminShopsControllerRemove>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['adminShopsControllerRemove'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminShopsControllerRemove>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  adminShopsControllerRemove(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AdminShopsControllerRemoveMutationResult = NonNullable<Awaited<ReturnType<typeof adminShopsControllerRemove>>>
+
+    export type AdminShopsControllerRemoveMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Удалить магазин навсегда (каскадом удаляет товары, владелец снова покупатель)
+ */
+export const useAdminShopsControllerRemove = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminShopsControllerRemove>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof adminShopsControllerRemove>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getAdminShopsControllerRemoveMutationOptions(options), queryClient);
     }

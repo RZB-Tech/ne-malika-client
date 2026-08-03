@@ -29,13 +29,22 @@ function SellerLayoutInner({ children }: { children: React.ReactNode }) {
   const { shop } = useSellerShop();
 
   // Пока магазина нет, разделы товаров ведут в тупик — оставляем только обзор
-  // и форму магазина.
+  // и форму магазина. У упразднённого магазина товары посмотреть можно, а
+  // добавить новый уже нет — бэкенд такой запрос отклоняет.
   const items: NavItem[] = [
     { href: "/seller", label: t("seller.nav.dashboard"), icon: LayoutDashboard, exact: true },
     ...(shop
       ? [
           { href: "/seller/products", label: t("seller.nav.products"), icon: Package },
-          { href: "/seller/products/new", label: t("seller.nav.addProduct"), icon: PlusCircle },
+          ...(shop.status === "active"
+            ? [
+                {
+                  href: "/seller/products/new",
+                  label: t("seller.nav.addProduct"),
+                  icon: PlusCircle,
+                },
+              ]
+            : []),
         ]
       : []),
     { href: "/seller/profile", label: t("seller.nav.profile"), icon: Store },

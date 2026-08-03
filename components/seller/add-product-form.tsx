@@ -58,11 +58,19 @@ export function AddProductForm() {
 
   const onPriceChange = (raw: string) => setPrice(formatPriceInput(raw));
 
+  // Упразднённый магазин скрыт из выдачи, и бэкенд отклоняет создание товара —
+  // не даём заполнить длинную форму впустую.
+  const shopAbolished = Boolean(shop) && shop!.status !== "active";
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!shop) {
       toast.error("Сначала создайте магазин в разделе «Профиль»");
       router.push("/seller/profile");
+      return;
+    }
+    if (shopAbolished) {
+      toast.error("Магазин упразднён — добавлять товары нельзя");
       return;
     }
     const priceNum = parsePriceInput(price);
@@ -132,6 +140,19 @@ export function AddProductForm() {
           >
             Создать магазин
           </button>
+        </Card>
+      )}
+
+      {shopAbolished && (
+        <Card className="border-destructive/40 bg-destructive/5 p-4 text-sm">
+          <p className="font-medium text-destructive">
+            Магазин упразднён администратором — новые товары добавить нельзя.
+          </p>
+          {shop?.abolishReason && (
+            <p className="mt-1 text-muted-foreground">
+              Причина: {shop.abolishReason}
+            </p>
+          )}
         </Card>
       )}
 
@@ -252,7 +273,11 @@ export function AddProductForm() {
       </Card>
 
       <div className="flex flex-wrap justify-end gap-3 rounded-xl bg-card p-3 ring-1 ring-foreground/10">
-        <Button type="submit" className="gap-2" disabled={submitting}>
+        <Button
+          type="submit"
+          className="gap-2"
+          disabled={submitting || shopAbolished}
+        >
           <Send className="size-4" />
           {submitting ? t("common.loading") : t("seller.add.publish")}
         </Button>
