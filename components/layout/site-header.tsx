@@ -20,7 +20,10 @@ export function SiteHeader() {
   const { isAuthenticated, isHydrated } = useAuth();
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-background">
+    // Без разделительной линии: контент отделяет размытие подложки — оно мягче
+    // и не режет макет пополам. Полупрозрачный фон только там, где браузер
+    // умеет backdrop-filter, иначе шапка стала бы просвечивать насквозь.
+    <header className="sticky top-0 z-50 w-full bg-background supports-backdrop-filter:bg-background/80 supports-backdrop-filter:backdrop-blur-xl">
       {/* Одна строка на все экраны: бургер — знак — поиск во всю оставшуюся
           ширину — действия. Поиск здесь главный элемент, поэтому он забирает
           всё свободное место, а логотип ужимается до знака. */}

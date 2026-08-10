@@ -173,7 +173,7 @@ export function PhotoAiDialog({
               <img
                 src={photo!.url}
                 alt="Исходное фото"
-                className="size-28 shrink-0 rounded-lg border border-border object-cover"
+                className="size-28 shrink-0 rounded-xl bg-muted object-cover ring-1 ring-foreground/10"
               />
               <div className="min-w-0 flex-1 space-y-1.5">
                 <div className="flex items-center justify-between gap-2">
@@ -294,10 +294,10 @@ export function PhotoAiDialog({
                       type="button"
                       onClick={() => toggle(r.key)}
                       className={cn(
-                        "relative aspect-square overflow-hidden rounded-lg border-2 transition-colors",
+                        "relative aspect-square overflow-hidden rounded-xl transition-all",
                         picked.has(r.key)
-                          ? "border-primary"
-                          : "border-transparent hover:border-border",
+                          ? "ring-2 ring-primary ring-offset-2 ring-offset-popover"
+                          : "ring-1 ring-foreground/10 hover:ring-foreground/25",
                       )}
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}

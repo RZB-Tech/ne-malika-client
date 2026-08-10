@@ -95,9 +95,10 @@ export function CategorySelect({
           type="button"
           disabled={disabled || isLoading}
           className={cn(
-            "flex h-9 w-full items-center justify-between gap-2 rounded-lg border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none transition-[color,box-shadow]",
-            "focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
-            "disabled:cursor-not-allowed disabled:opacity-50",
+            "flex h-11 w-full items-center justify-between gap-2 rounded-xl border-0 bg-muted/60 px-3.5 py-2 text-sm outline-none transition-[background-color,box-shadow]",
+            "hover:bg-muted/80 focus-visible:bg-muted focus-visible:ring-2 focus-visible:ring-ring/40",
+            "disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
+            "dark:bg-input/40 dark:hover:bg-input/60",
             !label && "text-muted-foreground",
           )}
         >
@@ -111,7 +112,7 @@ export function CategorySelect({
       </PopoverTrigger>
 
       <PopoverContent className="w-(--radix-popover-trigger-width) p-0">
-        <div className="flex items-center gap-2 border-b border-border px-3">
+        <div className="flex items-center gap-2 border-b border-border/60 px-3">
           <Search className="size-4 shrink-0 text-muted-foreground" />
           <Input
             autoFocus
