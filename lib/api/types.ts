@@ -1,7 +1,3 @@
-// Hand-written response shapes for endpoints whose OpenAPI responses ship
-// without a schema. They mirror the backend Drizzle rows / service results, so
-// we cast the generated hooks' `unknown`/`void` data to these at the app layer.
-
 export type ProductState = "new" | "old";
 /** `pending` — товар ждёт ИИ-проверку и в публичную выдачу ещё не попал. */
 export type EntityStatus = "active" | "abolished" | "hidden" | "pending";
@@ -40,7 +36,7 @@ export interface PublicProductCard {
   name: string;
   description: string | null;
   photos: string[];
-  price: string; // numeric serialized as string
+  price: string;
   state: ProductState;
   createdAt: string;
   shopName: string;

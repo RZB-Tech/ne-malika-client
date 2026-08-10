@@ -1,7 +1,3 @@
-// Adapters from backend rows to the frontend's display types (`Product`,
-// `Store`). The backend model is leaner than the demo model, so absent fields
-// (category, brand, rating, stock, views…) get sensible neutral defaults.
-
 import type { ModerationStatus, Product, SellerStatus, Store } from "@/lib/data";
 import { photoUrl } from "./photo";
 import type {
@@ -39,7 +35,6 @@ const SELLER_STATUS_BY_STATUS: Record<EntityStatus, SellerStatus> = {
   active: "active",
   hidden: "pending",
   abolished: "blocked",
-  // Магазины в pending не бывают — статус общий с товарами (см. EntityStatus).
   pending: "pending",
 };
 

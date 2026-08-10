@@ -92,7 +92,6 @@ export default function AdminProducts() {
     },
   );
 
-  // Магазины нужны только для выпадающего списка в форме — берём одной пачкой.
   const shopsQuery = useAdminShopsControllerList(
     { limit: 100 },
     {
@@ -109,7 +108,6 @@ export default function AdminProducts() {
   const removeMutation = useAdminProductCardsControllerRemove();
 
   const pageData = useMemo(() => {
-    // Фикстуры фильтруем на клиенте — иначе вкладки локально не проверить.
     const fixtures = devAdminProducts.filter(
       (p) =>
         (!status || p.status === status) &&
@@ -136,7 +134,6 @@ export default function AdminProducts() {
     toast.success("Товар возвращён в выдачу");
   };
 
-  // Переспрашивает вызывающая сторона — ConfirmDialog в меню и в карточке.
   const remove = async (id: number) => {
     await removeMutation.mutateAsync({ id });
     await queryClient.invalidateQueries();
