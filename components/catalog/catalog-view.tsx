@@ -9,7 +9,7 @@ import { ProductCard } from "@/components/product/product-card";
 import { useCatalogFilters } from "./use-catalog-filters";
 import type { SortKey } from "./use-catalog-filters";
 import { useT } from "@/components/providers/i18n-provider";
-import { CategoryBar } from "@/components/catalog/category-bar";
+import { findCategory, useCategories } from "@/lib/api/categories";
 import { openHeaderMenu } from "@/components/layout/header-menu-bus";
 import { productCardsControllerFindAll } from "@/lib/api/generated/endpoints/product-cards-public/product-cards-public";
 import type { ProductCardsControllerFindAllParams } from "@/lib/api/generated/schemas";
@@ -45,7 +45,8 @@ export function CatalogView({
   // гидратация покажет не тот список.
   initialData?: Paginated<PublicProductCard>;
 } = {}) {
-  const { t } = useT();
+  const { t, locale } = useT();
+  const { roots } = useCategories();
 
   // Фильтры живут в URL и редактируются из шторки в шапке — здесь их только
   // читают и показывают чипсами.
@@ -57,7 +58,6 @@ export function CatalogView({
     category,
     setCategory,
     subCategoryId,
-    setSubCategory,
     setSort,
     clearPrice,
     resetFilters,
@@ -183,25 +183,31 @@ export function CatalogView({
       });
     if (sort !== "latest")
       chips.push({ key: "sort", label: t(`catalog.sort.${sort}`) });
+
+    // Категорию выбирают в меню шапки, а сбрасывают здесь: иначе фильтр
+    // остался бы включённым и никак не показанным.
+    const leaf = findCategory(roots, subCategoryId);
+    const root = roots.find((r) => r.slug === category);
+    const categoryLabel = leaf
+      ? `${leaf.root.name[locale]} · ${leaf.category.name[locale]}`
+      : (root?.name[locale] ?? null);
+    if (categoryLabel) chips.push({ key: "category", label: categoryLabel });
+
     return chips;
-  }, [filters, sort, t]);
+  }, [filters, sort, t, roots, category, subCategoryId, locale]);
 
   const clearChip = useCallback(
-    (key: string) => (key === "price" ? clearPrice() : setSort("latest")),
-    [clearPrice, setSort],
+    (key: string) => {
+      if (key === "price") return clearPrice();
+      // Сброс раздела уносит и подкатегорию — она принадлежала ему.
+      if (key === "category") return setCategory(null);
+      return setSort("latest");
+    },
+    [clearPrice, setSort, setCategory],
   );
 
   return (
     <div className="mx-auto max-w-[1600px] px-5 py-8 sm:px-8 lg:px-10">
-      <div className="mb-6">
-        <CategoryBar
-          selected={category}
-          selectedSubId={subCategoryId}
-          onSelect={setCategory}
-          onSelectSub={setSubCategory}
-        />
-      </div>
-
       <div className="mb-6">
         <h1 className="font-heading text-2xl font-bold tracking-tight sm:text-3xl">{title}</h1>
         <p className="mt-1 text-sm text-muted-foreground tabular">
@@ -225,7 +231,7 @@ export function CatalogView({
             <button
               key={c.key}
               onClick={() => clearChip(c.key)}
-              className="inline-flex items-center gap-1 rounded-full border border-border bg-card py-1 pl-3 pr-2 text-xs font-medium text-foreground transition-colors hover:bg-muted"
+              className="inline-flex items-center gap-1 rounded-full bg-muted/70 py-1 pl-3 pr-2 text-xs font-medium text-foreground transition-colors hover:bg-muted"
             >
               {c.label}
               <X className="size-3 text-muted-foreground" />
