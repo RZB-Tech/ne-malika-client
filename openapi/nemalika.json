@@ -990,7 +990,8 @@
               "enum": [
                 "active",
                 "hidden",
-                "abolished"
+                "abolished",
+                "pending"
               ],
               "type": "string"
             }

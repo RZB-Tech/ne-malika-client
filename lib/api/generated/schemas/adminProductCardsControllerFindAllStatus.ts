@@ -13,4 +13,5 @@ export const AdminProductCardsControllerFindAllStatus = {
   active: 'active',
   hidden: 'hidden',
   abolished: 'abolished',
+  pending: 'pending',
 } as const;

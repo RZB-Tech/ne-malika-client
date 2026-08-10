@@ -64,7 +64,6 @@ export function HeaderMenu() {
         </div>
 
         <SheetFooter className="gap-3 border-t border-border">
-          {/* Видны и анониму: история, избранное и сравнение копятся без входа. */}
           <div className="grid grid-cols-2 gap-2">
             <Button asChild variant="outline" className="gap-2">
               <Link href="/account" onClick={() => setOpen(false)}>

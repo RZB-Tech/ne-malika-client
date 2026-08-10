@@ -3,7 +3,8 @@
 // we cast the generated hooks' `unknown`/`void` data to these at the app layer.
 
 export type ProductState = "new" | "old";
-export type EntityStatus = "active" | "abolished" | "hidden";
+/** `pending` — товар ждёт ИИ-проверку и в публичную выдачу ещё не попал. */
+export type EntityStatus = "active" | "abolished" | "hidden" | "pending";
 /** `user` — покупатель; продавцом становятся, создав магазин. */
 export type UserRole = "user" | "seller" | "admin";
 export type AiVerdict = "pass" | "warn" | "fail";

@@ -66,6 +66,7 @@ import type {
 const TABS: { value: string; label: string; status?: EntityStatus }[] = [
   { value: "all", label: "Все" },
   { value: "active", label: "Активные", status: "active" },
+  { value: "pending", label: "На проверке", status: "pending" },
   { value: "hidden", label: "Скрытые", status: "hidden" },
   { value: "abolished", label: "Упразднённые", status: "abolished" },
 ];

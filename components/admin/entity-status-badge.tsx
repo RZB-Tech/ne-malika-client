@@ -6,12 +6,14 @@ const STYLE: Record<EntityStatus, string> = {
   active: "bg-success/12 text-success",
   hidden: "bg-warning/15 text-warning",
   abolished: "bg-destructive/12 text-destructive",
+  pending: "bg-muted text-muted-foreground",
 };
 
 const LABEL: Record<EntityStatus, string> = {
   active: "Активен",
   hidden: "Скрыт",
   abolished: "Упразднён",
+  pending: "На проверке",
 };
 
 /** Единый бейдж статуса для админки: и у магазинов, и у товаров он один и тот же. */

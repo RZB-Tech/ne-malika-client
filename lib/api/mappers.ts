@@ -32,12 +32,15 @@ const MODERATION_BY_STATUS: Record<EntityStatus, ModerationStatus> = {
   active: "published",
   hidden: "moderation",
   abolished: "rejected",
+  pending: "moderation",
 };
 
 const SELLER_STATUS_BY_STATUS: Record<EntityStatus, SellerStatus> = {
   active: "active",
   hidden: "pending",
   abolished: "blocked",
+  // Магазины в pending не бывают — статус общий с товарами (см. EntityStatus).
+  pending: "pending",
 };
 
 function telegramUsername(link: string | null | undefined): string {
