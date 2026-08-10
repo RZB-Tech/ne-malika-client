@@ -74,6 +74,17 @@ axiosInstance.interceptors.response.use(
       }
     }
 
+    // Nest кладёт объяснение в тело ответа, а axios оставляет в message только
+    // «Request failed with status code 502». Подменяем текст здесь, иначе
+    // каждый toast в приложении показывал бы код вместо причины.
+    const body = error.response?.data as
+      | { message?: string | string[] }
+      | undefined;
+    const serverMessage = Array.isArray(body?.message)
+      ? body.message.join('; ')
+      : body?.message;
+    if (serverMessage) error.message = serverMessage;
+
     return Promise.reject(error);
   },
 );
