@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Sparkles, Wand2 } from "lucide-react";
+import { Check, ImagePlus, Sparkles, Wand2, X } from "lucide-react";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -30,6 +30,7 @@ import type {
   GenerateImagesDtoSize,
 } from "@/lib/api/generated/schemas";
 import { storedPhoto, type UploadedPhoto } from "@/components/seller/photo-dropzone";
+import { uploadPhoto } from "@/lib/api/upload";
 import { cn } from "@/lib/utils";
 
 /**
@@ -77,6 +78,12 @@ export function PhotoAiDialog({
   const [count, setCount] = useState<number>(2);
   const [quality, setQuality] = useState<GenerateImagesDtoQuality>("medium");
   const [size, setSize] = useState<GenerateImagesDtoSize>("1024x1024");
+  // Референс — необязательный образец оформления: модель ориентируется и на
+  // него тоже. Держим ключ и превью: ключ уходит на сервер, превью показываем.
+  const [reference, setReference] = useState<{ key: string; url: string } | null>(
+    null,
+  );
+  const [uploading, setUploading] = useState(false);
   const [results, setResults] = useState<Generated[]>([]);
   const [picked, setPicked] = useState<Set<string>>(new Set());
 
@@ -92,6 +99,7 @@ export function PhotoAiDialog({
     setPrompt("");
     setResults([]);
     setPicked(new Set());
+    setReference(null);
     onClose();
   };
 
@@ -142,6 +150,21 @@ export function PhotoAiDialog({
       chosen.map((r) => storedPhoto(r.key, r.url, "Сгенерировано ИИ")),
     );
     close();
+  };
+
+  const pickReference = async (file: File | undefined) => {
+    if (!file) return;
+    setUploading(true);
+    try {
+      const key = await uploadPhoto(file);
+      setReference({ key, url: URL.createObjectURL(file) });
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "Не удалось загрузить референс",
+      );
+    } finally {
+      setUploading(false);
+    }
   };
 
   const toggle = (key: string) =>
@@ -201,6 +224,53 @@ export function PhotoAiDialog({
                   placeholder="ИИ сам опишет товар — или напишите, что хотите получить"
                 />
               </div>
+            </div>
+
+            {/* Референс необязателен: он задаёт манеру съёмки, а сам товар
+                модель всё равно берёт с исходного фото. */}
+            <div className="space-y-1.5">
+              <Label>Референс оформления</Label>
+              {reference ? (
+                <div className="flex items-center gap-3">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={reference.url}
+                    alt="Референс"
+                    className="size-20 rounded-xl bg-muted object-cover ring-1 ring-foreground/10"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="gap-1.5 text-xs"
+                    onClick={() => setReference(null)}
+                  >
+                    <X className="size-3.5" />
+                    Убрать
+                  </Button>
+                </div>
+              ) : (
+                <label
+                  className={cn(
+                    "flex h-20 cursor-pointer items-center justify-center gap-2 rounded-xl bg-muted/60 text-sm text-muted-foreground transition-colors hover:bg-muted/80",
+                    uploading && "pointer-events-none opacity-60",
+                  )}
+                >
+                  <ImagePlus className="size-4" />
+                  {uploading
+                    ? "Загружаем…"
+                    : "Добавить образец карточки (необязательно)"}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      void pickReference(e.target.files?.[0]);
+                      e.target.value = "";
+                    }}
+                  />
+                </label>
+              )}
             </div>
 
             <div className="grid gap-3 sm:grid-cols-3">
