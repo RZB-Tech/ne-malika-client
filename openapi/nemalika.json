@@ -1844,6 +1844,76 @@
         ]
       }
     },
+    "/api/v1/admin/image-gen/prompt": {
+      "post": {
+        "operationId": "AdminImageGenController_describe",
+        "summary": "Составить промпт по фотографии товара",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DescribePromptDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "image-gen-admin"
+        ],
+        "security": [
+          {
+            "access-token": []
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/image-gen/generate": {
+      "post": {
+        "operationId": "AdminImageGenController_generate",
+        "summary": "Перерисовать фотографию товара: 1–4 варианта на выбор",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenerateImagesDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GeneratedImageDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "image-gen-admin"
+        ],
+        "security": [
+          {
+            "access-token": []
+          }
+        ]
+      }
+    },
     "/api/v1/reports": {
       "post": {
         "operationId": "ReportsController_create",
@@ -2832,6 +2902,90 @@
           "uploadUrl",
           "fields",
           "expiresInSec"
+        ]
+      },
+      "DescribePromptDto": {
+        "type": "object",
+        "properties": {
+          "photoKey": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Фото, по которому писать промпт"
+          }
+        },
+        "required": [
+          "photoKey"
+        ]
+      },
+      "GenerateImagesDto": {
+        "type": "object",
+        "properties": {
+          "photoKey": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Фото товара, которое берём за основу — его же и перерисуем"
+          },
+          "referenceKey": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Необязательный референс: вторая картинка, на которую надо ориентироваться"
+          },
+          "prompt": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 2000,
+            "example": "Ноутбук на светлом фоне, студийный свет, вид три четверти"
+          },
+          "count": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 4,
+            "default": 2
+          },
+          "quality": {
+            "type": "string",
+            "enum": [
+              "low",
+              "medium",
+              "high"
+            ],
+            "default": "medium"
+          },
+          "size": {
+            "type": "string",
+            "enum": [
+              "1024x1024",
+              "1024x1536",
+              "1536x1024",
+              "2048x2048",
+              "1728x2560",
+              "2560x1728",
+              "2880x2880",
+              "2160x3840",
+              "3840x2160"
+            ],
+            "default": "1024x1024"
+          }
+        },
+        "required": [
+          "photoKey",
+          "prompt"
+        ]
+      },
+      "GeneratedImageDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "url"
         ]
       },
       "CreateReportDto": {

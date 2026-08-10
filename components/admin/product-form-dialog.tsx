@@ -33,6 +33,7 @@ import {
   useAdminProductCardsControllerUpdate,
 } from "@/lib/api/generated/endpoints/product-cards-admin/product-cards-admin";
 import { CategorySelect } from "@/components/seller/category-select";
+import { PhotoAiDialog } from "@/components/admin/photo-ai-dialog";
 import { resolvePhotoKeys } from "@/lib/api/upload";
 import { photoUrl } from "@/lib/api/photo";
 import { formatPriceInput, parsePriceInput } from "@/lib/format";
@@ -116,6 +117,8 @@ function FormBody({
     ),
   );
   const [saving, setSaving] = useState(false);
+  // Фото, которое админ нажал для перерисовки через ИИ.
+  const [aiPhoto, setAiPhoto] = useState<UploadedPhoto | null>(null);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -292,7 +295,29 @@ function FormBody({
 
       <div className="flex flex-col gap-2">
         <Label>Фотографии</Label>
-        <PhotoDropzone photos={photos} onChange={setPhotos} />
+        <PhotoDropzone
+          photos={photos}
+          onChange={setPhotos}
+          onPhotoClick={setAiPhoto}
+        />
+        <p className="mt-2 text-xs text-muted-foreground">
+          Нажмите на фото, чтобы перерисовать его через ИИ.
+        </p>
+
+        <PhotoAiDialog
+          photo={aiPhoto}
+          onClose={() => setAiPhoto(null)}
+          onApply={(generated) => {
+            // Первый выбранный встаёт на место исходного, остальные — в конец.
+            setPhotos((prev) => {
+              const at = prev.findIndex((x) => x.id === aiPhoto?.id);
+              if (at === -1) return [...prev, ...generated];
+              const next = [...prev];
+              next.splice(at, 1, generated[0]);
+              return [...next, ...generated.slice(1)];
+            });
+          }}
+        />
       </div>
 
       <DialogFooter>

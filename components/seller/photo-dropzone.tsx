@@ -53,9 +53,13 @@ async function compress(file: File): Promise<UploadedPhoto> {
 export function PhotoDropzone({
   photos,
   onChange,
+  onPhotoClick,
 }: {
   photos: UploadedPhoto[];
   onChange: (p: UploadedPhoto[]) => void;
+  /** Задан — плитка становится кликабельной. Сейчас так админка открывает
+      перерисовку через ИИ; продавцу клик по фото ничего не делает. */
+  onPhotoClick?: (photo: UploadedPhoto) => void;
 }) {
   const { t } = useT();
   const [drag, setDrag] = useState(false);
@@ -134,7 +138,11 @@ export function PhotoDropzone({
                 <img
                   src={p.url}
                   alt={p.name}
-                  className="size-full object-cover"
+                  onClick={onPhotoClick ? () => onPhotoClick(p) : undefined}
+                  className={cn(
+                    "size-full object-cover",
+                    onPhotoClick && "cursor-pointer",
+                  )}
                   // Сохранённое фото может не открыться (в дев-бакете нет объекта) —
                   // прячем «битую» картинку, остаётся ровная плитка.
                   onError={(e) => e.currentTarget.classList.add("opacity-0")}
