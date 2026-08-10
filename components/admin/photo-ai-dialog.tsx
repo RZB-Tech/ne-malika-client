@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Check, ImagePlus, Sparkles, Wand2, X } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -13,7 +13,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Skeleton } from "@/components/ui/skeleton";
 import {
   Select,
   SelectContent,
@@ -346,13 +345,7 @@ export function PhotoAiDialog({
               {generateMutation.isPending ? "Рисую…" : "Сгенерировать"}
             </Button>
 
-            {generateMutation.isPending && (
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                {Array.from({ length: count }).map((_, i) => (
-                  <Skeleton key={i} className="aspect-square rounded-lg" />
-                ))}
-              </div>
-            )}
+            {generateMutation.isPending && <GeneratingGrid count={count} />}
 
             {results.length > 0 && (
               <div className="space-y-2">
@@ -395,5 +388,43 @@ export function PhotoAiDialog({
         )}
       </DialogContent>
     </Dialog>
+  );
+}
+
+/**
+ * Ожидание генерации. Обычная «пульсирующая» заглушка на минуте ожидания
+ * читается как зависшая страница, поэтому здесь блик бежит по плитке, плитки
+ * оживают по очереди, а счётчик показывает, что процесс идёт и сколько уже
+ * длится — это единственное, что admin реально может отслеживать.
+ */
+function GeneratingGrid({ count }: { count: number }) {
+  const [seconds, setSeconds] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => setSeconds((s) => s + 1), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  return (
+    <div className="space-y-2">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {Array.from({ length: count }).map((_, i) => (
+          <div
+            key={i}
+            className="shimmer grid aspect-square place-items-center rounded-xl bg-muted/70"
+            style={{ animationDelay: `${i * 220}ms` }}
+          >
+            <Wand2
+              className="size-6 animate-pulse text-muted-foreground/45"
+              style={{ animationDelay: `${i * 220}ms` }}
+            />
+          </div>
+        ))}
+      </div>
+      <p className="tabular text-xs text-muted-foreground">
+        {`Рисуем ${count} ${count === 1 ? "вариант" : "варианта"}… ${seconds} с`}
+        {seconds > 45 && " — почти готово, крупные размеры рисуются дольше"}
+      </p>
+    </div>
   );
 }
