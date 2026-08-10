@@ -131,6 +131,7 @@ export function PhotoAiDialog({
           count,
           quality,
           size,
+          referenceKey: reference?.key,
         },
       })) as unknown as Generated[];
       setResults(res);
