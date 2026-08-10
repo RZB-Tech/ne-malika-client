@@ -1443,6 +1443,95 @@
         ]
       }
     },
+    "/api/v1/seller/uploads": {
+      "post": {
+        "operationId": "SellerFilesController_createUploadUrl",
+        "summary": "Получить presigned-ссылку для прямой загрузки фото в S3",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUploadUrlDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadUrlResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "files"
+        ],
+        "security": [
+          {
+            "access-token": []
+          }
+        ]
+      }
+    },
+    "/api/v1/files/{key}": {
+      "get": {
+        "operationId": "FilesController_getFile",
+        "summary": "Получить файл из S3 по ключу",
+        "parameters": [
+          {
+            "name": "key",
+            "required": true,
+            "in": "path",
+            "description": "Ключ файла, полученный при создании presigned-ссылки",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Файл успешно получен",
+            "content": {
+              "image/jpeg": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "image/png": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "image/webp": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ключ не является UUID v4"
+          },
+          "404": {
+            "description": "Файл не найден"
+          }
+        },
+        "tags": [
+          "files"
+        ]
+      }
+    },
     "/api/v1/me/product-views": {
       "get": {
         "operationId": "ProductViewsController_findMine",
@@ -1752,95 +1841,6 @@
           {
             "access-token": []
           }
-        ]
-      }
-    },
-    "/api/v1/seller/uploads": {
-      "post": {
-        "operationId": "SellerFilesController_createUploadUrl",
-        "summary": "Получить presigned-ссылку для прямой загрузки фото в S3",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateUploadUrlDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UploadUrlResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "files"
-        ],
-        "security": [
-          {
-            "access-token": []
-          }
-        ]
-      }
-    },
-    "/api/v1/files/{key}": {
-      "get": {
-        "operationId": "FilesController_getFile",
-        "summary": "Получить файл из S3 по ключу",
-        "parameters": [
-          {
-            "name": "key",
-            "required": true,
-            "in": "path",
-            "description": "Ключ файла, полученный при создании presigned-ссылки",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Файл успешно получен",
-            "content": {
-              "image/jpeg": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              },
-              "image/png": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              },
-              "image/webp": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Ключ не является UUID v4"
-          },
-          "404": {
-            "description": "Файл не найден"
-          }
-        },
-        "tags": [
-          "files"
         ]
       }
     },
@@ -2570,6 +2570,61 @@
           "aiChecksEnabled"
         ]
       },
+      "CreateUploadUrlDto": {
+        "type": "object",
+        "properties": {
+          "contentType": {
+            "type": "string",
+            "enum": [
+              "image/jpeg",
+              "image/png",
+              "image/webp"
+            ],
+            "description": "MIME-тип загружаемого файла",
+            "example": "image/jpeg"
+          }
+        },
+        "required": [
+          "contentType"
+        ]
+      },
+      "UploadUrlResponseDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Ключ файла — сохраняется в БД как photo/photos"
+          },
+          "publicUrl": {
+            "type": "string",
+            "description": "Публичный URL файла после загрузки"
+          },
+          "uploadUrl": {
+            "type": "string",
+            "description": "URL для multipart/form-data POST-запроса загрузки"
+          },
+          "fields": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Поля form-data, которые нужно отправить ДО поля с файлом"
+          },
+          "expiresInSec": {
+            "type": "number",
+            "example": 300,
+            "description": "Через сколько секунд ссылка истечёт"
+          }
+        },
+        "required": [
+          "key",
+          "publicUrl",
+          "uploadUrl",
+          "fields",
+          "expiresInSec"
+        ]
+      },
       "ProductViewDto": {
         "type": "object",
         "properties": {
@@ -2849,61 +2904,6 @@
           "items"
         ]
       },
-      "CreateUploadUrlDto": {
-        "type": "object",
-        "properties": {
-          "contentType": {
-            "type": "string",
-            "enum": [
-              "image/jpeg",
-              "image/png",
-              "image/webp"
-            ],
-            "description": "MIME-тип загружаемого файла",
-            "example": "image/jpeg"
-          }
-        },
-        "required": [
-          "contentType"
-        ]
-      },
-      "UploadUrlResponseDto": {
-        "type": "object",
-        "properties": {
-          "key": {
-            "type": "string",
-            "format": "uuid",
-            "description": "Ключ файла — сохраняется в БД как photo/photos"
-          },
-          "publicUrl": {
-            "type": "string",
-            "description": "Публичный URL файла после загрузки"
-          },
-          "uploadUrl": {
-            "type": "string",
-            "description": "URL для multipart/form-data POST-запроса загрузки"
-          },
-          "fields": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Поля form-data, которые нужно отправить ДО поля с файлом"
-          },
-          "expiresInSec": {
-            "type": "number",
-            "example": 300,
-            "description": "Через сколько секунд ссылка истечёт"
-          }
-        },
-        "required": [
-          "key",
-          "publicUrl",
-          "uploadUrl",
-          "fields",
-          "expiresInSec"
-        ]
-      },
       "DescribePromptDto": {
         "type": "object",
         "properties": {
@@ -2954,10 +2954,10 @@
           "size": {
             "type": "string",
             "enum": [
-              "1024x1024",
-              "2048x2048",
-              "2560x2560",
-              "2880x2880"
+              "512",
+              "1K",
+              "2K",
+              "4K"
             ],
             "default": "1024x1024"
           }

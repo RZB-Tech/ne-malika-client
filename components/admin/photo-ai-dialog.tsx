@@ -33,16 +33,14 @@ import { storedPhoto, type UploadedPhoto } from "@/components/seller/photo-dropz
 import { cn } from "@/lib/utils";
 
 /**
- * Четыре квадратных разрешения. Квадрат — потому что карточка товара везде
- * квадратная, а модель принимает произвольный размер лишь в рамках лимита:
- * обе стороны кратны 16, всего не больше 8 294 400 пикселей. Отсюда и потолок —
- * 2880x2880 ровно упирается в лимит, поэтому «4K» здесь это он.
+ * Разрешения тирами, как их принимает Images API. «3K» тут нет намеренно —
+ * такого тира не существует, провайдер понимает только эти четыре.
  */
 const RESOLUTIONS = [
-  { value: "1024x1024", label: "1K" },
-  { value: "2048x2048", label: "2K" },
-  { value: "2560x2560", label: "3K" },
-  { value: "2880x2880", label: "4K" },
+  { value: "512", label: "512" },
+  { value: "1K", label: "1K" },
+  { value: "2K", label: "2K" },
+  { value: "4K", label: "4K" },
 ] as const satisfies readonly { value: GenerateImagesDtoSize; label: string }[];
 
 const QUALITIES = [
@@ -77,7 +75,7 @@ export function PhotoAiDialog({
   const [prompt, setPrompt] = useState("");
   const [count, setCount] = useState<number>(2);
   const [quality, setQuality] = useState<GenerateImagesDtoQuality>("medium");
-  const [size, setSize] = useState<GenerateImagesDtoSize>("1024x1024");
+  const [size, setSize] = useState<GenerateImagesDtoSize>("1K");
   const [results, setResults] = useState<Generated[]>([]);
   const [picked, setPicked] = useState<Set<string>>(new Set());
 
@@ -262,8 +260,8 @@ export function PhotoAiDialog({
             </div>
 
             <p className="text-xs text-muted-foreground tabular">
-              Итоговый размер: {size} px
-              {size === "2880x2880" && " — максимум, который принимает модель"}
+              Разрешение: {size}
+              {size === "4K" && " — максимум, который принимает модель"}
             </p>
 
             <Button
