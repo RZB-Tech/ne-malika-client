@@ -8,6 +8,7 @@ import {
   ArrowLeft,
   CheckCircle2,
   Plus,
+  RefreshCw,
   Send,
   Sparkles,
   Trash2,
@@ -40,6 +41,7 @@ import {
 import { useT } from "@/components/providers/i18n-provider";
 import {
   useSellerAiChecksControllerGetCheck,
+  useSellerAiChecksControllerRecheck,
   useSellerProductCardsControllerRemove,
   useSellerProductCardsControllerUpdate,
 } from "@/lib/api/generated/endpoints/product-cards-seller/product-cards-seller";
@@ -66,6 +68,7 @@ export function SellerProductDetail({ id }: { id: number }) {
 
   const updateMutation = useSellerProductCardsControllerUpdate();
   const removeMutation = useSellerProductCardsControllerRemove();
+  const recheckMutation = useSellerAiChecksControllerRecheck();
 
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
@@ -337,20 +340,44 @@ const ASPECT_LABELS: Record<string, string> = {
 function AiCheckPanel({
   check,
   loading,
+  onRecheck,
+  recheckDisabled,
 }: {
   check: AiProductCheck | undefined;
   loading: boolean;
+  onRecheck: () => void;
+  recheckDisabled: boolean;
 }) {
   const ui = check?.verdict ? VERDICT_UI[check.verdict] : null;
 
   return (
     <Card className="p-6">
-      <div className="mb-4 flex items-center gap-2">
+      <div className="mb-4 flex flex-wrap items-center gap-2">
         <Sparkles className="size-5 text-primary" />
         <h2 className="font-heading text-lg font-bold tracking-tight">
           ИИ-проверка
         </h2>
+        {!loading && (
+          <Button
+            variant="outline"
+            size="sm"
+            className="ml-auto gap-2"
+            onClick={onRecheck}
+            disabled={recheckDisabled}
+          >
+            <RefreshCw className="size-4" />
+            Проверить заново
+          </Button>
+        )}
       </div>
+
+      {/* Технический текст ошибки продавцу не поможет — он не в его власти. */}
+      {check?.error && (
+        <p className="mb-4 rounded-lg bg-muted p-3 text-sm text-muted-foreground">
+          Проверка не завершилась из-за сбоя на нашей стороне. Товар опубликован,
+          но проверен не был — нажмите «Проверить заново».
+        </p>
+      )}
 
       {loading ? (
         <Skeleton className="h-24 w-full" />
