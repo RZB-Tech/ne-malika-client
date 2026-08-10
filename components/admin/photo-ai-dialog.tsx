@@ -33,30 +33,17 @@ import { storedPhoto, type UploadedPhoto } from "@/components/seller/photo-dropz
 import { cn } from "@/lib/utils";
 
 /**
- * Разрешение и формат — две независимые ручки, вместе они дают строку size.
- * «4K» здесь упирается в лимит модели по пикселям: 2880×2880 для квадрата,
- * 3840×2160 для горизонтали — больше API не принимает.
+ * Четыре квадратных разрешения. Квадрат — потому что карточка товара везде
+ * квадратная, а модель принимает произвольный размер лишь в рамках лимита:
+ * обе стороны кратны 16, всего не больше 8 294 400 пикселей. Отсюда и потолок —
+ * 2880x2880 ровно упирается в лимит, поэтому «4K» здесь это он.
  */
-const FORMATS = [
-  { value: "square", label: "Квадрат" },
-  { value: "portrait", label: "Портрет" },
-  { value: "landscape", label: "Альбом" },
-] as const;
-
 const RESOLUTIONS = [
-  { value: "1k", label: "1K" },
-  { value: "2k", label: "2K" },
-  { value: "4k", label: "4K" },
-] as const;
-
-type Format = (typeof FORMATS)[number]["value"];
-type Resolution = (typeof RESOLUTIONS)[number]["value"];
-
-const SIZE_BY: Record<Resolution, Record<Format, GenerateImagesDtoSize>> = {
-  "1k": { square: "1024x1024", portrait: "1024x1536", landscape: "1536x1024" },
-  "2k": { square: "2048x2048", portrait: "1728x2560", landscape: "2560x1728" },
-  "4k": { square: "2880x2880", portrait: "2160x3840", landscape: "3840x2160" },
-};
+  { value: "1024x1024", label: "1K" },
+  { value: "2048x2048", label: "2K" },
+  { value: "2560x2560", label: "3K" },
+  { value: "2880x2880", label: "4K" },
+] as const satisfies readonly { value: GenerateImagesDtoSize; label: string }[];
 
 const QUALITIES = [
   { value: "low", label: "Черновик" },
@@ -90,8 +77,7 @@ export function PhotoAiDialog({
   const [prompt, setPrompt] = useState("");
   const [count, setCount] = useState<number>(2);
   const [quality, setQuality] = useState<GenerateImagesDtoQuality>("medium");
-  const [format, setFormat] = useState<Format>("square");
-  const [resolution, setResolution] = useState<Resolution>("1k");
+  const [size, setSize] = useState<GenerateImagesDtoSize>("1024x1024");
   const [results, setResults] = useState<Generated[]>([]);
   const [picked, setPicked] = useState<Set<string>>(new Set());
 
@@ -137,7 +123,7 @@ export function PhotoAiDialog({
           prompt: prompt.trim(),
           count,
           quality,
-          size: SIZE_BY[resolution][format],
+          size,
         },
       })) as unknown as Generated[];
       setResults(res);
@@ -218,7 +204,7 @@ export function PhotoAiDialog({
               </div>
             </div>
 
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-3 sm:grid-cols-3">
               <div className="space-y-1.5">
                 <Label>Сколько вариантов</Label>
                 <Select
@@ -258,8 +244,8 @@ export function PhotoAiDialog({
               <div className="space-y-1.5">
                 <Label>Разрешение</Label>
                 <Select
-                  value={resolution}
-                  onValueChange={(v) => setResolution(v as Resolution)}
+                  value={size}
+                  onValueChange={(v) => setSize(v as GenerateImagesDtoSize)}
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue />
@@ -273,29 +259,11 @@ export function PhotoAiDialog({
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-1.5">
-                <Label>Формат</Label>
-                <Select
-                  value={format}
-                  onValueChange={(v) => setFormat(v as Format)}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {FORMATS.map((f) => (
-                      <SelectItem key={f.value} value={f.value}>
-                        {f.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
             </div>
 
             <p className="text-xs text-muted-foreground tabular">
-              Итоговый размер: {SIZE_BY[resolution][format]} px
-              {resolution === "4k" && " — максимум, который принимает модель"}
+              Итоговый размер: {size} px
+              {size === "2880x2880" && " — максимум, который принимает модель"}
             </p>
 
             <Button

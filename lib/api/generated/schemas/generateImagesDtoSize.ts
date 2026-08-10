@@ -11,12 +11,7 @@ export type GenerateImagesDtoSize = typeof GenerateImagesDtoSize[keyof typeof Ge
 
 export const GenerateImagesDtoSize = {
   '1024x1024': '1024x1024',
-  '1024x1536': '1024x1536',
-  '1536x1024': '1536x1024',
   '2048x2048': '2048x2048',
-  '1728x2560': '1728x2560',
-  '2560x1728': '2560x1728',
+  '2560x2560': '2560x2560',
   '2880x2880': '2880x2880',
-  '2160x3840': '2160x3840',
-  '3840x2160': '3840x2160',
 } as const;
