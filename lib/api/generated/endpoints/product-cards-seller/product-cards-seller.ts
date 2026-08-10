@@ -428,3 +428,65 @@ export function useSellerAiChecksControllerGetCheck<TData = Awaited<ReturnType<t
 
 
 
+/**
+ * @summary Отправить свой товар на повторную ИИ-проверку
+ */
+export const sellerAiChecksControllerRecheck = (
+    id: number,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<void>(
+      {url: `/api/v1/seller/product-cards/${id}/recheck`, method: 'POST', signal
+    },
+      options);
+    }
+
+
+
+
+export const getSellerAiChecksControllerRecheckMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof sellerAiChecksControllerRecheck>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof sellerAiChecksControllerRecheck>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['sellerAiChecksControllerRecheck'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof sellerAiChecksControllerRecheck>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  sellerAiChecksControllerRecheck(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SellerAiChecksControllerRecheckMutationResult = NonNullable<Awaited<ReturnType<typeof sellerAiChecksControllerRecheck>>>
+
+    export type SellerAiChecksControllerRecheckMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Отправить свой товар на повторную ИИ-проверку
+ */
+export const useSellerAiChecksControllerRecheck = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof sellerAiChecksControllerRecheck>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof sellerAiChecksControllerRecheck>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getSellerAiChecksControllerRecheckMutationOptions(options), queryClient);
+    }

@@ -145,6 +145,18 @@ export function SellerProductDetail({ id }: { id: number }) {
     }
   };
 
+  const recheck = async () => {
+    try {
+      await recheckMutation.mutateAsync({ id });
+      await queryClient.invalidateQueries();
+      toast.success("Товар отправлен на проверку — результат появится здесь");
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "Не удалось отправить на проверку",
+      );
+    }
+  };
+
   const remove = async () => {
     try {
       await removeMutation.mutateAsync({ id });
@@ -292,7 +304,12 @@ export function SellerProductDetail({ id }: { id: number }) {
       </Card>
 
       {/* AI check */}
-      <AiCheckPanel check={aiCheckQuery.data} loading={aiCheckQuery.isLoading} />
+      <AiCheckPanel
+        check={aiCheckQuery.data}
+        loading={aiCheckQuery.isLoading}
+        onRecheck={recheck}
+        recheckDisabled={recheckMutation.isPending || row.status === "abolished"}
+      />
 
       {/* photos editor */}
       <Card className="p-6">

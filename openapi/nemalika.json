@@ -943,6 +943,35 @@
         ]
       }
     },
+    "/api/v1/seller/product-cards/{id}/recheck": {
+      "post": {
+        "operationId": "SellerAiChecksController_recheck",
+        "summary": "Отправить свой товар на повторную ИИ-проверку",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "product-cards-seller"
+        ],
+        "security": [
+          {
+            "access-token": []
+          }
+        ]
+      }
+    },
     "/api/v1/admin/product-cards": {
       "get": {
         "operationId": "AdminProductCardsController_findAll",
