@@ -7,17 +7,19 @@
  */
 import type { GenerateImagesDtoQuality } from './generateImagesDtoQuality';
 import type { GenerateImagesDtoSize } from './generateImagesDtoSize';
+import type { GenerateImagesDtoStyle } from './generateImagesDtoStyle';
 
 export interface GenerateImagesDto {
   /** Фото товара, которое берём за основу — его же и перерисуем */
   photoKey: string;
-  /** Необязательный референс: вторая картинка, на которую надо ориентироваться */
+  /** Необязательный референс: вторая картинка, оформление которой надо повторить */
   referenceKey?: string;
   /**
      * @minLength 3
      * @maxLength 2000
      */
   prompt: string;
+  style?: GenerateImagesDtoStyle;
   /**
      * @minimum 1
      * @maximum 4

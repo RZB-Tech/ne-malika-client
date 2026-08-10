@@ -27,22 +27,47 @@ import {
 import type {
   GenerateImagesDtoQuality,
   GenerateImagesDtoSize,
+  GenerateImagesDtoStyle,
 } from "@/lib/api/generated/schemas";
 import { storedPhoto, type UploadedPhoto } from "@/components/seller/photo-dropzone";
 import { uploadPhoto } from "@/lib/api/upload";
 import { cn } from "@/lib/utils";
 
+type Format = "portrait" | "square";
+type Tier = "1K" | "2K" | "3K" | "4K";
+
 /**
- * Ярлыки простые, значения — в пикселях: тиры вроде «1K» модель не принимает,
- * отвечает «Expected WIDTHxHEIGHT». 4K здесь упирается в потолок модели по
- * числу пикселей, больше квадрат не бывает.
+ * Значения — в пикселях: тиры вроде «1K» модель не принимает, отвечает
+ * «Expected WIDTHxHEIGHT». Вертикальные 3:4 — формат карточки на маркетплейсах,
+ * заголовок и выноски помещаются только в него. В обеих колонках 4K упирается в
+ * потолок модели по числу пикселей, больше не бывает.
  */
-const RESOLUTIONS = [
-  { value: "1024x1024", label: "1K" },
-  { value: "2048x2048", label: "2K" },
-  { value: "2560x2560", label: "3K" },
-  { value: "2880x2880", label: "4K" },
-] as const satisfies readonly { value: GenerateImagesDtoSize; label: string }[];
+const SIZES: Record<Format, Record<Tier, GenerateImagesDtoSize>> = {
+  portrait: {
+    "1K": "960x1280",
+    "2K": "1440x1920",
+    "3K": "1728x2304",
+    "4K": "2448x3264",
+  },
+  square: {
+    "1K": "1024x1024",
+    "2K": "2048x2048",
+    "3K": "2560x2560",
+    "4K": "2880x2880",
+  },
+};
+
+const TIERS = ["1K", "2K", "3K", "4K"] as const satisfies readonly Tier[];
+
+const STYLES = [
+  { value: "infographic", label: "Инфографика" },
+  { value: "photo", label: "Фото на белом" },
+] as const satisfies readonly { value: GenerateImagesDtoStyle; label: string }[];
+
+const FORMATS = [
+  { value: "portrait", label: "Вертикальный 3:4" },
+  { value: "square", label: "Квадрат 1:1" },
+] as const satisfies readonly { value: Format; label: string }[];
 
 const QUALITIES = [
   { value: "low", label: "Черновик" },
@@ -61,6 +86,10 @@ interface Generated {
  * Перерисовка фотографии товара. Исходник уходит модели как основа, поэтому на
  * выходе тот же товар — иначе карточка обещала бы одно, а приезжало другое.
  *
+ * По умолчанию рисуется карточка-инфографика, как на Wildberries и Ozon: товар
+ * на оформленном фоне, заголовок и выноски. Режим «фото на белом» оставлен для
+ * случаев, когда нужна обычная студийная съёмка.
+ *
  * Выбранные варианты возвращаются наружу: первый встаёт на место исходного фото,
  * остальные добавляются в конец галереи.
  */
@@ -75,24 +104,24 @@ export function PhotoAiDialog({
 }) {
   const [prompt, setPrompt] = useState("");
   const [count, setCount] = useState<number>(2);
+  const [style, setStyle] = useState<GenerateImagesDtoStyle>("infographic");
+  const [format, setFormat] = useState<Format>("portrait");
+  const [tier, setTier] = useState<Tier>("1K");
   const [quality, setQuality] = useState<GenerateImagesDtoQuality>("medium");
-  const [size, setSize] = useState<GenerateImagesDtoSize>("1024x1024");
-  // Референс — необязательный образец оформления: модель ориентируется и на
-  // него тоже. Держим ключ и превью: ключ уходит на сервер, превью показываем.
   const [reference, setReference] = useState<{ key: string; url: string } | null>(
     null,
   );
   const [uploading, setUploading] = useState(false);
   const [results, setResults] = useState<Generated[]>([]);
+  const [resultFormat, setResultFormat] = useState<Format>("portrait");
   const [picked, setPicked] = useState<Set<string>>(new Set());
 
   const describeMutation = useAdminImageGenControllerDescribe();
   const generateMutation = useAdminImageGenControllerGenerate();
 
   const open = photo !== null;
-  // Генерировать можно только по сохранённому фото: у только что выбранного
-  // файла ещё нет ключа в S3, а модель работает с тем, что лежит в хранилище.
   const photoKey = photo?.key;
+  const size = SIZES[format][tier];
 
   const close = () => {
     setPrompt("");
@@ -102,11 +131,17 @@ export function PhotoAiDialog({
     onClose();
   };
 
+  /** Инфографика вертикальная, студийное фото — квадратное: так их и снимают. */
+  const changeStyle = (next: GenerateImagesDtoStyle) => {
+    setStyle(next);
+    setFormat(next === "photo" ? "square" : "portrait");
+  };
+
   const describe = async () => {
     if (!photoKey) return;
     try {
       const res = (await describeMutation.mutateAsync({
-        data: { photoKey },
+        data: { photoKey, referenceKey: reference?.key, style },
       })) as unknown as { prompt: string };
       setPrompt(res.prompt);
     } catch (err) {
@@ -127,6 +162,7 @@ export function PhotoAiDialog({
         data: {
           photoKey,
           prompt: prompt.trim(),
+          style,
           count,
           quality,
           size,
@@ -134,6 +170,7 @@ export function PhotoAiDialog({
         },
       })) as unknown as Generated[];
       setResults(res);
+      setResultFormat(format);
       setPicked(new Set());
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Генерация не удалась");
@@ -181,8 +218,8 @@ export function PhotoAiDialog({
         <DialogHeader>
           <DialogTitle>Перерисовать фото через ИИ</DialogTitle>
           <DialogDescription>
-            Модель видит текущее фото и рисует тот же товар заново. Выбранные
-            варианты заменят исходное изображение.
+            Модель видит текущее фото и рисует по нему карточку с тем же товаром.
+            Выбранные варианты заменят исходное изображение.
           </DialogDescription>
         </DialogHeader>
 
@@ -221,23 +258,27 @@ export function PhotoAiDialog({
                   rows={4}
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
-                  placeholder="ИИ сам опишет товар — или напишите, что хотите получить"
+                  placeholder="ИИ сам опишет карточку — или напишите, что хотите получить"
                 />
               </div>
             </div>
 
-            {/* Референс необязателен: он задаёт манеру съёмки, а сам товар
-                модель всё равно берёт с исходного фото. */}
             <div className="space-y-1.5">
               <Label>Референс оформления</Label>
               {reference ? (
                 <div className="flex items-center gap-3">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={reference.url}
                     alt="Референс"
                     className="size-20 rounded-xl bg-muted object-cover ring-1 ring-foreground/10"
                   />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs text-muted-foreground">
+                      Модель повторит фон, расположение текста и плашек — но
+                      товар и надписи возьмёт из вашего фото. Нажмите «Составить
+                      промпт» ещё раз, чтобы описание учло референс.
+                    </p>
+                  </div>
                   <Button
                     type="button"
                     variant="ghost"
@@ -271,6 +312,45 @@ export function PhotoAiDialog({
                   />
                 </label>
               )}
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="space-y-1.5">
+                <Label>Что рисуем</Label>
+                <Select
+                  value={style}
+                  onValueChange={(v) => changeStyle(v as GenerateImagesDtoStyle)}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {STYLES.map((s) => (
+                      <SelectItem key={s.value} value={s.value}>
+                        {s.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label>Формат</Label>
+                <Select
+                  value={format}
+                  onValueChange={(v) => setFormat(v as Format)}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {FORMATS.map((f) => (
+                      <SelectItem key={f.value} value={f.value}>
+                        {f.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
             <div className="grid gap-3 sm:grid-cols-3">
@@ -312,17 +392,14 @@ export function PhotoAiDialog({
               </div>
               <div className="space-y-1.5">
                 <Label>Разрешение</Label>
-                <Select
-                  value={size}
-                  onValueChange={(v) => setSize(v as GenerateImagesDtoSize)}
-                >
+                <Select value={tier} onValueChange={(v) => setTier(v as Tier)}>
                   <SelectTrigger className="w-full">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {RESOLUTIONS.map((r) => (
-                      <SelectItem key={r.value} value={r.value}>
-                        {r.label}
+                    {TIERS.map((t) => (
+                      <SelectItem key={t} value={t}>
+                        {t}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -332,7 +409,7 @@ export function PhotoAiDialog({
 
             <p className="text-xs text-muted-foreground tabular">
               Итоговый размер: {size} px
-              {size === "2880x2880" && " — максимум, который принимает модель"}
+              {tier === "4K" && " — максимум, который принимает модель"}
             </p>
 
             <Button
@@ -345,7 +422,9 @@ export function PhotoAiDialog({
               {generateMutation.isPending ? "Рисую…" : "Сгенерировать"}
             </Button>
 
-            {generateMutation.isPending && <GeneratingGrid count={count} />}
+            {generateMutation.isPending && (
+              <GeneratingGrid count={count} format={format} />
+            )}
 
             {results.length > 0 && (
               <div className="space-y-2">
@@ -359,7 +438,10 @@ export function PhotoAiDialog({
                       type="button"
                       onClick={() => toggle(r.key)}
                       className={cn(
-                        "relative aspect-square overflow-hidden rounded-xl transition-all",
+                        "relative overflow-hidden rounded-xl transition-all",
+                        resultFormat === "portrait"
+                          ? "aspect-[3/4]"
+                          : "aspect-square",
                         picked.has(r.key)
                           ? "ring-2 ring-primary ring-offset-2 ring-offset-popover"
                           : "ring-1 ring-foreground/10 hover:ring-foreground/25",
@@ -397,7 +479,13 @@ export function PhotoAiDialog({
  * оживают по очереди, а счётчик показывает, что процесс идёт и сколько уже
  * длится — это единственное, что admin реально может отслеживать.
  */
-function GeneratingGrid({ count }: { count: number }) {
+function GeneratingGrid({
+  count,
+  format,
+}: {
+  count: number;
+  format: Format;
+}) {
   const [seconds, setSeconds] = useState(0);
 
   useEffect(() => {
@@ -411,7 +499,10 @@ function GeneratingGrid({ count }: { count: number }) {
         {Array.from({ length: count }).map((_, i) => (
           <div
             key={i}
-            className="shimmer grid aspect-square place-items-center rounded-xl bg-muted/70"
+            className={cn(
+              "shimmer grid place-items-center rounded-xl bg-muted/70",
+              format === "portrait" ? "aspect-[3/4]" : "aspect-square",
+            )}
             style={{ animationDelay: `${i * 220}ms` }}
           >
             <Wand2

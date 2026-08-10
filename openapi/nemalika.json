@@ -2911,6 +2911,19 @@
             "type": "string",
             "format": "uuid",
             "description": "Фото, по которому писать промпт"
+          },
+          "referenceKey": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Референс оформления: если он есть, промпт описывает товар в его вёрстке"
+          },
+          "style": {
+            "type": "string",
+            "enum": [
+              "infographic",
+              "photo"
+            ],
+            "default": "infographic"
           }
         },
         "required": [
@@ -2928,13 +2941,21 @@
           "referenceKey": {
             "type": "string",
             "format": "uuid",
-            "description": "Необязательный референс: вторая картинка, на которую надо ориентироваться"
+            "description": "Необязательный референс: вторая картинка, оформление которой надо повторить"
           },
           "prompt": {
             "type": "string",
             "minLength": 3,
             "maxLength": 2000,
             "example": "Ноутбук на светлом фоне, студийный свет, вид три четверти"
+          },
+          "style": {
+            "type": "string",
+            "enum": [
+              "infographic",
+              "photo"
+            ],
+            "default": "infographic"
           },
           "count": {
             "type": "number",
@@ -2954,12 +2975,16 @@
           "size": {
             "type": "string",
             "enum": [
+              "960x1280",
+              "1440x1920",
+              "1728x2304",
+              "2448x3264",
               "1024x1024",
               "2048x2048",
               "2560x2560",
               "2880x2880"
             ],
-            "default": "1024x1024"
+            "default": "960x1280"
           }
         },
         "required": [
