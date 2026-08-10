@@ -23,19 +23,23 @@ function PopoverContent({
   sideOffset = 4,
   ...props
 }: React.ComponentProps<typeof PopoverPrimitive.Content>) {
+  // Без Portal — намеренно. Диалог блокирует прокрутку всего, что лежит вне
+  // него, а портал уносит содержимое в body: список категорий открывался, но
+  // колесо мыши на нём не работало. Оставаясь внутри диалога, он скроллится.
   return (
-    <PopoverPrimitive.Portal>
+    <>
       <PopoverPrimitive.Content
         data-slot="popover-content"
         align={align}
         sideOffset={sideOffset}
+        collisionPadding={12}
         className={cn(
           "z-50 w-72 origin-(--radix-popover-content-transform-origin) rounded-lg bg-popover p-1 text-popover-foreground shadow-md ring-1 ring-foreground/10 outline-none duration-100 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95",
           className,
         )}
         {...props}
       />
-    </PopoverPrimitive.Portal>
+    </>
   );
 }
 
