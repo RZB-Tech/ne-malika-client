@@ -627,6 +627,31 @@
         ]
       }
     },
+    "/api/v1/categories": {
+      "get": {
+        "operationId": "CategoriesController_findAll",
+        "summary": "Дерево категорий каталога: корни с вложенными подкатегориями",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CategoryDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "categories"
+        ]
+      }
+    },
     "/api/v1/product-cards": {
       "get": {
         "operationId": "ProductCardsController_findAll",
@@ -716,6 +741,26 @@
             "schema": {
               "example": 1,
               "type": "number"
+            }
+          },
+          {
+            "name": "category_id",
+            "required": false,
+            "in": "query",
+            "description": "id категории; товары подкатегорий тоже попадут в выдачу",
+            "schema": {
+              "example": 12,
+              "type": "number"
+            }
+          },
+          {
+            "name": "category",
+            "required": false,
+            "in": "query",
+            "description": "slug категории верхнего уровня — альтернатива category_id",
+            "schema": {
+              "example": "laptops",
+              "type": "string"
             }
           },
           {
@@ -2240,6 +2285,63 @@
           }
         }
       },
+      "CategoryNameDto": {
+        "type": "object",
+        "properties": {
+          "ru": {
+            "type": "string",
+            "example": "Ноутбуки"
+          },
+          "uz-Latn": {
+            "type": "string",
+            "example": "Noutbuklar"
+          },
+          "uz-Cyrl": {
+            "type": "string",
+            "example": "Ноутбуклар"
+          }
+        },
+        "required": [
+          "ru",
+          "uz-Latn",
+          "uz-Cyrl"
+        ]
+      },
+      "CategoryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "example": 12
+          },
+          "slug": {
+            "type": "string",
+            "example": "laptops"
+          },
+          "name": {
+            "$ref": "#/components/schemas/CategoryNameDto"
+          },
+          "icon": {
+            "type": "string",
+            "nullable": true,
+            "example": "Laptop",
+            "description": "Имя иконки lucide, есть только у категорий верхнего уровня"
+          },
+          "children": {
+            "description": "Подкатегории",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategoryDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "name",
+          "children"
+        ]
+      },
       "CharacteristicDto": {
         "type": "object",
         "properties": {
@@ -2273,6 +2375,11 @@
           "description": {
             "type": "string",
             "example": "Состояние отличное, гарантия до 2027 года"
+          },
+          "categoryId": {
+            "type": "number",
+            "example": 12,
+            "description": "id категории из GET /categories, обычно лист дерева"
           },
           "photos": {
             "minItems": 1,
@@ -2333,6 +2440,11 @@
           "description": {
             "type": "string",
             "example": "Состояние отличное, гарантия до 2027 года"
+          },
+          "categoryId": {
+            "type": "number",
+            "example": 12,
+            "description": "id категории из GET /categories, обычно лист дерева"
           },
           "photos": {
             "minItems": 1,

@@ -33,6 +33,7 @@ import { ProductImage } from "@/components/shared/product-image";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { ModerationBadge } from "@/components/shared/badges";
 import { ProductStatsCard } from "@/components/seller/product-stats";
+import { CategorySelect } from "@/components/seller/category-select";
 import {
   PhotoDropzone,
   storedPhoto,
@@ -74,6 +75,7 @@ export function SellerProductDetail({ id }: { id: number }) {
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
   const [state, setState] = useState<"new" | "old">("new");
+  const [categoryId, setCategoryId] = useState<number | null>(null);
   const [specs, setSpecs] = useState<Spec[]>([]);
   const [photos, setPhotos] = useState<UploadedPhoto[]>([]);
   const [hydratedRowId, setHydratedRowId] = useState<number | null>(null);
@@ -87,6 +89,7 @@ export function SellerProductDetail({ id }: { id: number }) {
     setPrice(formatPriceInput(Number(row.price)));
     setDescription(row.description ?? "");
     setState(row.state);
+    setCategoryId(row.categoryId ?? null);
     setSpecs(row.characteristics ?? []);
     setPhotos(
       (row.photos ?? []).map((key) => storedPhoto(key, photoUrl(key) ?? "", row.name)),
@@ -131,6 +134,7 @@ export function SellerProductDetail({ id }: { id: number }) {
           photos: photoKeys,
           price: priceNum,
           state,
+          categoryId: categoryId ?? undefined,
           characteristics: specs
             .filter((s) => s.key.trim() && s.value.trim())
             .map((s) => ({ key: s.key.trim(), value: s.value.trim() })),
@@ -230,6 +234,10 @@ export function SellerProductDetail({ id }: { id: number }) {
                     <SelectItem value="old">{t("seller.add.conditionUsed")}</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+              <div className="space-y-1.5 sm:col-span-2">
+                <Label>Категория</Label>
+                <CategorySelect value={categoryId} onChange={setCategoryId} />
               </div>
               <div className="space-y-1.5 sm:col-span-2">
                 <Label htmlFor="pdesc">{t("seller.add.description")}</Label>

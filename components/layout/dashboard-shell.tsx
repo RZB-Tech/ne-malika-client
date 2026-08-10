@@ -31,6 +31,8 @@ export interface NavItem {
   label: string;
   icon: LucideIcon;
   exact?: boolean;
+  /** Если задан — пункт открывает окно вместо перехода по href. */
+  onSelect?: () => void;
 }
 
 /** Плашка владельца раздела. В свёрнутом меню от неё остаётся только аватар. */
@@ -174,10 +176,19 @@ function NavMenu({ items }: { items: NavItem[] }) {
             isActive={item.href === activeHref}
             tooltip={item.label}
           >
-            <Link href={item.href}>
-              <item.icon />
-              <span>{item.label}</span>
-            </Link>
+            {/* Пункт с onSelect открывает окно вместо перехода: href у него
+                остаётся ключом и запасным адресом для контекстного меню. */}
+            {item.onSelect ? (
+              <button type="button" onClick={item.onSelect}>
+                <item.icon />
+                <span>{item.label}</span>
+              </button>
+            ) : (
+              <Link href={item.href}>
+                <item.icon />
+                <span>{item.label}</span>
+              </Link>
+            )}
           </SidebarMenuButton>
         </SidebarMenuItem>
       ))}

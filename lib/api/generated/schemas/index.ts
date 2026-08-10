@@ -20,6 +20,8 @@ export * from './authUserDtoPhoneNumber';
 export * from './authUserDtoRole';
 export * from './authUserDtoTelegramPhoto';
 export * from './authUserDtoTelegramUsername';
+export * from './categoryDto';
+export * from './categoryNameDto';
 export * from './characteristicDto';
 export * from './createProductCardDto';
 export * from './createProductCardDtoState';

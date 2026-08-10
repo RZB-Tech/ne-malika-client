@@ -9,6 +9,8 @@ import {
 } from "@/components/layout/dashboard-shell";
 import { useT } from "@/components/providers/i18n-provider";
 import { StoreAvatar } from "@/components/shared/store-avatar";
+import { AddProductDialog } from "@/components/seller/add-product-dialog";
+import { openAddProduct } from "@/components/seller/add-product-bus";
 import { useSellerShop } from "@/lib/api/seller";
 import { hueFromId } from "@/lib/api/mappers";
 import { photoUrl } from "@/lib/api/photo";
@@ -42,6 +44,7 @@ function SellerLayoutInner({ children }: { children: React.ReactNode }) {
                   href: "/seller/products/new",
                   label: t("seller.nav.addProduct"),
                   icon: PlusCircle,
+                  onSelect: openAddProduct,
                 },
               ]
             : []),
@@ -72,6 +75,8 @@ function SellerLayoutInner({ children }: { children: React.ReactNode }) {
       brand={brand}
     >
       {children}
+      {/* Одно окно на весь кабинет — открывается событием из любой кнопки. */}
+      <AddProductDialog />
     </DashboardShell>
   );
 }

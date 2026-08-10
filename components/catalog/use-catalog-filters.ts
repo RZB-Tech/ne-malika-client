@@ -52,6 +52,12 @@ export function useCatalogFilters() {
     : "latest";
   const priceMin = readNumber(searchParams.get("priceMin"));
   const priceMax = readNumber(searchParams.get("priceMax"));
+  // Slug, а не id: ссылка на раздел каталога должна быть читаемой и переживать
+  // пересборку дерева категорий.
+  const category = searchParams.get("category")?.trim() || null;
+  // Лист адресуем id: его slug уникален лишь внутри раздела — «gaming» есть и у
+  // ноутбуков, и у мышей, по одному slug выборка была бы неоднозначной.
+  const subCategoryId = readNumber(searchParams.get("sub"));
 
   // Merges against the live URL rather than a captured render's copy, so a
   // debounced write can never resurrect params that changed while it waited.
@@ -145,6 +151,17 @@ export function useCatalogFilters() {
 
   const clearPrice = useCallback(() => resetPrice(EMPTY), [resetPrice]);
 
+  // Смена раздела сбрасывает подкатегорию: она принадлежала прежнему разделу.
+  const setCategory = useCallback(
+    (slug: string | null) => setParams({ category: slug, sub: null }),
+    [setParams],
+  );
+
+  const setSubCategory = useCallback(
+    (id: number | null) => setParams({ sub: id ? String(id) : null }),
+    [setParams],
+  );
+
   // Clears the filters, not the text query — the search bar keeps its own copy
   // of `q` and would otherwise show a word it is no longer searching for.
   const resetFilters = useCallback(() => {
@@ -152,13 +169,20 @@ export function useCatalogFilters() {
     sentRef.current = EMPTY;
     draftRef.current = EMPTY;
     setPriceDraft(EMPTY);
-    setParams({ priceMin: null, priceMax: null, sort: null });
+    setParams({
+      priceMin: null,
+      priceMax: null,
+      sort: null,
+      category: null,
+      sub: null,
+    });
   }, [setParams]);
 
   // Сколько всего накручено — цифра на бургере в шапке.
   const activeCount =
     (price.priceMin != null || price.priceMax != null ? 1 : 0) +
-    (sort === "latest" ? 0 : 1);
+    (sort === "latest" ? 0 : 1) +
+    (category ? 1 : 0);
 
   return {
     q,
@@ -166,6 +190,10 @@ export function useCatalogFilters() {
     price,
     filters,
     priceDraft,
+    category,
+    setCategory,
+    subCategoryId,
+    setSubCategory,
     updatePrice,
     setSort,
     clearPrice,

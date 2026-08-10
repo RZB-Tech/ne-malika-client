@@ -38,5 +38,13 @@ price_min?: number;
 price_max?: number;
 state?: ProductCardsControllerFindAllState;
 shop_id?: number;
+/**
+ * id категории; товары подкатегорий тоже попадут в выдачу
+ */
+category_id?: number;
+/**
+ * slug категории верхнего уровня — альтернатива category_id
+ */
+category?: string;
 sort?: ProductCardsControllerFindAllSort;
 };

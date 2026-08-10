@@ -15,6 +15,8 @@ export interface CreateProductCardDto {
      */
   name: string;
   description?: string;
+  /** id категории из GET /categories, обычно лист дерева */
+  categoryId?: number;
   /**
      * @minItems 1
      * @maxItems 10

@@ -1,11 +1,15 @@
 import {
+  Armchair,
+  BatteryCharging,
   Box,
   CircuitBoard,
   Cpu,
   Database,
+  Disc,
   Fan,
   Gamepad2,
   HardDrive,
+  HardDriveDownload,
   Headphones,
   Keyboard,
   Laptop,
@@ -16,12 +20,17 @@ import {
   Power,
   Printer,
   Server,
+  Smartphone,
+  Speaker,
+  Tablet,
+  Usb,
   Webcam,
   Wifi,
   Wrench,
   type LucideIcon,
 } from "lucide-react";
 
+/** Ключи — значения поля icon у корневых категорий (см. таблицу categories). */
 const map: Record<string, LucideIcon> = {
   PcCase,
   Laptop,
@@ -43,6 +52,14 @@ const map: Record<string, LucideIcon> = {
   Gamepad2,
   Fan,
   Wrench,
+  Speaker,
+  BatteryCharging,
+  HardDriveDownload,
+  Tablet,
+  Smartphone,
+  Usb,
+  Disc,
+  Armchair,
 };
 
 export function CategoryIcon({
@@ -50,11 +67,12 @@ export function CategoryIcon({
   className,
   strokeWidth,
 }: {
-  name: string;
+  /** Категории из БД могут прийти без иконки — тогда рисуем коробку. */
+  name: string | null | undefined;
   className?: string;
   strokeWidth?: number;
 }) {
-  const Icon = map[name] ?? Box;
+  const Icon = (name && map[name]) || Box;
   return <Icon className={className} strokeWidth={strokeWidth} />;
 }
 

@@ -38,6 +38,7 @@ const ru = {
     language: "Язык",
   },
   nav: {
+    catalog: "Каталог",
     account: "Личный кабинет",
     sellerCabinet: "Кабинет продавца",
     admin: "Админ-панель",
@@ -375,6 +376,7 @@ const uzLatn: typeof ru = {
     language: "Til",
   },
   nav: {
+    catalog: "Katalog",
     account: "Shaxsiy kabinet",
     sellerCabinet: "Sotuvchi kabineti",
     admin: "Admin panel",
@@ -713,6 +715,7 @@ const uzCyrl: typeof ru = {
     language: "Тил",
   },
   nav: {
+    catalog: "Каталог",
     account: "Шахсий кабинет",
     sellerCabinet: "Сотувчи кабинети",
     admin: "Админ панел",

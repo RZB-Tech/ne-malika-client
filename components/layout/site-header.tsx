@@ -9,6 +9,7 @@ import { LanguageSwitch } from "@/components/shared/language-switch";
 import { LoginDialog } from "@/components/auth/login-dialog";
 import { UserMenu } from "@/components/auth/user-menu";
 import { HeaderMenu } from "./header-menu";
+import { CatalogMenu } from "./catalog-menu";
 import { FavoritesLink } from "./favorites-link";
 import { useT } from "@/components/providers/i18n-provider";
 import { useAuth } from "@/lib/api/auth";
@@ -28,6 +29,8 @@ export function SiteHeader() {
 
         <Logo showText={false} className="lg:hidden" />
         <Logo className="hidden lg:inline-flex" />
+
+        <CatalogMenu />
 
         <div className="min-w-0 flex-1">
           <SearchBar />

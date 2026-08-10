@@ -10,6 +10,7 @@ import { StatCard } from "@/components/shared/stat-card";
 import { ProductImage } from "@/components/shared/product-image";
 import { ModerationBadge } from "@/components/shared/badges";
 import { useT } from "@/components/providers/i18n-provider";
+import { openAddProduct } from "@/components/seller/add-product-bus";
 import { formatPrice } from "@/lib/format";
 import { useSellerProducts } from "@/lib/api/seller";
 import { mapProductRow } from "@/lib/api/mappers";
@@ -69,11 +70,9 @@ export default function SellerDashboard() {
           </p>
         </div>
         {shop.status === "active" && (
-          <Button asChild className="gap-2">
-            <Link href="/seller/products/new">
-              <PlusCircle className="size-4" />
-              {t("seller.products.addNew")}
-            </Link>
+          <Button className="gap-2" onClick={openAddProduct}>
+            <PlusCircle className="size-4" />
+            {t("seller.products.addNew")}
           </Button>
         )}
       </div>

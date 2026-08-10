@@ -42,6 +42,16 @@ export interface PublicProductCard {
   shopName: string;
   /** Present on the single-item detail projection (GET /product-cards/:id). */
   characteristics?: ProductCharacteristic[] | null;
+  /**
+   * Категория появилась позже фикстур и части сохранённых ответов, поэтому
+   * поля необязательные — как и characteristics выше.
+   */
+  categoryId?: number | null;
+  /** Slug листа каталога; до корня клиент доходит по своему дереву категорий. */
+  categorySlug?: string | null;
+  categoryNameRu?: string | null;
+  categoryNameUzLatn?: string | null;
+  categoryNameUzCyrl?: string | null;
 }
 
 /** Full product row returned in seller cabinet & inside a public shop. */
@@ -54,6 +64,7 @@ export interface ProductCardRow {
   price: string;
   state: ProductState;
   characteristics: ProductCharacteristic[] | null;
+  categoryId?: number | null;
   status: EntityStatus;
   abolishReason: string | null;
   abolishedAt: string | null;

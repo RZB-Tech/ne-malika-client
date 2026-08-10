@@ -32,6 +32,7 @@ import {
   useAdminProductCardsControllerCreate,
   useAdminProductCardsControllerUpdate,
 } from "@/lib/api/generated/endpoints/product-cards-admin/product-cards-admin";
+import { CategorySelect } from "@/components/seller/category-select";
 import { resolvePhotoKeys } from "@/lib/api/upload";
 import { photoUrl } from "@/lib/api/photo";
 import { formatPriceInput, parsePriceInput } from "@/lib/format";
@@ -104,6 +105,9 @@ function FormBody({
     editing ? formatPriceInput(Number(editing.price)) : "",
   );
   const [state, setState] = useState<"new" | "old">(editing?.state ?? "new");
+  const [categoryId, setCategoryId] = useState<number | null>(
+    editing?.categoryId ?? null,
+  );
   const [description, setDescription] = useState(editing?.description ?? "");
   const [specs, setSpecs] = useState(editing?.characteristics ?? []);
   const [photos, setPhotos] = useState<UploadedPhoto[]>(
@@ -137,6 +141,7 @@ function FormBody({
         photos: await resolvePhotoKeys(photos),
         price: priceNum,
         state,
+        categoryId: categoryId ?? undefined,
         characteristics: specs.filter((s) => s.key.trim() && s.value.trim()),
       };
 
@@ -224,6 +229,11 @@ function FormBody({
       </div>
 
       <div className="flex flex-col gap-1.5">
+        <Label>Категория</Label>
+        <CategorySelect value={categoryId} onChange={setCategoryId} />
+      </div>
+
+      <div className="space-y-1.5">
         <Label htmlFor="pdesc">Описание</Label>
         <Textarea
           id="pdesc"

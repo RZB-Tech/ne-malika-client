@@ -9,6 +9,7 @@ import { ProductCard } from "@/components/product/product-card";
 import { useCatalogFilters } from "./use-catalog-filters";
 import type { SortKey } from "./use-catalog-filters";
 import { useT } from "@/components/providers/i18n-provider";
+import { CategoryBar } from "@/components/catalog/category-bar";
 import { openHeaderMenu } from "@/components/layout/header-menu-bus";
 import { productCardsControllerFindAll } from "@/lib/api/generated/endpoints/product-cards-public/product-cards-public";
 import type { ProductCardsControllerFindAllParams } from "@/lib/api/generated/schemas";
@@ -48,8 +49,19 @@ export function CatalogView({
 
   // Фильтры живут в URL и редактируются из шторки в шапке — здесь их только
   // читают и показывают чипсами.
-  const { q, sort, price, filters, setSort, clearPrice, resetFilters } =
-    useCatalogFilters();
+  const {
+    q,
+    sort,
+    price,
+    filters,
+    category,
+    setCategory,
+    subCategoryId,
+    setSubCategory,
+    setSort,
+    clearPrice,
+    resetFilters,
+  } = useCatalogFilters();
 
   const params: ProductCardsControllerFindAllParams = useMemo(
     () => ({
@@ -57,15 +69,25 @@ export function CatalogView({
       q: q || undefined,
       price_min: price.priceMin ?? undefined,
       price_max: price.priceMax ?? undefined,
+      // Выбранный лист уже задаёт ветку целиком — раздел в запросе лишний.
+      ...(subCategoryId
+        ? { category_id: subCategoryId }
+        : category
+          ? { category }
+          : {}),
       sort: SORT_MAP[sort],
     }),
-    [q, price, sort],
+    [q, price, category, subCategoryId, sort],
   );
 
   // Совпадают ли текущие параметры с серверным первым запросом. Только тогда
   // отданный сервером initialData валиден для этого ключа.
   const isInitialParams =
-    !q && price.priceMin == null && price.priceMax == null && sort === "latest";
+    !q &&
+    price.priceMin == null &&
+    price.priceMax == null &&
+    !category &&
+    sort === "latest";
 
   const listQuery = useInfiniteQuery({
     // Фильтры в ключе: их смена — это другой кеш, а не дозагрузка к текущему.
@@ -171,6 +193,15 @@ export function CatalogView({
 
   return (
     <div className="mx-auto max-w-[1600px] px-5 py-8 sm:px-8 lg:px-10">
+      <div className="mb-6">
+        <CategoryBar
+          selected={category}
+          selectedSubId={subCategoryId}
+          onSelect={setCategory}
+          onSelectSub={setSubCategory}
+        />
+      </div>
+
       <div className="mb-6">
         <h1 className="font-heading text-2xl font-bold tracking-tight sm:text-3xl">{title}</h1>
         <p className="mt-1 text-sm text-muted-foreground tabular">

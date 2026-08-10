@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { PhotoDropzone, type UploadedPhoto } from "./photo-dropzone";
+import { CategorySelect } from "./category-select";
 import { useT } from "@/components/providers/i18n-provider";
 import { useSellerShop } from "@/lib/api/seller";
 import { useSellerProductCardsControllerCreate } from "@/lib/api/generated/endpoints/product-cards-seller/product-cards-seller";
@@ -35,7 +36,18 @@ function SectionTitle({ index, children }: { index: number; children: React.Reac
   );
 }
 
-export function AddProductForm() {
+/**
+ * Форма нового товара. Живёт и отдельной страницей, и внутри диалога, поэтому
+ * заголовок с переходом после сохранения вынесены в параметры: в диалоге
+ * заголовок свой, а уходить со страницы не нужно — достаточно закрыться.
+ */
+export function AddProductForm({
+  embedded = false,
+  onDone,
+}: {
+  embedded?: boolean;
+  onDone?: () => void;
+} = {}) {
   const { t } = useT();
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -54,6 +66,7 @@ export function AddProductForm() {
   ]);
   const [photos, setPhotos] = useState<UploadedPhoto[]>([]);
   const [price, setPrice] = useState("");
+  const [categoryId, setCategoryId] = useState<number | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   const onPriceChange = (raw: string) => setPrice(formatPriceInput(raw));
@@ -82,6 +95,10 @@ export function AddProductForm() {
       toast.error("Добавьте хотя бы одно фото");
       return;
     }
+    if (!categoryId) {
+      toast.error("Выберите категорию товара");
+      return;
+    }
 
     setSubmitting(true);
     try {
@@ -103,6 +120,7 @@ export function AddProductForm() {
           photos: keys,
           price: priceNum,
           state,
+          categoryId: categoryId ?? undefined,
           characteristics: characteristics.length ? characteristics : undefined,
         },
       });
@@ -111,7 +129,10 @@ export function AddProductForm() {
       toast.success(t("seller.add.publish"), {
         description: "Товар отправлен на ИИ-проверку",
       });
-      router.push("/seller/products");
+      // Из диалога уводить некуда — он просто закрывается, а список под ним
+      // уже обновлён сбросом кэша выше.
+      if (onDone) onDone();
+      else router.push("/seller/products");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Не удалось создать товар");
     } finally {
@@ -123,12 +144,14 @@ export function AddProductForm() {
 
   return (
     <form onSubmit={submit} className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="font-heading text-2xl font-bold tracking-tight">{t("seller.add.title")}</h1>
-          <p className="mt-1 text-sm text-muted-foreground">{t("seller.add.subtitle")}</p>
+      {!embedded && (
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h1 className="font-heading text-2xl font-bold tracking-tight">{t("seller.add.title")}</h1>
+            <p className="mt-1 text-sm text-muted-foreground">{t("seller.add.subtitle")}</p>
+          </div>
         </div>
-      </div>
+      )}
 
       {!shopLoading && !shop && (
         <Card className="border-warning/40 bg-warning/5 p-4 text-sm">
@@ -191,6 +214,11 @@ export function AddProductForm() {
               onChange={(e) => setDescription(e.target.value)}
               placeholder={t("seller.add.descriptionPlaceholder")}
             />
+          </div>
+
+          <div className={field}>
+            <Label>Категория</Label>
+            <CategorySelect value={categoryId} onChange={setCategoryId} />
           </div>
 
           <div className="grid gap-5 sm:grid-cols-2">

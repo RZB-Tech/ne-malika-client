@@ -92,10 +92,17 @@
   --sidebar-accent-foreground: oklch(0.3 0.03 262);
   --sidebar-border: oklch(0.918 0.005 260);
   --sidebar-ring: oklch(0.54 0.215 262);
+
+  /* Полоса прокрутки: полупрозрачная от текста, поэтому одинаково садится
+     и на белый фон страницы, и на серую подложку карточки. */
+  --scrollbar-thumb: oklch(0.18 0.01 260 / 22%);
+  --scrollbar-thumb-hover: oklch(0.18 0.01 260 / 38%);
 }
 
 .dark {
   color-scheme: dark;
+  --scrollbar-thumb: oklch(0.95 0.006 260 / 20%);
+  --scrollbar-thumb-hover: oklch(0.95 0.006 260 / 34%);
   --background: oklch(0.16 0.012 264);
   --foreground: oklch(0.95 0.006 260);
   --card: oklch(0.196 0.014 264);
@@ -154,6 +161,49 @@
   }
   ::selection {
     background: color-mix(in oklch, var(--primary) 24%, transparent);
+  }
+
+  /* Единая полоса прокрутки во всём приложении. Firefox понимает scrollbar-*,
+     Chromium и Safari — псевдоэлементы, поэтому правила дублируются.
+     Дорожку не красим: на карточке, в диалоге и на странице фон разный, а
+     ползунок полупрозрачный и ложится на любой. Скрыть полосу там, где она
+     мешает, по-прежнему можно классом .no-scrollbar — он объявлен ниже, в
+     слое utilities, и перебивает эти правила. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  *::-webkit-scrollbar-track,
+  *::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+  *::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-thumb);
+    border-radius: 9999px;
+    /* Прозрачная рамка с background-clip делает поля вокруг ползунка —
+       без неё он прилипает к краю окна. */
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background-color: var(--scrollbar-thumb-hover);
+  }
+
+  /* Кому анимации мешают — тому их не показываем. Панели при этом не ломаются:
+     они снимаются с DOM по таймеру, а не по окончании анимации. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
 

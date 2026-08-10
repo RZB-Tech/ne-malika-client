@@ -36,6 +36,7 @@ import { ProductImage } from "@/components/shared/product-image";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { ModerationBadge } from "@/components/shared/badges";
 import { useT } from "@/components/providers/i18n-provider";
+import { openAddProduct } from "@/components/seller/add-product-bus";
 import { formatPrice } from "@/lib/format";
 import { useSellerProductCardsControllerRemove } from "@/lib/api/generated/endpoints/product-cards-seller/product-cards-seller";
 import { useSellerProducts } from "@/lib/api/seller";
@@ -81,11 +82,9 @@ export default function SellerProducts() {
         {/* У упразднённого магазина товары остаются видны владельцу, но новые
             добавлять нельзя — кнопку убираем. */}
         {shop?.status === "active" && (
-          <Button asChild className="gap-2">
-            <Link href="/seller/products/new">
-              <PlusCircle className="size-4" />
-              {t("seller.products.addNew")}
-            </Link>
+          <Button className="gap-2" onClick={openAddProduct}>
+            <PlusCircle className="size-4" />
+            {t("seller.products.addNew")}
           </Button>
         )}
       </div>
