@@ -133,7 +133,7 @@ export function CatalogView({
   // Сколько страниц уже подтянулось само. Сбрасывается вместе с фильтрами —
   // приведение состояния во время рендера, чтобы новая выдача не отрисовалась
   // со счётчиком от предыдущей.
-  const filterKey = `${q}|${price.priceMin}|${price.priceMax}|${sort}`;
+  const filterKey = `${q}|${price.priceMin}|${price.priceMax}|${sort}|${category}|${subCategoryId}`;
   const [autoLoads, setAutoLoads] = useState(0);
   const [prevFilterKey, setPrevFilterKey] = useState(filterKey);
   if (filterKey !== prevFilterKey) {

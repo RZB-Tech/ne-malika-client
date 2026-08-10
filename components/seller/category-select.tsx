@@ -122,7 +122,7 @@ export function CategorySelect({
           />
         </div>
 
-        <div className="max-h-72 overflow-y-auto p-1">
+        <div className="max-h-72 overflow-y-auto overscroll-contain p-1">
           {filtered.length === 0 ? (
             <p className="px-3 py-6 text-center text-sm text-muted-foreground">
               Ничего не найдено
