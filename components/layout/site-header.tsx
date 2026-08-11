@@ -4,7 +4,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { Suspense } from "react";
 import {
-  ArrowRight,
   Cpu,
   HardDrive,
   Heart,
@@ -126,7 +125,7 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background">
-      <div className="flex h-17 w-full items-center gap-2 px-5 sm:gap-3 lg:px-6">
+      <div className="mx-auto flex h-17 w-full max-w-[1600px] items-center gap-2 px-5 sm:gap-3 sm:px-8 lg:px-10">
         <HeaderMenu />
 
         <Logo showText={false} className="md:hidden" />
@@ -191,7 +190,7 @@ export function SiteHeader() {
       {/* Вторая строка: на телефоне разделы, язык и тема живут в бургере,
           поэтому там её просто нет. */}
       <div className="hidden border-t border-border/70 lg:block">
-        <div className="flex h-10 w-full items-center px-5 lg:px-6">
+        <div className="mx-auto flex h-10 w-full max-w-[1600px] items-center px-5 sm:px-8 lg:px-10">
           <nav className="no-scrollbar flex min-w-0 items-center gap-1 overflow-x-auto">
             {roots.length > 0
               ? roots.slice(0, QUICK_CATEGORIES).map((root) => (
@@ -232,13 +231,7 @@ export function SiteHeader() {
         </div>
       </div>
 
-      {/* Третий уровень повторяет композицию референса: изображение остаётся
-          чистым фоном, а текст и CTA рендерятся поверх него и не теряют
-          резкость на Retina-экранах. */}
-      <section
-        aria-label={t("home.promoTitle")}
-        className="relative h-18 overflow-hidden rounded-b-3xl bg-primary"
-      >
+      <div className="relative mx-auto h-18 w-full max-w-[1600px] overflow-hidden rounded-b-3xl bg-primary">
         <Image
           src="/header-gaming-banner.png"
           alt=""
@@ -247,28 +240,7 @@ export function SiteHeader() {
           sizes="100vw"
           className="object-cover"
         />
-        <div className="absolute inset-0 mx-auto flex h-full max-w-[1020px] items-center justify-center px-4 lg:justify-start">
-          <div className="hidden w-60 shrink-0 lg:block" aria-hidden />
-
-          <div className="flex items-center gap-3 sm:gap-6">
-            <h2 className="font-heading text-sm font-bold whitespace-nowrap text-white drop-shadow-sm sm:text-xl">
-              {t("home.promoTitle")}
-            </h2>
-            <Button
-              asChild
-              variant="secondary"
-              size="xs"
-              className="rounded-full bg-foreground text-background shadow-sm hover:bg-foreground/85"
-            >
-              <Link href="/?sort=latest">
-                {t("home.promoCta")}
-                <ArrowRight data-icon="inline-end" />
-              </Link>
-            </Button>
-          </div>
-
-        </div>
-      </section>
+      </div>
     </header>
   );
 }
