@@ -23,7 +23,6 @@ import { SearchBar, SearchBarSkeleton } from "@/components/shared/search-bar";
 import { LanguageSwitch } from "@/components/shared/language-switch";
 import { LoginDialog } from "@/components/auth/login-dialog";
 import { UserMenu } from "@/components/auth/user-menu";
-import { HeaderMenu } from "./header-menu";
 import { CatalogMenu } from "./catalog-menu";
 import { useT } from "@/components/providers/i18n-provider";
 import { useAuth } from "@/lib/api/auth";
@@ -157,8 +156,6 @@ export function SiteHeader() {
           isCompact ? "h-16" : "h-17",
         )}
       >
-        <HeaderMenu />
-
         <Logo showText={false} className="md:hidden" />
         <Logo className="mr-1 hidden md:inline-flex" />
 
@@ -174,8 +171,6 @@ export function SiteHeader() {
             <SearchBar appearance="marketplace" />
           </Suspense>
         </div>
-
-        <span className="flex-1 md:hidden" />
 
         {/* Действия покупателя: значок и подпись под ним. Подписи важнее
             компактности — иконка весов без слова «Сравнение» не читается
@@ -367,7 +362,7 @@ function FavoritesAction() {
       asChild
       variant="ghost"
       size="lg"
-      className={cn(ACTION_CLASS, "size-9 px-0 sm:h-13 sm:w-16")}
+      className={cn(ACTION_CLASS, "hidden md:flex")}
     >
       <Link
         href="/account?tab=favorites"

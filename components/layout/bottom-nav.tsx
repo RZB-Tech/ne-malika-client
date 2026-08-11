@@ -31,7 +31,7 @@ export function BottomNav() {
   return (
     <nav
       aria-label={t("common.menu")}
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-card pb-[env(safe-area-inset-bottom)] lg:hidden"
+      className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-card pb-[env(safe-area-inset-bottom)] md:hidden"
     >
       <div className="flex h-14 items-stretch">
         <Item

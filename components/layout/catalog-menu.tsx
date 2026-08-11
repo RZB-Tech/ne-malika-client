@@ -94,7 +94,7 @@ export function CatalogMenu() {
         // Синяя на светлой шапке: это главная кнопка навигации, и она должна
         // читаться первой, до строки поиска.
         size="lg"
-        className={cn("h-11 gap-2 rounded-xl px-3 sm:px-4")}
+        className={cn("hidden h-11 gap-2 rounded-xl px-3 sm:px-4 md:inline-flex")}
         onClick={() => (open ? close() : openMenu())}
         aria-expanded={open}
         aria-haspopup="true"

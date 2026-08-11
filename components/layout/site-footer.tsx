@@ -1,5 +1,7 @@
 "use client";
 
+import { LanguageSwitch } from "@/components/shared/language-switch";
+import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
 import { useT } from "@/components/providers/i18n-provider";
 
 export function SiteFooter() {
@@ -17,6 +19,17 @@ export function SiteFooter() {
           ·
         </span>
         <span>{t("footer.disclaimer")}</span>
+      </div>
+
+      {/* Язык и тема жили в бургере, а его в шапке больше нет. На телефоне их
+          ищут внизу страницы — это единственное оставшееся место, где им не
+          тесно. На широком экране они по-прежнему во второй строке шапки. */}
+      <div className="flex items-center justify-center gap-1 pb-8 md:hidden">
+        <LanguageSwitch />
+        <AnimatedThemeToggler
+          aria-label={t("common.theme")}
+          className="inline-flex size-8 items-center justify-center rounded-lg text-muted-foreground transition-colors outline-none hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/40 [&_svg]:size-4"
+        />
       </div>
     </footer>
   );
