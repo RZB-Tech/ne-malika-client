@@ -5,6 +5,7 @@ import {
   Flag,
   Package,
   Settings,
+  Send,
   ShieldCheck,
   Sparkles,
   Store,
@@ -38,6 +39,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
     { href: "/admin/users", label: t("admin.nav.users"), icon: Users },
     { href: "/admin/products", label: t("admin.nav.products"), icon: Package },
     { href: "/admin/ai-review", label: t("admin.nav.aiReview"), icon: Sparkles },
+    { href: "/admin/broadcast", label: t("admin.nav.broadcast"), icon: Send },
     { href: "/admin/settings", label: t("admin.nav.settings"), icon: Settings },
   ];
 
