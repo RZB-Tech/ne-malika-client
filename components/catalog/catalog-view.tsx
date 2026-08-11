@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { Loader2, SearchX } from "lucide-react";
+import { Loader2, SearchX, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   ProductCard,
@@ -10,6 +10,7 @@ import {
 } from "@/components/product/product-card";
 import { useCatalogFilters } from "./use-catalog-filters";
 import { useT } from "@/components/providers/i18n-provider";
+import { findCategory, useCategories } from "@/lib/api/categories";
 import { productCardsControllerFindAll } from "@/lib/api/generated/endpoints/product-cards-public/product-cards-public";
 import type { ProductCardsControllerFindAllParams } from "@/lib/api/generated/schemas";
 import { mapPublicProductCard } from "@/lib/api/mappers";
@@ -36,11 +37,12 @@ export function CatalogView({
   // гидратация покажет не тот список.
   initialData?: Paginated<PublicProductCard>;
 } = {}) {
-  const { t } = useT();
+  const { t, locale } = useT();
+  const { roots } = useCategories();
 
   // Фильтры живут в URL и редактируются из шторки в шапке — здесь их только
   // читают и показывают чипсами.
-  const { q, category, subCategoryId } = useCatalogFilters();
+  const { q, category, setCategory, subCategoryId } = useCatalogFilters();
 
   const params: ProductCardsControllerFindAllParams = useMemo(
     () => ({
@@ -113,6 +115,15 @@ export function CatalogView({
     setAutoLoads(0);
   }
 
+  // Подпись выбранного раздела. Категорию выбирают в меню шапки, а сбросить
+  // её больше негде: панель фильтров убрана, и без этой плашки выдача молча
+  // оставалась бы суженной.
+  const categoryLabel = useMemo(() => {
+    const leaf = findCategory(roots, subCategoryId);
+    if (leaf) return `${leaf.root.name[locale]} · ${leaf.category.name[locale]}`;
+    return roots.find((r) => r.slug === category)?.name[locale] ?? null;
+  }, [roots, category, subCategoryId, locale]);
+
   const canAutoLoad = hasNextPage && autoLoads < MAX_AUTO_PAGES;
 
   // IntersectionObserver, а не обработчик scroll: браузер сам считает пересечение
@@ -144,6 +155,18 @@ export function CatalogView({
 
   return (
     <div className="mx-auto max-w-[1600px] px-5 py-8 sm:px-8 lg:px-10">
+      {categoryLabel && (
+        <div className="mb-4">
+          <button
+            onClick={() => setCategory(null)}
+            className="inline-flex items-center gap-1 rounded-full bg-muted/70 py-1 pl-3 pr-2 text-xs font-medium text-foreground transition-colors hover:bg-muted"
+          >
+            {categoryLabel}
+            <X className="size-3 text-muted-foreground" />
+          </button>
+        </div>
+      )}
+
       {isError ? (
         <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border py-24 text-center">
           <SearchX className="size-10 text-muted-foreground/50" />

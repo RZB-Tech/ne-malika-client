@@ -36,7 +36,11 @@ export function SiteHeader() {
 
         <CatalogMenu />
 
-        <div className="min-w-0 flex-1">
+        {/* Поле поиска делаем белым: заливка по умолчанию берётся от muted и
+            на синем фоне сливалась с шапкой, а плейсхолдер терял контраст.
+            Правим здесь, а не в SearchBar — он используется и на светлых
+            страницах, где всё и так в порядке. */}
+        <div className="min-w-0 flex-1 [&_input]:border-transparent [&_input]:bg-white [&_input]:text-foreground [&_input]:placeholder:text-muted-foreground [&_svg]:text-muted-foreground">
           <SearchBar />
         </div>
 
