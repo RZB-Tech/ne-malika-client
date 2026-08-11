@@ -36,6 +36,16 @@ export function ProductImage({
   fit?: "cover" | "contain" | "natural";
 }) {
   const [failed, setFailed] = useState(false);
+
+  // Отметку об ошибке снимаем при смене фотографии: карточка каталога
+  // перелистывает их по наведению, и одна битая ссылка иначе роняла бы на
+  // плашку-заглушку всю остальную галерею.
+  const [shown, setShown] = useState(src);
+  if (src !== shown) {
+    setShown(src);
+    setFailed(false);
+  }
+
   const iconName = getCategory(categorySlug)?.icon ?? "Box";
   const showImage = Boolean(src) && !failed;
   const natural = fit === "natural";

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { ProductImage } from "@/components/shared/product-image";
 import { ContactSellerButton } from "@/components/product/contact-seller-button";
 import { FavoriteButton } from "@/components/product/favorite-button";
@@ -13,6 +14,24 @@ import { formatPrice } from "@/lib/format";
 import { productToSnapshot } from "@/lib/product-snapshot";
 import { type Product } from "@/lib/data";
 import { Badge } from "@/components/ui/badge";
+
+/** Через сколько показывать следующее фото, пока курсор на карточке. */
+const PHOTO_INTERVAL_MS = 1000;
+
+/**
+ * Перелистывать ли фотографии самостоятельно.
+ *
+ * Только там, где есть настоящее наведение: на телефоне `onMouseEnter`
+ * срабатывает по касанию, и карточка начинала бы мигать под пальцем. И только
+ * если человек не просил систему убрать анимацию — движущаяся сама по себе
+ * картинка ровно то, от чего эта настройка защищает.
+ */
+function canAutoplay(): boolean {
+  return (
+    window.matchMedia("(hover: hover)").matches &&
+    !window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
+}
 
 /**
  * Карточка каталога по раскладке маркетплейса: высокая картинка 3:4, а под ней
@@ -27,11 +46,46 @@ export function ProductCard({ product }: { product: Product }) {
   const { t, locale } = useT();
   const snapshot = productToSnapshot(product);
 
+  const photos = product.photoUrls ?? [];
+  const [active, setActive] = useState(0);
+  const [hovered, setHovered] = useState(false);
+
+  useEffect(() => {
+    if (!hovered || photos.length < 2 || !canAutoplay()) return;
+
+    // Соседние кадры подгружаем сразу, а первый перелистывается через секунду:
+    // иначе на месте фотографии на мгновение появлялась бы пустота, пока
+    // браузер её качает.
+    for (const url of photos.slice(1)) {
+      const preload = new Image();
+      preload.src = url;
+    }
+
+    const id = setInterval(
+      () => setActive((i) => (i + 1) % photos.length),
+      PHOTO_INTERVAL_MS,
+    );
+    return () => clearInterval(id);
+    // Зависимость по длине, а не по массиву: у него каждый рендер новая ссылка,
+    // и перелистывание сбрасывалось бы на первом кадре бесконечно.
+  }, [hovered, photos.length]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const leave = () => {
+    setHovered(false);
+    // Возвращаем главный кадр: карточка в ленте должна выглядеть одинаково
+    // и до наведения, и после.
+    setActive(0);
+  };
+
   return (
     // isolate + z-20: <img> внутри ProductImage тоже z-10, и без своего
     // контекста наложения побеждал он — на телефоне (где hover-scale не
     // срабатывает) тап по сердцу попадал в фото и уводил на страницу товара.
-    <div className="group relative isolate flex flex-col">
+    <div
+      className="group relative isolate flex flex-col"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={leave}
+    >
       {/* Вне <Link>: это переключатели, а не переход к товару. Поверх картинки
           и со своим z-index, иначе ссылка карточки перехватывает клик. */}
       <div className="absolute top-2 right-2 z-20 flex flex-col gap-1.5">
@@ -48,7 +102,7 @@ export function ProductCard({ product }: { product: Product }) {
           <ProductImage
             hue={product.hue}
             categorySlug={product.categorySlug}
-            src={product.imageUrl}
+            src={photos[active] ?? product.imageUrl}
             alt={product.name}
             fit="contain"
             className="aspect-[3/4] w-full transition-transform duration-300 group-hover:scale-[1.03]"
