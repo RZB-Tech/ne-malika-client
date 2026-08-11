@@ -88,22 +88,28 @@ export function CatalogMenu() {
       <Button
         // Синяя на светлой шапке: это главная кнопка навигации, и она должна
         // читаться первой, до строки поиска.
+        size="lg"
         className={cn("h-11 gap-2 rounded-xl px-3 sm:px-4")}
         onClick={() => (open ? close() : openMenu())}
         aria-expanded={open}
         aria-haspopup="true"
       >
         {/* Иконки меняются местами плавно: без этого «крестик» щёлкает. */}
-        <span className="relative grid size-4 place-items-center">
+        <span
+          data-icon="inline-start"
+          className="relative grid size-5 place-items-center"
+        >
           <LayoutGrid
+            fill="currentColor"
+            strokeWidth={0}
             className={cn(
-              "absolute size-4 transition-all duration-200",
+              "absolute transition-all duration-200",
               open ? "scale-75 opacity-0" : "scale-100 opacity-100",
             )}
           />
           <X
             className={cn(
-              "absolute size-4 transition-all duration-200",
+              "absolute transition-all duration-200",
               open ? "scale-100 opacity-100" : "scale-75 opacity-0",
             )}
           />

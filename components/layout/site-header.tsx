@@ -2,16 +2,16 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
 import {
   Cpu,
   HardDrive,
   Heart,
-  History,
   Keyboard,
   Laptop,
   Monitor,
-  Scale,
+  Package,
+  ShoppingBasket,
   Smartphone,
   UserRound,
   type LucideIcon,
@@ -120,12 +120,46 @@ export function SiteHeader() {
   const { t, locale } = useT();
   const { isAuthenticated, isHydrated } = useAuth();
   const { roots } = useCategories();
+  const [isCompact, setIsCompact] = useState(false);
+
+  useEffect(() => {
+    let animationFrame = 0;
+
+    const updateHeader = () => {
+      cancelAnimationFrame(animationFrame);
+      animationFrame = requestAnimationFrame(() => {
+        setIsCompact((current) => {
+          const next = current ? window.scrollY > 8 : window.scrollY > 32;
+          return next === current ? current : next;
+        });
+      });
+    };
+
+    updateHeader();
+    window.addEventListener("scroll", updateHeader, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", updateHeader);
+      cancelAnimationFrame(animationFrame);
+    };
+  }, []);
   const [marketCity, ...marketPlaceParts] = t("common.market").split(" · ");
   const marketPlace = marketPlaceParts.join(" · ");
 
   return (
-    <header className="sticky top-0 z-50 mx-auto w-full max-w-[1600px] rounded-b-3xl bg-background">
-      <div className="mx-auto flex h-17 w-full max-w-[1600px] items-center gap-2 px-5 sm:gap-3 sm:px-8 lg:px-10">
+    <header
+      data-compact={isCompact}
+      className={cn(
+        "sticky top-0 z-50 mx-auto w-full max-w-[1600px] rounded-b-3xl bg-background transition-shadow duration-200",
+        isCompact && "shadow-sm",
+      )}
+    >
+      <div
+        className={cn(
+          "mx-auto flex w-full max-w-[1600px] items-center gap-2 px-5 transition-[height] duration-200 ease-out sm:gap-3 sm:px-8 lg:px-10",
+          isCompact ? "h-16" : "h-17",
+        )}
+      >
         <HeaderMenu />
 
         <Logo showText={false} className="md:hidden" />
@@ -166,9 +200,23 @@ export function SiteHeader() {
               </Button>
             </LoginDialog>
           ) : (
-            <div className="hidden md:block">
-              <UserMenu />
-            </div>
+            <UserMenu
+              trigger={
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="lg"
+                  className={cn(ACTION_CLASS, "hidden text-foreground md:flex")}
+                  title={t("nav.login")}
+                >
+                  <ActionBody
+                    icon={UserRound}
+                    label={t("nav.login")}
+                    attention
+                  />
+                </Button>
+              }
+            />
           )}
 
           <Button
@@ -177,19 +225,27 @@ export function SiteHeader() {
             size="lg"
             className={cn(ACTION_CLASS, "hidden md:flex")}
           >
-            <Link href="/account?tab=history" title={t("nav.history")}>
-              <ActionBody icon={History} label={t("nav.history")} />
+            <Link href="/account?tab=history" title={t("nav.orders")}>
+              <ActionBody icon={Package} label={t("nav.orders")} />
             </Link>
           </Button>
 
           <FavoritesAction />
-          <CompareAction />
+          <CartAction />
         </nav>
       </div>
 
       {/* Вторая строка: на телефоне разделы, язык и тема живут в бургере,
           поэтому там её просто нет. */}
-      <div className="hidden lg:block">
+      <div
+        aria-hidden={isCompact}
+        className={cn(
+          "hidden overflow-hidden transition-[height,opacity] duration-200 ease-out lg:block",
+          isCompact
+            ? "invisible h-0 pointer-events-none opacity-0"
+            : "h-10 opacity-100",
+        )}
+      >
         <div className="mx-auto flex h-10 w-full max-w-[1600px] items-center px-5 sm:px-8 lg:px-10">
           <nav className="no-scrollbar flex min-w-0 items-center gap-1 overflow-x-auto">
             {roots.length > 0
@@ -231,7 +287,15 @@ export function SiteHeader() {
         </div>
       </div>
 
-      <div className="relative mx-auto h-18 w-full max-w-[1600px] overflow-hidden rounded-b-3xl bg-primary">
+      <div
+        aria-hidden={isCompact}
+        className={cn(
+          "relative mx-auto w-full max-w-[1600px] overflow-hidden rounded-b-3xl bg-primary transition-[height,opacity] duration-200 ease-out",
+          isCompact
+            ? "invisible h-0 pointer-events-none opacity-0"
+            : "h-18 opacity-100",
+        )}
+      >
         <Image
           src="/header-gaming-banner.png"
           alt=""
@@ -264,7 +328,7 @@ function ActionBody({
   return (
     <>
       <span className="relative">
-        <Icon />
+        <Icon strokeWidth={2.1} />
         {attention && (
           <span className="absolute -top-1 -right-1 size-2 rounded-full bg-destructive ring-2 ring-background" />
         )}
@@ -310,7 +374,7 @@ function FavoritesAction() {
   );
 }
 
-function CompareAction() {
+function CartAction() {
   const { t } = useT();
   const { items } = useCompare();
 
@@ -321,10 +385,10 @@ function CompareAction() {
       size="lg"
       className={cn(ACTION_CLASS, "hidden md:flex")}
     >
-      <Link href="/compare" title={t("nav.compare")}>
+      <Link href="/compare" title={t("nav.cart")}>
         <ActionBody
-          icon={Scale}
-          label={t("nav.compare")}
+          icon={ShoppingBasket}
+          label={t("nav.cart")}
           count={items.length}
         />
       </Link>

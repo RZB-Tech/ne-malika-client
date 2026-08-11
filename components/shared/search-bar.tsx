@@ -31,11 +31,11 @@ const DEBOUNCE_MS = 300;
  * снято — иначе получается рамка в рамке.
  */
 const MARKETPLACE_BOX =
-  "h-11 overflow-hidden rounded-xl border-2 border-primary bg-background focus-within:ring-3 focus-within:ring-primary/15";
+  "h-11 overflow-hidden rounded-[14px] border-2 border-primary bg-background focus-within:ring-3 focus-within:ring-primary/15";
 const MARKETPLACE_INPUT =
   "h-full flex-1 rounded-none bg-background pl-3 pr-12 shadow-none hover:bg-background focus-visible:bg-background focus-visible:ring-0 dark:bg-background dark:hover:bg-background dark:focus-visible:bg-background";
 const MARKETPLACE_BUTTON =
-  "h-full w-18 shrink-0 rounded-none border-0";
+  "h-full w-18 shrink-0 rounded-none border-0 px-0";
 
 export function SearchBar({
   className,
@@ -71,8 +71,6 @@ export function SearchBar({
     (root) => root.slug === searchParams.get("category"),
   );
 
-  // Несколько строк поиска могут быть смонтированы разом (шапка и шторка).
-  // Адрес меняет только та, в которой действительно печатают.
   const typed = useRef(false);
 
   /**
@@ -169,7 +167,7 @@ export function SearchBar({
               type="button"
               variant="secondary"
               size="sm"
-              className="hidden h-full max-w-28 shrink-0 rounded-none px-3 sm:inline-flex"
+              className="hidden h-full w-22 shrink-0 rounded-none px-2 sm:inline-flex"
             >
               <span className="truncate">
                 {activeRoot?.name[locale] ?? t("catalog.everywhere")}
@@ -177,7 +175,10 @@ export function SearchBar({
               <ChevronDown data-icon="inline-end" className="opacity-50" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="max-h-80 min-w-64 overflow-y-auto">
+          <DropdownMenuContent
+            align="start"
+            className="max-h-80 min-w-64 overflow-y-auto"
+          >
             <DropdownMenuLabel>{t("nav.catalog")}</DropdownMenuLabel>
             <DropdownMenuGroup>
               <DropdownMenuItem asChild>
@@ -252,7 +253,7 @@ export function SearchBar({
       {marketplace && (
         <Button
           type="submit"
-          size="icon"
+          size="lg"
           aria-label={t("common.search")}
           title={t("common.search")}
           className={MARKETPLACE_BUTTON}
@@ -294,7 +295,7 @@ export function SearchBarSkeleton({
           disabled
           variant="secondary"
           size="sm"
-          className="hidden h-full w-20 shrink-0 rounded-none sm:inline-flex"
+          className="hidden h-full w-22 shrink-0 rounded-none sm:inline-flex"
           aria-hidden
         >
           {" "}
@@ -310,7 +311,7 @@ export function SearchBarSkeleton({
             aria-hidden
             className="pointer-events-none absolute right-20 size-4 text-muted-foreground"
           />
-          <Button disabled size="icon" className={MARKETPLACE_BUTTON}>
+          <Button disabled size="lg" className={MARKETPLACE_BUTTON}>
             <Search />
           </Button>
         </>
