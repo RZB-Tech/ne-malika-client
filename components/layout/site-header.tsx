@@ -1,8 +1,22 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Suspense } from "react";
-import { Heart, History, Scale, Store, UserRound } from "lucide-react";
+import {
+  ArrowRight,
+  Cpu,
+  HardDrive,
+  Heart,
+  History,
+  Keyboard,
+  Laptop,
+  Monitor,
+  Scale,
+  Smartphone,
+  UserRound,
+  type LucideIcon,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/shared/logo";
 import { CategoryIcon } from "@/components/shared/category-icon";
@@ -17,18 +31,80 @@ import { useAuth } from "@/lib/api/auth";
 import { useCategories } from "@/lib/api/categories";
 import { useFavorites } from "@/lib/favorites/use-favorites";
 import { useCompare } from "@/lib/compare/use-compare";
-import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
+import type { Locale } from "@/lib/i18n/config";
+import { cn } from "@/lib/utils";
 
 /**
  * Сколько разделов выносим во вторую строку. Больше семи не помещается даже на
  * широком экране, а перенос на две строки ломает высоту шапки — остальные
  * разделы открывает кнопка «Каталог».
  */
-const QUICK_CATEGORIES = 7;
+const QUICK_CATEGORIES = 6;
+
+const FALLBACK_QUICK_CATEGORIES: Array<{
+  query: string;
+  icon: LucideIcon;
+  name: Record<Locale, string>;
+}> = [
+  {
+    query: "электроника",
+    icon: Cpu,
+    name: {
+      ru: "Электроника",
+      "uz-Latn": "Elektronika",
+      "uz-Cyrl": "Электроника",
+    },
+  },
+  {
+    query: "ноутбук",
+    icon: Laptop,
+    name: {
+      ru: "Ноутбуки",
+      "uz-Latn": "Noutbuklar",
+      "uz-Cyrl": "Ноутбуклар",
+    },
+  },
+  {
+    query: "компьютер",
+    icon: HardDrive,
+    name: {
+      ru: "Компьютеры",
+      "uz-Latn": "Kompyuterlar",
+      "uz-Cyrl": "Компьютерлар",
+    },
+  },
+  {
+    query: "смартфон",
+    icon: Smartphone,
+    name: {
+      ru: "Смартфоны",
+      "uz-Latn": "Smartfonlar",
+      "uz-Cyrl": "Смартфонлар",
+    },
+  },
+  {
+    query: "монитор",
+    icon: Monitor,
+    name: {
+      ru: "Мониторы",
+      "uz-Latn": "Monitorlar",
+      "uz-Cyrl": "Мониторлар",
+    },
+  },
+  {
+    query: "периферия",
+    icon: Keyboard,
+    name: {
+      ru: "Периферия",
+      "uz-Latn": "Periferiya",
+      "uz-Cyrl": "Периферия",
+    },
+  },
+];
 
 /** Общий вид действия в шапке: значок сверху, подпись под ним. */
 const ACTION_CLASS =
-  "flex h-13 w-14 shrink-0 flex-col items-center justify-center gap-1 rounded-lg text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/40";
+  "flex h-13 w-16 shrink-0 flex-col items-center justify-center gap-1 rounded-lg text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/40";
 
 /**
  * Шапка витрины по раскладке крупных маркетплейсов: светлая, в две строки.
@@ -45,10 +121,12 @@ export function SiteHeader() {
   const { t, locale } = useT();
   const { isAuthenticated, isHydrated } = useAuth();
   const { roots } = useCategories();
+  const [marketCity, ...marketPlaceParts] = t("common.market").split(" · ");
+  const marketPlace = marketPlaceParts.join(" · ");
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background">
-      <div className="mx-auto flex h-16 max-w-[1600px] items-center gap-2 px-4 sm:gap-3 sm:px-8 lg:px-10">
+      <div className="flex h-17 w-full items-center gap-2 px-5 sm:gap-3 lg:px-6">
         <HeaderMenu />
 
         <Logo showText={false} className="md:hidden" />
@@ -68,72 +146,142 @@ export function SiteHeader() {
         {/* Действия покупателя: значок и подпись под ним. Подписи важнее
             компактности — иконка весов без слова «Сравнение» не читается
             никем, кроме того, кто её рисовал. */}
-        <nav className="flex shrink-0 items-center gap-0.5 sm:gap-1">
-          {isHydrated &&
-            (isAuthenticated ? (
-              <Link href="/account" className={ACTION_CLASS} title={t("nav.history")}>
-                <ActionBody icon={History} label={t("nav.history")} />
-              </Link>
-            ) : (
-              <LoginDialog>
-                <button type="button" className={ACTION_CLASS} title={t("nav.login")}>
-                  <ActionBody icon={UserRound} label={t("nav.login")} />
-                </button>
-              </LoginDialog>
-            ))}
+        <nav
+          aria-label={t("common.actions")}
+          className="flex shrink-0 items-center gap-0.5 sm:gap-1"
+        >
+          {!isHydrated || !isAuthenticated ? (
+            <LoginDialog>
+              <Button
+                type="button"
+                variant="ghost"
+                size="lg"
+                className={cn(ACTION_CLASS, "hidden text-foreground md:flex")}
+                title={t("nav.login")}
+              >
+                <ActionBody
+                  icon={UserRound}
+                  label={t("nav.login")}
+                  attention
+                />
+              </Button>
+            </LoginDialog>
+          ) : (
+            <div className="hidden md:block">
+              <UserMenu />
+            </div>
+          )}
+
+          <Button
+            asChild
+            variant="ghost"
+            size="lg"
+            className={cn(ACTION_CLASS, "hidden md:flex")}
+          >
+            <Link href="/account?tab=history" title={t("nav.history")}>
+              <ActionBody icon={History} label={t("nav.history")} />
+            </Link>
+          </Button>
 
           <FavoritesAction />
           <CompareAction />
-
-          {!isHydrated ? (
-            // Заглушка до чтения localStorage: иначе гость на мгновение видит
-            // себя вошедшим и наоборот.
-            <div
-              className="ml-1 size-8 shrink-0 rounded-full bg-muted"
-              aria-hidden
-            />
-          ) : isAuthenticated ? (
-            <div className="ml-1">
-              <UserMenu />
-            </div>
-          ) : (
-            <LoginDialog>
-              <Button size="sm" className="ml-1 hidden gap-1.5 lg:inline-flex">
-                <Store className="size-4" />
-                {t("nav.becomeSeller")}
-              </Button>
-            </LoginDialog>
-          )}
         </nav>
       </div>
 
       {/* Вторая строка: на телефоне разделы, язык и тема живут в бургере,
           поэтому там её просто нет. */}
       <div className="hidden border-t border-border/70 lg:block">
-        <div className="mx-auto flex h-10 max-w-[1600px] items-center gap-1 px-4 sm:px-8 lg:px-10">
-          {roots.slice(0, QUICK_CATEGORIES).map((root) => (
-            <Link
-              key={root.id}
-              href={`/?category=${root.slug}`}
-              className="flex shrink-0 items-center gap-1.5 rounded-md px-2 py-1 text-[13px] text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-            >
-              <CategoryIcon name={root.icon} className="size-4" />
-              {root.name[locale]}
-            </Link>
-          ))}
+        <div className="flex h-10 w-full items-center px-5 lg:px-6">
+          <nav className="no-scrollbar flex min-w-0 items-center gap-1 overflow-x-auto">
+            {roots.length > 0
+              ? roots.slice(0, QUICK_CATEGORIES).map((root) => (
+                  <Link
+                    key={root.id}
+                    href={`/?category=${root.slug}`}
+                    className="flex shrink-0 items-center gap-1.5 rounded-md px-2 py-1 text-[13px] text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                  >
+                    <CategoryIcon name={root.icon} className="size-4" />
+                    {root.name[locale]}
+                  </Link>
+                ))
+              : FALLBACK_QUICK_CATEGORIES.map((item) => {
+                  const Icon = item.icon;
 
-          <div className="ml-auto flex shrink-0 items-center gap-1">
-            <span className="hidden text-xs text-muted-foreground xl:inline">
-              {t("common.market")}
+                  return (
+                    <Link
+                      key={item.query}
+                      href={`/?q=${encodeURIComponent(item.query)}`}
+                      className="flex shrink-0 items-center gap-1.5 rounded-md px-2 py-1 text-[13px] text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                    >
+                      <Icon className="size-4" />
+                      {item.name[locale]}
+                    </Link>
+                  );
+                })}
+          </nav>
+
+          <div className="ml-auto flex shrink-0 items-center gap-1 pl-3">
+            <span className="hidden items-center text-xs xl:flex">
+              <span className="text-muted-foreground">{marketCity} ·</span>
+              <span className="ml-1 font-semibold text-primary">
+                {marketPlace}
+              </span>
             </span>
             <LanguageSwitch />
-            <AnimatedThemeToggler
-              aria-label={t("common.theme")}
-              className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors outline-none hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/40 [&_svg]:size-4"
-            />
           </div>
         </div>
       </div>
+
+      {/* Третий уровень повторяет композицию референса: изображение остаётся
+          чистым фоном, а текст и CTA рендерятся поверх него и не теряют
+          резкость на Retina-экранах. */}
+      <section
+        aria-label={t("home.promoTitle")}
+        className="relative h-18 overflow-hidden rounded-b-3xl bg-primary"
+      >
+        <Image
+          src="/header-sale-banner-user.png"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover"
+        />
+        <div className="absolute inset-0 mx-auto flex h-full max-w-[1020px] items-center justify-center px-4 lg:justify-start">
+          <div className="hidden w-60 shrink-0 lg:block" aria-hidden />
+
+          <div className="flex items-center gap-3 sm:gap-6">
+            <h2 className="font-heading text-sm font-bold whitespace-nowrap text-white drop-shadow-sm sm:text-xl">
+              {t("home.promoTitle")}
+            </h2>
+            <Button
+              asChild
+              variant="secondary"
+              size="xs"
+              className="rounded-full bg-foreground text-background shadow-sm hover:bg-foreground/85"
+            >
+              <Link href="/?sort=latest">
+                {t("home.promoCta")}
+                <ArrowRight data-icon="inline-end" />
+              </Link>
+            </Button>
+          </div>
+
+          <div
+            className="ml-auto hidden items-center text-white drop-shadow-sm lg:flex"
+            aria-hidden
+          >
+            <span className="-rotate-6 rounded-lg bg-warning px-2 py-1 font-heading text-2xl font-black italic shadow-md">
+              NM
+            </span>
+            <span className="-ml-1 font-heading text-lg leading-[0.82] font-black">
+              ТЕХНО
+              <br />
+              СЕЗОН
+            </span>
+          </div>
+        </div>
+      </section>
     </header>
   );
 }
@@ -147,22 +295,32 @@ function ActionBody({
   icon: Icon,
   label,
   count,
+  attention = false,
 }: {
   icon: typeof Heart;
   label: string;
   count?: number;
+  attention?: boolean;
 }) {
   return (
     <>
       <span className="relative">
-        <Icon className="size-[1.35rem]" />
+        <Icon />
+        {attention && (
+          <span className="absolute -top-1 -right-1 size-2 rounded-full bg-destructive ring-2 ring-background" />
+        )}
         {count !== undefined && count > 0 && (
           <span className="absolute -top-1 -right-1.5 flex min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground tabular">
             {count > 99 ? "99+" : count}
           </span>
         )}
       </span>
-      <span className="hidden text-[11px] leading-none sm:block">{label}</span>
+      {/* Подпись не переносится и не жмётся: «Сравнение» в две строки поднимает
+          высоту всей шапки. На узком экране подписи нет вовсе — там и места
+          нет, и рядом стоит бургер с теми же пунктами словами. */}
+      <span className="hidden truncate text-[11px] leading-none whitespace-nowrap sm:block">
+        {label}
+      </span>
     </>
   );
 }
@@ -173,17 +331,23 @@ function FavoritesAction() {
   const { count } = useFavorites();
 
   return (
-    <Link
-      href="/account?tab=favorites"
-      className={ACTION_CLASS}
-      title={t("account.tabs.favorites")}
+    <Button
+      asChild
+      variant="ghost"
+      size="lg"
+      className={cn(ACTION_CLASS, "size-9 px-0 sm:h-13 sm:w-16")}
     >
-      <ActionBody
-        icon={Heart}
-        label={t("account.tabs.favorites")}
-        count={count}
-      />
-    </Link>
+      <Link
+        href="/account?tab=favorites"
+        title={t("account.tabs.favorites")}
+      >
+        <ActionBody
+          icon={Heart}
+          label={t("account.tabs.favorites")}
+          count={count}
+        />
+      </Link>
+    </Button>
   );
 }
 
@@ -192,8 +356,19 @@ function CompareAction() {
   const { items } = useCompare();
 
   return (
-    <Link href="/compare" className={ACTION_CLASS} title={t("nav.compare")}>
-      <ActionBody icon={Scale} label={t("nav.compare")} count={items.length} />
-    </Link>
+    <Button
+      asChild
+      variant="ghost"
+      size="lg"
+      className={cn(ACTION_CLASS, "hidden md:flex")}
+    >
+      <Link href="/compare" title={t("nav.compare")}>
+        <ActionBody
+          icon={Scale}
+          label={t("nav.compare")}
+          count={items.length}
+        />
+      </Link>
+    </Button>
   );
 }

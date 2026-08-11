@@ -32,6 +32,7 @@ const ru = {
   common: {
     search: "Поиск",
     searchPlaceholder: "Название, бренд или модель…",
+    headerSearchPlaceholder: "Искать на neMalika",
     market: "Ташкент · рынок Малика",
     clear: "Очистить",
     menu: "Меню",
@@ -956,6 +957,7 @@ const uzLatn: typeof ru = {
   common: {
     search: "Qidiruv",
     searchPlaceholder: "Nomi, brendi yoki modeli…",
+    headerSearchPlaceholder: "neMalika’da qidirish",
     market: "Toshkent · Malika bozori",
     clear: "Tozalash",
     menu: "Menyu",
@@ -1888,6 +1890,7 @@ const uzCyrl: typeof ru = {
   common: {
     search: "Қидирув",
     searchPlaceholder: "Номи, бренди ёки модели…",
+    headerSearchPlaceholder: "neMalika’да қидириш",
     market: "Тошкент · Малика бозори",
     clear: "Тозалаш",
     menu: "Меню",

@@ -28,7 +28,7 @@ function categoryHref(root: CategoryDto, child?: CategoryDto): string {
  */
 export function CatalogMenu() {
   const { t, locale } = useT();
-  const { roots } = useCategories();
+  const { roots, isLoading } = useCategories();
 
   // Два состояния вместо одного: `open` ведёт анимацию, `mounted` держит панель
   // в DOM. Убрать её сразу по клику — значит не показать закрытие вовсе.
@@ -83,14 +83,12 @@ export function CatalogMenu() {
     };
   }, [open, close]);
 
-  if (roots.length === 0) return null;
-
   return (
     <div ref={containerRef} className="shrink-0">
       <Button
         // Синяя на светлой шапке: это главная кнопка навигации, и она должна
         // читаться первой, до строки поиска.
-        className={cn("h-10 gap-2 rounded-xl px-3 sm:px-4")}
+        className={cn("h-11 gap-2 rounded-xl px-3 sm:px-4")}
         onClick={() => (open ? close() : openMenu())}
         aria-expanded={open}
         aria-haspopup="true"
@@ -113,102 +111,118 @@ export function CatalogMenu() {
         <span className="hidden sm:inline">{t("nav.catalog")}</span>
       </Button>
 
+      {/* Панель и затемнение позиционируются от самой шапки (`top-full`), а не
+          от окна с фиксированным отступом: у шапки теперь три уровня, и любой
+          зашитый отступ разъезжался бы при каждой правке её высоты. */}
       {mounted && (
         <>
           {/* Затемнение — только под панелью, шапка остаётся кликабельной. */}
           <div
             data-state={open ? "open" : "closed"}
-            className="fixed inset-x-0 bottom-0 top-16 lg:top-26 z-40 bg-black/40 duration-200 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0"
+            className="absolute inset-x-0 top-full z-40 h-screen bg-black/40 duration-200 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0"
             aria-hidden
           />
           <div
             data-state={open ? "open" : "closed"}
-            className="fixed inset-x-0 top-16 z-50 border-b border-border bg-background shadow-lg lg:top-26 duration-200 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-top-4 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-top-4"
+            className="absolute inset-x-0 top-full z-50 border-b border-border bg-background shadow-lg duration-200 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-top-4 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-top-4"
           >
             <div className="mx-auto max-h-[min(70vh,40rem)] max-w-[1600px] overflow-y-auto px-4 py-4 sm:px-8 lg:px-10">
-              {/* Узкий экран: либо список разделов, либо содержимое одного. */}
-              <div className="lg:hidden">
-                {drilled && active ? (
-                  <MobileChildren
-                    root={active}
-                    locale={locale}
-                    onBack={() => setDrilled(false)}
-                    onNavigate={close}
-                  />
-                ) : (
-                  <ul className="divide-y divide-border">
-                    {roots.map((root) => (
-                      <li key={root.id}>
-                        <button
-                          type="button"
-                          className="flex w-full items-center gap-3 py-3 text-left text-sm"
-                          onClick={() => {
-                            setActiveId(root.id);
-                            setDrilled(true);
-                          }}
-                        >
-                          <CategoryIcon
-                            name={root.icon}
-                            className="size-5 text-muted-foreground"
-                          />
-                          <span className="flex-1">{root.name[locale]}</span>
-                          <ChevronRight className="size-4 text-muted-foreground" />
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-
-              {/* Широкий экран: разделы и подкатегории рядом. */}
-              <div className="hidden gap-8 lg:grid lg:grid-cols-[16rem_1fr]">
-                <ul className="max-h-[min(60vh,34rem)] overflow-y-auto pr-2">
-                  {roots.map((root) => (
-                    <li key={root.id}>
-                      <Link
-                        href={categoryHref(root)}
-                        onClick={close}
-                        onMouseEnter={() => setActiveId(root.id)}
-                        onFocus={() => setActiveId(root.id)}
-                        className={cn(
-                          "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
-                          root.id === active?.id
-                            ? "bg-muted font-medium text-foreground"
-                            : "text-muted-foreground hover:bg-muted/60",
-                        )}
-                      >
-                        <CategoryIcon name={root.icon} className="size-4" />
-                        <span className="flex-1">{root.name[locale]}</span>
-                        <ChevronRight className="size-4 opacity-50" />
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-
-                {active && (
-                  <div className="min-w-0">
-                    <Link
-                      href={categoryHref(active)}
-                      onClick={close}
-                      className="font-heading text-lg font-bold tracking-tight hover:text-primary"
-                    >
-                      {active.name[locale]}
-                    </Link>
-                    <div className="mt-4 columns-2 gap-8 xl:columns-3">
-                      {active.children.map((child) => (
-                        <Link
-                          key={child.id}
-                          href={categoryHref(active, child)}
-                          onClick={close}
-                          className="mb-2 block break-inside-avoid text-sm text-muted-foreground hover:text-primary"
-                        >
-                          {child.name[locale]}
-                        </Link>
-                      ))}
-                    </div>
+              {roots.length === 0 ? (
+                <p className="py-8 text-center text-sm text-muted-foreground">
+                  {isLoading ? t("common.loading") : t("common.nothingFound")}
+                </p>
+              ) : (
+                <>
+                  {/* Узкий экран: либо список разделов, либо содержимое одного. */}
+                  <div className="lg:hidden">
+                    {drilled && active ? (
+                      <MobileChildren
+                        root={active}
+                        locale={locale}
+                        onBack={() => setDrilled(false)}
+                        onNavigate={close}
+                      />
+                    ) : (
+                      <ul className="divide-y divide-border">
+                        {roots.map((root) => (
+                          <li key={root.id}>
+                            <button
+                              type="button"
+                              className="flex w-full items-center gap-3 py-3 text-left text-sm"
+                              onClick={() => {
+                                setActiveId(root.id);
+                                setDrilled(true);
+                              }}
+                            >
+                              <CategoryIcon
+                                name={root.icon}
+                                className="size-5 text-muted-foreground"
+                              />
+                              <span className="flex-1">
+                                {root.name[locale]}
+                              </span>
+                              <ChevronRight className="size-4 text-muted-foreground" />
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </div>
-                )}
-              </div>
+
+                  {/* Широкий экран: разделы и подкатегории рядом. */}
+                  <div className="hidden gap-8 lg:grid lg:grid-cols-[16rem_1fr]">
+                    <ul className="max-h-[min(60vh,34rem)] overflow-y-auto pr-2">
+                      {roots.map((root) => (
+                        <li key={root.id}>
+                          <Link
+                            href={categoryHref(root)}
+                            onClick={close}
+                            onMouseEnter={() => setActiveId(root.id)}
+                            onFocus={() => setActiveId(root.id)}
+                            className={cn(
+                              "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
+                              root.id === active?.id
+                                ? "bg-muted font-medium text-foreground"
+                                : "text-muted-foreground hover:bg-muted/60",
+                            )}
+                          >
+                            <CategoryIcon
+                              name={root.icon}
+                              className="size-4"
+                            />
+                            <span className="flex-1">{root.name[locale]}</span>
+                            <ChevronRight className="size-4 opacity-50" />
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+
+                    {active && (
+                      <div className="min-w-0">
+                        <Link
+                          href={categoryHref(active)}
+                          onClick={close}
+                          className="font-heading text-lg font-bold tracking-tight hover:text-primary"
+                        >
+                          {active.name[locale]}
+                        </Link>
+                        <div className="mt-4 columns-2 gap-8 xl:columns-3">
+                          {active.children.map((child) => (
+                            <Link
+                              key={child.id}
+                              href={categoryHref(active, child)}
+                              onClick={close}
+                              className="mb-2 block break-inside-avoid text-sm text-muted-foreground hover:text-primary"
+                            >
+                              {child.name[locale]}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </>

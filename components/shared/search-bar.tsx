@@ -2,10 +2,22 @@
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Search, X } from "lucide-react";
+import Link from "next/link";
+import { Camera, ChevronDown, Search, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { CategoryIcon } from "@/components/shared/category-icon";
 import { cn } from "@/lib/utils";
 import { useT } from "@/components/providers/i18n-provider";
+import { useCategories } from "@/lib/api/categories";
 
 /** Каталог — единственная страница, где запрос что-то меняет прямо на глазах. */
 const CATALOG_PATH = "/";
@@ -19,11 +31,11 @@ const DEBOUNCE_MS = 300;
  * снято — иначе получается рамка в рамке.
  */
 const MARKETPLACE_BOX =
-  "h-11 gap-1 rounded-2xl border-2 border-primary bg-background p-1 focus-within:ring-3 focus-within:ring-primary/15";
+  "h-11 overflow-hidden rounded-xl border-2 border-primary bg-background focus-within:ring-3 focus-within:ring-primary/15";
 const MARKETPLACE_INPUT =
-  "h-full flex-1 rounded-xl bg-transparent pl-3 pr-9 shadow-none hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 dark:bg-transparent dark:hover:bg-transparent dark:focus-visible:bg-transparent";
+  "h-full flex-1 rounded-none bg-background pl-3 pr-12 shadow-none hover:bg-background focus-visible:bg-background focus-visible:ring-0 dark:bg-background dark:hover:bg-background dark:focus-visible:bg-background";
 const MARKETPLACE_BUTTON =
-  "grid h-full w-11 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground transition-colors outline-none hover:bg-primary/90 focus-visible:ring-3 focus-visible:ring-primary/30";
+  "h-full w-18 shrink-0 rounded-none border-0";
 
 export function SearchBar({
   className,
@@ -46,7 +58,8 @@ export function SearchBar({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const { t } = useT();
+  const { t, locale } = useT();
+  const { roots } = useCategories();
 
   const urlQuery = searchParams.get("q")?.trim() ?? "";
   const onCatalog = pathname === CATALOG_PATH;
@@ -54,6 +67,9 @@ export function SearchBar({
 
   const [value, setValue] = useState(urlQuery);
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const activeRoot = roots.find(
+    (root) => root.slug === searchParams.get("category"),
+  );
 
   // Несколько строк поиска могут быть смонтированы разом (шапка и шторка).
   // Адрес меняет только та, в которой действительно печатают.
@@ -101,6 +117,18 @@ export function SearchBar({
     if (onCatalog) router.replace(catalogUrl(""), { scroll: false });
   };
 
+  const scopeUrl = (category?: string) => {
+    const params = new URLSearchParams(onCatalog ? searchParams.toString() : "");
+    const query = value.trim();
+    if (query) params.set("q", query);
+    else params.delete("q");
+    if (category) params.set("category", category);
+    else params.delete("category");
+    params.delete("sub");
+    const next = params.toString();
+    return next ? `${CATALOG_PATH}?${next}` : CATALOG_PATH;
+  };
+
   // Живой поиск: на самом каталоге набор текста обновляет адрес после паузы.
   // На других страницах строка выдёргивала бы человека со страницы посреди
   // слова, поэтому там переход только по Enter.
@@ -134,6 +162,39 @@ export function SearchBar({
           )}
         />
       )}
+      {marketplace && (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              className="hidden h-full max-w-28 shrink-0 rounded-none px-3 sm:inline-flex"
+            >
+              <span className="truncate">
+                {activeRoot?.name[locale] ?? t("catalog.everywhere")}
+              </span>
+              <ChevronDown data-icon="inline-end" className="opacity-50" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="max-h-80 min-w-64 overflow-y-auto">
+            <DropdownMenuLabel>{t("nav.catalog")}</DropdownMenuLabel>
+            <DropdownMenuGroup>
+              <DropdownMenuItem asChild>
+                <Link href={scopeUrl()}>{t("catalog.everywhere")}</Link>
+              </DropdownMenuItem>
+              {roots.map((root) => (
+                <DropdownMenuItem key={root.id} asChild>
+                  <Link href={scopeUrl(root.slug)}>
+                    <CategoryIcon name={root.icon} />
+                    {root.name[locale]}
+                  </Link>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
       <Input
         ref={inputRef}
         value={value}
@@ -142,8 +203,22 @@ export function SearchBar({
           typed.current = true;
           setValue(e.target.value);
         }}
-        aria-label={placeholder ?? t("common.searchPlaceholder")}
-        placeholder={placeholder ?? t("common.searchPlaceholder")}
+        aria-label={
+          placeholder ??
+          t(
+            marketplace
+              ? "common.headerSearchPlaceholder"
+              : "common.searchPlaceholder",
+          )
+        }
+        placeholder={
+          placeholder ??
+          t(
+            marketplace
+              ? "common.headerSearchPlaceholder"
+              : "common.searchPlaceholder",
+          )
+        }
         className={cn(
           "pl-10 pr-10",
           size === "lg" && "h-13 rounded-xl pl-11 text-base shadow-sm",
@@ -153,28 +228,37 @@ export function SearchBar({
       {value && (
         // Единственный способ вернуть полный каталог: панели фильтров, где
         // раньше был сброс, больше нет.
-        <button
+        <Button
           type="button"
+          variant="ghost"
+          size="icon-xs"
           onClick={clear}
           aria-label={t("common.clear")}
           className={cn(
-            "absolute grid size-7 place-items-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground",
+            "absolute",
             // Правее — кнопка поиска, крестик встаёт перед ней.
-            marketplace ? "right-12" : "right-2",
+            marketplace ? "right-20" : "right-2",
           )}
         >
-          <X className="size-4" />
-        </button>
+          <X />
+        </Button>
+      )}
+      {marketplace && !value && (
+        <Camera
+          aria-hidden
+          className="pointer-events-none absolute right-20 size-4 text-muted-foreground"
+        />
       )}
       {marketplace && (
-        <button
+        <Button
           type="submit"
+          size="icon"
           aria-label={t("common.search")}
           title={t("common.search")}
           className={MARKETPLACE_BUTTON}
         >
-          <Search className="size-[1.15rem]" />
-        </button>
+          <Search />
+        </Button>
       )}
     </form>
   );
@@ -205,14 +289,31 @@ export function SearchBarSkeleton({
       {!marketplace && (
         <Search className="pointer-events-none absolute left-3.5 size-4 text-muted-foreground" />
       )}
+      {marketplace && (
+        <Button
+          disabled
+          variant="secondary"
+          size="sm"
+          className="hidden h-full w-20 shrink-0 rounded-none sm:inline-flex"
+          aria-hidden
+        >
+          {" "}
+        </Button>
+      )}
       <Input
         disabled
         className={cn("pl-10 pr-10", marketplace && MARKETPLACE_INPUT)}
       />
       {marketplace && (
-        <span className={MARKETPLACE_BUTTON}>
-          <Search className="size-[1.15rem]" />
-        </span>
+        <>
+          <Camera
+            aria-hidden
+            className="pointer-events-none absolute right-20 size-4 text-muted-foreground"
+          />
+          <Button disabled size="icon" className={MARKETPLACE_BUTTON}>
+            <Search />
+          </Button>
+        </>
       )}
     </div>
   );
