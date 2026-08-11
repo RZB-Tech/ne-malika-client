@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Check, Trash2, X } from "lucide-react";
+import { Check, Sparkles, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -18,12 +18,14 @@ import { formatDate } from "@/lib/format";
 import {
   adminReviewsControllerApprove,
   adminReviewsControllerList,
+  adminReviewsControllerRecheck,
   adminReviewsControllerReject,
   adminReviewsControllerRemove,
   adminReviewsControllerStats,
 } from "@/lib/api/generated/endpoints/reviews-admin/reviews-admin";
 import type {
   AdminReview,
+  AiVerdict,
   Paginated,
   ReviewStatus,
   ReviewStatusCounts,
@@ -31,6 +33,47 @@ import type {
 
 const TABS: ReviewStatus[] = ["pending", "approved", "rejected"];
 const KEY = "/api/v1/admin/reviews";
+
+/**
+ * Что решил ИИ. Отдельной строкой, а не бейджем у статуса: модератору важен не
+ * столько сам вердикт, сколько объяснение — ради него он сюда и пришёл.
+ */
+function AiVerdictLine({
+  verdict,
+  note,
+  byHuman,
+}: {
+  verdict: AiVerdict | null;
+  note: string | null;
+  byHuman: boolean;
+}) {
+  const { t } = useT();
+
+  // Решение человека перекрывает вердикт модели — показывать её мнение как
+  // действующее было бы враньём.
+  if (byHuman) {
+    return (
+      <p className="mt-2 text-xs text-muted-foreground">
+        {t("admin.reviews.byHuman")}
+      </p>
+    );
+  }
+
+  if (!verdict) {
+    return (
+      <p className="mt-2 text-xs text-warning">
+        {t("admin.reviews.aiMissing")}
+      </p>
+    );
+  }
+
+  return (
+    <p className="mt-2 text-xs text-muted-foreground">
+      <span className="font-medium">{t(`admin.reviews.ai.${verdict}`)}</span>
+      {note ? ` — ${note}` : ""}
+    </p>
+  );
+}
 
 export default function AdminReviews() {
   const { t, locale } = useT();
@@ -83,6 +126,12 @@ export default function AdminReviews() {
     await adminReviewsControllerRemove(id);
     await refresh();
     toast.success(t("admin.reviews.removed"));
+  };
+
+  const recheck = async (id: number) => {
+    await adminReviewsControllerRecheck(id);
+    await refresh();
+    toast.success(t("admin.reviews.rechecked"));
   };
 
   return (
@@ -178,9 +227,28 @@ export default function AdminReviews() {
                       })}
                     </p>
                   )}
+
+                  {/* Что решил ИИ и почему. Для «на проверке» это главное:
+                      сюда попадает только то, в чём модель засомневалась. */}
+                  <AiVerdictLine
+                    verdict={review.aiVerdict}
+                    note={review.aiNote}
+                    byHuman={review.moderatedBy !== null}
+                  />
                 </div>
 
                 <div className="flex shrink-0 flex-wrap gap-2">
+                  {/* Нужна, когда модель была недоступна: отзыв повиснет в
+                      «на проверке», а решать его руками незачем. */}
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="gap-1.5 text-muted-foreground"
+                    onClick={() => recheck(review.id)}
+                    title={t("admin.reviews.recheckHint")}
+                  >
+                    <Sparkles className="size-3.5" />
+                  </Button>
                   {review.status !== "approved" && (
                     <Button
                       size="sm"

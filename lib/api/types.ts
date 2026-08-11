@@ -262,6 +262,11 @@ export interface AdminReview extends OwnReview {
   authorName: string;
   authorPhoto: string | null;
   moderatedAt: string | null;
+  /** null у решений ИИ: живого модератора за ними не было. */
+  moderatedBy: number | null;
+  /** Решение ИИ-модератора. null — проверка не отработала. */
+  aiVerdict: AiVerdict | null;
+  aiNote: string | null;
 }
 
 /** GET /reviews/summary — средняя оценка и сколько отзывов на каждую звезду. */

@@ -300,6 +300,68 @@ export const useAdminReviewsControllerApprove = <TError = ErrorType<unknown>,
       return useMutation(getAdminReviewsControllerApproveMutationOptions(options), queryClient);
     }
     /**
+ * @summary Прогнать отзыв через ИИ-проверку заново
+ */
+export const adminReviewsControllerRecheck = (
+    id: number,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<void>(
+      {url: `/api/v1/admin/reviews/${id}/recheck`, method: 'POST', signal
+    },
+      options);
+    }
+
+
+
+
+export const getAdminReviewsControllerRecheckMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminReviewsControllerRecheck>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof adminReviewsControllerRecheck>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['adminReviewsControllerRecheck'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminReviewsControllerRecheck>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  adminReviewsControllerRecheck(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AdminReviewsControllerRecheckMutationResult = NonNullable<Awaited<ReturnType<typeof adminReviewsControllerRecheck>>>
+
+    export type AdminReviewsControllerRecheckMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Прогнать отзыв через ИИ-проверку заново
+ */
+export const useAdminReviewsControllerRecheck = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminReviewsControllerRecheck>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof adminReviewsControllerRecheck>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getAdminReviewsControllerRecheckMutationOptions(options), queryClient);
+    }
+    /**
  * @summary Отклонить отзыв с причиной — её увидит автор
  */
 export const adminReviewsControllerReject = (

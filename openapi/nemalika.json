@@ -2931,6 +2931,35 @@
         ]
       }
     },
+    "/api/v1/admin/reviews/{id}/recheck": {
+      "post": {
+        "operationId": "AdminReviewsController_recheck",
+        "summary": "Прогнать отзыв через ИИ-проверку заново",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "reviews-admin"
+        ],
+        "security": [
+          {
+            "access-token": []
+          }
+        ]
+      }
+    },
     "/api/v1/admin/reviews/{id}/reject": {
       "post": {
         "operationId": "AdminReviewsController_reject",
