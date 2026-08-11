@@ -80,6 +80,8 @@ const ru = {
   home: {
     newTitle: "Новинки",
     viewAll: "Смотреть все",
+    promoTitle: "РАСПРОДАЖА НАЧАЛАСЬ",
+    promoCta: "Скидки до 30%",
     ctaTitle: "Продаёте технику?",
     ctaText:
       "Разместите товары бесплатно и получайте клиентов напрямую в Telegram. Настройка магазина займёт 10 минут.",
@@ -108,6 +110,7 @@ const ru = {
     emptyText: "Попробуйте изменить запрос или сбросить фильтры.",
     loadError: "Не удалось загрузить товары. Проверьте, что бэкенд запущен.",
     allSections: "Все разделы",
+    everywhere: "Везде",
   },
   availability: {
     in_stock: "В наличии",
@@ -1001,6 +1004,8 @@ const uzLatn: typeof ru = {
   home: {
     newTitle: "Yangi mahsulotlar",
     viewAll: "Barchasini ko‘rish",
+    promoTitle: "CHEGIRMALAR BOSHLANDI",
+    promoCta: "30% gacha chegirma",
     ctaTitle: "Texnika sotasizmi?",
     ctaText:
       "Mahsulotlaringizni bepul joylashtiring va mijozlarni to‘g‘ridan-to‘g‘ri Telegramda qabul qiling. Do‘konni sozlash 10 daqiqa vaqt oladi.",
@@ -1030,6 +1035,7 @@ const uzLatn: typeof ru = {
     loadError:
       "Mahsulotlarni yuklab bo‘lmadi. Backend ishga tushganini tekshiring.",
     allSections: "Barcha bo‘limlar",
+    everywhere: "Hamma joyda",
   },
   availability: {
     in_stock: "Sotuvda bor",
@@ -1930,6 +1936,8 @@ const uzCyrl: typeof ru = {
   home: {
     newTitle: "Янги маҳсулотлар",
     viewAll: "Барчасини кўриш",
+    promoTitle: "ЧЕГИРМАЛАР БОШЛАНДИ",
+    promoCta: "30% гача чегирма",
     ctaTitle: "Техника сотасизми?",
     ctaText:
       "Маҳсулотларингизни бепул жойлаштиринг ва мижозларни тўғридан-тўғри Телеграмда қабул қилинг. Дўконни созлаш 10 дақиқа вақт олади.",
@@ -1959,6 +1967,7 @@ const uzCyrl: typeof ru = {
     loadError:
       "Маҳсулотларни юклаб бўлмади. Backend ишга тушганини текширинг.",
     allSections: "Барча бўлимлар",
+    everywhere: "Ҳамма жойда",
   },
   availability: {
     in_stock: "Сотувда бор",
