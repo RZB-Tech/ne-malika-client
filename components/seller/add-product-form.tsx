@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -19,6 +20,7 @@ import {
 } from "@/components/ui/select";
 import { PhotoDropzone, type UploadedPhoto } from "./photo-dropzone";
 import { PhotoAiDialog } from "@/components/shared/photo-ai-dialog";
+import { FixDescriptionButton } from "@/components/shared/fix-description-button";
 import { applyGenerated } from "@/components/shared/apply-generated";
 import { CategorySelect } from "./category-select";
 import { useT } from "@/components/providers/i18n-provider";
@@ -68,6 +70,8 @@ export function AddProductForm({
   ]);
   const [photos, setPhotos] = useState<UploadedPhoto[]>([]);
   const [price, setPrice] = useState("");
+  /** Цена не названа — договорная. Само поле при этом гасится. */
+  const [negotiable, setNegotiable] = useState(false);
   const [categoryId, setCategoryId] = useState<number | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [aiPhoto, setAiPhoto] = useState<UploadedPhoto | null>(null);
@@ -87,8 +91,8 @@ export function AddProductForm({
       toast.error(t("seller.add.shopAbolished"));
       return;
     }
-    const priceNum = parsePriceInput(price);
-    if (!name.trim() || !priceNum) {
+    const priceNum = negotiable ? null : parsePriceInput(price);
+    if (!name.trim() || (!negotiable && !priceNum)) {
       toast.error(t("seller.add.needNamePrice"));
       return;
     }
@@ -207,7 +211,20 @@ export function AddProductForm({
           </div>
 
           <div className={field}>
-            <Label htmlFor="desc">{t("seller.add.description")}</Label>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <Label htmlFor="desc">{t("seller.add.description")}</Label>
+              <FixDescriptionButton
+                photo={photos[0]}
+                name={name}
+                text={description}
+                onResult={setDescription}
+                onPhotoStored={(photoId, key) =>
+                  setPhotos((prev) =>
+                    prev.map((p) => (p.id === photoId ? { ...p, key } : p)),
+                  )
+                }
+              />
+            </div>
             <Textarea
               id="desc"
               rows={4}
@@ -233,7 +250,17 @@ export function AddProductForm({
                 onChange={(e) => onPriceChange(e.target.value)}
                 placeholder="419 900"
                 className="tabular"
+                disabled={negotiable}
               />
+              {/* Поле не прячем, а гасим: так видно, что цену вообще можно
+                  указать, и галочку легко снять обратно. */}
+              <label className="flex cursor-pointer items-center gap-2 pt-1 text-sm text-muted-foreground">
+                <Checkbox
+                  checked={negotiable}
+                  onCheckedChange={(v) => setNegotiable(v === true)}
+                />
+                {t("seller.add.negotiable")}
+              </label>
             </div>
             <div className={field}>
               <Label>{t("seller.add.condition")}</Label>

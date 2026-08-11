@@ -39,7 +39,7 @@ import {
   type ProductFormTarget,
 } from "@/components/admin/product-form-dialog";
 import { useT } from "@/components/providers/i18n-provider";
-import { formatPrice } from "@/lib/format";
+import { priceText } from "@/lib/format";
 import {
   useAdminProductCardsControllerAbolish,
   useAdminProductCardsControllerFindAll,
@@ -319,7 +319,7 @@ export default function AdminProducts() {
                     <EntityStatusBadge status={p.status} />
                   </TableCell>
                   <TableCell className="tabular whitespace-nowrap text-right text-sm font-medium">
-                    {formatPrice(Number(p.price), locale)} {t("common.currency")}
+                    {priceText(p.price, locale, t)}
                   </TableCell>
                   {/* Клик по меню не должен открывать ящик со всей карточкой. */}
                   <TableCell onClick={(e) => e.stopPropagation()}>

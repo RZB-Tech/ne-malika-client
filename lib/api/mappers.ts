@@ -93,7 +93,7 @@ function toProduct(
     brand: shopName,
     model: "",
     sku: "",
-    price: Number(pc.price),
+    price: pc.price === null || pc.price === undefined ? null : Number(pc.price),
     description: pc.description ?? "",
     specs: (pc.characteristics ?? []).map((c) => ({
       name: c.key,

@@ -2187,6 +2187,43 @@
         ]
       }
     },
+    "/api/v1/image-gen/description": {
+      "post": {
+        "operationId": "ImageGenController_rewriteDescription",
+        "summary": "Исправить описание товара, сверяясь с его фотографией",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RewriteDescriptionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RewrittenDescriptionDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "image-gen"
+        ],
+        "security": [
+          {
+            "access-token": []
+          }
+        ]
+      }
+    },
     "/api/v1/image-gen/generate": {
       "post": {
         "operationId": "ImageGenController_generate",
@@ -3510,8 +3547,10 @@
           },
           "price": {
             "type": "number",
+            "nullable": true,
             "minimum": 0,
-            "example": 899.99
+            "example": 899.99,
+            "description": "Пусто или null — «Цена договорная»"
           },
           "state": {
             "type": "string",
@@ -3542,7 +3581,6 @@
         "required": [
           "name",
           "photos",
-          "price",
           "state"
         ]
       },
@@ -3575,8 +3613,10 @@
           },
           "price": {
             "type": "number",
+            "nullable": true,
             "minimum": 0,
-            "example": 899.99
+            "example": 899.99,
+            "description": "Пусто или null — «Цена договорная»"
           },
           "state": {
             "type": "string",
@@ -4203,6 +4243,43 @@
         },
         "required": [
           "photoKey"
+        ]
+      },
+      "RewriteDescriptionDto": {
+        "type": "object",
+        "properties": {
+          "photoKey": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Фото товара: по нему модель сверяет написанное"
+          },
+          "text": {
+            "type": "string",
+            "maxLength": 2000,
+            "description": "Текст продавца. Пустой допустим — тогда описание пишется по одной фотографии",
+            "example": "клавиатура механическа RGB подсветка беспроводная"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "Название товара. Модель его не переписывает, но опирается на него"
+          }
+        },
+        "required": [
+          "photoKey",
+          "text"
+        ]
+      },
+      "RewrittenDescriptionDto": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "Исправленное описание"
+          }
+        },
+        "required": [
+          "text"
         ]
       },
       "GenerateImagesDto": {

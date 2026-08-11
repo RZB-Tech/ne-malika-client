@@ -13,7 +13,7 @@ import { useT } from "@/components/providers/i18n-provider";
 import { TelegramLinkCard } from "@/components/shared/telegram-link-card";
 import { PushCard } from "@/components/shared/push-card";
 import { openAddProduct } from "@/components/seller/add-product-bus";
-import { formatPrice } from "@/lib/format";
+import { priceText } from "@/lib/format";
 import { useSellerProducts } from "@/lib/api/seller";
 import { mapProductRow } from "@/lib/api/mappers";
 
@@ -149,7 +149,7 @@ export default function SellerDashboard() {
                       {p.name}
                     </div>
                     <div className="truncate text-sm font-semibold tabular">
-                      {formatPrice(p.price, locale)} {t("common.currency")}
+                      {priceText(p.price, locale, t)}
                     </div>
                     <ModerationBadge status={p.moderation} />
                   </div>

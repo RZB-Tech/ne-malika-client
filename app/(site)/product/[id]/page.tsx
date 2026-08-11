@@ -34,7 +34,12 @@ export async function generateMetadata({
     return { title: "Товар не найден", robots: { index: false, follow: true } };
   }
 
-  const priceFmt = new Intl.NumberFormat("ru-RU").format(Number(product.price));
+  // Товар без цены: в описании для поисковика так и пишем — «цена договорная».
+  // Подставить сюда ноль значило бы отдать краулеру товар за 0 сум.
+  const priceLine =
+    product.price === null
+      ? "Цена договорная."
+      : `Цена ${new Intl.NumberFormat("ru-RU").format(Number(product.price))} сум.`;
   const specs = specsSummary(product.characteristics);
   const descBase =
     product.description?.trim() ||
@@ -42,7 +47,7 @@ export async function generateMetadata({
   const description = [
     descBase,
     specs && `Характеристики: ${specs}.`,
-    `Цена ${priceFmt} сум. Продавец: ${product.shopName}. Рынок Малика, Ташкент.`,
+    `${priceLine} Продавец: ${product.shopName}. Рынок Малика, Ташкент.`,
   ]
     .filter(Boolean)
     .join(" ")
@@ -123,14 +128,19 @@ export default async function ProductPage({
       name: c.key,
       value: c.value,
     })),
-    offers: {
-      "@type": "Offer",
-      price: Number(raw.price),
-      priceCurrency: "UZS",
-      availability: "https://schema.org/InStock",
-      url: absoluteUrl(`/product/${raw.id}`),
-      seller: { "@type": "Organization", name: raw.shopName },
-    },
+    // Оффер только у товара с ценой. Схема требует в offers.price число, и
+    // «договорная» как 0 — это витрина товаров за ноль в поисковой выдаче.
+    offers:
+      raw.price === null
+        ? undefined
+        : {
+            "@type": "Offer",
+            price: Number(raw.price),
+            priceCurrency: "UZS",
+            availability: "https://schema.org/InStock",
+            url: absoluteUrl(`/product/${raw.id}`),
+            seller: { "@type": "Organization", name: raw.shopName },
+          },
   };
 
   return (

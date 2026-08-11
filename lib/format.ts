@@ -12,6 +12,27 @@ export function formatPrice(value: number, locale: Locale): string {
   }).format(value);
 }
 
+/**
+ * Цена вместе с валютой, а для товара без цены — «Договорная».
+ *
+ * Пустая цена — не ошибка и не ноль: часть техники на рынке продают по
+ * договорённости, и подставлять туда «0 сум» нельзя.
+ */
+export function priceText(
+  value: string | number | null | undefined,
+  locale: Locale,
+  t: (key: string) => string,
+): string {
+  // Строку принимаем тоже: numeric с бэкенда приходит как "1500000.00", и
+  // приводить его к числу в каждом месте показа — лишний повод ошибиться.
+  if (value === null || value === undefined || value === "") {
+    return t("product.negotiable");
+  }
+  const amount = typeof value === "number" ? value : Number(value);
+  if (!Number.isFinite(amount)) return t("product.negotiable");
+  return `${formatPrice(amount, locale)} ${t("common.currency")}`;
+}
+
 export function formatNumber(value: number, locale: Locale): string {
   return new Intl.NumberFormat(localeTag[locale], {
     notation: value >= 10000 ? "compact" : "standard",

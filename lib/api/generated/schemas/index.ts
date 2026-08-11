@@ -76,6 +76,8 @@ export * from './rejectReviewDto';
 export * from './reviewsControllerListParams';
 export * from './reviewsControllerMineParams';
 export * from './reviewsControllerSummaryParams';
+export * from './rewriteDescriptionDto';
+export * from './rewrittenDescriptionDto';
 export * from './sellerReviewsControllerListParams';
 export * from './setRoleDto';
 export * from './setRoleDtoRole';

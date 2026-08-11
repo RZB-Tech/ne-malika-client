@@ -11,7 +11,7 @@ import { ProductImage } from "@/components/shared/product-image";
 import { EntityStatusBadge } from "@/components/admin/entity-status-badge";
 import { Pagination } from "@/components/shared/pagination";
 import { useT } from "@/components/providers/i18n-provider";
-import { formatDate, formatPrice } from "@/lib/format";
+import { formatDate, priceText } from "@/lib/format";
 import {
   useAdminProductCardsControllerAiReview,
   useAdminProductCardsControllerRecheck,
@@ -117,8 +117,7 @@ export default function AdminAiReview() {
                   <EntityStatusBadge status={row.status} />
                 </div>
                 <div className="mt-0.5 text-sm text-muted-foreground">
-                  {row.shopName} · {formatPrice(Number(row.price), locale)}{" "}
-                  {t("common.currency")} ·{" "}
+                  {row.shopName} · {priceText(row.price, locale, t)} ·{" "}
                   {formatDate(row.checkedAt, locale)}
                 </div>
               </div>

@@ -37,7 +37,7 @@ import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { ModerationBadge } from "@/components/shared/badges";
 import { useT } from "@/components/providers/i18n-provider";
 import { openAddProduct } from "@/components/seller/add-product-bus";
-import { formatPrice } from "@/lib/format";
+import { priceText } from "@/lib/format";
 import { useSellerProductCardsControllerRemove } from "@/lib/api/generated/endpoints/product-cards-seller/product-cards-seller";
 import { useSellerProducts } from "@/lib/api/seller";
 import { mapProductRow } from "@/lib/api/mappers";
@@ -133,7 +133,7 @@ export default function SellerProducts() {
                     </div>
                   </TableCell>
                   <TableCell className="whitespace-nowrap text-sm font-medium tabular">
-                    {formatPrice(p.price, locale)} {t("common.currency")}
+                    {priceText(p.price, locale, t)}
                   </TableCell>
                   <TableCell><ModerationBadge status={p.moderation} /></TableCell>
                   <TableCell onClick={(e) => e.stopPropagation()}>

@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Select,
@@ -31,6 +32,7 @@ import {
 } from "@/components/ui/select";
 import { ProductImage } from "@/components/shared/product-image";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { FixDescriptionButton } from "@/components/shared/fix-description-button";
 import { ModerationBadge } from "@/components/shared/badges";
 import { ProductStatsCard } from "@/components/seller/product-stats";
 import { CategorySelect } from "@/components/seller/category-select";
@@ -76,6 +78,8 @@ export function SellerProductDetail({ id }: { id: number }) {
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
+  /** Цена не названа — договорная. */
+  const [negotiable, setNegotiable] = useState(false);
   const [state, setState] = useState<"new" | "old">("new");
   const [categoryId, setCategoryId] = useState<number | null>(null);
   const [specs, setSpecs] = useState<Spec[]>([]);
@@ -90,7 +94,8 @@ export function SellerProductDetail({ id }: { id: number }) {
   if (row && row.id !== hydratedRowId) {
     setHydratedRowId(row.id);
     setName(row.name);
-    setPrice(formatPriceInput(Number(row.price)));
+    setPrice(row.price === null ? "" : formatPriceInput(Number(row.price)));
+    setNegotiable(row.price === null);
     setDescription(row.description ?? "");
     setState(row.state);
     setCategoryId(row.categoryId ?? null);
@@ -117,8 +122,8 @@ export function SellerProductDetail({ id }: { id: number }) {
   const product = mapProductRow(row, shop?.name);
 
   const save = async () => {
-    const priceNum = parsePriceInput(price);
-    if (name.trim().length < 2 || !priceNum) {
+    const priceNum = negotiable ? null : parsePriceInput(price);
+    if (name.trim().length < 2 || (!negotiable && !priceNum)) {
       toast.error(t("seller.detail.checkNamePrice"));
       return;
     }
@@ -225,7 +230,15 @@ export function SellerProductDetail({ id }: { id: number }) {
                   value={price}
                   onChange={(e) => setPrice(formatPriceInput(e.target.value))}
                   className="tabular"
+                  disabled={negotiable}
                 />
+                <label className="flex cursor-pointer items-center gap-2 pt-1 text-sm text-muted-foreground">
+                  <Checkbox
+                    checked={negotiable}
+                    onCheckedChange={(v) => setNegotiable(v === true)}
+                  />
+                  {t("seller.add.negotiable")}
+                </label>
               </div>
               <div className="space-y-1.5">
                 <Label>{t("seller.add.condition")}</Label>
@@ -244,7 +257,20 @@ export function SellerProductDetail({ id }: { id: number }) {
                 <CategorySelect value={categoryId} onChange={setCategoryId} />
               </div>
               <div className="space-y-1.5 sm:col-span-2">
-                <Label htmlFor="pdesc">{t("seller.add.description")}</Label>
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <Label htmlFor="pdesc">{t("seller.add.description")}</Label>
+                  <FixDescriptionButton
+                    photo={photos[0]}
+                    name={name}
+                    text={description}
+                    onResult={setDescription}
+                    onPhotoStored={(photoId, key) =>
+                      setPhotos((prev) =>
+                        prev.map((p) => (p.id === photoId ? { ...p, key } : p)),
+                      )
+                    }
+                  />
+                </div>
                 <Textarea id="pdesc" rows={3} value={description} onChange={(e) => setDescription(e.target.value)} />
               </div>
             </div>

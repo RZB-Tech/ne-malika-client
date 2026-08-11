@@ -22,8 +22,12 @@ export interface CreateProductCardDto {
      * @maxItems 10
      */
   photos: string[];
-  /** @minimum 0 */
-  price: number;
+  /**
+     * Пусто или null — «Цена договорная»
+     * @minimum 0
+     * @nullable
+     */
+  price?: number | null;
   state: CreateProductCardDtoState;
   /** Произвольные характеристики товара (ключ-значение) */
   characteristics?: CharacteristicDto[];

@@ -68,10 +68,18 @@ export function ProductCard({ product }: { product: Product }) {
               колонок покупатель сравнивает именно её, а не названия. */}
           <div className="flex flex-wrap items-baseline gap-x-2">
             <span className="tabular text-base font-bold text-foreground">
-              {formatPrice(product.price, locale)}{" "}
-              <span className="text-xs font-medium text-muted-foreground">
-                {t("common.currency")}
-              </span>
+              {product.price === null ? (
+                // Товар без цены: вместо суммы одно слово — сумму назовут в
+                // переписке. Тем же кеглем, чтобы плитка не разъезжалась.
+                t("product.negotiable")
+              ) : (
+                <>
+                  {formatPrice(product.price, locale)}{" "}
+                  <span className="text-xs font-medium text-muted-foreground">
+                    {t("common.currency")}
+                  </span>
+                </>
+              )}
             </span>
             {product.oldPrice && (
               <span className="tabular text-xs text-muted-foreground line-through">

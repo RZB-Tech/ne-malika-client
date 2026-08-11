@@ -168,8 +168,18 @@ export function ProductDetail({
 
             <div className="mt-4 flex items-end gap-3">
               <span className="font-heading text-3xl font-bold tabular">
-                {formatPrice(product.price, locale)}
-                <span className="ml-1 text-lg font-semibold text-muted-foreground">{t("common.currency")}</span>
+                {product.price === null ? (
+                  // Кегль мельче: «Цена договорная» в 3xl перекрикивает
+                  // название товара, а сказать этой строке нечего.
+                  <span className="text-2xl">{t("product.negotiableFull")}</span>
+                ) : (
+                  <>
+                    {formatPrice(product.price, locale)}
+                    <span className="ml-1 text-lg font-semibold text-muted-foreground">
+                      {t("common.currency")}
+                    </span>
+                  </>
+                )}
               </span>
               {product.oldPrice && (
                 <span className="pb-1 text-sm text-muted-foreground line-through tabular">

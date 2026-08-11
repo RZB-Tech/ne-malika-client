@@ -30,6 +30,8 @@ import type {
   GeneratedImageDto,
   ImageGenBalanceDto,
   ImageGenControllerHistoryParams,
+  RewriteDescriptionDto,
+  RewrittenDescriptionDto,
   StoredImageDto
 } from '../../schemas';
 
@@ -304,6 +306,70 @@ export const useImageGenControllerDescribe = <TError = ErrorType<unknown>,
         TContext
       > => {
       return useMutation(getImageGenControllerDescribeMutationOptions(options), queryClient);
+    }
+    /**
+ * @summary Исправить описание товара, сверяясь с его фотографией
+ */
+export const imageGenControllerRewriteDescription = (
+    rewriteDescriptionDto: BodyType<RewriteDescriptionDto>,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<RewrittenDescriptionDto>(
+      {url: `/api/v1/image-gen/description`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: rewriteDescriptionDto, signal
+    },
+      options);
+    }
+
+
+
+
+export const getImageGenControllerRewriteDescriptionMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof imageGenControllerRewriteDescription>>, TError,{data: BodyType<RewriteDescriptionDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof imageGenControllerRewriteDescription>>, TError,{data: BodyType<RewriteDescriptionDto>}, TContext> => {
+
+const mutationKey = ['imageGenControllerRewriteDescription'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof imageGenControllerRewriteDescription>>, {data: BodyType<RewriteDescriptionDto>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  imageGenControllerRewriteDescription(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ImageGenControllerRewriteDescriptionMutationResult = NonNullable<Awaited<ReturnType<typeof imageGenControllerRewriteDescription>>>
+    export type ImageGenControllerRewriteDescriptionMutationBody = BodyType<RewriteDescriptionDto>
+    export type ImageGenControllerRewriteDescriptionMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Исправить описание товара, сверяясь с его фотографией
+ */
+export const useImageGenControllerRewriteDescription = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof imageGenControllerRewriteDescription>>, TError,{data: BodyType<RewriteDescriptionDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof imageGenControllerRewriteDescription>>,
+        TError,
+        {data: BodyType<RewriteDescriptionDto>},
+        TContext
+      > => {
+      return useMutation(getImageGenControllerRewriteDescriptionMutationOptions(options), queryClient);
     }
     /**
  * @summary Перерисовать фотографию товара: 1–4 варианта на выбор

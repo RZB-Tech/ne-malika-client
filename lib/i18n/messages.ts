@@ -113,6 +113,8 @@ const ru = {
   },
   product: {
     description: "Описание",
+    negotiable: "Договорная",
+    negotiableFull: "Цена договорная",
     specs: "Характеристики",
     model: "Модель",
     sku: "Артикул",
@@ -202,6 +204,7 @@ const ru = {
       name: "Название",
       namePlaceholder: "Например, Видеокарта NVIDIA GeForce RTX 4070",
       price: "Цена",
+      negotiable: "Договорная цена",
       description: "Описание",
       descriptionPlaceholder: "Расскажите о состоянии, комплектации и особенностях…",
       brand: "Бренд",
@@ -883,6 +886,16 @@ const ru = {
       ratingRequired: "Поставьте оценку",
     },
   },
+  ai: {
+    description: {
+      action: "Поправить по фото",
+      hint: "ИИ исправит ошибки и добавит то, что видно на фотографии",
+      done: "Описание исправлено",
+      undo: "Вернуть",
+      failed: "Не удалось исправить описание",
+      needPhoto: "Сначала добавьте фотографию товара",
+    },
+  },
   report: {
     trigger: "Пожаловаться",
     title: "Пожаловаться",
@@ -1008,6 +1021,8 @@ const uzLatn: typeof ru = {
   },
   product: {
     description: "Tavsif",
+    negotiable: "Kelishiladi",
+    negotiableFull: "Narx kelishiladi",
     specs: "Xususiyatlar",
     model: "Model",
     sku: "Artikul",
@@ -1096,6 +1111,7 @@ const uzLatn: typeof ru = {
       name: "Nomi",
       namePlaceholder: "Masalan, NVIDIA GeForce RTX 4070 videokartasi",
       price: "Narx",
+      negotiable: "Kelishilgan narx",
       description: "Tavsif",
       descriptionPlaceholder: "Holati, to‘plami va xususiyatlari haqida yozing…",
       brand: "Brend",
@@ -1783,6 +1799,16 @@ const uzLatn: typeof ru = {
       ratingRequired: "Baho qo‘ying",
     },
   },
+  ai: {
+    description: {
+      action: "Foto bo‘yicha tuzatish",
+      hint: "AI xatolarni tuzatadi va suratda ko‘ringanini qo‘shadi",
+      done: "Tavsif tuzatildi",
+      undo: "Qaytarish",
+      failed: "Tavsifni tuzatib bo‘lmadi",
+      needPhoto: "Avval mahsulot suratini qo‘shing",
+    },
+  },
   report: {
     trigger: "Shikoyat qilish",
     title: "Shikoyat qilish",
@@ -1910,6 +1936,8 @@ const uzCyrl: typeof ru = {
   },
   product: {
     description: "Тавсиф",
+    negotiable: "Келишилади",
+    negotiableFull: "Нарх келишилади",
     specs: "Хусусиятлар",
     model: "Модел",
     sku: "Артикул",
@@ -1998,6 +2026,7 @@ const uzCyrl: typeof ru = {
       name: "Номи",
       namePlaceholder: "Масалан, NVIDIA GeForce RTX 4070 видеокартаси",
       price: "Нарх",
+      negotiable: "Келишилган нарх",
       description: "Тавсиф",
       descriptionPlaceholder: "Ҳолати, тўплами ва хусусиятлари ҳақида ёзинг…",
       brand: "Бренд",
@@ -2682,6 +2711,16 @@ const uzCyrl: typeof ru = {
       sent: "Раҳмат! Шарҳ текширувга юборилди",
       failed: "Шарҳни юбориб бўлмади",
       ratingRequired: "Баҳо қўйинг",
+    },
+  },
+  ai: {
+    description: {
+      action: "Фото бўйича тузатиш",
+      hint: "ИИ хатоларни тузатади ва суратда кўринганини қўшади",
+      done: "Тавсиф тузатилди",
+      undo: "Қайтариш",
+      failed: "Тавсифни тузатиб бўлмади",
+      needPhoto: "Аввал маҳсулот суратини қўшинг",
     },
   },
   report: {

@@ -15,7 +15,7 @@ import {
 } from "@/components/admin/detail-drawer";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { useT } from "@/components/providers/i18n-provider";
-import { formatDate, formatPrice } from "@/lib/format";
+import { formatDate, priceText } from "@/lib/format";
 import { hueFromId } from "@/lib/api/mappers";
 import { photoUrl } from "@/lib/api/photo";
 import type { AdminProductRow } from "@/lib/api/types";
@@ -115,10 +115,7 @@ export function ProductDrawer({
               iconClassName="size-6"
             />
             <div className="tabular text-xl font-bold">
-              {formatPrice(Number(product.price), locale)}{" "}
-              <span className="text-sm font-normal text-muted-foreground">
-                {t("common.currency")}
-              </span>
+              {priceText(product.price, locale, t)}
             </div>
           </div>
 

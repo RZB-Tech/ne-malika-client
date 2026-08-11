@@ -17,7 +17,7 @@ import {
   drawerAction,
 } from "@/components/admin/detail-drawer";
 import { useT } from "@/components/providers/i18n-provider";
-import { formatDate, formatPrice } from "@/lib/format";
+import { formatDate, priceText } from "@/lib/format";
 import { useAdminUsersControllerGetOne } from "@/lib/api/generated/endpoints/users-admin/users-admin";
 import { devUserActivity, IS_DEV } from "@/lib/api/dev-fixtures";
 import type { AdminUserDetail, AdminUserRow, UserRole } from "@/lib/api/types";
@@ -225,8 +225,7 @@ export function UserDrawer({
                       <div className="truncate text-sm">{p.name}</div>
                       <div className="text-xs text-muted-foreground">
                         {formatDate(p.updatedAt, locale)} ·{" "}
-                        {formatPrice(Number(p.price), locale)}{" "}
-                        {t("common.currency")}
+                        {priceText(p.price, locale, t)}
                       </div>
                     </div>
                     <EntityStatusBadge status={p.status} />

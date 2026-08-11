@@ -13,8 +13,8 @@ export interface ProductSnapshot {
   shopId: number;
   shopName: string;
   name: string;
-  /** numeric с бэкенда приходит строкой — храним как есть. */
-  price: string;
+  /** numeric с бэкенда приходит строкой — храним как есть. null — договорная. */
+  price: string | null;
   /** Ключ файла в S3, не готовый URL: адрес прокси может измениться. */
   photo: string | null;
   state: "new" | "old";
@@ -40,7 +40,7 @@ export function productToSnapshot(product: Product): ProductSnapshot {
     shopId: Number(product.storeId),
     shopName: product.brand,
     name: product.name,
-    price: String(product.price),
+    price: product.price === null ? null : String(product.price),
     photo: product.photoKeys?.[0] ?? null,
     state: product.isNew ? "new" : "old",
   };

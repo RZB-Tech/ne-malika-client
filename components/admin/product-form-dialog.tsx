@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -34,6 +35,7 @@ import {
 } from "@/lib/api/generated/endpoints/product-cards-admin/product-cards-admin";
 import { CategorySelect } from "@/components/seller/category-select";
 import { PhotoAiDialog } from "@/components/shared/photo-ai-dialog";
+import { FixDescriptionButton } from "@/components/shared/fix-description-button";
 import { applyGenerated } from "@/components/shared/apply-generated";
 import { useT } from "@/components/providers/i18n-provider";
 import { resolvePhotoKeys } from "@/lib/api/upload";
@@ -106,8 +108,10 @@ function FormBody({
   );
   const [name, setName] = useState(editing?.name ?? "");
   const [price, setPrice] = useState(
-    editing ? formatPriceInput(Number(editing.price)) : "",
+    editing?.price ? formatPriceInput(Number(editing.price)) : "",
   );
+  /** Цена не названа — договорная. */
+  const [negotiable, setNegotiable] = useState(editing?.price === null);
   const [state, setState] = useState<"new" | "old">(editing?.state ?? "new");
   const [categoryId, setCategoryId] = useState<number | null>(
     editing?.categoryId ?? null,
@@ -125,8 +129,8 @@ function FormBody({
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const priceNum = parsePriceInput(price);
-    if (name.trim().length < 2 || !priceNum) {
+    const priceNum = negotiable ? null : parsePriceInput(price);
+    if (name.trim().length < 2 || (!negotiable && !priceNum)) {
       toast.error(t("admin.form.checkNamePrice"));
       return;
     }
@@ -213,7 +217,15 @@ function FormBody({
             value={price}
             onChange={(e) => setPrice(formatPriceInput(e.target.value))}
             className="tabular"
+            disabled={negotiable}
           />
+          <label className="flex cursor-pointer items-center gap-2 pt-1 text-sm text-muted-foreground">
+            <Checkbox
+              checked={negotiable}
+              onCheckedChange={(v) => setNegotiable(v === true)}
+            />
+            {t("seller.add.negotiable")}
+          </label>
         </div>
         <div className="flex flex-col gap-1.5">
           <Label>{t("product.state")}</Label>
@@ -238,7 +250,20 @@ function FormBody({
       </div>
 
       <div className="space-y-1.5">
-        <Label htmlFor="pdesc">{t("admin.form.description")}</Label>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <Label htmlFor="pdesc">{t("admin.form.description")}</Label>
+          <FixDescriptionButton
+            photo={photos[0]}
+            name={name}
+            text={description}
+            onResult={setDescription}
+            onPhotoStored={(photoId, key) =>
+              setPhotos((prev) =>
+                prev.map((p) => (p.id === photoId ? { ...p, key } : p)),
+              )
+            }
+          />
+        </div>
         <Textarea
           id="pdesc"
           rows={3}

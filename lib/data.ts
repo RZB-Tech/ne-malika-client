@@ -53,7 +53,8 @@ export interface Product {
   brand: string;
   model: string;
   sku: string;
-  price: number;
+  /** null — «цена договорная». */
+  price: number | null;
   oldPrice?: number;
   description: string;
   specs: Spec[];

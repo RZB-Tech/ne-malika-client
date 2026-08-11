@@ -38,7 +38,8 @@ export interface PublicProductCard {
   name: string;
   description: string | null;
   photos: string[];
-  price: string;
+  /** null — «цена договорная»: продавец не назвал сумму. */
+  price: string | null;
   state: ProductState;
   createdAt: string;
   shopName: string;
@@ -69,7 +70,8 @@ export interface ProductCardRow {
   name: string;
   description: string | null;
   photos: string[];
-  price: string;
+  /** null — «цена договорная»: продавец не назвал сумму. */
+  price: string | null;
   state: ProductState;
   characteristics: ProductCharacteristic[] | null;
   categoryId?: number | null;
@@ -187,7 +189,8 @@ export interface AdminUserActivity {
   id: number;
   name: string;
   status: EntityStatus;
-  price: string;
+  /** null — «цена договорная»: продавец не назвал сумму. */
+  price: string | null;
   createdAt: string;
   updatedAt: string;
   shopName: string;
@@ -207,7 +210,8 @@ export interface AiReviewRow {
   error: string | null;
   checkedAt: string;
   name: string;
-  price: string;
+  /** null — «цена договорная»: продавец не назвал сумму. */
+  price: string | null;
   photos: string[];
   status: EntityStatus;
   description: string | null;

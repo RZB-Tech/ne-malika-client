@@ -12,7 +12,7 @@ import { useT } from "@/components/providers/i18n-provider";
 import { productCardsControllerFindAll } from "@/lib/api/generated/endpoints/product-cards-public/product-cards-public";
 import { hueFromId } from "@/lib/api/mappers";
 import { photoUrl } from "@/lib/api/photo";
-import { formatPrice } from "@/lib/format";
+import { priceText } from "@/lib/format";
 import { useCompare } from "@/lib/compare/use-compare";
 import type { Paginated, PublicProductCard } from "@/lib/api/types";
 import { cn } from "@/lib/utils";
@@ -57,7 +57,7 @@ export function CompareTable() {
       {
         label: t("compare.rowPrice"),
         values: items.map(
-          (i) => `${formatPrice(Number(i.price), locale)} ${t("common.currency")}`,
+          (i) => priceText(i.price, locale, t),
         ),
         differs: new Set(items.map((i) => i.price)).size > 1,
       },
