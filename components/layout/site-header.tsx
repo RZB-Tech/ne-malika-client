@@ -240,7 +240,7 @@ export function SiteHeader() {
         className="relative h-18 overflow-hidden rounded-b-3xl bg-primary"
       >
         <Image
-          src="/header-sale-banner-user.png"
+          src="/header-gaming-banner.png"
           alt=""
           fill
           priority
@@ -267,19 +267,6 @@ export function SiteHeader() {
             </Button>
           </div>
 
-          <div
-            className="ml-auto hidden items-center text-white drop-shadow-sm lg:flex"
-            aria-hidden
-          >
-            <span className="-rotate-6 rounded-lg bg-warning px-2 py-1 font-heading text-2xl font-black italic shadow-md">
-              NM
-            </span>
-            <span className="-ml-1 font-heading text-lg leading-[0.82] font-black">
-              ТЕХНО
-              <br />
-              СЕЗОН
-            </span>
-          </div>
         </div>
       </section>
     </header>
