@@ -4,6 +4,8 @@ export type EntityStatus = "active" | "abolished" | "hidden" | "pending";
 /** `user` — покупатель; продавцом становятся, создав магазин. */
 export type UserRole = "user" | "seller" | "admin";
 export type AiVerdict = "pass" | "warn" | "fail";
+/** `pending` — отзыв написан, но до проверки его не видно и в оценке он не участвует. */
+export type ReviewStatus = "pending" | "approved" | "rejected";
 
 export interface PaginationMeta {
   page: number;
@@ -40,6 +42,12 @@ export interface PublicProductCard {
   state: ProductState;
   createdAt: string;
   shopName: string;
+  /**
+   * Оценка по опубликованным отзывам. Необязательные: сохранённые ответы и
+   * фикстуры собраны до появления отзывов.
+   */
+  ratingAvg?: number;
+  ratingCount?: number;
   /** Present on the single-item detail projection (GET /product-cards/:id). */
   characteristics?: ProductCharacteristic[] | null;
   /**
@@ -65,6 +73,8 @@ export interface ProductCardRow {
   state: ProductState;
   characteristics: ProductCharacteristic[] | null;
   categoryId?: number | null;
+  ratingAvg?: number;
+  ratingCount?: number;
   status: EntityStatus;
   abolishReason: string | null;
   abolishedAt: string | null;
@@ -93,6 +103,9 @@ export interface ShopRow {
   address: string | null;
   workSchedule: WorkScheduleEntry[] | null;
   location: number[] | null;
+  /** Оценка продавца — по отзывам о магазине и обо всех его товарах. */
+  ratingAvg?: number;
+  ratingCount?: number;
   status: EntityStatus;
   abolishReason: string | null;
   abolishedAt: string | null;
@@ -208,4 +221,56 @@ export interface ReportRow {
   productCardId: number | null;
   createdAt: string;
   updatedAt: string;
+}
+
+/** GET /reviews — опубликованный отзыв на витрине. */
+export interface PublicReview {
+  id: number;
+  rating: number;
+  text: string | null;
+  createdAt: string;
+  shopId: number;
+  /** Пусто — отзыв о магазине целиком. */
+  productCardId: number | null;
+  productName: string | null;
+  /** Имя и первая буква фамилии: отзывы читают посторонние. */
+  authorName: string;
+  authorPhoto: string | null;
+}
+
+/** GET /reviews/mine — свой отзыв целиком, вместе с решением модератора. */
+export interface OwnReview {
+  id: number;
+  rating: number;
+  text: string | null;
+  status: ReviewStatus;
+  moderationNote: string | null;
+  createdAt: string;
+  shopId: number;
+  productCardId: number | null;
+  shopName: string;
+  productName: string | null;
+}
+
+/** GET /admin/reviews — то же плюс автор: модератору видно, кто написал. */
+export interface AdminReview extends OwnReview {
+  authorId: number;
+  authorName: string;
+  authorPhoto: string | null;
+  moderatedAt: string | null;
+}
+
+/** GET /reviews/summary — средняя оценка и сколько отзывов на каждую звезду. */
+export interface ReviewSummary {
+  count: number;
+  average: number;
+  /** Ключи «1»…«5». */
+  breakdown: Record<string, number>;
+}
+
+/** GET /admin/reviews/stats — счётчики очереди модерации. */
+export interface ReviewStatusCounts {
+  pending: number;
+  approved: number;
+  rejected: number;
 }

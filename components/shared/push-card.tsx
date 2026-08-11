@@ -34,19 +34,18 @@ export function PushCard() {
   );
   const [busy, setBusy] = useState(false);
 
-  // Состояние читается после монтирования, а не при инициализации: на сервере
-  // ни navigator, ни Notification нет, и первый клиентский рендер обязан
-  // совпасть с серверным, иначе React сообщит о рассинхроне гидратации.
   useEffect(() => {
     if (!isPushSupported()) return;
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setSupported(true);
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setPermission(permissionState());
     // Ключ и сам факт включённого канала знает только сервер: без ключей VAPID
-    // подписаться нельзя, и карточку показывать незачем.
+    // подписаться нельзя, и карточку показывать незачем. Состояние выставляем
+    // в ответе, а не в теле эффекта: до ответа карточка всё равно скрыта, а
+    // setState прямо в эффекте — это лишний каскад рендеров.
     void fetchPushConfig()
-      .then((config) => setPublicKey(config.enabled ? config.publicKey : null))
+      .then((config) => {
+        setSupported(true);
+        setPermission(permissionState());
+        setPublicKey(config.enabled ? config.publicKey : null);
+      })
       .catch(() => setPublicKey(null));
   }, []);
 

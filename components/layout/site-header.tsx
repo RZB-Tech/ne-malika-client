@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import { Suspense } from "react";
 import { History, Store } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/shared/logo";
-import { SearchBar } from "@/components/shared/search-bar";
+import { SearchBar, SearchBarSkeleton } from "@/components/shared/search-bar";
 import { LanguageSwitch } from "@/components/shared/language-switch";
 import { LoginDialog } from "@/components/auth/login-dialog";
 import { UserMenu } from "@/components/auth/user-menu";
@@ -41,7 +42,13 @@ export function SiteHeader() {
             Правим здесь, а не в SearchBar — он используется и на светлых
             страницах, где всё и так в порядке. */}
         <div className="min-w-0 flex-1 [&_input]:border-transparent [&_input]:bg-white [&_input]:text-foreground [&_input]:placeholder:text-muted-foreground [&_svg]:text-muted-foreground">
-          <SearchBar />
+          {/* Строка поиска читает адрес страницы, а он известен только в
+              браузере. Без границы Suspense весь сайт, включая статические
+              страницы, пришлось бы рендерить на клиенте — Next на это ругается
+              прямо на сборке. */}
+          <Suspense fallback={<SearchBarSkeleton />}>
+            <SearchBar />
+          </Suspense>
         </div>
 
         <div className="flex shrink-0 items-center gap-0.5">

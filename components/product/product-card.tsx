@@ -6,6 +6,7 @@ import { ContactSellerButton } from "@/components/product/contact-seller-button"
 import { FavoriteButton } from "@/components/product/favorite-button";
 import { CompareButton } from "@/components/product/compare-button";
 import { AvailabilityBadge } from "@/components/shared/badges";
+import { RatingStars } from "@/components/shared/rating-stars";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useT } from "@/components/providers/i18n-provider";
 import { formatPrice } from "@/lib/format";
@@ -94,6 +95,15 @@ export function ProductCard({ product }: { product: Product }) {
           <h3 className="line-clamp-2 text-sm leading-snug text-muted-foreground group-hover:text-foreground">
             {product.name}
           </h3>
+
+          {/* Оценка последней строкой и только когда есть отзывы: пустые серые
+              звёзды на каждой плитке — это шум, а не информация. */}
+          {(product.ratingCount ?? 0) > 0 && (
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <RatingStars value={product.rating ?? 0} />
+              <span className="tabular">{product.ratingCount}</span>
+            </div>
+          )}
         </div>
       </Link>
 

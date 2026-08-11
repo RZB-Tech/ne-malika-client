@@ -62,8 +62,19 @@ import type {
   Paginated,
 } from "@/lib/api/types";
 
-/** Вкладки фильтра. `undefined` — без параметра, то есть все статусы. */
-const TABS: { value: string; labelKey: string; status?: EntityStatus }[] = [
+/**
+ * Вкладки фильтра. `undefined` — без параметра, то есть все статусы.
+ *
+ * «Без категории» фильтрует не по статусу, а по пустому category_id: такие
+ * товары остаются после удаления раздела каталога и встречаются в любом
+ * статусе, поэтому статус здесь не задан намеренно.
+ */
+const TABS: {
+  value: string;
+  labelKey: string;
+  status?: EntityStatus;
+  uncategorized?: boolean;
+}[] = [
   { value: "all", labelKey: "admin.productList.tabAll" },
   { value: "active", labelKey: "admin.productList.tabActive", status: "active" },
   {
@@ -77,6 +88,11 @@ const TABS: { value: string; labelKey: string; status?: EntityStatus }[] = [
     labelKey: "admin.productList.tabAbolished",
     status: "abolished",
   },
+  {
+    value: "uncategorized",
+    labelKey: "admin.productList.tabUncategorized",
+    uncategorized: true,
+  },
 ];
 
 export default function AdminProducts() {
@@ -88,10 +104,12 @@ export default function AdminProducts() {
   const [opened, setOpened] = useState<AdminProductRow | null>(null);
   const [form, setForm] = useState<ProductFormTarget | null>(null);
 
-  const status = TABS.find((x) => x.value === tab)?.status;
+  const active = TABS.find((x) => x.value === tab);
+  const status = active?.status;
+  const uncategorized = active?.uncategorized;
 
   const { data, isLoading } = useAdminProductCardsControllerFindAll(
-    { page, limit: 20, q: q.trim() || undefined, status },
+    { page, limit: 20, q: q.trim() || undefined, status, uncategorized },
     {
       query: {
         select: (raw) => raw as unknown as Paginated<AdminProductRow>,
@@ -119,10 +137,11 @@ export default function AdminProducts() {
     const fixtures = devAdminProducts.filter(
       (p) =>
         (!status || p.status === status) &&
+        (!uncategorized || !p.categoryId) &&
         (!q.trim() || p.name.toLowerCase().includes(q.trim().toLowerCase())),
     );
     return devFallbackPage(data, fixtures);
-  }, [data, status, q]);
+  }, [data, status, uncategorized, q]);
 
   const rows = pageData.data;
 
@@ -238,6 +257,12 @@ export default function AdminProducts() {
           />
         </div>
       </div>
+
+      {uncategorized && (
+        <Card className="bg-muted/50 p-4 text-sm text-muted-foreground">
+          {t("admin.productList.uncategorizedHint")}
+        </Card>
+      )}
 
       {isDevData && (
         <Card className="bg-muted/50 p-4 text-sm text-muted-foreground">

@@ -8,6 +8,7 @@ import {
   Send,
   ShieldCheck,
   Sparkles,
+  Star,
   Store,
   Users,
 } from "lucide-react";
@@ -35,6 +36,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
   const items: NavItem[] = [
     { href: "/admin", label: t("admin.nav.dashboard"), icon: BarChart3, exact: true },
     { href: "/admin/reports", label: t("admin.nav.reports"), icon: Flag },
+    { href: "/admin/reviews", label: t("admin.nav.reviews"), icon: Star },
     { href: "/admin/sellers", label: t("admin.nav.sellers"), icon: Store },
     { href: "/admin/users", label: t("admin.nav.users"), icon: Users },
     { href: "/admin/products", label: t("admin.nav.products"), icon: Package },

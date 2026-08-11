@@ -1,6 +1,6 @@
 "use client";
 
-import { LayoutDashboard, Package, Store } from "lucide-react";
+import { LayoutDashboard, Package, Star, Store } from "lucide-react";
 import { RequireRole } from "@/components/auth/require-role";
 import {
   DashboardShell,
@@ -37,7 +37,10 @@ function SellerLayoutInner({ children }: { children: React.ReactNode }) {
   const items: NavItem[] = [
     { href: "/seller", label: t("seller.nav.dashboard"), icon: LayoutDashboard, exact: true },
     ...(shop
-      ? [{ href: "/seller/products", label: t("seller.nav.products"), icon: Package }]
+      ? [
+          { href: "/seller/products", label: t("seller.nav.products"), icon: Package },
+          { href: "/seller/reviews", label: t("seller.nav.reviews"), icon: Star },
+        ]
       : []),
     { href: "/seller/profile", label: t("seller.nav.profile"), icon: Store },
   ];

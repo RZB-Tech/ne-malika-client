@@ -1,77 +1,105 @@
 "use client";
 
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Search } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useT } from "@/components/providers/i18n-provider";
+
+/** Каталог — единственная страница, где запрос что-то меняет прямо на глазах. */
+const CATALOG_PATH = "/";
+
+/** Пауза перед запросом: примерно столько длится провал между словами. */
+const DEBOUNCE_MS = 300;
 
 export function SearchBar({
   className,
   size = "default",
   placeholder,
   autoFocus,
-  defaultValue = "",
-  withButton = false,
 }: {
   className?: string;
   size?: "default" | "lg";
   placeholder?: string;
   autoFocus?: boolean;
-  defaultValue?: string;
-  withButton?: boolean;
 }) {
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { t } = useT();
-  const [value, setValue] = useState(defaultValue);
 
-  // Several search bars are mounted at once (header + mobile sheet). Only the
-  // one the user is actually typing into may drive the URL.
+  const urlQuery = searchParams.get("q")?.trim() ?? "";
+  const onCatalog = pathname === CATALOG_PATH;
+
+  const [value, setValue] = useState(urlQuery);
+  const inputRef = useRef<HTMLInputElement | null>(null);
+
+  // Несколько строк поиска могут быть смонтированы разом (шапка и шторка).
+  // Адрес меняет только та, в которой действительно печатают.
   const typed = useRef(false);
-  const lastPushed = useRef(defaultValue.trim());
 
-  // Keep whatever else the catalog put in the URL (price bounds, sort) — typing
-  // a query narrows the current search rather than starting a blank one.
+  /**
+   * Поле следует за адресом, а не живёт своей жизнью: по ссылке `/?q=canon`
+   * человек должен увидеть запрос в поле, а не пустую строку над найденным.
+   * Приведение состояния во время рендера, а не в эффекте — иначе один кадр
+   * показывал бы прежний текст.
+   */
+  const [syncedQuery, setSyncedQuery] = useState(urlQuery);
+  if (onCatalog && urlQuery !== syncedQuery) {
+    setSyncedQuery(urlQuery);
+    // Свои же правки адреса пропускаем: иначе набранный пробел исчезал бы
+    // из-под курсора, ведь в адрес уходит обрезанная строка.
+    if (urlQuery !== value.trim()) setValue(urlQuery);
+  }
+
+  // Остальные параметры каталога сохраняем: запрос сужает текущую выдачу, а не
+  // начинает пустую — выбранный раздел никуда не девается.
   const catalogUrl = useCallback(
     (q: string) => {
-      const params = new URLSearchParams(
-        pathname === "/" ? window.location.search : "",
-      );
+      const params = new URLSearchParams(onCatalog ? searchParams.toString() : "");
       if (q) params.set("q", q);
       else params.delete("q");
       const query = params.toString();
-      return query ? `/?${query}` : "/";
+      return query ? `${CATALOG_PATH}?${query}` : CATALOG_PATH;
     },
-    [pathname],
+    [onCatalog, searchParams],
   );
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     typed.current = false;
-    lastPushed.current = value.trim();
     router.push(catalogUrl(value.trim()));
   };
 
-  // Live search: on the catalog itself, typing updates the URL after a pause.
-  // Elsewhere the bar would yank the user off the page mid-keystroke, so there
-  // it stays submit-driven.
+  const clear = () => {
+    typed.current = false;
+    setValue("");
+    inputRef.current?.focus();
+    if (onCatalog) router.replace(catalogUrl(""), { scroll: false });
+  };
+
+  // Живой поиск: на самом каталоге набор текста обновляет адрес после паузы.
+  // На других страницах строка выдёргивала бы человека со страницы посреди
+  // слова, поэтому там переход только по Enter.
   useEffect(() => {
-    if (!typed.current || pathname !== "/") return;
+    if (!typed.current || !onCatalog) return;
 
     const q = value.trim();
-    if (q === lastPushed.current) return;
+    if (q === urlQuery) return;
 
     const id = setTimeout(() => {
-      lastPushed.current = q;
       router.replace(catalogUrl(q), { scroll: false });
-    }, 300);
+    }, DEBOUNCE_MS);
     return () => clearTimeout(id);
-  }, [value, pathname, router, catalogUrl]);
+  }, [value, urlQuery, onCatalog, router, catalogUrl]);
 
   return (
-    <form onSubmit={submit} className={cn("relative flex w-full items-center", className)}>
+    <form
+      role="search"
+      onSubmit={submit}
+      className={cn("relative flex w-full items-center", className)}
+    >
       <Search
         className={cn(
           "pointer-events-none absolute left-3.5 text-muted-foreground",
@@ -79,19 +107,46 @@ export function SearchBar({
         )}
       />
       <Input
+        ref={inputRef}
         value={value}
         autoFocus={autoFocus}
         onChange={(e) => {
           typed.current = true;
           setValue(e.target.value);
         }}
+        aria-label={placeholder ?? t("common.searchPlaceholder")}
         placeholder={placeholder ?? t("common.searchPlaceholder")}
         className={cn(
-          "pl-10",
+          "pl-10 pr-10",
           size === "lg" && "h-13 rounded-xl pl-11 text-base shadow-sm",
-          withButton && (size === "lg" ? "pr-32" : "pr-24"),
         )}
       />
+      {value && (
+        // Единственный способ вернуть полный каталог: панели фильтров, где
+        // раньше был сброс, больше нет.
+        <button
+          type="button"
+          onClick={clear}
+          aria-label={t("common.clear")}
+          className="absolute right-2 grid size-7 place-items-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+        >
+          <X className="size-4" />
+        </button>
+      )}
     </form>
+  );
+}
+
+/**
+ * Заглушка на время серверного рендера. Строка поиска читает адресную строку,
+ * а это возможно только в браузере; без заглушки шапка на долю секунды
+ * оставалась бы без поля, и содержимое рядом прыгало бы вбок.
+ */
+export function SearchBarSkeleton({ className }: { className?: string }) {
+  return (
+    <div className={cn("relative flex w-full items-center", className)}>
+      <Search className="pointer-events-none absolute left-3.5 size-4 text-muted-foreground" />
+      <Input disabled className="pl-10 pr-10" />
+    </div>
   );
 }

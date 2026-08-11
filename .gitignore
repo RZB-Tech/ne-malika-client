@@ -5,6 +5,11 @@
 /node_modules
 /.pnp
 .pnp.*
+# Пакетный менеджер здесь только pnpm — им ставит и Dockerfile, и CI. Чужой
+# lock-файл от случайного `npm i` разъедется с pnpm-lock и однажды соберёт
+# другой набор версий.
+package-lock.json
+yarn.lock
 .yarn/*
 !.yarn/patches
 !.yarn/plugins
@@ -17,12 +22,18 @@
 # next.js
 /.next/
 /out/
+# Сборка в отдельную папку (NEXT_DIST_DIR) — так проверочный build не мешает
+# запущенному `next dev`.
+/.next-*/
 
 # production
 /build
 
 # misc
 .DS_Store
+# Windows создаёт их сам в любой открытой в проводнике папке.
+Thumbs.db
+desktop.ini
 *.pem
 
 # debug

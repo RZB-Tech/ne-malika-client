@@ -14,6 +14,8 @@ import { CompareButton } from "@/components/product/compare-button";
 import { RevealPhone } from "@/components/product/reveal-phone";
 import { ReportDialog } from "@/components/shared/report-dialog";
 import { StoreAvatar } from "@/components/shared/store-avatar";
+import { RatingStars } from "@/components/shared/rating-stars";
+import { ReviewsSection } from "@/components/reviews/reviews-section";
 import { useT } from "@/components/providers/i18n-provider";
 import { formatWorkSchedule } from "@/lib/api/mappers";
 import { formatPrice } from "@/lib/format";
@@ -130,6 +132,13 @@ export function ProductDetail({
               </dl>
             </section>
           )}
+
+          {/* Отзывы под характеристиками: сначала товар, потом чужое мнение
+              о нём. Оценка в правой панели уже видна сверху. */}
+          <ReviewsSection
+            target={{ productId: Number(product.id) }}
+            ownerId={store.ownerId}
+          />
         </div>
 
         {/* right: buy panel */}
@@ -142,6 +151,20 @@ export function ProductDetail({
             <h1 className="font-heading text-xl font-bold leading-snug tracking-tight">
               {product.name}
             </h1>
+
+            {/* Оценка сразу под названием: решение о покупке принимают здесь,
+                а до отзывов внизу страницы ещё надо долистать. */}
+            {(product.ratingCount ?? 0) > 0 && (
+              <div className="mt-2 flex items-center gap-2 text-sm">
+                <RatingStars value={product.rating ?? 0} />
+                <span className="font-medium tabular">
+                  {(product.rating ?? 0).toFixed(1).replace(".", ",")}
+                </span>
+                <span className="text-muted-foreground">
+                  {t("reviews.count", { count: product.ratingCount ?? 0 })}
+                </span>
+              </div>
+            )}
 
             <div className="mt-4 flex items-end gap-3">
               <span className="font-heading text-3xl font-bold tabular">

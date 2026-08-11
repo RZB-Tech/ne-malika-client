@@ -15,6 +15,8 @@ export interface Category {
 export interface Store {
   id: string;
   slug: string;
+  /** id владельца — известен только у магазинов с бэкенда. */
+  ownerId?: number;
   name: string;
   logoHue: number;
   description: string;
@@ -56,6 +58,9 @@ export interface Product {
   description: string;
   specs: Spec[];
   warrantyMonths: number;
+  /** Средняя оценка по опубликованным отзывам; 0 — отзывов ещё нет. */
+  rating?: number;
+  ratingCount?: number;
   availability: Availability;
   quantity: number;
   storeId: string;

@@ -100,6 +100,8 @@ function toProduct(
       value: c.value,
     })),
     warrantyMonths: 0,
+    rating: pc.ratingAvg ?? 0,
+    ratingCount: pc.ratingCount ?? 0,
     availability: "in_stock",
     quantity: 1,
     storeId: String(pc.shopId),
@@ -133,6 +135,8 @@ export function mapShop(s: ShopRow | PublicShop): Store {
   return {
     id: String(s.id),
     slug: String(s.id),
+    /** Владелец: продавцу не показываем кнопку отзыва о собственном магазине. */
+    ownerId: s.owner,
     name: s.name,
     logoHue: hueFromId(s.id),
     description: s.description ?? "",
@@ -143,8 +147,8 @@ export function mapShop(s: ShopRow | PublicShop): Store {
     telegramLink: s.telegramLink ?? undefined,
     workSchedule: s.workSchedule ?? undefined,
     workingHours: "",
-    rating: 0,
-    ratingCount: 0,
+    rating: s.ratingAvg ?? 0,
+    ratingCount: s.ratingCount ?? 0,
     joined: s.createdAt,
     status: SELLER_STATUS_BY_STATUS[s.status] ?? "active",
     storeViews: 0,

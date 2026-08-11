@@ -20,6 +20,7 @@ import { ProductCard } from "@/components/product/product-card";
 import { TelegramButton } from "@/components/product/telegram-button";
 import { ReportDialog } from "@/components/shared/report-dialog";
 import { StoreAvatar } from "@/components/shared/store-avatar";
+import { ReviewsSection } from "@/components/reviews/reviews-section";
 import { useT } from "@/components/providers/i18n-provider";
 import { formatWorkSchedule } from "@/lib/api/mappers";
 import { formatDate } from "@/lib/format";
@@ -89,12 +90,17 @@ export function StoreDetail({
                 <h1 className="font-heading text-2xl font-bold tracking-tight">{store.name}</h1>
                 {store.rating > 0 && (
                   <Badge
-                  variant="secondary"
-                  className="gap-1"
-                  aria-label={t("store.rating")}
-                >
+                    variant="secondary"
+                    className="gap-1"
+                    aria-label={t("store.rating")}
+                  >
                     <Star className="size-3 fill-warning text-warning" />
-                    <span className="tabular">{store.rating.toFixed(1)}</span>
+                    <span className="tabular">
+                      {store.rating.toFixed(1).replace(".", ",")}
+                    </span>
+                    <span className="text-muted-foreground tabular">
+                      · {store.ratingCount}
+                    </span>
                   </Badge>
                 )}
               </div>
@@ -165,6 +171,13 @@ export function StoreDetail({
           </div>
         )}
       </div>
+
+      {/* Отзывы о продавце — вместе с отзывами о его товарах: ровно из них и
+          складывается оценка в шапке. */}
+      <ReviewsSection
+        target={{ shopId: Number(store.id) }}
+        ownerId={store.ownerId}
+      />
     </div>
   );
 }

@@ -14,6 +14,7 @@ import {
   Keyboard,
   Laptop,
   MemoryStick,
+  Microchip,
   Monitor,
   Mouse,
   PcCase,
@@ -60,6 +61,9 @@ const map: Record<string, LucideIcon> = {
   Usb,
   Disc,
   Armchair,
+  // Корень «Запчасти для ПК» из миграции 0024. «Периферия» из 0025 берёт
+  // Keyboard — он освободился, когда клавиатуры стали листом внутри неё.
+  Microchip,
 };
 
 export function CategoryIcon({

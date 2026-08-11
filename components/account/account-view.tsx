@@ -1,10 +1,11 @@
 "use client";
 
-import { Heart, History, UserRound } from "lucide-react";
+import { Heart, History, Star, UserRound } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useT } from "@/components/providers/i18n-provider";
 import { AccountProfile } from "./account-profile";
 import { FavoritesList } from "./favorites-list";
+import { MyReviews } from "./my-reviews";
 import { ViewHistory } from "./view-history";
 
 /**
@@ -34,9 +35,9 @@ export function AccountView({
       </p>
 
       <Tabs defaultValue={defaultTab} className="mt-6 gap-6">
-        {/* Во всю ширину: три вкладки делят её поровну и помещаются на телефоне.
+        {/* Во всю ширину: вкладки делят её поровну и помещаются на телефоне.
             overflow-x-auto — страховка на случай длинных переводов. */}
-        <TabsList className="w-full max-w-md overflow-x-auto">
+        <TabsList className="w-full max-w-xl overflow-x-auto">
           {/* Отступы по умолчанию (px-3.5) на телефоне съедают лишние ~35px,
               и третья вкладка уезжает за край. */}
           <TabsTrigger value="history" className={tab}>
@@ -46,6 +47,10 @@ export function AccountView({
           <TabsTrigger value="favorites" className={tab}>
             <Heart />
             {t("account.tabs.favorites")}
+          </TabsTrigger>
+          <TabsTrigger value="reviews" className={tab}>
+            <Star />
+            {t("account.tabs.reviews")}
           </TabsTrigger>
           <TabsTrigger value="profile" className={tab}>
             <UserRound />
@@ -58,6 +63,9 @@ export function AccountView({
         </TabsContent>
         <TabsContent value="favorites">
           <FavoritesList />
+        </TabsContent>
+        <TabsContent value="reviews">
+          <MyReviews />
         </TabsContent>
         <TabsContent value="profile">
           <AccountProfile />
