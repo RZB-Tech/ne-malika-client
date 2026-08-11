@@ -164,14 +164,18 @@ export function SiteHeader() {
 
         <CatalogMenu />
 
-        <div className="min-w-0 flex-1">
-          {/* Строка поиска читает адрес страницы, а он известен только в
-              браузере. Без границы Suspense весь сайт, включая статические
-              страницы, пришлось бы рендерить на клиенте. */}
+        {/* На телефоне поиск занимает отдельную строку ниже: рядом с бургером,
+            знаком и входом ему остаётся сотня точек, и от поля видно одну
+            букву. Строка поиска читает адрес страницы, а он известен только в
+            браузере, поэтому граница Suspense — без неё весь сайт, включая
+            статические страницы, пришлось бы рендерить на клиенте. */}
+        <div className="hidden min-w-0 flex-1 md:block">
           <Suspense fallback={<SearchBarSkeleton appearance="marketplace" />}>
             <SearchBar appearance="marketplace" />
           </Suspense>
         </div>
+
+        <span className="flex-1 md:hidden" />
 
         {/* Действия покупателя: значок и подпись под ним. Подписи важнее
             компактности — иконка весов без слова «Сравнение» не читается
@@ -204,12 +208,11 @@ export function SiteHeader() {
                   variant="ghost"
                   size="lg"
                   className={cn(ACTION_CLASS, "hidden text-foreground md:flex")}
-                  title={t("nav.login")}
+                  title={t("nav.account")}
                 >
                   <ActionBody
                     icon={UserRound}
-                    label={t("nav.login")}
-                    attention
+                    label={t("nav.account")}
                   />
                 </Button>
               }
@@ -230,6 +233,14 @@ export function SiteHeader() {
           <FavoritesAction />
           <CartAction />
         </nav>
+      </div>
+
+      {/* Поиск во всю ширину — телефонная строка. Прячется вместе с шапкой при
+          прокрутке вниз, как и всё остальное: место на экране дороже. */}
+      <div className="px-5 pb-3 md:hidden">
+        <Suspense fallback={<SearchBarSkeleton appearance="marketplace" />}>
+          <SearchBar appearance="marketplace" />
+        </Suspense>
       </div>
 
       {/* Вторая строка: на телефоне разделы, язык и тема живут в бургере,
@@ -298,6 +309,7 @@ export function SiteHeader() {
           alt=""
           fill
           priority
+          unoptimized
           sizes="(max-width: 1600px) 100vw, 1600px"
           className="object-cover object-left"
         />

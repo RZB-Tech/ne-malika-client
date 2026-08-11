@@ -40,7 +40,9 @@
     ".next-hover/types/**/*.ts",
     ".next-hover/dev/types/**/*.ts",
     ".next-hdr/types/**/*.ts",
-    ".next-hdr/dev/types/**/*.ts"
+    ".next-hdr/dev/types/**/*.ts",
+    ".next-mob/types/**/*.ts",
+    ".next-mob/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",

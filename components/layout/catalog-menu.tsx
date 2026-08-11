@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { CategoryIcon } from "@/components/shared/category-icon";
 import { useT } from "@/components/providers/i18n-provider";
 import { useCategories } from "@/lib/api/categories";
+import { onOpenCatalog } from "./catalog-bus";
 import type { CategoryDto } from "@/lib/api/generated/schemas";
 import type { Locale } from "@/lib/i18n/config";
 import { cn } from "@/lib/utils";
@@ -59,6 +60,10 @@ export function CatalogMenu() {
   }, []);
 
   useEffect(() => () => clearTimeout(unmountTimer.current), []);
+
+  // На телефоне кнопки каталога в шапке нет — там её место занимает нижняя
+  // панель навигации, и открывает она то же самое меню.
+  useEffect(() => onOpenCatalog(openMenu), [openMenu]);
 
   // Шапка живёт в layout и не размонтируется при переходах, поэтому панель
   // закрывают сами обработчики: ссылки внутри — по клику, всё снаружи — по
