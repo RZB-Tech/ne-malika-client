@@ -88,10 +88,9 @@ export function CatalogMenu() {
   return (
     <div ref={containerRef} className="shrink-0">
       <Button
-        // На синей шапке вариант по умолчанию сливался с фоном: обе кнопки
-        // светлые, открытая — белая.
-        variant="secondary"
-        className={cn("gap-2", open && "bg-white text-primary hover:bg-white")}
+        // Синяя на светлой шапке: это главная кнопка навигации, и она должна
+        // читаться первой, до строки поиска.
+        className={cn("h-10 gap-2 rounded-xl px-3 sm:px-4")}
         onClick={() => (open ? close() : openMenu())}
         aria-expanded={open}
         aria-haspopup="true"
@@ -119,12 +118,12 @@ export function CatalogMenu() {
           {/* Затемнение — только под панелью, шапка остаётся кликабельной. */}
           <div
             data-state={open ? "open" : "closed"}
-            className="fixed inset-x-0 bottom-0 top-16 z-40 bg-black/40 duration-200 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0"
+            className="fixed inset-x-0 bottom-0 top-16 lg:top-26 z-40 bg-black/40 duration-200 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0"
             aria-hidden
           />
           <div
             data-state={open ? "open" : "closed"}
-            className="fixed inset-x-0 top-16 z-50 border-b border-border bg-background shadow-lg duration-200 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-top-4 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-top-4"
+            className="fixed inset-x-0 top-16 z-50 border-b border-border bg-background shadow-lg lg:top-26 duration-200 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-top-4 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-top-4"
           >
             <div className="mx-auto max-h-[min(70vh,40rem)] max-w-[1600px] overflow-y-auto px-4 py-4 sm:px-8 lg:px-10">
               {/* Узкий экран: либо список разделов, либо содержимое одного. */}
