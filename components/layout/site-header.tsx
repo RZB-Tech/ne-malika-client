@@ -124,7 +124,7 @@ export function SiteHeader() {
   const marketPlace = marketPlaceParts.join(" · ");
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-background">
+    <header className="sticky top-0 z-50 mx-auto w-full max-w-[1600px] rounded-b-3xl bg-background">
       <div className="mx-auto flex h-17 w-full max-w-[1600px] items-center gap-2 px-5 sm:gap-3 sm:px-8 lg:px-10">
         <HeaderMenu />
 
@@ -189,7 +189,7 @@ export function SiteHeader() {
 
       {/* Вторая строка: на телефоне разделы, язык и тема живут в бургере,
           поэтому там её просто нет. */}
-      <div className="hidden border-t border-border/70 lg:block">
+      <div className="hidden lg:block">
         <div className="mx-auto flex h-10 w-full max-w-[1600px] items-center px-5 sm:px-8 lg:px-10">
           <nav className="no-scrollbar flex min-w-0 items-center gap-1 overflow-x-auto">
             {roots.length > 0
