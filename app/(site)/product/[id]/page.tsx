@@ -5,6 +5,7 @@ import { TrackProductView } from "@/components/product/track-product-view";
 import { getPublicProduct, getPublicShop } from "@/lib/api/server";
 import { mapPublicProductCard, mapShop } from "@/lib/api/mappers";
 import { photoUrl } from "@/lib/api/photo";
+import { markdownToPlainText } from "@/lib/markdown";
 import type { Store } from "@/lib/data";
 import { SITE_NAME, absoluteUrl } from "@/lib/seo";
 
@@ -41,8 +42,10 @@ export async function generateMetadata({
       ? "Цена договорная."
       : `Цена ${new Intl.NumberFormat("ru-RU").format(Number(product.price))} сум.`;
   const specs = specsSummary(product.characteristics);
+  // Разметку снимаем: в сниппете поисковика звёздочки и дефисы списка занимают
+  // место и читаются как мусор.
   const descBase =
-    product.description?.trim() ||
+    markdownToPlainText(product.description ?? "") ||
     `${product.name} — купить на рынке Малика (Malika) в Ташкенте.`;
   const description = [
     descBase,
@@ -120,7 +123,9 @@ export default async function ProductPage({
     "@context": "https://schema.org",
     "@type": "Product",
     name: raw.name,
-    description: raw.description ?? undefined,
+    description: raw.description
+      ? markdownToPlainText(raw.description)
+      : undefined,
     image: (raw.photos ?? []).map((k) => photoUrl(k)).filter(Boolean),
     sku: String(raw.id),
     additionalProperty: (raw.characteristics ?? []).map((c) => ({

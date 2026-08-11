@@ -232,6 +232,9 @@ export function AddProductForm({
               onChange={(e) => setDescription(e.target.value)}
               placeholder={t("seller.add.descriptionPlaceholder")}
             />
+            <p className="text-xs text-muted-foreground">
+              {t("ai.description.markdownHint")}
+            </p>
           </div>
 
           <div className={field}>

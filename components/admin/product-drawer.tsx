@@ -14,6 +14,7 @@ import {
   drawerAction,
 } from "@/components/admin/detail-drawer";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { Markdown } from "@/components/shared/markdown";
 import { useT } from "@/components/providers/i18n-provider";
 import { formatDate, priceText } from "@/lib/format";
 import { hueFromId } from "@/lib/api/mappers";
@@ -121,9 +122,12 @@ export function ProductDrawer({
 
           {product.description && (
             <DetailSection title={t("product.description")}>
-              <p className="text-sm text-muted-foreground">
-                {product.description}
-              </p>
+              {/* Тем же разбором, что и витрина: администратор должен видеть
+                  карточку такой, какой её увидит покупатель. */}
+              <Markdown
+                text={product.description}
+                className="text-sm text-muted-foreground"
+              />
             </DetailSection>
           )}
 

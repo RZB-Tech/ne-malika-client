@@ -15,6 +15,7 @@ import { RevealPhone } from "@/components/product/reveal-phone";
 import { ReportDialog } from "@/components/shared/report-dialog";
 import { StoreAvatar } from "@/components/shared/store-avatar";
 import { RatingStars } from "@/components/shared/rating-stars";
+import { Markdown } from "@/components/shared/markdown";
 import { ReviewsSection } from "@/components/reviews/reviews-section";
 import { useT } from "@/components/providers/i18n-provider";
 import { formatWorkSchedule } from "@/lib/api/mappers";
@@ -109,7 +110,12 @@ export function ProductDetail({
           {/* description */}
           <section className="mt-10">
             <h2 className="font-heading text-xl font-bold tracking-tight">{t("product.description")}</h2>
-            <p className="mt-3 max-w-2xl leading-relaxed text-muted-foreground">{product.description}</p>
+            {/* Описание размечено markdown: списком характеристик его пишет и
+                ИИ-правка, и сами продавцы. */}
+            <Markdown
+              text={product.description}
+              className="mt-3 max-w-2xl leading-relaxed text-muted-foreground"
+            />
           </section>
 
           {/* specs */}

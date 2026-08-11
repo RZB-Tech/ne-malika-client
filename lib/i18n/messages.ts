@@ -890,6 +890,8 @@ const ru = {
     description: {
       action: "Поправить по фото",
       hint: "ИИ исправит ошибки и добавит то, что видно на фотографии",
+      markdownHint:
+        "Можно списком: строка «- пункт», выделение — **двумя звёздочками**",
       done: "Описание исправлено",
       undo: "Вернуть",
       failed: "Не удалось исправить описание",
@@ -1803,6 +1805,8 @@ const uzLatn: typeof ru = {
     description: {
       action: "Foto bo‘yicha tuzatish",
       hint: "AI xatolarni tuzatadi va suratda ko‘ringanini qo‘shadi",
+      markdownHint:
+        "Ro‘yxat qilish mumkin: «- band» satri, ajratish — **ikki yulduzcha**",
       done: "Tavsif tuzatildi",
       undo: "Qaytarish",
       failed: "Tavsifni tuzatib bo‘lmadi",
@@ -2717,6 +2721,8 @@ const uzCyrl: typeof ru = {
     description: {
       action: "Фото бўйича тузатиш",
       hint: "ИИ хатоларни тузатади ва суратда кўринганини қўшади",
+      markdownHint:
+        "Рўйхат қилиш мумкин: «- банд» сатри, ажратиш — **икки юлдузча**",
       done: "Тавсиф тузатилди",
       undo: "Қайтариш",
       failed: "Тавсифни тузатиб бўлмади",

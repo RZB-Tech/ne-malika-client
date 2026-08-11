@@ -272,6 +272,9 @@ export function SellerProductDetail({ id }: { id: number }) {
                   />
                 </div>
                 <Textarea id="pdesc" rows={3} value={description} onChange={(e) => setDescription(e.target.value)} />
+                <p className="text-xs text-muted-foreground">
+                  {t("ai.description.markdownHint")}
+                </p>
               </div>
             </div>
 

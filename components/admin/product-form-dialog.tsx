@@ -270,6 +270,9 @@ function FormBody({
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         />
+        <p className="text-xs text-muted-foreground">
+          {t("ai.description.markdownHint")}
+        </p>
       </div>
 
       <div className="flex flex-col gap-2">
