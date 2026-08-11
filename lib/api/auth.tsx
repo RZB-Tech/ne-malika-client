@@ -143,6 +143,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         telegramPhoto: null,
         phoneNumber: null,
         hasContact: false,
+        telegramLinked: false,
       });
       return;
     }

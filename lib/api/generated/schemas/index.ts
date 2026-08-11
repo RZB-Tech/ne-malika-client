@@ -7,6 +7,9 @@
  */
 
 export * from './addFavoriteDto';
+export * from './adminBroadcastsControllerCountAudience';
+export * from './adminBroadcastsControllerCountParams';
+export * from './adminBroadcastsControllerListParams';
 export * from './adminProductCardsControllerAiReviewParams';
 export * from './adminProductCardsControllerFindAllParams';
 export * from './adminProductCardsControllerFindAllStatus';
@@ -20,9 +23,12 @@ export * from './authUserDtoPhoneNumber';
 export * from './authUserDtoRole';
 export * from './authUserDtoTelegramPhoto';
 export * from './authUserDtoTelegramUsername';
+export * from './broadcastAudienceCountDto';
 export * from './categoryDto';
 export * from './categoryNameDto';
 export * from './characteristicDto';
+export * from './createBroadcastDto';
+export * from './createBroadcastDtoAudience';
 export * from './createProductCardDto';
 export * from './createProductCardDtoState';
 export * from './createReportDto';

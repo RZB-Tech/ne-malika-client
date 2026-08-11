@@ -22,4 +22,6 @@ export interface AuthUserDto {
   phoneNumber: AuthUserDtoPhoneNumber;
   /** Получен ли номер телефона через бота */
   hasContact: boolean;
+  /** Открыт ли чат с ботом. Пока false, уведомления в Telegram не доходят */
+  telegramLinked: boolean;
 }

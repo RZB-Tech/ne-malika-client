@@ -1532,6 +1532,119 @@
         ]
       }
     },
+    "/api/v1/admin/broadcasts": {
+      "get": {
+        "operationId": "AdminBroadcastsController_list",
+        "summary": "История рассылок",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Номер страницы",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Размер страницы",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "broadcasts-admin"
+        ],
+        "security": [
+          {
+            "access-token": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "AdminBroadcastsController_send",
+        "summary": "Отправить рассылку в Telegram",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBroadcastDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "broadcasts-admin"
+        ],
+        "security": [
+          {
+            "access-token": []
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/broadcasts/audience": {
+      "get": {
+        "operationId": "AdminBroadcastsController_count",
+        "summary": "Сколько адресатов получит рассылку",
+        "parameters": [
+          {
+            "name": "audience",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "all",
+                "sellers",
+                "buyers"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BroadcastAudienceCountDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "broadcasts-admin"
+        ],
+        "security": [
+          {
+            "access-token": []
+          }
+        ]
+      }
+    },
     "/api/v1/me/product-views": {
       "get": {
         "operationId": "ProductViewsController_findMine",
@@ -2119,6 +2232,11 @@
             "type": "boolean",
             "description": "Получен ли номер телефона через бота",
             "example": false
+          },
+          "telegramLinked": {
+            "type": "boolean",
+            "description": "Открыт ли чат с ботом. Пока false, уведомления в Telegram не доходят",
+            "example": false
           }
         },
         "required": [
@@ -2128,7 +2246,8 @@
           "telegramUsername",
           "telegramPhoto",
           "phoneNumber",
-          "hasContact"
+          "hasContact",
+          "telegramLinked"
         ]
       },
       "AuthResponseDto": {
@@ -2623,6 +2742,41 @@
           "uploadUrl",
           "fields",
           "expiresInSec"
+        ]
+      },
+      "BroadcastAudienceCountDto": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "number",
+            "description": "Сколько адресатов получат рассылку сейчас"
+          }
+        },
+        "required": [
+          "count"
+        ]
+      },
+      "CreateBroadcastDto": {
+        "type": "object",
+        "properties": {
+          "audience": {
+            "type": "string",
+            "enum": [
+              "all",
+              "sellers",
+              "buyers"
+            ]
+          },
+          "text": {
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 4096,
+            "description": "Текст сообщения. Допускается HTML-разметка Telegram."
+          }
+        },
+        "required": [
+          "audience",
+          "text"
         ]
       },
       "ProductViewDto": {

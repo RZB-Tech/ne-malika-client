@@ -301,6 +301,7 @@ const ru = {
       reports: "Жалобы",
       users: "Пользователи",
       aiReview: "Проверка ИИ",
+      broadcast: "Рассылка",
     },
     stats: {
       title: "Статистика платформы",
@@ -344,6 +345,47 @@ const ru = {
         published: "Опубликованы",
         rejected: "Отклонены",
       },
+    },
+    broadcast: {
+      title: "Рассылка",
+      subtitle:
+        "Сообщение уходит в Telegram всем, кто открыл чат с ботом. Отправить и отменить нельзя — проверьте текст.",
+      audience: "Кому",
+      audienceAll: "Всем",
+      audienceSellers: "Продавцам",
+      audienceBuyers: "Покупателям",
+      text: "Текст сообщения",
+      textPlaceholder:
+        "Например: на этой неделе добавили категорию «Мониторы» — загляните и добавьте свои товары.",
+      textHint:
+        "Поддерживается разметка Telegram: <b>жирный</b>, <i>курсив</i>, <a href=\"…\">ссылка</a>.",
+      recipients: "Получат сейчас: {count}",
+      recipientsNone:
+        "Получателей нет: никто из этой группы ещё не открыл чат с ботом.",
+      send: "Отправить",
+      sending: "Отправляем…",
+      confirmTitle: "Отправить рассылку?",
+      confirmText:
+        "Сообщение получат {count} чел. Отменить отправку будет нельзя.",
+      sent: "Доставлено {delivered} из {recipients}",
+      failed: "Не удалось отправить рассылку",
+      tooShort: "Напишите текст сообщения",
+      history: "История рассылок",
+      historyEmpty: "Рассылок ещё не было.",
+      colDate: "Когда",
+      colAudience: "Кому",
+      colText: "Текст",
+      colResult: "Доставлено",
+      colAuthor: "Отправил",
+    },
+    telegramLink: {
+      title: "Включите уведомления в Telegram",
+      text: "Бот не может написать первым, пока вы не откроете чат. Нажмите «Старт» — и будете сразу узнавать о жалобах и товарах, снятых проверкой.",
+      textSeller:
+        "Бот не может написать первым, пока вы не откроете чат. Нажмите «Старт» — и будете получать напоминания и новости площадки.",
+      button: "Открыть бота",
+      notConfigured:
+        "Ссылка на бота не настроена: не задан NEXT_PUBLIC_TELEGRAM_BOT_USERNAME.",
     },
     common: {
       rowHint:
@@ -1018,6 +1060,7 @@ const uzLatn: typeof ru = {
       reports: "Shikoyatlar",
       users: "Foydalanuvchilar",
       aiReview: "AI tekshiruvi",
+      broadcast: "Tarqatma",
     },
     stats: {
       title: "Platforma statistikasi",
@@ -1061,6 +1104,47 @@ const uzLatn: typeof ru = {
         published: "Chop etilgan",
         rejected: "Rad etilgan",
       },
+    },
+    broadcast: {
+      title: "Tarqatma",
+      subtitle:
+        "Xabar bot bilan chat ochgan barchaga Telegramda yuboriladi. Yuborilgandan keyin bekor qilib bo‘lmaydi — matnni tekshiring.",
+      audience: "Kimga",
+      audienceAll: "Barchaga",
+      audienceSellers: "Sotuvchilarga",
+      audienceBuyers: "Xaridorlarga",
+      text: "Xabar matni",
+      textPlaceholder:
+        "Masalan: shu hafta «Monitorlar» kategoriyasi qo‘shildi — kirib, o‘z mahsulotlaringizni joylang.",
+      textHint:
+        "Telegram bezaklari ishlaydi: <b>qalin</b>, <i>kursiv</i>, <a href=\"…\">havola</a>.",
+      recipients: "Hozir oladi: {count}",
+      recipientsNone:
+        "Qabul qiluvchilar yo‘q: bu guruhdan hali hech kim bot bilan chat ochmagan.",
+      send: "Yuborish",
+      sending: "Yuborilmoqda…",
+      confirmTitle: "Tarqatma yuborilsinmi?",
+      confirmText:
+        "Xabarni {count} kishi oladi. Yuborishni bekor qilib bo‘lmaydi.",
+      sent: "{recipients} tadan {delivered} tasiga yetkazildi",
+      failed: "Tarqatmani yuborib bo‘lmadi",
+      tooShort: "Xabar matnini yozing",
+      history: "Tarqatmalar tarixi",
+      historyEmpty: "Hali tarqatmalar bo‘lmagan.",
+      colDate: "Qachon",
+      colAudience: "Kimga",
+      colText: "Matn",
+      colResult: "Yetkazildi",
+      colAuthor: "Yuborgan",
+    },
+    telegramLink: {
+      title: "Telegramda bildirishnomalarni yoqing",
+      text: "Siz chat ochmaguningizcha bot birinchi bo‘lib yoza olmaydi. «Start»ni bosing — shikoyatlar va tekshiruv olib tashlagan mahsulotlar haqida darhol bilasiz.",
+      textSeller:
+        "Siz chat ochmaguningizcha bot birinchi bo‘lib yoza olmaydi. «Start»ni bosing — eslatmalar va platforma yangiliklarini olasiz.",
+      button: "Botni ochish",
+      notConfigured:
+        "Botga havola sozlanmagan: NEXT_PUBLIC_TELEGRAM_BOT_USERNAME berilmagan.",
     },
     common: {
       rowHint:
@@ -1741,6 +1825,7 @@ const uzCyrl: typeof ru = {
       reports: "Шикоятлар",
       users: "Фойдаланувчилар",
       aiReview: "AI текшируви",
+      broadcast: "Тарқатма",
     },
     stats: {
       title: "Платформа статистикаси",
@@ -1784,6 +1869,47 @@ const uzCyrl: typeof ru = {
         published: "Чоп этилган",
         rejected: "Рад этилган",
       },
+    },
+    broadcast: {
+      title: "Тарқатма",
+      subtitle:
+        "Хабар бот билан чат очган барчага Телеграмда юборилади. Юборилгандан кейин бекор қилиб бўлмайди — матнни текширинг.",
+      audience: "Кимга",
+      audienceAll: "Барчага",
+      audienceSellers: "Сотувчиларга",
+      audienceBuyers: "Харидорларга",
+      text: "Хабар матни",
+      textPlaceholder:
+        "Масалан: шу ҳафта «Мониторлар» категорияси қўшилди — кириб, ўз маҳсулотларингизни жойланг.",
+      textHint:
+        "Телеграм безаклари ишлайди: <b>қалин</b>, <i>курсив</i>, <a href=\"…\">ҳавола</a>.",
+      recipients: "Ҳозир олади: {count}",
+      recipientsNone:
+        "Қабул қилувчилар йўқ: бу гуруҳдан ҳали ҳеч ким бот билан чат очмаган.",
+      send: "Юбориш",
+      sending: "Юборилмоқда…",
+      confirmTitle: "Тарқатма юборилсинми?",
+      confirmText:
+        "Хабарни {count} киши олади. Юборишни бекор қилиб бўлмайди.",
+      sent: "{recipients} тадан {delivered} тасига етказилди",
+      failed: "Тарқатмани юбориб бўлмади",
+      tooShort: "Хабар матнини ёзинг",
+      history: "Тарқатмалар тарихи",
+      historyEmpty: "Ҳали тарқатмалар бўлмаган.",
+      colDate: "Қачон",
+      colAudience: "Кимга",
+      colText: "Матн",
+      colResult: "Етказилди",
+      colAuthor: "Юборган",
+    },
+    telegramLink: {
+      title: "Телеграмда билдиришномаларни ёқинг",
+      text: "Сиз чат очмагунингизча бот биринчи бўлиб ёза олмайди. «Старт»ни босинг — шикоятлар ва текширув олиб ташлаган маҳсулотлар ҳақида дарҳол биласиз.",
+      textSeller:
+        "Сиз чат очмагунингизча бот биринчи бўлиб ёза олмайди. «Старт»ни босинг — эслатмалар ва платформа янгиликларини оласиз.",
+      button: "Ботни очиш",
+      notConfigured:
+        "Ботга ҳавола созланмаган: NEXT_PUBLIC_TELEGRAM_BOT_USERNAME берилмаган.",
     },
     common: {
       rowHint:
