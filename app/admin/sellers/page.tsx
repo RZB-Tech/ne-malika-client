@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   Ban,
+  Coins,
   ExternalLink,
   RotateCcw,
   Search,
@@ -27,6 +28,7 @@ import { StoreAvatar } from "@/components/shared/store-avatar";
 import { EntityStatusBadge } from "@/components/admin/entity-status-badge";
 import { Pagination } from "@/components/shared/pagination";
 import { ShopDrawer } from "@/components/admin/shop-drawer";
+import { GrantCreditsDialog } from "@/components/admin/grant-credits-dialog";
 import {
   RowActionsMenu,
   RowContextMenu,
@@ -57,6 +59,11 @@ export default function AdminSellers() {
   const { t, locale } = useT();
   const queryClient = useQueryClient();
   const [opened, setOpened] = useState<AdminShopRow | null>(null);
+  // Магазин, которому сейчас выдают кредиты. Диалог живёт снаружи таблицы,
+  // иначе он размонтировался бы вместе со строкой при обновлении списка.
+  const [granting, setGranting] = useState<{ id: number; name: string } | null>(
+    null,
+  );
   const [page, setPage] = useState(1);
   const [q, setQ] = useState("");
 
@@ -158,6 +165,11 @@ export default function AdminSellers() {
             onConfirm: (reason) => blockOwner(shop.ownerId, reason),
           },
         },
+    {
+      label: t("admin.credits.grantAction"),
+      icon: Coins,
+      onSelect: () => setGranting({ id: shop.id, name: shop.name }),
+    },
     {
       label: t("admin.shops.remove"),
       icon: Trash2,
@@ -317,6 +329,8 @@ export default function AdminSellers() {
         onUnblockOwner={unblockOwner}
         onRemove={remove}
       />
+
+      <GrantCreditsDialog shop={granting} onClose={() => setGranting(null)} />
     </div>
   );
 }

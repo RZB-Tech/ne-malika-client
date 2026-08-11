@@ -6,13 +6,12 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export interface AppSettingsDto {
-  /** Автоматическая ИИ-проверка товаров при создании и редактировании */
-  aiChecksEnabled: boolean;
+export interface ImageGenBalanceDto {
+  /** Разрешена ли генерация: у админа — всегда */
+  allowed: boolean;
   /**
-     * Множитель наценки на кредиты: сумма от магазина делится на него. При 2 оплата $20 даёт $10 доступного расхода.
-     * @minimum 1
-     * @maximum 100
+     * Остаток кредитов. null — без ограничения (администратор)
+     * @nullable
      */
-  creditMarkup?: number;
+  credits: number | null;
 }

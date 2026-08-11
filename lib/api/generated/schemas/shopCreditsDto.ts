@@ -6,13 +6,11 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export interface AppSettingsDto {
-  /** Автоматическая ИИ-проверка товаров при создании и редактировании */
-  aiChecksEnabled: boolean;
-  /**
-     * Множитель наценки на кредиты: сумма от магазина делится на него. При 2 оплата $20 даёт $10 доступного расхода.
-     * @minimum 1
-     * @maximum 100
-     */
-  creditMarkup?: number;
+export interface ShopCreditsDto {
+  /** Начислено всего, за вычетом потраченного */
+  balance: number;
+  /** Занято выполняющимися сейчас запросами */
+  reserved: number;
+  /** Доступно к трате: balance − reserved */
+  available: number;
 }

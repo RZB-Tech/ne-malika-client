@@ -6,13 +6,16 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export interface ImageGenAccessDto {
-  /** Включить или выключить генерацию */
-  enabled: boolean;
-  /**
-     * Потолок числа картинок. Пусто — безлимитно
-     * @minimum 0
-     * @nullable
-     */
-  limit?: number | null;
-}
+export type AdminCreditsControllerHistoryParams = {
+/**
+ * Номер страницы
+ * @minimum 1
+ */
+page?: number;
+/**
+ * Размер страницы
+ * @minimum 1
+ * @maximum 100
+ */
+limit?: number;
+};

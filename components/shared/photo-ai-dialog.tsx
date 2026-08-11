@@ -24,7 +24,7 @@ import {
   useImageGenControllerDescribe,
   useImageGenControllerGenerate,
   useImageGenControllerHistory,
-  useImageGenControllerQuota,
+  useImageGenControllerBalance,
 } from "@/lib/api/generated/endpoints/image-gen/image-gen";
 import type {
   GenerateImagesDtoQuality,
@@ -162,14 +162,15 @@ export function PhotoAiDialog({
     setSavedKey(null);
   }
 
-  const quotaQuery = useImageGenControllerQuota({
+  // Остаток кредитов магазина. Показывается до нажатия кнопки, а не после
+  // отказа: узнать, что кредиты кончились, из пустого результата нельзя.
+  const quotaQuery = useImageGenControllerBalance({
     query: { enabled: open, retry: false },
   });
   const quota = quotaQuery.data as unknown as
-    | { allowed: boolean; limit: number | null; used: number }
+    | { allowed: boolean; credits: number | null }
     | undefined;
-  const left =
-    quota && quota.limit !== null ? Math.max(0, quota.limit - quota.used) : null;
+  const left = quota?.credits ?? null;
 
   // Всё, что уже нарисовано по этому фото. Раньше результат жил только в
   // состоянии диалога и пропадал при закрытии — сами картинки при этом
@@ -239,7 +240,7 @@ export function PhotoAiDialog({
       })) as unknown as Generated[];
       setResults((prev) => [...res, ...prev]);
       setPicked(new Set());
-      // Квота списана, а в галерее прибавилось — обе цифры берём с сервера.
+      // Кредиты списаны, а в галерее прибавилось — обе цифры берём с сервера.
       await Promise.all([quotaQuery.refetch(), historyQuery.refetch()]);
     } catch (err) {
       toast.error(
@@ -550,10 +551,7 @@ export function PhotoAiDialog({
                     left === 0 ? "text-destructive" : "text-muted-foreground",
                   )}
                 >
-                  {t("admin.photoAi.quotaLeft", {
-                    left,
-                    limit: quota?.limit ?? 0,
-                  })}
+                  {t("admin.photoAi.creditsLeft", { left })}
                 </span>
               ) : quota ? (
                 <span className="text-sm text-muted-foreground">

@@ -1,10 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Sparkles } from "lucide-react";
+import { Coins, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -21,6 +23,31 @@ export default function AdminSettings() {
     query: { retry: false },
   });
   const updateMutation = useAdminSettingsControllerUpdate();
+
+  // Строка, а не число: поле можно очистить во время правки, и «» не должно
+  // превращаться в 0 — множитель ноль означал бы деление на ноль при выдаче.
+  const [markup, setMarkup] = useState<string | null>(null);
+  const markupValue = markup ?? String(settings?.creditMarkup ?? 2);
+
+  const saveMarkup = async () => {
+    const parsed = Number(markupValue);
+    if (!Number.isFinite(parsed) || parsed < 1) {
+      toast.error(t("admin.settings.saveFailed"));
+      setMarkup(null);
+      return;
+    }
+    if (settings && parsed === settings.creditMarkup) return;
+    try {
+      await updateMutation.mutateAsync({
+        data: { aiChecksEnabled: settings?.aiChecksEnabled ?? true, creditMarkup: parsed },
+      });
+      await queryClient.invalidateQueries();
+      setMarkup(null);
+      toast.success(t("admin.imageGen.saved"));
+    } catch {
+      toast.error(t("admin.settings.saveFailed"));
+    }
+  };
 
   const toggleAiChecks = async (enabled: boolean) => {
     try {
@@ -72,6 +99,39 @@ export default function AdminSettings() {
               disabled={updateMutation.isPending}
               onCheckedChange={toggleAiChecks}
             />
+          </div>
+        )}
+      </Card>
+
+      {/* Множитель наценки: сумма от магазина делится на него при начислении. */}
+      <Card className="p-6">
+        {isLoading || !settings ? (
+          <Skeleton className="h-16 w-full" />
+        ) : (
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div className="min-w-0 flex-1">
+              <Label htmlFor="markup" className="flex items-center gap-2 font-medium">
+                <Coins className="size-4 text-primary" />
+                {t("admin.credits.markupTitle")}
+              </Label>
+              <p className="mt-1.5 text-sm text-muted-foreground">
+                {t("admin.credits.markupText")}
+              </p>
+            </div>
+            <div className="w-32 shrink-0 space-y-1.5">
+              <Label htmlFor="markup" className="text-xs text-muted-foreground">
+                {t("admin.credits.markupLabel")}
+              </Label>
+              <Input
+                id="markup"
+                inputMode="decimal"
+                className="tabular"
+                value={markupValue}
+                onChange={(e) => setMarkup(e.target.value.replace(/[^\d.]/g, ""))}
+                onBlur={saveMarkup}
+                disabled={updateMutation.isPending}
+              />
+            </div>
           </div>
         )}
       </Card>

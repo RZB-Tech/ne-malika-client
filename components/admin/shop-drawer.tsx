@@ -16,6 +16,7 @@ import {
   drawerAction,
 } from "@/components/admin/detail-drawer";
 import { useT } from "@/components/providers/i18n-provider";
+import { ShopCreditsRow } from "@/components/admin/shop-credits-row";
 import { formatDate } from "@/lib/format";
 import { hueFromId } from "@/lib/api/mappers";
 import { photoUrl } from "@/lib/api/photo";
@@ -156,6 +157,10 @@ export function ShopDrawer({
               </div>
             </div>
           </div>
+
+          <DetailSection title={t("admin.credits.balance")}>
+            <ShopCreditsRow shopId={shop.id} />
+          </DetailSection>
 
           <DetailSection title={t("admin.shops.contacts")}>
             <DetailRow label={t("admin.shops.phone")} value={shop.contact} />

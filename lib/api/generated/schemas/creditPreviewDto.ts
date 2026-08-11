@@ -6,14 +6,8 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export interface ImageGenQuotaDto {
-  /** Разрешена ли генерация этому пользователю */
-  allowed: boolean;
-  /**
-     * Сколько картинок всего разрешено. null — без ограничения
-     * @nullable
-     */
-  limit: number | null;
-  /** Сколько уже сгенерировано */
-  used: number;
+export interface CreditPreviewDto {
+  /** Сколько кредитов даст указанная сумма */
+  credits: number;
+  markup: number;
 }

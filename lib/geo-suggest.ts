@@ -45,7 +45,6 @@ export async function suggestPlaces(
 ): Promise<PlaceSuggestion[]> {
   const q = query.trim();
   if (q.length < 2) return [];
-  // Bias address lookups by the base city so streets/houses resolve locally.
   const city = opts.city || BASE_CITY;
   const text = opts.kind === "address" ? `${city}, ${q}` : q;
   try {
@@ -67,7 +66,6 @@ async function suggestYandex(
     lang: "ru_RU",
     results: "6",
     types: opts.kind === "city" ? "locality" : "street,house",
-    // Restrict suggestions to the Tashkent window.
     ll: TASHKENT.center.join(","),
     spn: TASHKENT.span.join(","),
     strict_bounds: "1",
@@ -106,7 +104,6 @@ async function suggestPhoton(
     q: text,
     limit: "6",
     lang: "ru",
-    // Bias toward Tashkent centre and clip to its bounding box.
     lat: String(TASHKENT.center[1]),
     lon: String(TASHKENT.center[0]),
     bbox: TASHKENT.bbox.join(","),

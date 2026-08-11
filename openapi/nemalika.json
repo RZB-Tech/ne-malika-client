@@ -1974,10 +1974,10 @@
         ]
       }
     },
-    "/api/v1/image-gen/quota": {
+    "/api/v1/image-gen/balance": {
       "get": {
-        "operationId": "ImageGenController_quota",
-        "summary": "Доступ и остаток по генерации изображений",
+        "operationId": "ImageGenController_balance",
+        "summary": "Остаток кредитов магазина на ИИ",
         "parameters": [],
         "responses": {
           "200": {
@@ -1985,7 +1985,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ImageGenQuotaDto"
+                  "$ref": "#/components/schemas/ImageGenBalanceDto"
                 }
               }
             }
@@ -2110,13 +2110,13 @@
         ]
       }
     },
-    "/api/v1/admin/image-gen/access/{userId}": {
+    "/api/v1/admin/shops/{shopId}/credits": {
       "get": {
-        "operationId": "AdminImageGenController_access",
-        "summary": "Текущий доступ и расход пользователя",
+        "operationId": "AdminCreditsController_balance",
+        "summary": "Баланс кредитов магазина",
         "parameters": [
           {
-            "name": "userId",
+            "name": "shopId",
             "required": true,
             "in": "path",
             "schema": {
@@ -2130,14 +2130,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ImageGenQuotaDto"
+                  "$ref": "#/components/schemas/ShopCreditsDto"
                 }
               }
             }
           }
         },
         "tags": [
-          "image-gen-admin"
+          "credits-admin"
         ],
         "security": [
           {
@@ -2145,12 +2145,12 @@
           }
         ]
       },
-      "patch": {
-        "operationId": "AdminImageGenController_setAccess",
-        "summary": "Выдать или снять доступ к генерации",
+      "post": {
+        "operationId": "AdminCreditsController_grant",
+        "summary": "Начислить кредиты магазину",
         "parameters": [
           {
-            "name": "userId",
+            "name": "shopId",
             "required": true,
             "in": "path",
             "schema": {
@@ -2163,7 +2163,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ImageGenAccessDto"
+                "$ref": "#/components/schemas/GrantCreditsDto"
               }
             }
           }
@@ -2174,14 +2174,102 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ImageGenQuotaDto"
+                  "$ref": "#/components/schemas/GrantResultDto"
                 }
               }
             }
           }
         },
         "tags": [
-          "image-gen-admin"
+          "credits-admin"
+        ],
+        "security": [
+          {
+            "access-token": []
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/shops/{shopId}/credits/history": {
+      "get": {
+        "operationId": "AdminCreditsController_history",
+        "summary": "История начислений и списаний",
+        "parameters": [
+          {
+            "name": "shopId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Номер страницы",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Размер страницы",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "credits-admin"
+        ],
+        "security": [
+          {
+            "access-token": []
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/credits/preview": {
+      "get": {
+        "operationId": "AdminCreditsPreviewController_preview",
+        "summary": "Сколько кредитов даст сумма",
+        "parameters": [
+          {
+            "name": "amountUsd",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreditPreviewDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "credits-admin"
         ],
         "security": [
           {
@@ -2846,6 +2934,13 @@
             "type": "boolean",
             "description": "Автоматическая ИИ-проверка товаров при создании и редактировании",
             "example": true
+          },
+          "creditMarkup": {
+            "type": "number",
+            "description": "Множитель наценки на кредиты: сумма от магазина делится на него. При 2 оплата $20 даёт $10 доступного расхода.",
+            "minimum": 1,
+            "maximum": 100,
+            "example": 2
           }
         },
         "required": [
@@ -3282,28 +3377,23 @@
           "items"
         ]
       },
-      "ImageGenQuotaDto": {
+      "ImageGenBalanceDto": {
         "type": "object",
         "properties": {
           "allowed": {
             "type": "boolean",
-            "description": "Разрешена ли генерация этому пользователю"
+            "description": "Разрешена ли генерация: у админа — всегда"
           },
-          "limit": {
+          "credits": {
             "type": "number",
             "nullable": true,
-            "description": "Сколько картинок всего разрешено. null — без ограничения",
-            "example": 50
-          },
-          "used": {
-            "type": "number",
-            "description": "Сколько уже сгенерировано"
+            "description": "Остаток кредитов. null — без ограничения (администратор)",
+            "example": 8400
           }
         },
         "required": [
           "allowed",
-          "limit",
-          "used"
+          "credits"
         ]
       },
       "StoredImageDto": {
@@ -3434,23 +3524,83 @@
           "url"
         ]
       },
-      "ImageGenAccessDto": {
+      "ShopCreditsDto": {
         "type": "object",
         "properties": {
-          "enabled": {
-            "type": "boolean",
-            "description": "Включить или выключить генерацию"
-          },
-          "limit": {
+          "balance": {
             "type": "number",
-            "nullable": true,
-            "minimum": 0,
-            "description": "Потолок числа картинок. Пусто — безлимитно",
-            "example": 50
+            "description": "Начислено всего, за вычетом потраченного"
+          },
+          "reserved": {
+            "type": "number",
+            "description": "Занято выполняющимися сейчас запросами"
+          },
+          "available": {
+            "type": "number",
+            "description": "Доступно к трате: balance − reserved"
           }
         },
         "required": [
-          "enabled"
+          "balance",
+          "reserved",
+          "available"
+        ]
+      },
+      "GrantCreditsDto": {
+        "type": "object",
+        "properties": {
+          "amountUsd": {
+            "type": "number",
+            "description": "Сумма, которую заплатил магазин, в долларах. Начислится делённой на множитель наценки из настроек.",
+            "minimum": 1,
+            "maximum": 10000,
+            "example": 20
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "Комментарий для истории: номер платежа, договорённость"
+          }
+        },
+        "required": [
+          "amountUsd"
+        ]
+      },
+      "GrantResultDto": {
+        "type": "object",
+        "properties": {
+          "balance": {
+            "type": "number"
+          },
+          "credits": {
+            "type": "number",
+            "description": "Сколько кредитов начислено этой выдачей"
+          },
+          "markup": {
+            "type": "number",
+            "description": "Множитель, применённый при начислении"
+          }
+        },
+        "required": [
+          "balance",
+          "credits",
+          "markup"
+        ]
+      },
+      "CreditPreviewDto": {
+        "type": "object",
+        "properties": {
+          "credits": {
+            "type": "number",
+            "description": "Сколько кредитов даст указанная сумма"
+          },
+          "markup": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "credits",
+          "markup"
         ]
       },
       "CreateReportDto": {

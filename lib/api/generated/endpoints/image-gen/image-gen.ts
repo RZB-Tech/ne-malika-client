@@ -28,8 +28,8 @@ import type {
   DescribePromptDto,
   GenerateImagesDto,
   GeneratedImageDto,
+  ImageGenBalanceDto,
   ImageGenControllerHistoryParams,
-  ImageGenQuotaDto,
   StoredImageDto
 } from '../../schemas';
 
@@ -57,16 +57,16 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
 };
 
 /**
- * @summary Доступ и остаток по генерации изображений
+ * @summary Остаток кредитов магазина на ИИ
  */
-export const imageGenControllerQuota = (
+export const imageGenControllerBalance = (
 
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
 
 
-      return customInstance<ImageGenQuotaDto>(
-      {url: `/api/v1/image-gen/quota`, method: 'GET', signal
+      return customInstance<ImageGenBalanceDto>(
+      {url: `/api/v1/image-gen/balance`, method: 'GET', signal
     },
       options);
     }
@@ -74,69 +74,69 @@ export const imageGenControllerQuota = (
 
 
 
-export const getImageGenControllerQuotaQueryKey = () => {
+export const getImageGenControllerBalanceQueryKey = () => {
     return [
-    `/api/v1/image-gen/quota`
+    `/api/v1/image-gen/balance`
     ] as const;
     }
 
 
-export const getImageGenControllerQuotaQueryOptions = <TData = Awaited<ReturnType<typeof imageGenControllerQuota>>, TError = ErrorType<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof imageGenControllerQuota>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getImageGenControllerBalanceQueryOptions = <TData = Awaited<ReturnType<typeof imageGenControllerBalance>>, TError = ErrorType<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof imageGenControllerBalance>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getImageGenControllerQuotaQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getImageGenControllerBalanceQueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof imageGenControllerQuota>>> = ({ signal }) => imageGenControllerQuota(requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof imageGenControllerBalance>>> = ({ signal }) => imageGenControllerBalance(requestOptions, signal);
 
 
 
 
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof imageGenControllerQuota>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof imageGenControllerBalance>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type ImageGenControllerQuotaQueryResult = NonNullable<Awaited<ReturnType<typeof imageGenControllerQuota>>>
-export type ImageGenControllerQuotaQueryError = ErrorType<unknown>
+export type ImageGenControllerBalanceQueryResult = NonNullable<Awaited<ReturnType<typeof imageGenControllerBalance>>>
+export type ImageGenControllerBalanceQueryError = ErrorType<unknown>
 
 
-export function useImageGenControllerQuota<TData = Awaited<ReturnType<typeof imageGenControllerQuota>>, TError = ErrorType<unknown>>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof imageGenControllerQuota>>, TError, TData>> & Pick<
+export function useImageGenControllerBalance<TData = Awaited<ReturnType<typeof imageGenControllerBalance>>, TError = ErrorType<unknown>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof imageGenControllerBalance>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof imageGenControllerQuota>>,
+          Awaited<ReturnType<typeof imageGenControllerBalance>>,
           TError,
-          Awaited<ReturnType<typeof imageGenControllerQuota>>
+          Awaited<ReturnType<typeof imageGenControllerBalance>>
         > , 'initialData'
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useImageGenControllerQuota<TData = Awaited<ReturnType<typeof imageGenControllerQuota>>, TError = ErrorType<unknown>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof imageGenControllerQuota>>, TError, TData>> & Pick<
+export function useImageGenControllerBalance<TData = Awaited<ReturnType<typeof imageGenControllerBalance>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof imageGenControllerBalance>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof imageGenControllerQuota>>,
+          Awaited<ReturnType<typeof imageGenControllerBalance>>,
           TError,
-          Awaited<ReturnType<typeof imageGenControllerQuota>>
+          Awaited<ReturnType<typeof imageGenControllerBalance>>
         > , 'initialData'
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useImageGenControllerQuota<TData = Awaited<ReturnType<typeof imageGenControllerQuota>>, TError = ErrorType<unknown>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof imageGenControllerQuota>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export function useImageGenControllerBalance<TData = Awaited<ReturnType<typeof imageGenControllerBalance>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof imageGenControllerBalance>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
- * @summary Доступ и остаток по генерации изображений
+ * @summary Остаток кредитов магазина на ИИ
  */
 
-export function useImageGenControllerQuota<TData = Awaited<ReturnType<typeof imageGenControllerQuota>>, TError = ErrorType<unknown>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof imageGenControllerQuota>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export function useImageGenControllerBalance<TData = Awaited<ReturnType<typeof imageGenControllerBalance>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof imageGenControllerBalance>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getImageGenControllerQuotaQueryOptions(options)
+  const queryOptions = getImageGenControllerBalanceQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
