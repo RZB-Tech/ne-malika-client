@@ -1,8 +1,8 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { History, Menu, Scale, SlidersHorizontal, Store } from "lucide-react";
+import { History, Menu, Scale, Store } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -16,23 +16,18 @@ import { Logo } from "@/components/shared/logo";
 import { LanguageSwitch } from "@/components/shared/language-switch";
 import { LoginDialog } from "@/components/auth/login-dialog";
 import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
-import { FilterPanel } from "@/components/catalog/filter-panel";
-import { useCatalogFilters } from "@/components/catalog/use-catalog-filters";
 import { useT } from "@/components/providers/i18n-provider";
 import { useAuth } from "@/lib/api/auth";
-import { onOpenHeaderMenu } from "./header-menu-bus";
 
 /**
- * Бургер в шапке: слева выезжает панель с фильтрами каталога и навигацией.
- * Доступна на любой странице — фильтр, выбранный с карточки товара, уводит на
- * витрину с уже применённым запросом.
+ * Бургер в шапке: слева выезжает навигация — личный кабинет, сравнение, вход
+ * в кабинет продавца, язык и тема. Панель фильтров отсюда убрана вместе с
+ * кнопкой «Фильтры» над сеткой каталога.
  */
 export function HeaderMenu() {
   const { t } = useT();
   const { isAuthenticated, isAdmin, isSeller } = useAuth();
   const [open, setOpen] = useState(false);
-
-  useEffect(() => onOpenHeaderMenu(() => setOpen(true)), []);
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -40,13 +35,10 @@ export function HeaderMenu() {
         <Button
           variant="ghost"
           size="icon-sm"
-          className="relative shrink-0 lg:hidden"
+          className="relative shrink-0 hover:bg-white/15 hover:text-primary-foreground lg:hidden"
           aria-label={t("common.menu")}
         >
           <Menu className="size-5" />
-          <Suspense fallback={null}>
-            <ActiveFilterBadge />
-          </Suspense>
         </Button>
       </SheetTrigger>
 
@@ -56,12 +48,6 @@ export function HeaderMenu() {
             <Logo />
           </SheetTitle>
         </SheetHeader>
-
-        <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-4">
-          <Suspense fallback={null}>
-            <MenuFilters />
-          </Suspense>
-        </div>
 
         <SheetFooter className="gap-3 border-t border-border">
           <div className="grid grid-cols-2 gap-2">
@@ -115,48 +101,3 @@ export function HeaderMenu() {
   );
 }
 
-function MenuFilters() {
-  const { t } = useT();
-  const { sort, setSort, priceDraft, updatePrice, resetFilters, activeCount } =
-    useCatalogFilters();
-
-  return (
-    <>
-      <div className="flex h-12 items-center justify-between gap-2">
-        <span className="inline-flex items-center gap-2 text-sm font-semibold">
-          <SlidersHorizontal className="size-4 text-muted-foreground" />
-          {t("catalog.filters")}
-        </span>
-        {activeCount > 0 && (
-          <button
-            type="button"
-            onClick={resetFilters}
-            className="text-xs font-medium text-primary hover:underline"
-          >
-            {t("common.resetAll")}
-          </button>
-        )}
-      </div>
-
-      <FilterPanel
-        defaultOpen
-        filters={priceDraft}
-        setFilters={updatePrice}
-        sort={sort}
-        setSort={setSort}
-      />
-    </>
-  );
-}
-
-/** Счётчик применённых фильтров поверх бургера. */
-function ActiveFilterBadge() {
-  const { activeCount } = useCatalogFilters();
-  if (activeCount === 0) return null;
-
-  return (
-    <span className="absolute -top-0.5 -right-0.5 flex size-4 items-center justify-center rounded-full bg-primary text-[10px] font-semibold text-primary-foreground tabular">
-      {activeCount}
-    </span>
-  );
-}

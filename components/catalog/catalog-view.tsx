@@ -2,23 +2,18 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { Loader2, SearchX, SlidersHorizontal, X } from "lucide-react";
+import { Loader2, SearchX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   ProductCard,
   ProductCardSkeleton,
 } from "@/components/product/product-card";
 import { useCatalogFilters } from "./use-catalog-filters";
-import type { SortKey } from "./use-catalog-filters";
 import { useT } from "@/components/providers/i18n-provider";
-import { findCategory, useCategories } from "@/lib/api/categories";
-import { openHeaderMenu } from "@/components/layout/header-menu-bus";
 import { productCardsControllerFindAll } from "@/lib/api/generated/endpoints/product-cards-public/product-cards-public";
 import type { ProductCardsControllerFindAllParams } from "@/lib/api/generated/schemas";
 import { mapPublicProductCard } from "@/lib/api/mappers";
 import type { Paginated, PublicProductCard } from "@/lib/api/types";
-
-export type { CatalogFilters, PriceRange, SortKey } from "./use-catalog-filters";
 
 const PAGE_SIZE = 24;
 
@@ -32,12 +27,6 @@ const MAX_AUTO_PAGES = 4;
 /** Насколько заранее, не доходя до низа, начинать подгрузку. */
 const PRELOAD_MARGIN = "600px 0px";
 
-const SORT_MAP: Record<SortKey, ProductCardsControllerFindAllParams["sort"]> = {
-  latest: "newest",
-  priceAsc: "price_asc",
-  priceDesc: "price_desc",
-};
-
 export function CatalogView({
   initialData,
 }: {
@@ -47,53 +36,31 @@ export function CatalogView({
   // гидратация покажет не тот список.
   initialData?: Paginated<PublicProductCard>;
 } = {}) {
-  const { t, locale } = useT();
-  const { roots } = useCategories();
+  const { t } = useT();
 
   // Фильтры живут в URL и редактируются из шторки в шапке — здесь их только
   // читают и показывают чипсами.
-  const {
-    q,
-    sort,
-    price,
-    filters,
-    category,
-    setCategory,
-    subCategoryId,
-    setSort,
-    clearPrice,
-    resetFilters,
-  } = useCatalogFilters();
+  const { q, category, subCategoryId } = useCatalogFilters();
 
   const params: ProductCardsControllerFindAllParams = useMemo(
     () => ({
       limit: PAGE_SIZE,
       q: q || undefined,
-      price_min: price.priceMin ?? undefined,
-      price_max: price.priceMax ?? undefined,
       // Выбранный лист уже задаёт ветку целиком — раздел в запросе лишний.
       ...(subCategoryId
         ? { category_id: subCategoryId }
         : category
           ? { category }
           : {}),
-      sort: SORT_MAP[sort],
+      // Сортировка всегда по новизне: выбор убран вместе с панелью фильтров.
+      sort: 'newest' as const,
     }),
-    [q, price, category, subCategoryId, sort],
+    [q, category, subCategoryId],
   );
 
   // Совпадают ли текущие параметры с серверным первым запросом. Только тогда
   // отданный сервером initialData валиден для этого ключа.
-  const isInitialParams =
-    !q &&
-    price.priceMin == null &&
-    price.priceMax == null &&
-    !category &&
-    // Подкатегория тоже входит в queryKey: без этой проверки серверная
-    // нефильтрованная страница подставлялась бы как данные для выборки по
-    // подкатегории, и запрос за настоящими товарами не уходил бы вовсе.
-    subCategoryId == null &&
-    sort === "latest";
+  const isInitialParams = !q && !category && subCategoryId == null;
 
   const listQuery = useInfiniteQuery({
     // Фильтры в ключе: их смена — это другой кеш, а не дозагрузка к текущему.
@@ -134,12 +101,11 @@ export function CatalogView({
       (data?.pages ?? []).flatMap((p) => p.data.map(mapPublicProductCard)),
     [data],
   );
-  const total = data?.pages[0]?.meta.total ?? 0;
 
   // Сколько страниц уже подтянулось само. Сбрасывается вместе с фильтрами —
   // приведение состояния во время рендера, чтобы новая выдача не отрисовалась
   // со счётчиком от предыдущей.
-  const filterKey = `${q}|${price.priceMin}|${price.priceMax}|${sort}|${category}|${subCategoryId}`;
+  const filterKey = `${q}|${category}|${subCategoryId}`;
   const [autoLoads, setAutoLoads] = useState(0);
   const [prevFilterKey, setPrevFilterKey] = useState(filterKey);
   if (filterKey !== prevFilterKey) {
@@ -176,81 +142,8 @@ export function CatalogView({
     fetchNextPage();
   }, [fetchNextPage]);
 
-  const title = filters.q ? `“${filters.q}”` : t("catalog.allProducts");
-
-  // В memo держим только данные: обработчик подставляется в JSX по key.
-  // Замыкание, читающее ref-ы, во время рендера сюда класть нельзя.
-  const activeChips = useMemo(() => {
-    const chips: { key: string; label: string }[] = [];
-    if (filters.priceMin != null || filters.priceMax != null)
-      chips.push({
-        key: "price",
-        label: `${filters.priceMin ?? 0}–${filters.priceMax ?? "∞"} ${t("common.currency")}`,
-      });
-    if (sort !== "latest")
-      chips.push({ key: "sort", label: t(`catalog.sort.${sort}`) });
-
-    // Категорию выбирают в меню шапки, а сбрасывают здесь: иначе фильтр
-    // остался бы включённым и никак не показанным.
-    const leaf = findCategory(roots, subCategoryId);
-    const root = roots.find((r) => r.slug === category);
-    const categoryLabel = leaf
-      ? `${leaf.root.name[locale]} · ${leaf.category.name[locale]}`
-      : (root?.name[locale] ?? null);
-    if (categoryLabel) chips.push({ key: "category", label: categoryLabel });
-
-    return chips;
-  }, [filters, sort, t, roots, category, subCategoryId, locale]);
-
-  const clearChip = useCallback(
-    (key: string) => {
-      if (key === "price") return clearPrice();
-      // Сброс раздела уносит и подкатегорию — она принадлежала ему.
-      if (key === "category") return setCategory(null);
-      return setSort("latest");
-    },
-    [clearPrice, setSort, setCategory],
-  );
-
   return (
     <div className="mx-auto max-w-[1600px] px-5 py-8 sm:px-8 lg:px-10">
-      <div className="mb-6">
-        <h1 className="font-heading text-2xl font-bold tracking-tight sm:text-3xl">{title}</h1>
-        <p className="mt-1 text-sm text-muted-foreground tabular">
-          {t("catalog.results", { count: total })}
-        </p>
-
-        <div className="mt-4 flex flex-wrap items-center gap-2">
-          {/* Сама панель — в шторке слева; здесь только вход в неё и то,
-              что уже выбрано. */}
-          <Button
-            variant="outline"
-            size="sm"
-            className="gap-2"
-            onClick={openHeaderMenu}
-          >
-            <SlidersHorizontal className="size-4" />
-            {t("catalog.filters")}
-          </Button>
-
-          {activeChips.map((c) => (
-            <button
-              key={c.key}
-              onClick={() => clearChip(c.key)}
-              className="inline-flex items-center gap-1 rounded-full bg-muted/70 py-1 pl-3 pr-2 text-xs font-medium text-foreground transition-colors hover:bg-muted"
-            >
-              {c.label}
-              <X className="size-3 text-muted-foreground" />
-            </button>
-          ))}
-          {activeChips.length > 0 && (
-            <button onClick={resetFilters} className="text-xs font-medium text-primary hover:underline">
-              {t("common.resetAll")}
-            </button>
-          )}
-        </div>
-      </div>
-
       {isError ? (
         <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border py-24 text-center">
           <SearchX className="size-10 text-muted-foreground/50" />
@@ -272,9 +165,6 @@ export function CatalogView({
           <SearchX className="size-10 text-muted-foreground/50" />
           <h3 className="mt-4 font-heading text-lg font-semibold">{t("catalog.emptyTitle")}</h3>
           <p className="mt-1 max-w-xs text-sm text-muted-foreground">{t("catalog.emptyText")}</p>
-          <Button variant="outline" size="sm" className="mt-5" onClick={resetFilters}>
-            {t("common.resetAll")}
-          </Button>
         </div>
       ) : (
         <>

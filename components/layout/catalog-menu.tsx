@@ -88,8 +88,10 @@ export function CatalogMenu() {
   return (
     <div ref={containerRef} className="shrink-0">
       <Button
-        variant={open ? "default" : "secondary"}
-        className="gap-2"
+        // На синей шапке вариант по умолчанию сливался с фоном: обе кнопки
+        // светлые, открытая — белая.
+        variant="secondary"
+        className={cn("gap-2", open && "bg-white text-primary hover:bg-white")}
         onClick={() => (open ? close() : openMenu())}
         aria-expanded={open}
         aria-haspopup="true"

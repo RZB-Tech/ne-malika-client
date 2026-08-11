@@ -1,6 +1,6 @@
 "use client";
 
-import { LayoutDashboard, Package, PlusCircle, Store } from "lucide-react";
+import { LayoutDashboard, Package, Store } from "lucide-react";
 import { RequireRole } from "@/components/auth/require-role";
 import {
   DashboardShell,
@@ -10,7 +10,6 @@ import {
 import { useT } from "@/components/providers/i18n-provider";
 import { StoreAvatar } from "@/components/shared/store-avatar";
 import { AddProductDialog } from "@/components/seller/add-product-dialog";
-import { openAddProduct } from "@/components/seller/add-product-bus";
 import { useSellerShop } from "@/lib/api/seller";
 import { hueFromId } from "@/lib/api/mappers";
 import { photoUrl } from "@/lib/api/photo";
@@ -30,25 +29,15 @@ function SellerLayoutInner({ children }: { children: React.ReactNode }) {
   const { t } = useT();
   const { shop } = useSellerShop();
 
-  // Пока магазина нет, разделы товаров ведут в тупик — оставляем только обзор
-  // и форму магазина. У упразднённого магазина товары посмотреть можно, а
-  // добавить новый уже нет — бэкенд такой запрос отклоняет.
+  // Пока магазина нет, раздел товаров ведёт в тупик — оставляем только обзор
+  // и форму магазина.
+  //
+  // Кнопки «Добавить товар» в меню нет намеренно: добавление живёт внутри
+  // раздела «Мои товары», рядом со списком, который оно пополняет.
   const items: NavItem[] = [
     { href: "/seller", label: t("seller.nav.dashboard"), icon: LayoutDashboard, exact: true },
     ...(shop
-      ? [
-          { href: "/seller/products", label: t("seller.nav.products"), icon: Package },
-          ...(shop.status === "active"
-            ? [
-                {
-                  href: "/seller/products/new",
-                  label: t("seller.nav.addProduct"),
-                  icon: PlusCircle,
-                  onSelect: openAddProduct,
-                },
-              ]
-            : []),
-        ]
+      ? [{ href: "/seller/products", label: t("seller.nav.products"), icon: Package }]
       : []),
     { href: "/seller/profile", label: t("seller.nav.profile"), icon: Store },
   ];

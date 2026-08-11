@@ -20,18 +20,19 @@ export function SiteHeader() {
   const { isAuthenticated, isHydrated } = useAuth();
 
   return (
-    // Без разделительной линии: контент отделяет размытие подложки — оно мягче
-    // и не режет макет пополам. Полупрозрачный фон только там, где браузер
-    // умеет backdrop-filter, иначе шапка стала бы просвечивать насквозь.
-    <header className="sticky top-0 z-50 w-full bg-background supports-backdrop-filter:bg-background/80 supports-backdrop-filter:backdrop-blur-xl">
+    // Фирменный синий во всю шапку, поэтому содержимое поверх него белое:
+    // text-primary-foreground задаёт цвет всему, что рисуется currentColor.
+    // Полупрозрачность только там, где браузер умеет backdrop-filter, иначе
+    // шапка стала бы просвечивать насквозь.
+    <header className="sticky top-0 z-50 w-full bg-primary text-primary-foreground supports-backdrop-filter:bg-primary/90 supports-backdrop-filter:backdrop-blur-xl">
       {/* Одна строка на все экраны: бургер — знак — поиск во всю оставшуюся
           ширину — действия. Поиск здесь главный элемент, поэтому он забирает
           всё свободное место, а логотип ужимается до знака. */}
       <div className="mx-auto flex h-16 max-w-[1600px] items-center gap-2 px-4 sm:gap-3 sm:px-8 lg:px-10">
         <HeaderMenu />
 
-        <Logo showText={false} className="lg:hidden" />
-        <Logo className="hidden lg:inline-flex" />
+        <Logo showText={false} className="text-white lg:hidden" />
+        <Logo className="hidden text-white lg:inline-flex" />
 
         <CatalogMenu />
 
@@ -42,13 +43,15 @@ export function SiteHeader() {
         <div className="flex shrink-0 items-center gap-0.5">
           {/* Избранное есть и у анонима, поэтому сердце видно всегда. Ждём
               гидратации: до неё счётчик из localStorage ещё не прочитан. */}
-          {isHydrated && <FavoritesLink />}
+          {isHydrated && (
+            <FavoritesLink className="hover:bg-white/15 hover:text-primary-foreground" />
+          )}
 
           <div className="hidden sm:contents">
-            <LanguageSwitch />
+            <LanguageSwitch className="text-primary-foreground/80 hover:bg-white/15 hover:text-primary-foreground" />
             <AnimatedThemeToggler
               aria-label={t("common.theme")}
-              className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors outline-none hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 dark:hover:bg-muted/50 [&_svg]:size-[1.15rem]"
+              className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg text-primary-foreground/80 transition-colors outline-none hover:bg-white/15 hover:text-primary-foreground focus-visible:ring-3 focus-visible:ring-white/40 [&_svg]:size-[1.15rem]"
             />
           </div>
 
@@ -59,7 +62,7 @@ export function SiteHeader() {
               asChild
               variant="ghost"
               size="icon-sm"
-              className="hidden lg:inline-flex"
+              className="hidden hover:bg-white/15 hover:text-primary-foreground lg:inline-flex"
               aria-label={t("nav.account")}
               title={t("nav.account")}
             >
@@ -81,7 +84,11 @@ export function SiteHeader() {
             <LoginDialog>
               {/* На узких экранах кнопка не влезает рядом с поиском — там вход
                   лежит в шторке бургера. */}
-              <Button size="sm" className="ml-1 hidden gap-1.5 md:inline-flex">
+              <Button
+                size="sm"
+                variant="secondary"
+                className="ml-1 hidden gap-1.5 md:inline-flex"
+              >
                 <Store className="size-4" />
                 {t("nav.becomeSeller")}
               </Button>

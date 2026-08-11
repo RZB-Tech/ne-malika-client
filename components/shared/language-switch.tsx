@@ -12,7 +12,7 @@ import { useI18n } from "@/components/providers/i18n-provider";
 import { locales, localeNames, localeShort } from "@/lib/i18n/config";
 import { cn } from "@/lib/utils";
 
-export function LanguageSwitch() {
+export function LanguageSwitch({ className }: { className?: string } = {}) {
   const { locale, setLocale } = useI18n();
   return (
     <DropdownMenu>
@@ -20,7 +20,10 @@ export function LanguageSwitch() {
         <Button
           variant="ghost"
           size="sm"
-          className="gap-1.5 px-2 text-muted-foreground hover:text-foreground"
+          className={cn(
+            "gap-1.5 px-2 text-muted-foreground hover:text-foreground",
+            className,
+          )}
         >
           <Flag locale={locale} />
           <span className="text-xs font-semibold">{localeShort[locale]}</span>
