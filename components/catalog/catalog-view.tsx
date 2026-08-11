@@ -168,7 +168,7 @@ export function CatalogView({
       )}
 
       {isError ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border py-24 text-center">
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-card py-24 text-center">
           <SearchX className="size-10 text-muted-foreground/50" />
           <h3 className="mt-4 font-heading text-lg font-semibold">
             {t("catalog.emptyTitle")}
@@ -184,7 +184,7 @@ export function CatalogView({
           ))}
         </div>
       ) : results.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border py-24 text-center">
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-card py-24 text-center">
           <SearchX className="size-10 text-muted-foreground/50" />
           <h3 className="mt-4 font-heading text-lg font-semibold">{t("catalog.emptyTitle")}</h3>
           <p className="mt-1 max-w-xs text-sm text-muted-foreground">{t("catalog.emptyText")}</p>

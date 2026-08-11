@@ -129,7 +129,7 @@ export function SiteHeader() {
       cancelAnimationFrame(animationFrame);
       animationFrame = requestAnimationFrame(() => {
         setIsCompact((current) => {
-          const next = current ? window.scrollY > 8 : window.scrollY > 32;
+          const next = current ? window.scrollY > 24 : window.scrollY > 160;
           return next === current ? current : next;
         });
       });
@@ -149,10 +149,7 @@ export function SiteHeader() {
   return (
     <header
       data-compact={isCompact}
-      className={cn(
-        "sticky top-0 z-50 mx-auto w-full max-w-[1600px] rounded-b-3xl bg-background transition-shadow duration-200",
-        isCompact && "shadow-sm",
-      )}
+      className="sticky top-0 z-50 mx-auto w-full max-w-[1600px] rounded-b-3xl bg-card [overflow-anchor:none]"
     >
       <div
         className={cn(
@@ -301,8 +298,8 @@ export function SiteHeader() {
           alt=""
           fill
           priority
-          sizes="100vw"
-          className="object-cover"
+          sizes="(max-width: 1600px) 100vw, 1600px"
+          className="object-cover object-left"
         />
       </div>
     </header>

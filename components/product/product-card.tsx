@@ -82,7 +82,7 @@ export function ProductCard({ product }: { product: Product }) {
     // контекста наложения побеждал он — на телефоне (где hover-scale не
     // срабатывает) тап по сердцу попадал в фото и уводил на страницу товара.
     <div
-      className="group relative isolate flex flex-col"
+      className="group relative isolate flex flex-col rounded-2xl bg-card p-2"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={leave}
     >
@@ -189,7 +189,7 @@ export function ProductCard({ product }: { product: Product }) {
  */
 export function ProductCardSkeleton() {
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col rounded-2xl bg-card p-2">
       <Skeleton className="aspect-[3/4] w-full rounded-2xl" />
       <Skeleton className="mt-2.5 h-5 w-24" />
       <Skeleton className="mt-1 h-4 w-16" />

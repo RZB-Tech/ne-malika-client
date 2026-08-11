@@ -31,11 +31,18 @@ const DEBOUNCE_MS = 300;
  * снято — иначе получается рамка в рамке.
  */
 const MARKETPLACE_BOX =
-  "h-11 overflow-hidden rounded-[14px] border-2 border-primary bg-background focus-within:ring-3 focus-within:ring-primary/15";
+  "h-10 rounded-lg border-2 border-primary bg-card p-[3px] focus-within:ring-3 focus-within:ring-primary/15";
+
+/**
+ * Кнопка поиска отделена от края только полем контейнера, и цвет у них один —
+ * поэтому справа она выглядит вровень с рамкой, а выбор раздела слева остаётся
+ * отдельной плашкой на белом. Ровно так же собрано поле у крупных площадок.
+ */
+const MARKETPLACE_SCOPE =
+  "h-full max-w-32 shrink-0 rounded-md px-2.5 text-[13px] font-normal";
 const MARKETPLACE_INPUT =
-  "h-full flex-1 rounded-none bg-background pl-3 pr-12 shadow-none hover:bg-background focus-visible:bg-background focus-visible:ring-0 dark:bg-background dark:hover:bg-background dark:focus-visible:bg-background";
-const MARKETPLACE_BUTTON =
-  "h-full w-18 shrink-0 rounded-none border-0 px-0";
+  "h-full min-w-0 flex-1 rounded-none bg-transparent px-2.5 text-sm shadow-none hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 dark:bg-transparent dark:hover:bg-transparent dark:focus-visible:bg-transparent";
+const MARKETPLACE_BUTTON = "h-full w-13 shrink-0 rounded-md px-0";
 
 export function SearchBar({
   className,
@@ -167,12 +174,15 @@ export function SearchBar({
               type="button"
               variant="secondary"
               size="sm"
-              className="hidden h-full w-22 shrink-0 rounded-none px-2 sm:inline-flex"
+              className={cn("hidden sm:inline-flex", MARKETPLACE_SCOPE)}
             >
               <span className="truncate">
                 {activeRoot?.name[locale] ?? t("catalog.everywhere")}
               </span>
-              <ChevronDown data-icon="inline-end" className="opacity-50" />
+              <ChevronDown
+                data-icon="inline-end"
+                className="size-3.5 opacity-50"
+              />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent
@@ -236,9 +246,11 @@ export function SearchBar({
           onClick={clear}
           aria-label={t("common.clear")}
           className={cn(
-            "absolute",
-            // Правее — кнопка поиска, крестик встаёт перед ней.
-            marketplace ? "right-20" : "right-2",
+            marketplace
+              ? // Обычным элементом строки, а не поверх неё: рядом кнопка
+                // поиска, и любой зашитый отступ разъезжался бы вместе с ней.
+                "mr-1 shrink-0 text-muted-foreground"
+              : "absolute right-2",
           )}
         >
           <X />
@@ -247,13 +259,12 @@ export function SearchBar({
       {marketplace && !value && (
         <Camera
           aria-hidden
-          className="pointer-events-none absolute right-20 size-4 text-muted-foreground"
+          className="mr-2 size-4 shrink-0 text-muted-foreground"
         />
       )}
       {marketplace && (
         <Button
           type="submit"
-          size="lg"
           aria-label={t("common.search")}
           title={t("common.search")}
           className={MARKETPLACE_BUTTON}
@@ -295,7 +306,7 @@ export function SearchBarSkeleton({
           disabled
           variant="secondary"
           size="sm"
-          className="hidden h-full w-22 shrink-0 rounded-none sm:inline-flex"
+          className={cn("hidden w-22 sm:inline-flex", MARKETPLACE_SCOPE)}
           aria-hidden
         >
           {" "}
@@ -309,9 +320,9 @@ export function SearchBarSkeleton({
         <>
           <Camera
             aria-hidden
-            className="pointer-events-none absolute right-20 size-4 text-muted-foreground"
+            className="mr-2 size-4 shrink-0 text-muted-foreground"
           />
-          <Button disabled size="lg" className={MARKETPLACE_BUTTON}>
+          <Button disabled className={MARKETPLACE_BUTTON}>
             <Search />
           </Button>
         </>

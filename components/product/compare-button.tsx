@@ -60,7 +60,7 @@ export function CompareButton({
       title={label}
       onClick={onClick}
       className={cn(
-        "inline-flex size-8 items-center justify-center rounded-full bg-background/85 shadow-sm backdrop-blur transition-colors hover:bg-background focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none",
+        "inline-flex size-8 items-center justify-center rounded-full bg-card/85 shadow-sm backdrop-blur transition-colors hover:bg-card focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none",
         active
           ? "text-primary"
           : "text-muted-foreground hover:text-foreground",

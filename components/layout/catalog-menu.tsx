@@ -130,7 +130,7 @@ export function CatalogMenu() {
           />
           <div
             data-state={open ? "open" : "closed"}
-            className="absolute inset-x-0 top-full z-50 border-b border-border bg-background shadow-lg duration-200 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-top-4 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-top-4"
+            className="absolute inset-x-0 top-full z-50 border-b border-border bg-card shadow-lg duration-200 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-top-4 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-top-4"
           >
             <div className="mx-auto max-h-[min(70vh,40rem)] max-w-[1600px] overflow-y-auto px-4 py-4 sm:px-8 lg:px-10">
               {roots.length === 0 ? (
