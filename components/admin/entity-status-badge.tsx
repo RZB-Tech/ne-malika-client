@@ -1,4 +1,7 @@
+"use client";
+
 import { Badge } from "@/components/ui/badge";
+import { useT } from "@/components/providers/i18n-provider";
 import { cn } from "@/lib/utils";
 import type { EntityStatus } from "@/lib/api/types";
 
@@ -9,13 +12,6 @@ const STYLE: Record<EntityStatus, string> = {
   pending: "bg-muted text-muted-foreground",
 };
 
-const LABEL: Record<EntityStatus, string> = {
-  active: "Активен",
-  hidden: "Скрыт",
-  abolished: "Упразднён",
-  pending: "На проверке",
-};
-
 /** Единый бейдж статуса для админки: и у магазинов, и у товаров он один и тот же. */
 export function EntityStatusBadge({
   status,
@@ -24,12 +20,13 @@ export function EntityStatusBadge({
   status: EntityStatus;
   className?: string;
 }) {
+  const { t } = useT();
   return (
     <Badge
       variant="outline"
       className={cn("border-transparent font-medium", STYLE[status], className)}
     >
-      {LABEL[status]}
+      {t(`admin.status.${status}`)}
     </Badge>
   );
 }

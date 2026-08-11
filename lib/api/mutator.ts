@@ -4,6 +4,7 @@ import axios, {
   type InternalAxiosRequestConfig,
 } from "axios";
 import { clearAuth, getAccessToken, setAccessToken } from "./token-store";
+import { defaultLocale, STORAGE_KEY } from "@/lib/i18n/config";
 
 // Origin only — the generated operations already carry the `/api/v1` prefix.
 export const API_BASE_URL =
@@ -21,8 +22,18 @@ axiosInstance.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   if (token) {
     config.headers.set("Authorization", `Bearer ${token}`);
   }
+  // Язык берём из localStorage, а не из React-контекста: интерцептор живёт вне
+  // дерева компонентов. По этому заголовку бэкенд переводит тексты ошибок —
+  // без него узбекский интерфейс показывал бы русские сообщения в тостах.
+  config.headers.set("Accept-Language", readLocale());
   return config;
 });
+
+/** Сохранённый язык интерфейса. На сервере (SSR) localStorage нет. */
+function readLocale(): string {
+  if (typeof window === "undefined") return defaultLocale;
+  return localStorage.getItem(STORAGE_KEY) ?? defaultLocale;
+}
 
 // --- Silent refresh on 401 ---------------------------------------------------
 // Must match the path the backend scopes the httpOnly refresh cookie to

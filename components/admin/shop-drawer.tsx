@@ -38,7 +38,7 @@ export function ShopDrawer({
   onUnblockOwner: (ownerId: number) => Promise<void>;
   onRemove: (id: number) => Promise<void>;
 }) {
-  const { locale } = useT();
+  const { t, locale } = useT();
 
   return (
     <DetailDrawer
@@ -54,7 +54,7 @@ export function ShopDrawer({
                 variant="outline"
                 className="border-transparent bg-destructive/12 font-medium text-destructive"
               >
-                владелец заблокирован
+                {t("admin.shops.ownerBlockedLabel")}
               </Badge>
             )}
           </>
@@ -62,25 +62,28 @@ export function ShopDrawer({
       }
       description={
         shop &&
-        `${formatDate(shop.createdAt, locale)} · ${shop.productCount} товаров`
+        t("admin.shops.createdSummary", {
+          date: formatDate(shop.createdAt, locale),
+          count: shop.productCount,
+        })
       }
       footer={
         shop && (
           <>
             <Button asChild variant="ghost" className={drawerAction.neutral}>
               <Link href={`/store/${shop.id}`}>
-                <ExternalLink className="size-4" /> Профиль
+                <ExternalLink className="size-4" /> {t("admin.shops.profile")}
               </Link>
             </Button>
 
             {shop.status === "active" ? (
               <AbolishDialog
-                title="Упразднить магазин"
-                description="Магазин и его товары исчезнут из выдачи. Причина видна продавцу."
+                title={t("admin.shops.abolish")}
+                description={t("admin.shops.abolishText")}
                 onConfirm={(reason) => onAbolish(shop.id, reason)}
               >
                 <Button variant="ghost" className={drawerAction.warning}>
-                  <Ban className="size-4" /> Упразднить
+                  <Ban className="size-4" /> {t("admin.common.abolish")}
                 </Button>
               </AbolishDialog>
             ) : (
@@ -89,7 +92,7 @@ export function ShopDrawer({
                 className={drawerAction.success}
                 onClick={() => onRestore(shop.id)}
               >
-                <RotateCcw className="size-4" /> Вернуть
+                <RotateCcw className="size-4" /> {t("admin.common.restore")}
               </Button>
             )}
 
@@ -99,27 +102,30 @@ export function ShopDrawer({
                 className={`col-span-2 ${drawerAction.success}`}
                 onClick={() => onUnblockOwner(shop.ownerId)}
               >
-                <RotateCcw className="size-4" /> Разблокировать владельца
+                <RotateCcw className="size-4" /> {t("admin.shops.unblockOwnerShort")}
               </Button>
             ) : (
               <AbolishDialog
-                title="Заблокировать продавца"
-                description="Владелец не сможет войти в кабинет и создать новый магазин."
+                title={t("admin.shops.blockOwner")}
+                description={t("admin.shops.blockOwnerText")}
                 onConfirm={(reason) => onBlockOwner(shop.ownerId, reason)}
               >
                 <Button
                   variant="ghost"
                   className={`col-span-2 ${drawerAction.danger}`}
                 >
-                  <UserX className="size-4" /> Заблокировать владельца
+                  <UserX className="size-4" /> {t("admin.shops.blockOwnerShort")}
                 </Button>
               </AbolishDialog>
             )}
 
             <ConfirmDialog
-              title="Удалить магазин?"
-              description={`«${shop.name}» и все его товары (${shop.productCount}) исчезнут навсегда, владелец снова станет покупателем. Если нужна обратимая блокировка — используйте «Упразднить».`}
-              confirmLabel="Удалить"
+              title={t("admin.shops.removeTitle")}
+              description={t("admin.shops.removeText", {
+                name: shop.name,
+                count: shop.productCount,
+              })}
+              confirmLabel={t("admin.productList.remove")}
               destructive
               onConfirm={() => onRemove(shop.id)}
             >
@@ -127,7 +133,7 @@ export function ShopDrawer({
                 variant="ghost"
                 className={`col-span-2 ${drawerAction.danger}`}
               >
-                <Trash2 className="size-4" /> Удалить магазин
+                <Trash2 className="size-4" /> {t("admin.shops.remove")}
               </Button>
             </ConfirmDialog>
           </>
@@ -146,19 +152,25 @@ export function ShopDrawer({
             <div className="min-w-0">
               <div className="truncate font-medium">{shop.ownerName}</div>
               <div className="truncate text-sm text-muted-foreground">
-                {shop.ownerUsername ? `@${shop.ownerUsername}` : "без username"}
+                {shop.ownerUsername ? `@${shop.ownerUsername}` : t("common.noUsername")}
               </div>
             </div>
           </div>
 
-          <DetailSection title="Контакты">
-            <DetailRow label="Телефон" value={shop.contact} />
-            <DetailRow label="Адрес" value={shop.address ?? "—"} />
-            <DetailRow label="Товаров" value={shop.productCount} />
+          <DetailSection title={t("admin.shops.contacts")}>
+            <DetailRow label={t("admin.shops.phone")} value={shop.contact} />
+            <DetailRow
+              label={t("admin.shops.address")}
+              value={shop.address ?? "—"}
+            />
+            <DetailRow
+              label={t("admin.common.productCount")}
+              value={shop.productCount}
+            />
           </DetailSection>
 
           {shop.status === "abolished" && shop.abolishReason && (
-            <DetailNote tone="danger" title="Магазин упразднён">
+            <DetailNote tone="danger" title={t("admin.shops.abolishedNote")}>
               {shop.abolishReason}
             </DetailNote>
           )}
@@ -166,10 +178,13 @@ export function ShopDrawer({
           {shop.ownerBlockedAt && (
             <DetailNote
               tone="danger"
-              title={`Владелец заблокирован ${formatDate(shop.ownerBlockedAt, locale)}`}
+              title={t("admin.shops.ownerBlockedAt", {
+                date: formatDate(shop.ownerBlockedAt, locale),
+              })}
             >
-              {shop.ownerBlockReason ?? "Причина не указана"}. Вход в кабинет
-              закрыт.
+              {t("admin.shops.ownerBlockedText", {
+                reason: shop.ownerBlockReason ?? t("common.reasonMissing"),
+              })}
             </DetailNote>
           )}
         </>

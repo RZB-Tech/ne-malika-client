@@ -50,7 +50,7 @@ export function LoginDialog({
     ).Telegram?.WebApp;
     const initData = wa?.initData;
     if (!initData) {
-      toast.error("Не удалось получить данные Telegram");
+      toast.error(t("auth.telegramDataFailed"));
       return;
     }
     setLoading(true);
@@ -58,7 +58,7 @@ export function LoginDialog({
       const res = await loginWithInitData(initData);
       finish(res.user?.role);
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Не удалось войти");
+      toast.error(e instanceof Error ? e.message : t("auth.loginFailed"));
     } finally {
       setLoading(false);
     }
@@ -70,7 +70,7 @@ export function LoginDialog({
       const res = await loginWithTelegramUser(tgUser);
       finish(res.user?.role);
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Не удалось войти");
+      toast.error(e instanceof Error ? e.message : t("auth.loginFailed"));
     } finally {
       setLoading(false);
     }
@@ -108,7 +108,7 @@ export function LoginDialog({
               />
             ) : (
               <p className="text-center text-sm text-muted-foreground">
-                Вход через Telegram не настроен (нет NEXT_PUBLIC_TELEGRAM_BOT_ID).
+                {t("auth.telegramNotConfigured")}
               </p>
             )}
           </div>

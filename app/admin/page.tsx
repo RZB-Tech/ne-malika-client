@@ -86,38 +86,39 @@ export default function AdminStats() {
           {t("admin.stats.title")}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Данные из базы. Просмотры и переходы в Telegram считает
-          Яндекс.Метрика — они видны в карточке товара у продавца.
+          {t("admin.dashboard.note")}
         </p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          label="Магазинов"
+          label={t("admin.dashboard.shops")}
           value={formatNumber(shops.length, locale)}
           icon={Store}
         />
         <StatCard
-          label="Активных магазинов"
+          label={t("admin.dashboard.activeShops")}
           value={formatNumber(activeShops, locale)}
           icon={Store}
         />
         <StatCard
-          label="Товаров в выдаче"
+          label={t("admin.dashboard.productsLive")}
           value={formatNumber(productsTotal, locale)}
           icon={Package}
         />
         <StatCard
-          label="Жалоб"
+          label={t("admin.dashboard.reports")}
           value={formatNumber(reportsTotal, locale)}
           icon={Flag}
         />
       </div>
 
       <Card className="p-5">
-        <h2 className="mb-5 font-medium">Магазины по числу товаров</h2>
+        <h2 className="mb-5 font-medium">{t("admin.dashboard.topShops")}</h2>
         {topShops.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Данных пока нет.</p>
+          <p className="text-sm text-muted-foreground">
+            {t("admin.dashboard.noData")}
+          </p>
         ) : (
           <BarList data={topShops} formatValue={(v) => String(v)} />
         )}

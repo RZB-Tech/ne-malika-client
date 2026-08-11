@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/context-menu";
 import { AbolishDialog } from "@/components/admin/abolish-dialog";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { useT } from "@/components/providers/i18n-provider";
 
 /**
  * Одно описание действий строки на два способа вызова: три точки справа
@@ -49,10 +50,11 @@ export interface RowAction {
 }
 
 export function RowActionsMenu({ actions }: { actions: RowAction[] }) {
+  const { t } = useT();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon-sm" aria-label="Действия">
+        <Button variant="ghost" size="icon-sm" aria-label={t("common.actions")}>
           <MoreHorizontal className="size-4" />
         </Button>
       </DropdownMenuTrigger>

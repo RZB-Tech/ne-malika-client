@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { StoreAvatar } from "@/components/shared/store-avatar";
 import { hueFromId } from "@/lib/api/mappers";
 import { photoUrl } from "@/lib/api/photo";
+import { useT } from "@/components/providers/i18n-provider";
 import { cn } from "@/lib/utils";
 import type { AdminShopRow } from "@/lib/api/types";
 
@@ -18,13 +19,15 @@ export function ShopPicker({
   shops,
   value,
   onChange,
-  emptyHint = "Подходящих магазинов нет",
+  emptyHint,
 }: {
   shops: AdminShopRow[];
   value: number | null;
   onChange: (id: number) => void;
+  /** По умолчанию — «подходящих магазинов нет» на языке интерфейса. */
   emptyHint?: string;
 }) {
+  const { t } = useT();
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
   const rootRef = useRef<HTMLDivElement>(null);
@@ -83,7 +86,7 @@ export function ShopPicker({
         className="flex h-11 w-full items-center justify-between gap-1.5 rounded-lg border border-input bg-transparent py-2 pr-3 pl-3.5 text-sm transition-colors outline-none select-none focus-visible:border-foreground/40 dark:bg-input/30 dark:hover:bg-input/50"
       >
         <span className={cn("truncate", !selected && "text-muted-foreground")}>
-          {selected ? selected.name : "Выберите магазин"}
+          {selected ? selected.name : t("admin.shopPicker.choose")}
         </span>
         <ChevronDown className="size-4 shrink-0 opacity-50" />
       </button>
@@ -103,7 +106,7 @@ export function ShopPicker({
                   if (filtered[0]) pick(filtered[0].id);
                 }
               }}
-              placeholder="Поиск по названию или владельцу"
+              placeholder={t("admin.shopPicker.search")}
               className="rounded-none border-0 pl-9 shadow-none focus-visible:ring-0"
             />
           </div>
@@ -111,7 +114,9 @@ export function ShopPicker({
           <div className="max-h-64 overflow-y-auto p-1">
             {filtered.length === 0 ? (
               <p className="px-2 py-6 text-center text-sm text-muted-foreground">
-                {shops.length === 0 ? emptyHint : "Ничего не нашлось"}
+                {shops.length === 0
+                  ? (emptyHint ?? t("admin.shopPicker.empty"))
+                  : t("common.nothingFound")}
               </p>
             ) : (
               filtered.map((s) => (

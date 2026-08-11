@@ -45,9 +45,9 @@ export function ProductDrawer({
       badges={product && <EntityStatusBadge status={product.status} />}
       description={
         product &&
-        `${product.shopName} · ${formatDate(product.createdAt, locale)} · ${
-          product.state === "new" ? "новый" : "б/у"
-        }`
+        `${product.shopName} · ${formatDate(product.createdAt, locale)} · ${t(
+          product.state === "new" ? "product.stateNew" : "product.stateOld",
+        ).toLowerCase()}`
       }
       footer={
         product && (
@@ -57,23 +57,23 @@ export function ProductDrawer({
               className={drawerAction.primary}
               onClick={() => onEdit(product)}
             >
-              <Pencil className="size-4" /> Изменить
+              <Pencil className="size-4" /> {t("admin.productList.edit")}
             </Button>
 
             <Button asChild variant="ghost" className={drawerAction.neutral}>
               <Link href={`/product/${product.id}`}>
-                <ExternalLink className="size-4" /> На сайте
+                <ExternalLink className="size-4" /> {t("admin.productList.onSite")}
               </Link>
             </Button>
 
             {product.status === "active" ? (
               <AbolishDialog
-                title="Упразднить товар"
-                description="Товар скроется из публичной выдачи. Причина видна продавцу."
+                title={t("admin.productList.abolishTitle")}
+                description={t("admin.productList.abolishText")}
                 onConfirm={(reason) => onAbolish(product.id, reason)}
               >
                 <Button variant="ghost" className={drawerAction.warning}>
-                  <Ban className="size-4" /> Упразднить
+                  <Ban className="size-4" /> {t("admin.productList.abolish")}
                 </Button>
               </AbolishDialog>
             ) : (
@@ -82,19 +82,21 @@ export function ProductDrawer({
                 className={drawerAction.success}
                 onClick={() => onRestore(product.id)}
               >
-                <RotateCcw className="size-4" /> Вернуть
+                <RotateCcw className="size-4" /> {t("admin.common.restore")}
               </Button>
             )}
 
             <ConfirmDialog
-              title="Удалить товар?"
-              description={`«${product.name}» исчезнет навсегда. Если нужна обратимая блокировка — используйте «Упразднить».`}
-              confirmLabel="Удалить"
+              title={t("admin.productList.removeTitle")}
+              description={t("admin.productList.removeText", {
+                name: product.name,
+              })}
+              confirmLabel={t("admin.productList.remove")}
               destructive
               onConfirm={() => onRemove(product.id, product.name)}
             >
               <Button variant="ghost" className={drawerAction.danger}>
-                <Trash2 className="size-4" /> Удалить
+                <Trash2 className="size-4" /> {t("admin.productList.remove")}
               </Button>
             </ConfirmDialog>
           </>
@@ -121,7 +123,7 @@ export function ProductDrawer({
           </div>
 
           {product.description && (
-            <DetailSection title="Описание">
+            <DetailSection title={t("product.description")}>
               <p className="text-sm text-muted-foreground">
                 {product.description}
               </p>
@@ -129,7 +131,7 @@ export function ProductDrawer({
           )}
 
           {product.characteristics && product.characteristics.length > 0 && (
-            <DetailSection title="Характеристики">
+            <DetailSection title={t("product.specs")}>
               {product.characteristics.map((c) => (
                 <DetailRow key={c.key} label={c.key} value={c.value} />
               ))}
@@ -139,26 +141,30 @@ export function ProductDrawer({
           {product.status === "abolished" && product.abolishReason && (
             <DetailNote
               tone="danger"
-              title={`Упразднён${
+              title={
                 product.abolishedAt
-                  ? ` ${formatDate(product.abolishedAt, locale)}`
-                  : ""
-              }`}
+                  ? t("admin.productList.abolishedAt", {
+                      date: formatDate(product.abolishedAt, locale),
+                    })
+                  : t("admin.status.abolished")
+              }
             >
               {product.abolishReason}
             </DetailNote>
           )}
 
           {product.status === "hidden" && (
-            <DetailNote tone="warning" title="Скрыт ИИ-проверкой">
-              Причина видна продавцу в карточке товара.
+            <DetailNote
+              tone="warning"
+              title={t("admin.productList.hiddenByAi")}
+            >
+              {t("admin.productList.hiddenByAiText")}
             </DetailNote>
           )}
 
           {product.shopStatus !== "active" && (
             <DetailNote>
-              Магазин «{product.shopName}» не активен — товар не появится в
-              выдаче, даже если вернуть его.
+              {t("admin.productList.shopInactive", { name: product.shopName })}
             </DetailNote>
           )}
         </>

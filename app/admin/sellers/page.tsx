@@ -99,71 +99,76 @@ export default function AdminSellers() {
 
   const abolish = async (id: number, reason: string) => {
     await abolishMutation.mutateAsync({ id, data: { reason } });
-    await done("Магазин упразднён");
+    await done(t("admin.shops.abolished"));
   };
   const restore = async (id: number) => {
     await restoreMutation.mutateAsync({ id });
-    await done("Магазин возвращён в работу");
+    await done(t("admin.shops.restored"));
   };
   const blockOwner = async (ownerId: number, reason: string) => {
     await blockMutation.mutateAsync({ id: ownerId, data: { reason } });
-    await done("Продавец заблокирован");
+    await done(t("admin.shops.ownerBlocked"));
   };
   const unblockOwner = async (ownerId: number) => {
     await unblockMutation.mutateAsync({ id: ownerId });
-    await done("Блокировка снята");
+    await done(t("admin.shops.ownerUnblocked"));
   };
   // Переспрашивает вызывающая сторона — ConfirmDialog в меню и в карточке.
   const remove = async (id: number) => {
     await removeMutation.mutateAsync({ id });
-    await done("Магазин удалён, владелец снова покупатель");
+    await done(t("admin.shops.removed"));
   };
 
   /** Один набор действий и для трёх точек, и для правой кнопки мыши. */
   const actionsFor = (shop: AdminShopRow): RowAction[] => [
-    { label: "Открыть профиль", icon: ExternalLink, href: `/store/${shop.id}` },
+    {
+      label: t("admin.shops.openProfile"),
+      icon: ExternalLink,
+      href: `/store/${shop.id}`,
+    },
     shop.status === "active"
       ? {
-          label: "Упразднить магазин",
+          label: t("admin.shops.abolish"),
           icon: Ban,
           destructive: true,
           withReason: {
-            title: "Упразднить магазин",
-            description:
-              "Магазин и его товары исчезнут из выдачи. Причина видна продавцу.",
+            title: t("admin.shops.abolish"),
+            description: t("admin.shops.abolishText"),
             onConfirm: (reason) => abolish(shop.id, reason),
           },
         }
       : {
-          label: "Вернуть магазин",
+          label: t("admin.shops.restore"),
           icon: RotateCcw,
           onSelect: () => void restore(shop.id),
         },
     shop.ownerBlockedAt
       ? {
-          label: "Разблокировать продавца",
+          label: t("admin.shops.unblockOwner"),
           icon: RotateCcw,
           onSelect: () => void unblockOwner(shop.ownerId),
         }
       : {
-          label: "Заблокировать продавца",
+          label: t("admin.shops.blockOwner"),
           icon: UserX,
           destructive: true,
           withReason: {
-            title: "Заблокировать продавца",
-            description:
-              "Владелец не сможет войти в кабинет и создать новый магазин.",
+            title: t("admin.shops.blockOwner"),
+            description: t("admin.shops.blockOwnerText"),
             onConfirm: (reason) => blockOwner(shop.ownerId, reason),
           },
         },
     {
-      label: "Удалить магазин",
+      label: t("admin.shops.remove"),
       icon: Trash2,
       destructive: true,
       withConfirm: {
-        title: "Удалить магазин?",
-        description: `«${shop.name}» и все его товары (${shop.productCount}) исчезнут навсегда, владелец снова станет покупателем. Если нужна обратимая блокировка — используйте «Упразднить».`,
-        confirmLabel: "Удалить",
+        title: t("admin.shops.removeTitle"),
+        description: t("admin.shops.removeText", {
+          name: shop.name,
+          count: shop.productCount,
+        }),
+        confirmLabel: t("admin.productList.remove"),
         onConfirm: () => remove(shop.id),
       },
     },
@@ -176,8 +181,7 @@ export default function AdminSellers() {
           {t("admin.sellers.title")}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Нажмите на строку, чтобы открыть карточку. Правая кнопка мыши —
-          быстрые действия.
+          {t("admin.common.rowHint")}
         </p>
       </div>
 
@@ -189,21 +193,20 @@ export default function AdminSellers() {
             setQ(e.target.value);
             setPage(1);
           }}
-          placeholder="Поиск по магазину или владельцу"
+          placeholder={t("admin.shops.search")}
           className="pl-9"
         />
       </div>
 
       {isError && !isDevData && (
         <Card className="border-destructive/40 bg-destructive/5 p-4 text-sm">
-          Не удалось загрузить магазины. Раздел доступен только администраторам.
+          {t("admin.shops.loadFailed")}
         </Card>
       )}
 
       {isDevData && (
         <Card className="bg-muted/50 p-4 text-sm text-muted-foreground">
-          Показаны тестовые данные: бэкенд недоступен. Запустите его, чтобы
-          увидеть настоящие.
+          {t("admin.common.devData")}
         </Card>
       )}
 
@@ -215,7 +218,7 @@ export default function AdminSellers() {
                 <TableHead className="min-w-[220px]">
                   {t("admin.sellers.colStore")}
                 </TableHead>
-                <TableHead>Владелец</TableHead>
+                <TableHead>{t("admin.shops.colOwner")}</TableHead>
                 <TableHead className="text-right">
                   {t("admin.sellers.colProducts")}
                 </TableHead>
@@ -257,7 +260,7 @@ export default function AdminSellers() {
                             variant="outline"
                             className="border-transparent bg-destructive/12 text-xs font-medium text-destructive"
                           >
-                            заблокирован
+                            {t("admin.common.blocked")}
                           </Badge>
                         )}
                       </div>
@@ -293,7 +296,7 @@ export default function AdminSellers() {
         )}
         {!isLoading && rows.length === 0 && (
           <div className="py-16 text-center text-sm text-muted-foreground">
-            {q.trim() ? "Ничего не нашлось." : "Магазинов пока нет."}
+            {q.trim() ? t("common.nothingFound") : t("admin.shops.empty")}
           </div>
         )}
       </Card>

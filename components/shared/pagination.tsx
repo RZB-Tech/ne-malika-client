@@ -2,6 +2,7 @@
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useT } from "@/components/providers/i18n-provider";
 
 /**
  * Переключение страниц списка. Ничего не рисует, пока страница одна —
@@ -19,12 +20,14 @@ export function Pagination({
   total?: number;
   onChange: (page: number) => void;
 }) {
+  const { t } = useT();
+
   if (totalPages <= 1) return null;
 
   return (
     <div className="flex items-center justify-between gap-3">
       <span className="text-sm text-muted-foreground">
-        {total !== undefined && `Всего: ${total}`}
+        {total !== undefined && t("common.total", { count: total })}
       </span>
 
       <div className="flex items-center gap-2">
@@ -34,7 +37,7 @@ export function Pagination({
           disabled={page <= 1}
           onClick={() => onChange(page - 1)}
         >
-          <ChevronLeft className="size-4" /> Назад
+          <ChevronLeft className="size-4" /> {t("common.back")}
         </Button>
         <span className="tabular text-sm text-muted-foreground">
           {page} / {totalPages}
@@ -45,7 +48,7 @@ export function Pagination({
           disabled={page >= totalPages}
           onClick={() => onChange(page + 1)}
         >
-          Вперёд <ChevronRight className="size-4" />
+          {t("common.next")} <ChevronRight className="size-4" />
         </Button>
       </div>
     </div>

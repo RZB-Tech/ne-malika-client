@@ -61,7 +61,7 @@ export function ModerationBadge({
   );
 }
 
-/** Роль пользователя в админке. Она без локализации — как и вся панель. */
+/** Роль пользователя: в админке и в профиле покупателя. */
 export function RoleBadge({
   role,
   className,
@@ -69,12 +69,14 @@ export function RoleBadge({
   role: UserRole;
   className?: string;
 }) {
-  const cfg: Record<UserRole, { label: string; cls: string }> = {
-    user: { label: "Покупатель", cls: "bg-muted text-muted-foreground" },
-    seller: { label: "Продавец", cls: "bg-success/12 text-success" },
-    admin: { label: "Администратор", cls: "bg-primary/12 text-primary" },
+  const { t } = useT();
+  const cfg: Record<UserRole, string> = {
+    user: "bg-muted text-muted-foreground",
+    seller: "bg-success/12 text-success",
+    admin: "bg-primary/12 text-primary",
   };
-  const { label, cls } = cfg[role] ?? cfg.user;
+  const cls = cfg[role] ?? cfg.user;
+  const label = t(`roles.${role in cfg ? role : "user"}`);
 
   return (
     <Badge

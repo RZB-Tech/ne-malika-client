@@ -48,13 +48,15 @@ export default function SellerDashboard() {
       <Card className="flex flex-col items-center gap-4 py-16 text-center">
         <Store className="size-10 text-muted-foreground/50" />
         <div>
-          <h2 className="font-heading text-lg font-semibold">У вас ещё нет магазина</h2>
+          <h2 className="font-heading text-lg font-semibold">
+            {t("seller.shop.none")}
+          </h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Создайте магазин, чтобы начать публиковать товары.
+            {t("seller.shop.noneText")}
           </p>
         </div>
         <Button asChild>
-          <Link href="/seller/profile">Создать магазин</Link>
+          <Link href="/seller/profile">{t("seller.shop.create")}</Link>
         </Button>
       </Card>
     );
@@ -80,12 +82,11 @@ export default function SellerDashboard() {
       {shop.status !== "active" && (
         <Card className="border-destructive/40 bg-destructive/5 p-4 text-sm">
           <p className="font-medium text-destructive">
-            Магазин упразднён администратором: он и его товары скрыты из выдачи,
-            добавлять новые товары нельзя.
+            {t("seller.shop.abolished")}
           </p>
           {shop.abolishReason && (
             <p className="mt-1 text-muted-foreground">
-              Причина: {shop.abolishReason}
+              {t("common.reasonLine", { reason: shop.abolishReason })}
             </p>
           )}
         </Card>
@@ -93,15 +94,23 @@ export default function SellerDashboard() {
 
       <div className="grid gap-4 sm:grid-cols-3">
         <StatCard label={t("seller.nav.products")} value={String(total)} icon={Package} />
-        <StatCard label="Опубликовано" value={String(active)} icon={Tag} />
-        <StatCard label="Новых" value={String(newCount)} icon={Store} />
+        <StatCard
+          label={t("seller.shop.published")}
+          value={String(active)}
+          icon={Tag}
+        />
+        <StatCard
+          label={t("seller.shop.newOnes")}
+          value={String(newCount)}
+          icon={Store}
+        />
       </div>
 
       <div>
         <div className="mb-3 flex items-center justify-between">
           <h2 className="font-heading text-lg font-bold tracking-tight">{t("seller.nav.products")}</h2>
           <Button asChild variant="ghost" size="sm">
-            <Link href="/seller/products">Все товары</Link>
+            <Link href="/seller/products">{t("seller.shop.allProducts")}</Link>
           </Button>
         </div>
 

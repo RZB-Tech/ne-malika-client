@@ -63,12 +63,20 @@ import type {
 } from "@/lib/api/types";
 
 /** Вкладки фильтра. `undefined` — без параметра, то есть все статусы. */
-const TABS: { value: string; label: string; status?: EntityStatus }[] = [
-  { value: "all", label: "Все" },
-  { value: "active", label: "Активные", status: "active" },
-  { value: "pending", label: "На проверке", status: "pending" },
-  { value: "hidden", label: "Скрытые", status: "hidden" },
-  { value: "abolished", label: "Упразднённые", status: "abolished" },
+const TABS: { value: string; labelKey: string; status?: EntityStatus }[] = [
+  { value: "all", labelKey: "admin.productList.tabAll" },
+  { value: "active", labelKey: "admin.productList.tabActive", status: "active" },
+  {
+    value: "pending",
+    labelKey: "admin.productList.tabPending",
+    status: "pending",
+  },
+  { value: "hidden", labelKey: "admin.productList.tabHidden", status: "hidden" },
+  {
+    value: "abolished",
+    labelKey: "admin.productList.tabAbolished",
+    status: "abolished",
+  },
 ];
 
 export default function AdminProducts() {
@@ -124,56 +132,59 @@ export default function AdminProducts() {
     await abolishMutation.mutateAsync({ id, data: { reason } });
     await queryClient.invalidateQueries();
     setOpened(null);
-    toast.success("Товар упразднён");
+    toast.success(t("admin.productList.abolished"));
   };
 
   const restore = async (id: number) => {
     await restoreMutation.mutateAsync({ id });
     await queryClient.invalidateQueries();
     setOpened(null);
-    toast.success("Товар возвращён в выдачу");
+    toast.success(t("admin.productList.restored"));
   };
 
   const remove = async (id: number) => {
     await removeMutation.mutateAsync({ id });
     await queryClient.invalidateQueries();
     setOpened(null);
-    toast.success("Товар удалён");
+    toast.success(t("admin.productList.removed"));
   };
 
   /** Один набор действий и для трёх точек, и для правой кнопки мыши. */
   const actionsFor = (p: AdminProductRow): RowAction[] => [
     {
-      label: "Изменить",
+      label: t("admin.productList.edit"),
       icon: Pencil,
       onSelect: () => setForm({ product: p }),
     },
-    { label: "Открыть на сайте", icon: ExternalLink, href: `/product/${p.id}` },
+    {
+      label: t("admin.productList.openOnSite"),
+      icon: ExternalLink,
+      href: `/product/${p.id}`,
+    },
     p.status === "active"
       ? {
-          label: "Упразднить",
+          label: t("admin.common.abolish"),
           icon: Ban,
           destructive: true,
           withReason: {
-            title: "Упразднить товар",
-            description:
-              "Товар скроется из публичной выдачи. Причина видна продавцу.",
+            title: t("admin.productList.abolishTitle"),
+            description: t("admin.productList.abolishText"),
             onConfirm: (reason) => abolish(p.id, reason),
           },
         }
       : {
-          label: "Вернуть в выдачу",
+          label: t("admin.productList.restore"),
           icon: RotateCcw,
           onSelect: () => void restore(p.id),
         },
     {
-      label: "Удалить",
+      label: t("admin.productList.remove"),
       icon: Trash2,
       destructive: true,
       withConfirm: {
-        title: "Удалить товар?",
-        description: `«${p.name}» исчезнет навсегда. Если нужна обратимая блокировка — используйте «Упразднить».`,
-        confirmLabel: "Удалить",
+        title: t("admin.productList.removeTitle"),
+        description: t("admin.productList.removeText", { name: p.name }),
+        confirmLabel: t("admin.productList.remove"),
         onConfirm: () => remove(p.id),
       },
     },
@@ -186,8 +197,7 @@ export default function AdminProducts() {
           {t("admin.products.title")}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Нажмите на строку, чтобы открыть карточку. «Скрытые» — снятые
-          ИИ-проверкой, «упразднённые» — заблокированные вручную.
+          {t("admin.productList.hint")}
         </p>
       </div>
 
@@ -196,7 +206,7 @@ export default function AdminProducts() {
           className="order-last sm:order-none"
           onClick={() => setForm({ product: null })}
         >
-          <Plus className="size-4" /> Новый товар
+          <Plus className="size-4" /> {t("admin.productList.newProduct")}
         </Button>
 
         <Tabs
@@ -209,7 +219,7 @@ export default function AdminProducts() {
           <TabsList>
             {TABS.map((x) => (
               <TabsTrigger key={x.value} value={x.value}>
-                {x.label}
+                {t(x.labelKey)}
               </TabsTrigger>
             ))}
           </TabsList>
@@ -223,7 +233,7 @@ export default function AdminProducts() {
               setQ(e.target.value);
               setPage(1);
             }}
-            placeholder="Поиск по товару или магазину"
+            placeholder={t("admin.productList.search")}
             className="pl-9"
           />
         </div>
@@ -231,8 +241,7 @@ export default function AdminProducts() {
 
       {isDevData && (
         <Card className="bg-muted/50 p-4 text-sm text-muted-foreground">
-          Показаны тестовые данные: бэкенд недоступен. Запустите его, чтобы
-          увидеть настоящие.
+          {t("admin.common.devData")}
         </Card>
       )}
 
@@ -245,7 +254,7 @@ export default function AdminProducts() {
                   {t("admin.products.colProduct")}
                 </TableHead>
                 <TableHead>{t("admin.products.colStore")}</TableHead>
-                <TableHead>Статус</TableHead>
+                <TableHead>{t("admin.productList.colStatus")}</TableHead>
                 <TableHead className="text-right">
                   {t("admin.products.colPrice")}
                 </TableHead>
@@ -307,7 +316,7 @@ export default function AdminProducts() {
         )}
         {!isLoading && rows.length === 0 && (
           <div className="py-16 text-center text-sm text-muted-foreground">
-            Ничего не нашлось.
+            {t("common.nothingFound")}
           </div>
         )}
       </Card>

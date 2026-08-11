@@ -50,7 +50,7 @@ export function AccountProfile() {
       await logout();
       router.push("/");
     } catch {
-      toast.error("Не удалось выйти");
+      toast.error(t("common.logoutFailed"));
     }
   };
 

@@ -53,7 +53,7 @@ function SellerLayoutInner({ children }: { children: React.ReactNode }) {
     { href: "/seller/profile", label: t("seller.nav.profile"), icon: Store },
   ];
 
-  const name = shop?.name ?? "Мой магазин";
+  const name = shop?.name ?? t("seller.shop.mine");
 
   const brand: ShellBrand = {
     avatar: (
@@ -65,7 +65,7 @@ function SellerLayoutInner({ children }: { children: React.ReactNode }) {
       />
     ),
     title: name,
-    subtitle: shop ? t("seller.cabinet") : "Магазин не создан",
+    subtitle: shop ? t("seller.cabinet") : t("seller.shop.notCreated"),
   };
 
   return (

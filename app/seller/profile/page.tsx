@@ -83,11 +83,11 @@ export default function SellerProfile() {
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
     if (name.trim().length < 2) {
-      toast.error("Укажите название магазина");
+      toast.error(t("seller.profile.needName"));
       return;
     }
     if (!shop && !phone.trim()) {
-      toast.error("Укажите контактный телефон");
+      toast.error(t("seller.profile.needPhone"));
       return;
     }
 
@@ -97,7 +97,7 @@ export default function SellerProfile() {
       ? parseTelegramUsername(telegram)
       : null;
     if (telegram.trim() && !tgUsername) {
-      toast.error("Не удалось распознать Telegram — укажите username или ссылку t.me");
+      toast.error(t("seller.profile.badTelegram"));
       return;
     }
 
@@ -108,7 +108,7 @@ export default function SellerProfile() {
         try {
           photo = await uploadPhoto(dataUrlToBlob(logo));
         } catch {
-          toast.message("Логотип не загрузился — сохраняем без него");
+          toast.message(t("seller.profile.logoSkipped"));
         }
       }
 
@@ -140,7 +140,9 @@ export default function SellerProfile() {
       setLogo(null);
       toast.success(t("seller.profile.saved"));
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Не удалось сохранить магазин");
+      toast.error(
+        err instanceof Error ? err.message : t("seller.profile.saveFailed"),
+      );
     } finally {
       setSaving(false);
     }
@@ -164,7 +166,7 @@ export default function SellerProfile() {
       <div>
         <h1 className="font-heading text-2xl font-bold tracking-tight">{t("seller.profile.title")}</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          {shop ? t("seller.profile.subtitle") : "Создайте магазин, чтобы публиковать товары"}
+          {t(shop ? "seller.profile.subtitle" : "seller.shop.createSubtitle")}
         </p>
       </div>
 
@@ -182,7 +184,7 @@ export default function SellerProfile() {
               className="grid size-20 shrink-0 place-items-center rounded-2xl text-3xl font-bold text-white shadow-sm"
               style={{ background: `oklch(0.52 0.17 ${hue})` }}
             >
-              {(name || "М").slice(0, 1)}
+              {(name || t("seller.shop.mine")).slice(0, 1)}
             </span>
           )}
           <div>

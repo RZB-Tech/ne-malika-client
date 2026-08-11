@@ -9,6 +9,7 @@ import {
 } from "@telegram-login-ultimate/react";
 import { TelegramIcon } from "@/components/icons/telegram-icon";
 import { Button } from "@/components/ui/button";
+import { useT } from "@/components/providers/i18n-provider";
 
 /**
  * Browser Telegram sign-in via the official OAuth popup (oauth.telegram.org),
@@ -60,11 +61,14 @@ function OAuthButton({
   onAuth: (user: TelegramUserData) => void;
   onError?: (message: string) => void;
 }) {
+  const { t } = useT();
   const { start, isPending } = useTelegramLogin({
     botId,
     onSuccess: (data) => onAuth(data),
     onError: (err) =>
-      onError?.(err instanceof Error ? err.message : "Вход через Telegram отменён"),
+      onError?.(
+        err instanceof Error ? err.message : t("auth.telegramCancelled"),
+      ),
   });
 
   return (

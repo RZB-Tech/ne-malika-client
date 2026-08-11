@@ -34,6 +34,7 @@ import {
 } from "@/lib/api/generated/endpoints/product-cards-admin/product-cards-admin";
 import { CategorySelect } from "@/components/seller/category-select";
 import { PhotoAiDialog } from "@/components/admin/photo-ai-dialog";
+import { useT } from "@/components/providers/i18n-provider";
 import { resolvePhotoKeys } from "@/lib/api/upload";
 import { photoUrl } from "@/lib/api/photo";
 import { formatPriceInput, parsePriceInput } from "@/lib/format";
@@ -98,6 +99,7 @@ function FormBody({
     [shops],
   );
 
+  const { t } = useT();
   const [shopId, setShopId] = useState<number | null>(
     editing?.shopId ?? target.shopId ?? activeShops[0]?.id ?? null,
   );
@@ -124,15 +126,15 @@ function FormBody({
     e.preventDefault();
     const priceNum = parsePriceInput(price);
     if (name.trim().length < 2 || !priceNum) {
-      toast.error("Проверьте название и цену");
+      toast.error(t("admin.form.checkNamePrice"));
       return;
     }
     if (photos.length === 0) {
-      toast.error("Добавьте хотя бы одно фото");
+      toast.error(t("admin.form.needPhoto"));
       return;
     }
     if (!editing && !shopId) {
-      toast.error("Выберите магазин");
+      toast.error(t("admin.form.needShop"));
       return;
     }
 
@@ -155,10 +157,10 @@ function FormBody({
       }
 
       await queryClient.invalidateQueries();
-      toast.success(editing ? "Товар обновлён" : "Товар создан");
+      toast.success(t(editing ? "admin.form.updated" : "admin.form.created"));
       onDone();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Не удалось сохранить");
+      toast.error(err instanceof Error ? err.message : t("admin.form.saveFailed"));
     } finally {
       setSaving(false);
     }
@@ -168,34 +170,32 @@ function FormBody({
     <form onSubmit={submit} className="flex flex-col gap-5">
       <DialogHeader>
         <DialogTitle>
-          {editing ? "Изменить товар" : "Новый товар"}
+          {t(editing ? "admin.form.editTitle" : "admin.form.newTitle")}
         </DialogTitle>
         <DialogDescription>
-          {editing
-            ? "После сохранения товар заново уйдёт на ИИ-проверку."
-            : "Товар появится в выбранном магазине от имени продавца."}
+          {t(editing ? "admin.form.editHint" : "admin.form.newHint")}
         </DialogDescription>
       </DialogHeader>
 
       {!editing && (
         <div className="flex flex-col gap-1.5">
-          <Label>Магазин</Label>
+          <Label>{t("admin.form.shop")}</Label>
           <ShopPicker
             shops={activeShops}
             value={shopId}
             onChange={setShopId}
-            emptyHint="Активных магазинов нет"
+            emptyHint={t("admin.form.noActiveShops")}
           />
           {activeShops.length === 0 && (
             <p className="text-xs text-destructive">
-              Все магазины упразднены — добавлять товары некуда.
+              {t("admin.form.allShopsAbolished")}
             </p>
           )}
         </div>
       )}
 
       <div className="flex flex-col gap-1.5">
-        <Label htmlFor="pname">Название</Label>
+        <Label htmlFor="pname">{t("admin.form.name")}</Label>
         <Input
           id="pname"
           value={name}
@@ -205,7 +205,7 @@ function FormBody({
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="pprice">Цена, сум</Label>
+          <Label htmlFor="pprice">{t("admin.form.price")}</Label>
           <Input
             id="pprice"
             inputMode="numeric"
@@ -215,7 +215,7 @@ function FormBody({
           />
         </div>
         <div className="flex flex-col gap-1.5">
-          <Label>Состояние</Label>
+          <Label>{t("product.state")}</Label>
           <Select
             value={state}
             onValueChange={(v) => setState(v as "new" | "old")}
@@ -224,20 +224,20 @@ function FormBody({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="new">Новый</SelectItem>
-              <SelectItem value="old">Б/у</SelectItem>
+              <SelectItem value="new">{t("product.stateNew")}</SelectItem>
+              <SelectItem value="old">{t("product.stateOld")}</SelectItem>
             </SelectContent>
           </Select>
         </div>
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <Label>Категория</Label>
+        <Label>{t("category.label")}</Label>
         <CategorySelect value={categoryId} onChange={setCategoryId} />
       </div>
 
       <div className="space-y-1.5">
-        <Label htmlFor="pdesc">Описание</Label>
+        <Label htmlFor="pdesc">{t("admin.form.description")}</Label>
         <Textarea
           id="pdesc"
           rows={3}
@@ -247,11 +247,11 @@ function FormBody({
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label>Характеристики</Label>
+        <Label>{t("admin.form.specs")}</Label>
         {specs.map((s, i) => (
           <div key={i} className="flex gap-2">
             <Input
-              placeholder="Название"
+              placeholder={t("admin.form.specName")}
               value={s.key}
               onChange={(e) =>
                 setSpecs((arr) =>
@@ -262,7 +262,7 @@ function FormBody({
               }
             />
             <Input
-              placeholder="Значение"
+              placeholder={t("admin.form.specValue")}
               value={s.value}
               onChange={(e) =>
                 setSpecs((arr) =>
@@ -289,19 +289,19 @@ function FormBody({
           className="self-start"
           onClick={() => setSpecs((arr) => [...arr, { key: "", value: "" }])}
         >
-          Добавить строку
+          {t("admin.form.addSpec")}
         </Button>
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label>Фотографии</Label>
+        <Label>{t("admin.form.photos")}</Label>
         <PhotoDropzone
           photos={photos}
           onChange={setPhotos}
           onPhotoClick={setAiPhoto}
         />
         <p className="mt-2 text-xs text-muted-foreground">
-          Нажмите на фото, чтобы перерисовать его через ИИ.
+          {t("admin.form.photoHint")}
         </p>
 
         <PhotoAiDialog
@@ -322,7 +322,7 @@ function FormBody({
 
       <DialogFooter>
         <Button type="submit" disabled={saving}>
-          {saving ? "Сохранение…" : "Сохранить"}
+          {saving ? t("common.saving") : t("common.save")}
         </Button>
       </DialogFooter>
     </form>

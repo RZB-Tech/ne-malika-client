@@ -252,7 +252,7 @@ export function CatalogView({
             {t("catalog.emptyTitle")}
           </h3>
           <p className="mt-1 max-w-xs text-sm text-muted-foreground">
-            Не удалось загрузить товары. Проверьте, что бэкенд запущен.
+            {t("catalog.loadError")}
           </p>
         </div>
       ) : isLoading ? (

@@ -52,7 +52,7 @@ export function UserMenu() {
       await logout();
       router.push("/");
     } catch {
-      toast.error("Не удалось выйти");
+      toast.error(t("common.logoutFailed"));
     }
   };
 

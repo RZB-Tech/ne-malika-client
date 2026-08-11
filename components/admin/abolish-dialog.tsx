@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { useT } from "@/components/providers/i18n-provider";
 
 /** Reason-required confirmation used for admin "упразднить" actions. */
 export function AbolishDialog({
@@ -26,13 +27,14 @@ export function AbolishDialog({
   onConfirm: (reason: string) => Promise<void>;
   children: React.ReactNode;
 }) {
+  const { t } = useT();
   const [open, setOpen] = useState(false);
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
 
   const confirm = async () => {
     if (reason.trim().length < 5) {
-      toast.error("Укажите причину (минимум 5 символов)");
+      toast.error(t("admin.common.reasonTooShort"));
       return;
     }
     setBusy(true);
@@ -41,7 +43,7 @@ export function AbolishDialog({
       setReason("");
       setOpen(false);
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Не удалось выполнить действие");
+      toast.error(e instanceof Error ? e.message : t("common.actionFailed"));
     } finally {
       setBusy(false);
     }
@@ -59,14 +61,14 @@ export function AbolishDialog({
           value={reason}
           onChange={(e) => setReason(e.target.value)}
           rows={3}
-          placeholder="Причина — будет видна продавцу"
+          placeholder={t("admin.common.reasonPlaceholder")}
         />
         <DialogFooter>
           <Button variant="outline" onClick={() => setOpen(false)} disabled={busy}>
-            Отмена
+            {t("common.cancel")}
           </Button>
           <Button variant="destructive" onClick={confirm} disabled={busy}>
-            Упразднить
+            {t("admin.common.abolish")}
           </Button>
         </DialogFooter>
       </DialogContent>

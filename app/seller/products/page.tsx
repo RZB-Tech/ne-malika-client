@@ -68,7 +68,7 @@ export default function SellerProducts() {
       await queryClient.invalidateQueries();
       toast.success(t("common.delete"), { description: name });
     } catch {
-      toast.error("Не удалось удалить товар");
+      toast.error(t("seller.products.deleteFailed"));
     }
   };
 
@@ -127,7 +127,7 @@ export default function SellerProducts() {
                           {p.name}
                         </Link>
                         <div className="text-xs text-muted-foreground">
-                          {p.isNew ? "Новый" : "Б/у"}
+                          {t(p.isNew ? "product.stateNew" : "product.stateOld")}
                         </div>
                       </div>
                     </div>

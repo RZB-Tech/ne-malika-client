@@ -21,6 +21,7 @@ import { TelegramButton } from "@/components/product/telegram-button";
 import { ReportDialog } from "@/components/shared/report-dialog";
 import { StoreAvatar } from "@/components/shared/store-avatar";
 import { useT } from "@/components/providers/i18n-provider";
+import { formatWorkSchedule } from "@/lib/api/mappers";
 import { formatDate } from "@/lib/format";
 import { type Product, type Store } from "@/lib/data";
 
@@ -46,7 +47,11 @@ export function StoreDetail({
   const contacts = [
     { Icon: MapPin, label: t("product.address"), value: store.address },
     { Icon: Phone, label: t("product.phone"), value: store.phone },
-    { Icon: Clock, label: t("store.workingHours"), value: store.workingHours },
+    {
+      Icon: Clock,
+      label: t("store.workingHours"),
+      value: formatWorkSchedule(store.workSchedule, t) || store.workingHours,
+    },
     { Icon: Package, label: t("store.products"), value: String(all.length) },
     {
       Icon: CalendarDays,

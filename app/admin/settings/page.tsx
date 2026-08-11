@@ -26,11 +26,9 @@ export default function AdminSettings() {
     try {
       await updateMutation.mutateAsync({ data: { aiChecksEnabled: enabled } });
       await queryClient.invalidateQueries();
-      toast.success(
-        enabled ? "ИИ-проверка включена" : "ИИ-проверка выключена",
-      );
+      toast.success(t(enabled ? "admin.settings.aiOn" : "admin.settings.aiOff"));
     } catch {
-      toast.error("Не удалось сохранить настройку");
+      toast.error(t("admin.settings.saveFailed"));
     }
   };
 
@@ -41,13 +39,13 @@ export default function AdminSettings() {
           {t("admin.nav.settings")}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Настройки платформы. Применяются сразу для всех продавцов.
+          {t("admin.settings.subtitle")}
         </p>
       </div>
 
       {isError && (
         <Card className="border-destructive/40 bg-destructive/5 p-4 text-sm">
-          Не удалось загрузить настройки. Раздел доступен только администраторам.
+          {t("admin.settings.loadFailed")}
         </Card>
       )}
 
@@ -62,14 +60,10 @@ export default function AdminSettings() {
                 className="flex cursor-pointer items-center gap-2 font-medium"
               >
                 <Sparkles className="size-4 text-primary" />
-                ИИ-проверка товаров
+                {t("admin.settings.aiTitle")}
               </Label>
               <p className="mt-1.5 text-sm text-muted-foreground">
-                Каждый новый и отредактированный товар автоматически проверяется
-                моделью: описание, согласованность данных и фотографии. При
-                явном нарушении товар скрывается из выдачи до решения
-                администратора. Если выключить — товары публикуются сразу,
-                уже выполненные проверки остаются в истории.
+                {t("admin.settings.aiText")}
               </p>
             </div>
             <Switch

@@ -73,13 +73,15 @@ export function UserDrawer({
                 variant="outline"
                 className="border-transparent bg-destructive/12 font-medium text-destructive"
               >
-                заблокирован
+                {t("admin.common.blocked")}
               </Badge>
             )}
           </>
         )
       }
-      description={user && `В системе с ${formatDate(user.createdAt, locale)}`}
+      description={
+        user && t("admin.users.since", { date: formatDate(user.createdAt, locale) })
+      }
       footer={
         user && (
           <>
@@ -91,7 +93,7 @@ export function UserDrawer({
                   void onSetRole(user.id, user.shopId ? "seller" : "user")
                 }
               >
-                <ShieldOff className="size-4" /> Снять админа
+                <ShieldOff className="size-4" /> {t("admin.users.dropAdminShort")}
               </Button>
             ) : (
               <Button
@@ -99,19 +101,19 @@ export function UserDrawer({
                 className={drawerAction.primary}
                 onClick={() => void onSetRole(user.id, "admin")}
               >
-                <ShieldCheck className="size-4" /> Сделать админом
+                <ShieldCheck className="size-4" /> {t("admin.users.makeAdminShort")}
               </Button>
             )}
 
             {user.shopId ? (
               <Button asChild variant="ghost" className={drawerAction.neutral}>
                 <Link href={`/store/${user.shopId}`}>
-                  <Store className="size-4" /> Магазин
+                  <Store className="size-4" /> {t("admin.users.shopButton")}
                 </Link>
               </Button>
             ) : (
               <Button variant="ghost" className={drawerAction.neutral} disabled>
-                <Store className="size-4" /> Нет магазина
+                <Store className="size-4" /> {t("admin.users.noShopButton")}
               </Button>
             )}
 
@@ -121,19 +123,19 @@ export function UserDrawer({
                 className={`col-span-2 ${drawerAction.success}`}
                 onClick={() => void onUnblock(user.id)}
               >
-                <RotateCcw className="size-4" /> Разблокировать
+                <RotateCcw className="size-4" /> {t("admin.users.unblock")}
               </Button>
             ) : (
               <AbolishDialog
-                title="Заблокировать пользователя"
-                description="Вход в кабинет будет закрыт. Причина видна при входе."
+                title={t("admin.users.blockTitle")}
+                description={t("admin.users.blockText")}
                 onConfirm={(reason) => onBlock(user.id, reason)}
               >
                 <Button
                   variant="ghost"
                   className={`col-span-2 ${drawerAction.danger}`}
                 >
-                  <UserX className="size-4" /> Заблокировать
+                  <UserX className="size-4" /> {t("admin.users.block")}
                 </Button>
               </AbolishDialog>
             )}
@@ -152,19 +154,19 @@ export function UserDrawer({
               <div className="truncate text-sm text-muted-foreground">
                 {user.telegramUsername
                   ? `@${user.telegramUsername}`
-                  : "без username"}
+                  : t("common.noUsername")}
               </div>
               <div className="tabular truncate text-sm">
-                {user.phoneNumber ?? "номер не подтверждён"}
+                {user.phoneNumber ?? t("admin.users.phoneMissing")}
               </div>
             </div>
           </div>
 
-          <DetailSection title="Магазин">
+          <DetailSection title={t("admin.users.shopSection")}>
             {user.shopName ? (
               <>
                 <DetailRow
-                  label="Название"
+                  label={t("admin.users.shopName")}
                   value={
                     <span className="inline-flex items-center gap-2">
                       {user.shopName}
@@ -174,9 +176,12 @@ export function UserDrawer({
                     </span>
                   }
                 />
-                <DetailRow label="Товаров" value={user.productCount} />
                 <DetailRow
-                  label="Последнее изменение"
+                  label={t("admin.common.productCount")}
+                  value={user.productCount}
+                />
+                <DetailRow
+                  label={t("admin.users.lastChange")}
                   value={
                     user.lastProductAt
                       ? formatDate(user.lastProductAt, locale)
@@ -186,7 +191,7 @@ export function UserDrawer({
               </>
             ) : (
               <p className="text-sm text-muted-foreground">
-                Магазин не создан.
+                {t("admin.users.noShop")}
               </p>
             )}
           </DetailSection>
@@ -194,18 +199,20 @@ export function UserDrawer({
           {user.blockedAt && (
             <DetailNote
               tone="danger"
-              title={`Заблокирован ${formatDate(user.blockedAt, locale)}`}
+              title={t("admin.users.blockedAt", {
+                date: formatDate(user.blockedAt, locale),
+              })}
             >
-              {user.blockReason ?? "Причина не указана"}
+              {user.blockReason ?? t("common.reasonMissing")}
             </DetailNote>
           )}
 
-          <DetailSection title="Последние действия">
+          <DetailSection title={t("admin.users.recent")}>
             {isLoading ? (
               <Skeleton className="h-20 w-full" />
             ) : activity.length === 0 ? (
               <p className="text-sm text-muted-foreground">
-                Товаров пока не добавлял.
+                {t("admin.users.noProducts")}
               </p>
             ) : (
               <ul className="flex flex-col gap-2">

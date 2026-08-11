@@ -33,11 +33,11 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
 
   const items: NavItem[] = [
     { href: "/admin", label: t("admin.nav.dashboard"), icon: BarChart3, exact: true },
-    { href: "/admin/reports", label: "Жалобы", icon: Flag },
+    { href: "/admin/reports", label: t("admin.nav.reports"), icon: Flag },
     { href: "/admin/sellers", label: t("admin.nav.sellers"), icon: Store },
-    { href: "/admin/users", label: "Пользователи", icon: Users },
+    { href: "/admin/users", label: t("admin.nav.users"), icon: Users },
     { href: "/admin/products", label: t("admin.nav.products"), icon: Package },
-    { href: "/admin/ai-review", label: "Проверка ИИ", icon: Sparkles },
+    { href: "/admin/ai-review", label: t("admin.nav.aiReview"), icon: Sparkles },
     { href: "/admin/settings", label: t("admin.nav.settings"), icon: Settings },
   ];
 

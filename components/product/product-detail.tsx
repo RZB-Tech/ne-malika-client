@@ -15,6 +15,7 @@ import { RevealPhone } from "@/components/product/reveal-phone";
 import { ReportDialog } from "@/components/shared/report-dialog";
 import { StoreAvatar } from "@/components/shared/store-avatar";
 import { useT } from "@/components/providers/i18n-provider";
+import { formatWorkSchedule } from "@/lib/api/mappers";
 import { formatPrice } from "@/lib/format";
 import { productToSnapshot } from "@/lib/product-snapshot";
 import { type Product, type Store } from "@/lib/data";
@@ -40,11 +41,13 @@ export function ProductDetail({
           (hue) => ({ src: undefined as string | undefined, hue }),
         );
 
+  const hours = formatWorkSchedule(store.workSchedule, t) || store.workingHours;
+
   const meta = [
     { label: t("product.store"), value: store.name },
     {
-      label: "Состояние",
-      value: product.isNew ? "Новый" : "Б/у",
+      label: t("product.state"),
+      value: t(product.isNew ? "product.stateNew" : "product.stateOld"),
     },
   ];
 
@@ -178,10 +181,8 @@ export function ProductDetail({
                     {store.name}
                   </span>
                 </span>
-                {store.workingHours && (
-                  <span className="text-xs text-muted-foreground">
-                    {store.workingHours}
-                  </span>
+                {hours && (
+                  <span className="text-xs text-muted-foreground">{hours}</span>
                 )}
               </span>
             </Link>

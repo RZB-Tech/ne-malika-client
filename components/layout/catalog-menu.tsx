@@ -227,6 +227,7 @@ function MobileChildren({
   onBack: () => void;
   onNavigate: () => void;
 }) {
+  const { t } = useT();
   return (
     <div>
       <button
@@ -235,7 +236,7 @@ function MobileChildren({
         className="mb-2 flex items-center gap-1.5 text-sm text-muted-foreground"
       >
         <ChevronLeft className="size-4" />
-        Все разделы
+        {t("catalog.allSections")}
       </button>
 
       <Link

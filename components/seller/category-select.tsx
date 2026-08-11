@@ -59,7 +59,7 @@ export function CategorySelect({
   onChange: (id: number | null) => void;
   disabled?: boolean;
 }) {
-  const { locale } = useT();
+  const { t, locale } = useT();
   const { roots, isLoading } = useCategories();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -103,9 +103,7 @@ export function CategorySelect({
           )}
         >
           <span className="truncate">
-            {isLoading
-              ? "Загружаем категории…"
-              : label || "Выберите категорию"}
+            {isLoading ? t("category.loading") : label || t("category.choose")}
           </span>
           <ChevronDown className="size-4 shrink-0 opacity-50" />
         </button>
@@ -118,7 +116,7 @@ export function CategorySelect({
             autoFocus
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Поиск по категориям…"
+            placeholder={t("category.search")}
             className="h-9 border-0 px-0 shadow-none focus-visible:ring-0"
           />
         </div>
@@ -126,7 +124,7 @@ export function CategorySelect({
         <div className="max-h-72 overflow-y-auto overscroll-contain p-1">
           {filtered.length === 0 ? (
             <p className="px-3 py-6 text-center text-sm text-muted-foreground">
-              Ничего не найдено
+              {t("category.notFound")}
             </p>
           ) : (
             filtered.map((o, i) => (

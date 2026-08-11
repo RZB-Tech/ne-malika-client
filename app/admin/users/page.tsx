@@ -51,7 +51,7 @@ export function initials(name: string): string {
 }
 
 export default function AdminUsers() {
-  const { locale } = useT();
+  const { t, locale } = useT();
   const queryClient = useQueryClient();
   const [opened, setOpened] = useState<AdminUserRow | null>(null);
   const [page, setPage] = useState(1);
@@ -82,15 +82,17 @@ export default function AdminUsers() {
 
   const block = async (id: number, reason: string) => {
     await blockMutation.mutateAsync({ id, data: { reason } });
-    await done("Пользователь заблокирован");
+    await done(t("admin.users.blocked"));
   };
   const unblock = async (id: number) => {
     await unblockMutation.mutateAsync({ id });
-    await done("Блокировка снята");
+    await done(t("admin.users.unblocked"));
   };
   const setRole = async (id: number, role: UserRole) => {
     await roleMutation.mutateAsync({ id, data: { role } });
-    await done(role === "admin" ? "Выданы права админа" : "Права админа сняты");
+    await done(
+      t(role === "admin" ? "admin.users.adminGranted" : "admin.users.adminRevoked"),
+    );
   };
 
   // Снимая админа, возвращаем ту роль, которой человек соответствует: продавец
@@ -102,7 +104,7 @@ export default function AdminUsers() {
     ...(u.shopId
       ? [
           {
-            label: "Открыть магазин",
+            label: t("admin.users.openShop"),
             icon: Store,
             href: `/store/${u.shopId}`,
           } satisfies RowAction,
@@ -110,28 +112,28 @@ export default function AdminUsers() {
       : []),
     u.role === "admin"
       ? {
-          label: "Снять права админа",
+          label: t("admin.users.dropAdmin"),
           icon: ShieldOff,
           onSelect: () => void setRole(u.id, demotedRole(u)),
         }
       : {
-          label: "Сделать администратором",
+          label: t("admin.users.makeAdmin"),
           icon: ShieldCheck,
           onSelect: () => void setRole(u.id, "admin"),
         },
     u.blockedAt
       ? {
-          label: "Разблокировать",
+          label: t("admin.users.unblock"),
           icon: RotateCcw,
           onSelect: () => void unblock(u.id),
         }
       : {
-          label: "Заблокировать",
+          label: t("admin.users.block"),
           icon: UserX,
           destructive: true,
           withReason: {
-            title: "Заблокировать пользователя",
-            description: "Вход в кабинет будет закрыт. Причина видна при входе.",
+            title: t("admin.users.blockTitle"),
+            description: t("admin.users.blockText"),
             onConfirm: (reason) => block(u.id, reason),
           },
         },
@@ -141,23 +143,22 @@ export default function AdminUsers() {
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="font-heading text-2xl font-bold tracking-tight">
-          Пользователи
+          {t("admin.users.title")}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Нажмите на строку, чтобы посмотреть карточку и последние действия.
-          Правая кнопка мыши — быстрые действия.
+          {t("admin.users.subtitle")}
         </p>
       </div>
 
       {isError && !isDevData && (
         <Card className="border-destructive/40 bg-destructive/5 p-4 text-sm">
-          Не удалось загрузить пользователей.
+          {t("admin.users.loadFailed")}
         </Card>
       )}
 
       {isDevData && (
         <Card className="bg-muted/50 p-4 text-sm text-muted-foreground">
-          Показаны тестовые данные: бэкенд недоступен.
+          {t("admin.common.devDataShort")}
         </Card>
       )}
 
@@ -166,11 +167,15 @@ export default function AdminUsers() {
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-transparent">
-                <TableHead className="min-w-[220px]">Пользователь</TableHead>
-                <TableHead>Магазин</TableHead>
-                <TableHead>Роль</TableHead>
-                <TableHead className="text-right">Товаров</TableHead>
-                <TableHead>Регистрация</TableHead>
+                <TableHead className="min-w-[220px]">
+                  {t("admin.users.colUser")}
+                </TableHead>
+                <TableHead>{t("admin.users.colShop")}</TableHead>
+                <TableHead>{t("admin.users.colRole")}</TableHead>
+                <TableHead className="text-right">
+                  {t("admin.users.colProducts")}
+                </TableHead>
+                <TableHead>{t("admin.users.colJoined")}</TableHead>
                 <TableHead className="w-10" />
               </TableRow>
             </TableHeader>
@@ -197,7 +202,7 @@ export default function AdminUsers() {
                                 variant="outline"
                                 className="border-transparent bg-destructive/12 text-xs font-medium text-destructive"
                               >
-                                заблокирован
+                                {t("admin.common.blocked")}
                               </Badge>
                             )}
                           </div>
@@ -239,7 +244,7 @@ export default function AdminUsers() {
         )}
         {!isLoading && rows.length === 0 && (
           <div className="py-16 text-center text-sm text-muted-foreground">
-            Пользователей пока нет.
+            {t("admin.users.empty")}
           </div>
         )}
       </Card>

@@ -23,7 +23,7 @@ import {
 import type { Paginated, ReportRow } from "@/lib/api/types";
 
 export default function AdminReports() {
-  const { locale } = useT();
+  const { t, locale } = useT();
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
 
@@ -43,32 +43,33 @@ export default function AdminReports() {
   const onAbolishProduct = async (id: number, reason: string) => {
     await abolishProduct.mutateAsync({ id, data: { reason } });
     await queryClient.invalidateQueries();
-    toast.success("Товар упразднён");
+    toast.success(t("admin.reports.productAbolished"));
   };
   const onAbolishShop = async (id: number, reason: string) => {
     await abolishShop.mutateAsync({ id, data: { reason } });
     await queryClient.invalidateQueries();
-    toast.success("Магазин упразднён");
+    toast.success(t("admin.reports.shopAbolished"));
   };
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-heading text-2xl font-bold tracking-tight">Жалобы</h1>
+        <h1 className="font-heading text-2xl font-bold tracking-tight">
+          {t("admin.reports.title")}
+        </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Жалобы покупателей на магазины и товары.
+          {t("admin.reports.subtitle")}
         </p>
       </div>
 
       {isError && !isDevData && (
         <Card className="border-destructive/40 bg-destructive/5 p-4 text-sm">
-          Не удалось загрузить жалобы. Раздел доступен только администраторам.
+          {t("admin.reports.loadFailed")}
         </Card>
       )}
       {isDevData && (
         <Card className="bg-muted/50 p-4 text-sm text-muted-foreground">
-          Показаны тестовые данные: бэкенд недоступен. Запустите его, чтобы
-          увидеть настоящие.
+          {t("admin.common.devData")}
         </Card>
       )}
 
@@ -80,7 +81,7 @@ export default function AdminReports() {
         </div>
       ) : reports.length === 0 && (!isError || isDevData) ? (
         <Card className="py-16 text-center text-sm text-muted-foreground">
-          Жалоб пока нет.
+          {t("admin.reports.empty")}
         </Card>
       ) : (
         <div className="space-y-3">
@@ -90,14 +91,14 @@ export default function AdminReports() {
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                     <Badge variant="secondary">
-                      {r.productCardId ? "Товар" : "Магазин"}
+                      {t(r.productCardId ? "admin.reports.onProduct" : "admin.reports.onShop")}
                     </Badge>
                     <Link href={`/store/${r.shopId}`} className="hover:text-foreground hover:underline">
-                      магазин #{r.shopId}
+                      {t("admin.reports.shopRef", { id: r.shopId })}
                     </Link>
                     {r.productCardId && (
                       <Link href={`/product/${r.productCardId}`} className="hover:text-foreground hover:underline">
-                        товар #{r.productCardId}
+                        {t("admin.reports.productRef", { id: r.productCardId })}
                       </Link>
                     )}
                     <span>· {formatDate(r.createdAt, locale)}</span>
@@ -107,21 +108,21 @@ export default function AdminReports() {
                 <div className="flex shrink-0 gap-2">
                   {r.productCardId && (
                     <AbolishDialog
-                      title="Упразднить товар"
+                      title={t("admin.reports.abolishProduct")}
                       onConfirm={(reason) => onAbolishProduct(r.productCardId!, reason)}
                     >
                       <Button size="sm" variant="ghost" className="gap-1.5 text-muted-foreground hover:text-destructive">
-                        <Ban className="size-3.5" /> Товар
+                        <Ban className="size-3.5" /> {t("admin.reports.onProduct")}
                       </Button>
                     </AbolishDialog>
                   )}
                   <AbolishDialog
-                    title="Упразднить магазин"
-                    description="Все товары магазина будут скрыты."
+                    title={t("admin.reports.abolishShop")}
+                    description={t("admin.reports.abolishShopText")}
                     onConfirm={(reason) => onAbolishShop(r.shopId, reason)}
                   >
                     <Button size="sm" variant="ghost" className="gap-1.5 text-muted-foreground hover:text-destructive">
-                      <Store className="size-3.5" /> Магазин
+                      <Store className="size-3.5" /> {t("admin.reports.onShop")}
                     </Button>
                   </AbolishDialog>
                 </div>
@@ -134,11 +135,11 @@ export default function AdminReports() {
       {totalPages > 1 && (
         <div className="flex items-center justify-center gap-3">
           <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
-            Назад
+            {t("common.back")}
           </Button>
           <span className="text-sm text-muted-foreground tabular">{page} / {totalPages}</span>
           <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>
-            Вперёд
+            {t("common.next")}
           </Button>
         </div>
       )}

@@ -13,6 +13,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { buttonVariants } from "@/components/ui/button";
+import { useT } from "@/components/providers/i18n-provider";
 import { cn } from "@/lib/utils";
 
 /**
@@ -24,18 +25,20 @@ import { cn } from "@/lib/utils";
 export function ConfirmDialog({
   title,
   description,
-  confirmLabel = "Подтвердить",
+  confirmLabel,
   destructive = false,
   onConfirm,
   children,
 }: {
   title: string;
   description?: string;
+  /** По умолчанию — «Подтвердить» на языке интерфейса. */
   confirmLabel?: string;
   destructive?: boolean;
   onConfirm: () => Promise<void> | void;
   children: React.ReactNode;
 }) {
+  const { t } = useT();
   const [busy, setBusy] = useState(false);
 
   const confirm = async (e: React.MouseEvent) => {
@@ -61,7 +64,9 @@ export function ConfirmDialog({
           )}
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={busy}>Отмена</AlertDialogCancel>
+          <AlertDialogCancel disabled={busy}>
+            {t("common.cancel")}
+          </AlertDialogCancel>
           <AlertDialogAction
             disabled={busy}
             onClick={confirm}
@@ -70,7 +75,7 @@ export function ConfirmDialog({
                 buttonVariants({ variant: "destructive" }),
             )}
           >
-            {busy ? "Выполняется…" : confirmLabel}
+            {busy ? t("common.running") : (confirmLabel ?? t("common.confirm"))}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

@@ -15,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useReportsControllerCreate } from "@/lib/api/generated/endpoints/reports/reports";
+import { useT } from "@/components/providers/i18n-provider";
 
 export function ReportDialog({
   shopId,
@@ -25,6 +26,7 @@ export function ReportDialog({
   productCardId?: number;
   children?: React.ReactNode;
 }) {
+  const { t } = useT();
   const [open, setOpen] = useState(false);
   const [context, setContext] = useState("");
   const { mutateAsync, isPending } = useReportsControllerCreate();
@@ -32,7 +34,7 @@ export function ReportDialog({
   const submit = async () => {
     const value = context.trim();
     if (value.length < 5) {
-      toast.error("Опишите проблему подробнее (минимум 5 символов)");
+      toast.error(t("report.tooShort"));
       return;
     }
     try {
@@ -43,11 +45,11 @@ export function ReportDialog({
           product_card_id: productCardId,
         },
       });
-      toast.success("Жалоба отправлена. Спасибо!");
+      toast.success(t("report.sent"));
       setContext("");
       setOpen(false);
     } catch {
-      toast.error("Не удалось отправить жалобу");
+      toast.error(t("report.failed"));
     }
   };
 
@@ -57,30 +59,29 @@ export function ReportDialog({
         {children ?? (
           <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground">
             <Flag className="size-3.5" />
-            Пожаловаться
+            {t("report.trigger")}
           </Button>
         )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Пожаловаться</DialogTitle>
+          <DialogTitle>{t("report.title")}</DialogTitle>
           <DialogDescription>
-            Опишите, что не так с {productCardId ? "товаром" : "магазином"}. Жалобу
-            рассмотрит администратор.
+            {t(productCardId ? "report.onProduct" : "report.onShop")}
           </DialogDescription>
         </DialogHeader>
         <Textarea
           value={context}
           onChange={(e) => setContext(e.target.value)}
-          placeholder="Например: продавец не отвечает, товар не соответствует фото…"
+          placeholder={t("report.placeholder")}
           rows={4}
         />
         <DialogFooter>
           <Button variant="outline" onClick={() => setOpen(false)} disabled={isPending}>
-            Отмена
+            {t("common.cancel")}
           </Button>
           <Button onClick={submit} disabled={isPending}>
-            Отправить
+            {t("report.submit")}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -30,6 +30,7 @@ import type {
   GenerateImagesDtoStyle,
 } from "@/lib/api/generated/schemas";
 import { storedPhoto, type UploadedPhoto } from "@/components/seller/photo-dropzone";
+import { useT } from "@/components/providers/i18n-provider";
 import { uploadPhoto } from "@/lib/api/upload";
 import { cn } from "@/lib/utils";
 
@@ -60,19 +61,22 @@ const SIZES: Record<Format, Record<Tier, GenerateImagesDtoSize>> = {
 const TIERS = ["1K", "2K", "3K", "4K"] as const satisfies readonly Tier[];
 
 const STYLES = [
-  { value: "infographic", label: "Инфографика" },
-  { value: "photo", label: "Фото на белом" },
-] as const satisfies readonly { value: GenerateImagesDtoStyle; label: string }[];
+  { value: "infographic", labelKey: "admin.photoAi.styleInfographic" },
+  { value: "photo", labelKey: "admin.photoAi.stylePhoto" },
+] as const satisfies readonly {
+  value: GenerateImagesDtoStyle;
+  labelKey: string;
+}[];
 
 const FORMATS = [
-  { value: "portrait", label: "Вертикальный 3:4" },
-  { value: "square", label: "Квадрат 1:1" },
-] as const satisfies readonly { value: Format; label: string }[];
+  { value: "portrait", labelKey: "admin.photoAi.formatPortrait" },
+  { value: "square", labelKey: "admin.photoAi.formatSquare" },
+] as const satisfies readonly { value: Format; labelKey: string }[];
 
 const QUALITIES = [
-  { value: "low", label: "Черновик" },
-  { value: "medium", label: "Обычное" },
-  { value: "high", label: "Высокое" },
+  { value: "low", labelKey: "admin.photoAi.qualityLow" },
+  { value: "medium", labelKey: "admin.photoAi.qualityMedium" },
+  { value: "high", labelKey: "admin.photoAi.qualityHigh" },
 ] as const;
 
 const COUNTS = [1, 2, 3, 4] as const;
@@ -102,6 +106,7 @@ export function PhotoAiDialog({
   onClose: () => void;
   onApply: (replacement: UploadedPhoto[]) => void;
 }) {
+  const { t } = useT();
   const [prompt, setPrompt] = useState("");
   const [count, setCount] = useState<number>(2);
   const [style, setStyle] = useState<GenerateImagesDtoStyle>("infographic");
@@ -146,7 +151,7 @@ export function PhotoAiDialog({
       setPrompt(res.prompt);
     } catch (err) {
       toast.error(
-        err instanceof Error ? err.message : "Не удалось составить промпт",
+        err instanceof Error ? err.message : t("admin.photoAi.promptFailed"),
       );
     }
   };
@@ -154,7 +159,7 @@ export function PhotoAiDialog({
   const generate = async () => {
     if (!photoKey) return;
     if (prompt.trim().length < 3) {
-      toast.error("Опишите, что нужно получить, или нажмите «Составить промпт»");
+      toast.error(t("admin.photoAi.promptEmpty"));
       return;
     }
     try {
@@ -173,18 +178,22 @@ export function PhotoAiDialog({
       setResultFormat(format);
       setPicked(new Set());
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Генерация не удалась");
+      toast.error(
+        err instanceof Error ? err.message : t("admin.photoAi.generateFailed"),
+      );
     }
   };
 
   const apply = () => {
     const chosen = results.filter((r) => picked.has(r.key));
     if (chosen.length === 0) {
-      toast.error("Выберите хотя бы одно изображение");
+      toast.error(t("admin.photoAi.pickAtLeastOne"));
       return;
     }
     onApply(
-      chosen.map((r) => storedPhoto(r.key, r.url, "Сгенерировано ИИ")),
+      chosen.map((r) =>
+        storedPhoto(r.key, r.url, t("admin.photoAi.generatedCaption")),
+      ),
     );
     close();
   };
@@ -197,7 +206,7 @@ export function PhotoAiDialog({
       setReference({ key, url: URL.createObjectURL(file) });
     } catch (err) {
       toast.error(
-        err instanceof Error ? err.message : "Не удалось загрузить референс",
+        err instanceof Error ? err.message : t("admin.photoAi.referenceFailed"),
       );
     } finally {
       setUploading(false);
@@ -216,16 +225,13 @@ export function PhotoAiDialog({
     <Dialog open={open} onOpenChange={(v) => !v && close()}>
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl">
         <DialogHeader>
-          <DialogTitle>Перерисовать фото через ИИ</DialogTitle>
-          <DialogDescription>
-            Модель видит текущее фото и рисует по нему карточку с тем же товаром.
-            Выбранные варианты заменят исходное изображение.
-          </DialogDescription>
+          <DialogTitle>{t("admin.photoAi.title")}</DialogTitle>
+          <DialogDescription>{t("admin.photoAi.subtitle")}</DialogDescription>
         </DialogHeader>
 
         {!photoKey ? (
           <p className="text-sm text-muted-foreground">
-            Это фото ещё не сохранено. Сохраните товар, а потом перерисуйте.
+            {t("admin.photoAi.unsaved")}
           </p>
         ) : (
           <div className="space-y-4">
@@ -233,12 +239,12 @@ export function PhotoAiDialog({
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={photo!.url}
-                alt="Исходное фото"
+                alt={t("admin.photoAi.sourceAlt")}
                 className="size-28 shrink-0 rounded-xl bg-muted object-cover ring-1 ring-foreground/10"
               />
               <div className="min-w-0 flex-1 space-y-1.5">
                 <div className="flex items-center justify-between gap-2">
-                  <Label htmlFor="ai-prompt">Промпт</Label>
+                  <Label htmlFor="ai-prompt">{t("admin.photoAi.prompt")}</Label>
                   <Button
                     type="button"
                     variant="ghost"
@@ -248,9 +254,11 @@ export function PhotoAiDialog({
                     disabled={describeMutation.isPending}
                   >
                     <Sparkles className="size-3.5" />
-                    {describeMutation.isPending
-                      ? "Смотрю фото…"
-                      : "Составить промпт"}
+                    {t(
+                      describeMutation.isPending
+                        ? "admin.photoAi.describing"
+                        : "admin.photoAi.describe",
+                    )}
                   </Button>
                 </div>
                 <Textarea
@@ -258,25 +266,24 @@ export function PhotoAiDialog({
                   rows={4}
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
-                  placeholder="ИИ сам опишет карточку — или напишите, что хотите получить"
+                  placeholder={t("admin.photoAi.promptPlaceholder")}
                 />
               </div>
             </div>
 
             <div className="space-y-1.5">
-              <Label>Референс оформления</Label>
+              <Label>{t("admin.photoAi.reference")}</Label>
               {reference ? (
                 <div className="flex items-center gap-3">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={reference.url}
-                    alt="Референс"
+                    alt={t("admin.photoAi.referenceAlt")}
                     className="size-20 rounded-xl bg-muted object-cover ring-1 ring-foreground/10"
                   />
                   <div className="min-w-0 flex-1">
                     <p className="text-xs text-muted-foreground">
-                      Модель повторит фон, расположение текста и плашек — но
-                      товар и надписи возьмёт из вашего фото. Нажмите «Составить
-                      промпт» ещё раз, чтобы описание учло референс.
+                      {t("admin.photoAi.referenceHint")}
                     </p>
                   </div>
                   <Button
@@ -287,7 +294,7 @@ export function PhotoAiDialog({
                     onClick={() => setReference(null)}
                   >
                     <X className="size-3.5" />
-                    Убрать
+                    {t("admin.photoAi.referenceRemove")}
                   </Button>
                 </div>
               ) : (
@@ -298,9 +305,11 @@ export function PhotoAiDialog({
                   )}
                 >
                   <ImagePlus className="size-4" />
-                  {uploading
-                    ? "Загружаем…"
-                    : "Добавить образец карточки (необязательно)"}
+                  {t(
+                    uploading
+                      ? "common.uploading"
+                      : "admin.photoAi.referenceAdd",
+                  )}
                   <input
                     type="file"
                     accept="image/*"
@@ -316,7 +325,7 @@ export function PhotoAiDialog({
 
             <div className="grid gap-3 sm:grid-cols-2">
               <div className="space-y-1.5">
-                <Label>Что рисуем</Label>
+                <Label>{t("admin.photoAi.styleLabel")}</Label>
                 <Select
                   value={style}
                   onValueChange={(v) => changeStyle(v as GenerateImagesDtoStyle)}
@@ -327,14 +336,14 @@ export function PhotoAiDialog({
                   <SelectContent>
                     {STYLES.map((s) => (
                       <SelectItem key={s.value} value={s.value}>
-                        {s.label}
+                        {t(s.labelKey)}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-1.5">
-                <Label>Формат</Label>
+                <Label>{t("admin.photoAi.formatLabel")}</Label>
                 <Select
                   value={format}
                   onValueChange={(v) => setFormat(v as Format)}
@@ -345,7 +354,7 @@ export function PhotoAiDialog({
                   <SelectContent>
                     {FORMATS.map((f) => (
                       <SelectItem key={f.value} value={f.value}>
-                        {f.label}
+                        {t(f.labelKey)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -355,7 +364,7 @@ export function PhotoAiDialog({
 
             <div className="grid gap-3 sm:grid-cols-3">
               <div className="space-y-1.5">
-                <Label>Сколько вариантов</Label>
+                <Label>{t("admin.photoAi.countLabel")}</Label>
                 <Select
                   value={String(count)}
                   onValueChange={(v) => setCount(Number(v))}
@@ -373,7 +382,7 @@ export function PhotoAiDialog({
                 </Select>
               </div>
               <div className="space-y-1.5">
-                <Label>Качество</Label>
+                <Label>{t("admin.photoAi.qualityLabel")}</Label>
                 <Select
                   value={quality}
                   onValueChange={(v) => setQuality(v as GenerateImagesDtoQuality)}
@@ -384,14 +393,14 @@ export function PhotoAiDialog({
                   <SelectContent>
                     {QUALITIES.map((q) => (
                       <SelectItem key={q.value} value={q.value}>
-                        {q.label}
+                        {t(q.labelKey)}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-1.5">
-                <Label>Разрешение</Label>
+                <Label>{t("admin.photoAi.sizeLabel")}</Label>
                 <Select value={tier} onValueChange={(v) => setTier(v as Tier)}>
                   <SelectTrigger className="w-full">
                     <SelectValue />
@@ -408,8 +417,8 @@ export function PhotoAiDialog({
             </div>
 
             <p className="text-xs text-muted-foreground tabular">
-              Итоговый размер: {size} px
-              {tier === "4K" && " — максимум, который принимает модель"}
+              {t("admin.photoAi.sizeHint", { size })}
+              {tier === "4K" && ` — ${t("admin.photoAi.sizeMax")}`}
             </p>
 
             <Button
@@ -419,7 +428,11 @@ export function PhotoAiDialog({
               disabled={generateMutation.isPending}
             >
               <Wand2 className="size-4" />
-              {generateMutation.isPending ? "Рисую…" : "Сгенерировать"}
+              {t(
+                generateMutation.isPending
+                  ? "admin.photoAi.generating"
+                  : "admin.photoAi.generate",
+              )}
             </Button>
 
             {generateMutation.isPending && (
@@ -429,7 +442,7 @@ export function PhotoAiDialog({
             {results.length > 0 && (
               <div className="space-y-2">
                 <p className="text-sm text-muted-foreground">
-                  Нажмите на понравившиеся — можно выбрать несколько.
+                  {t("admin.photoAi.pickHint")}
                 </p>
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                   {results.map((r) => (
@@ -450,7 +463,7 @@ export function PhotoAiDialog({
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={r.url}
-                        alt="Вариант"
+                        alt={t("admin.photoAi.variantAlt")}
                         className="size-full object-cover"
                       />
                       {picked.has(r.key) && (
@@ -462,7 +475,7 @@ export function PhotoAiDialog({
                   ))}
                 </div>
                 <Button type="button" onClick={apply} className="mt-2">
-                  Заменить фото ({picked.size})
+                  {t("admin.photoAi.apply", { count: picked.size })}
                 </Button>
               </div>
             )}
@@ -486,6 +499,7 @@ function GeneratingGrid({
   count: number;
   format: Format;
 }) {
+  const { t } = useT();
   const [seconds, setSeconds] = useState(0);
 
   useEffect(() => {
@@ -513,8 +527,8 @@ function GeneratingGrid({
         ))}
       </div>
       <p className="tabular text-xs text-muted-foreground">
-        {`Рисуем ${count} ${count === 1 ? "вариант" : "варианта"}… ${seconds} с`}
-        {seconds > 45 && " — почти готово, крупные размеры рисуются дольше"}
+        {t("admin.photoAi.progress", { count, seconds })}
+        {seconds > 45 && ` — ${t("admin.photoAi.progressLong")}`}
       </p>
     </div>
   );

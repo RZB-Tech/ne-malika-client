@@ -78,25 +78,25 @@ export function AddProductForm({
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!shop) {
-      toast.error("Сначала создайте магазин в разделе «Профиль»");
+      toast.error(t("seller.add.needShop"));
       router.push("/seller/profile");
       return;
     }
     if (shopAbolished) {
-      toast.error("Магазин упразднён — добавлять товары нельзя");
+      toast.error(t("seller.add.shopAbolished"));
       return;
     }
     const priceNum = parsePriceInput(price);
     if (!name.trim() || !priceNum) {
-      toast.error("Заполните название и цену");
+      toast.error(t("seller.add.needNamePrice"));
       return;
     }
     if (photos.length === 0) {
-      toast.error("Добавьте хотя бы одно фото");
+      toast.error(t("seller.add.needPhoto"));
       return;
     }
     if (!categoryId) {
-      toast.error("Выберите категорию товара");
+      toast.error(t("seller.add.needCategory"));
       return;
     }
 
@@ -104,6 +104,9 @@ export function AddProductForm({
     try {
       const keys = await resolvePhotoKeys(photos);
 
+      // Ключи характеристик ложатся в базу и показываются всем покупателям,
+      // поэтому они не переводятся: иначе у одного товара было бы «Бренд», а у
+      // соседнего — «Brend», в зависимости от языка продавца в момент создания.
       const characteristics = [
         ...(brand.trim() ? [{ key: "Бренд", value: brand.trim() }] : []),
         ...(model.trim() ? [{ key: "Модель", value: model.trim() }] : []),
@@ -127,14 +130,16 @@ export function AddProductForm({
 
       await queryClient.invalidateQueries();
       toast.success(t("seller.add.publish"), {
-        description: "Товар отправлен на ИИ-проверку",
+        description: t("seller.add.sentToAi"),
       });
       // Из диалога уводить некуда — он просто закрывается, а список под ним
       // уже обновлён сбросом кэша выше.
       if (onDone) onDone();
       else router.push("/seller/products");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Не удалось создать товар");
+      toast.error(
+        err instanceof Error ? err.message : t("seller.add.createFailed"),
+      );
     } finally {
       setSubmitting(false);
     }
@@ -155,13 +160,13 @@ export function AddProductForm({
 
       {!shopLoading && !shop && (
         <Card className="border-warning/40 bg-warning/5 p-4 text-sm">
-          У вас ещё нет магазина.{" "}
+          {t("seller.shop.none")}{" "}
           <button
             type="button"
             className="font-medium text-primary hover:underline"
             onClick={() => router.push("/seller/profile")}
           >
-            Создать магазин
+            {t("seller.shop.create")}
           </button>
         </Card>
       )}
@@ -169,11 +174,11 @@ export function AddProductForm({
       {shopAbolished && (
         <Card className="border-destructive/40 bg-destructive/5 p-4 text-sm">
           <p className="font-medium text-destructive">
-            Магазин упразднён администратором — новые товары добавить нельзя.
+            {t("seller.shop.abolishedShort")}
           </p>
           {shop?.abolishReason && (
             <p className="mt-1 text-muted-foreground">
-              Причина: {shop.abolishReason}
+              {t("common.reasonLine", { reason: shop.abolishReason })}
             </p>
           )}
         </Card>
@@ -217,7 +222,7 @@ export function AddProductForm({
           </div>
 
           <div className={field}>
-            <Label>Категория</Label>
+            <Label>{t("category.label")}</Label>
             <CategorySelect value={categoryId} onChange={setCategoryId} />
           </div>
 

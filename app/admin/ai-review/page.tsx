@@ -52,36 +52,35 @@ export default function AdminAiReview() {
   const approve = async (id: number) => {
     await restoreMutation.mutateAsync({ id });
     await queryClient.invalidateQueries();
-    toast.success("Товар одобрен и вернулся в выдачу");
+    toast.success(t("admin.aiReview.approved"));
   };
 
   const recheck = async (id: number) => {
     await recheckMutation.mutateAsync({ id });
     await queryClient.invalidateQueries();
-    toast.success("Отправлено на повторную проверку");
+    toast.success(t("admin.aiReview.requeued"));
   };
 
   return (
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="font-heading text-2xl font-bold tracking-tight">
-          Проверка ИИ
+          {t("admin.aiReview.title")}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Товары, которые проверка забраковала или не смогла обработать. Их
-          нужно посмотреть глазами: одобрить вручную или отправить на повтор.
+          {t("admin.aiReview.subtitle")}
         </p>
       </div>
 
       {isError && !isDevData && (
         <Card className="border-destructive/40 bg-destructive/5 p-4 text-sm">
-          Не удалось загрузить очередь.
+          {t("admin.aiReview.loadFailed")}
         </Card>
       )}
 
       {isDevData && (
         <Card className="bg-muted/50 p-4 text-sm text-muted-foreground">
-          Показаны тестовые данные: бэкенд недоступен.
+          {t("admin.common.devDataShort")}
         </Card>
       )}
 
@@ -91,9 +90,9 @@ export default function AdminAiReview() {
         <Card className="flex flex-col items-center gap-3 py-16 text-center">
           <CheckCircle2 className="size-10 text-success" />
           <div>
-            <div className="font-medium">Очередь пуста</div>
+            <div className="font-medium">{t("admin.aiReview.emptyTitle")}</div>
             <p className="mt-1 text-sm text-muted-foreground">
-              Все проверки прошли без сбоев и отказов.
+              {t("admin.aiReview.emptyText")}
             </p>
           </div>
         </Card>
@@ -130,10 +129,10 @@ export default function AdminAiReview() {
                   size="sm"
                   onClick={() => void recheck(row.productCardId)}
                 >
-                  <RefreshCw className="size-4" /> Перепроверить
+                  <RefreshCw className="size-4" /> {t("admin.aiReview.recheck")}
                 </Button>
                 <Button size="sm" onClick={() => void approve(row.productCardId)}>
-                  <CheckCircle2 className="size-4" /> Одобрить
+                  <CheckCircle2 className="size-4" /> {t("admin.aiReview.approve")}
                 </Button>
               </div>
             </div>
@@ -143,7 +142,7 @@ export default function AdminAiReview() {
               <div className="flex gap-2 rounded-lg bg-muted p-3 text-sm">
                 <TriangleAlert className="size-4 shrink-0 text-warning" />
                 <div>
-                  <div className="font-medium">Проверка не выполнена</div>
+                  <div className="font-medium">{t("admin.aiReview.failedTitle")}</div>
                   <p className="mt-0.5 text-muted-foreground">{row.error}</p>
                 </div>
               </div>
@@ -152,10 +151,10 @@ export default function AdminAiReview() {
                 <XCircle className="size-4 shrink-0 text-destructive" />
                 <div>
                   <div className="font-medium text-destructive">
-                    Модель забраковала товар
+                    {t("admin.aiReview.rejectedTitle")}
                   </div>
                   <p className="mt-0.5 text-muted-foreground">
-                    {row.summary ?? "Без пояснения"}
+                    {row.summary ?? t("admin.aiReview.noSummary")}
                   </p>
                 </div>
               </div>

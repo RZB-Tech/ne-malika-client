@@ -1,4 +1,5 @@
 import type { Locale } from "./i18n/config";
+import type { WorkScheduleEntry } from "./api/types";
 
 export type Availability = "in_stock" | "out_of_stock" | "on_order";
 export type ModerationStatus = "draft" | "moderation" | "published" | "rejected";
@@ -21,7 +22,10 @@ export interface Store {
   city: string;
   phone: string;
   telegram: string;
+  /** Уже собранная строка расписания — для витрин, где сырых данных нет. */
   workingHours: string;
+  /** Сырое расписание с бэкенда: подписи дней зависят от языка. */
+  workSchedule?: WorkScheduleEntry[];
   rating: number;
   ratingCount: number;
   joined: string; // ISO

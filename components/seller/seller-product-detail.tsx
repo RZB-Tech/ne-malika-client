@@ -102,9 +102,9 @@ export function SellerProductDetail({ id }: { id: number }) {
   if (!row) {
     return (
       <div className="py-16 text-center text-sm text-muted-foreground">
-        Товар не найден.{" "}
+        {t("seller.detail.notFound")}{" "}
         <Link href="/seller/products" className="text-primary hover:underline">
-          К списку
+          {t("seller.detail.toList")}
         </Link>
       </div>
     );
@@ -115,11 +115,11 @@ export function SellerProductDetail({ id }: { id: number }) {
   const save = async () => {
     const priceNum = parsePriceInput(price);
     if (name.trim().length < 2 || !priceNum) {
-      toast.error("Проверьте название и цену");
+      toast.error(t("seller.detail.checkNamePrice"));
       return;
     }
     if (photos.length === 0) {
-      toast.error("Добавьте хотя бы одно фото");
+      toast.error(t("seller.detail.needPhoto"));
       return;
     }
     setSaving(true);
@@ -144,9 +144,9 @@ export function SellerProductDetail({ id }: { id: number }) {
       // Сбрасываем метку — форма перезаполнится с сервера, и свежезагруженные
       // фото начнут показываться по ключу, а не как локальный data:-URL.
       setHydratedRowId(null);
-      toast.success("Изменения сохранены — товар отправлен на ИИ-проверку");
+      toast.success(t("seller.detail.saved"));
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Не удалось сохранить");
+      toast.error(err instanceof Error ? err.message : t("seller.detail.saveFailed"));
     } finally {
       setSaving(false);
     }
@@ -156,10 +156,10 @@ export function SellerProductDetail({ id }: { id: number }) {
     try {
       await recheckMutation.mutateAsync({ id });
       await queryClient.invalidateQueries();
-      toast.success("Товар отправлен на проверку — результат появится здесь");
+      toast.success(t("seller.detail.recheckSent"));
     } catch (err) {
       toast.error(
-        err instanceof Error ? err.message : "Не удалось отправить на проверку",
+        err instanceof Error ? err.message : t("seller.detail.recheckFailed"),
       );
     }
   };
@@ -171,7 +171,7 @@ export function SellerProductDetail({ id }: { id: number }) {
       toast.success(t("common.delete"));
       router.push("/seller/products");
     } catch {
-      toast.error("Не удалось удалить товар");
+      toast.error(t("seller.detail.deleteFailed"));
     }
   };
 
@@ -236,7 +236,7 @@ export function SellerProductDetail({ id }: { id: number }) {
                 </Select>
               </div>
               <div className="space-y-1.5 sm:col-span-2">
-                <Label>Категория</Label>
+                <Label>{t("category.label")}</Label>
                 <CategorySelect value={categoryId} onChange={setCategoryId} />
               </div>
               <div className="space-y-1.5 sm:col-span-2">
@@ -333,16 +333,17 @@ export function SellerProductDetail({ id }: { id: number }) {
 }
 
 const VERDICT_UI = {
-  pass: { Icon: CheckCircle2, cls: "text-success", label: "Проверка пройдена" },
-  warn: { Icon: TriangleAlert, cls: "text-warning", label: "Есть замечания" },
-  fail: { Icon: XCircle, cls: "text-destructive", label: "Не пройдена" },
+  pass: { Icon: CheckCircle2, cls: "text-success", key: "seller.detail.pass" },
+  warn: { Icon: TriangleAlert, cls: "text-warning", key: "seller.detail.warn" },
+  fail: { Icon: XCircle, cls: "text-destructive", key: "seller.detail.fail" },
 } as const;
 
-const ASPECT_LABELS: Record<string, string> = {
-  description: "Описание",
-  dataConsistency: "Согласованность данных",
-  photos: "Фотографии",
-  photoMatch: "Фото и описание",
+/** Ключ аспекта с бэкенда → ключ подписи в словаре. */
+const ASPECT_KEYS: Record<string, string> = {
+  description: "seller.detail.criteriaDescription",
+  dataConsistency: "seller.detail.criteriaConsistency",
+  photos: "seller.detail.criteriaPhotos",
+  photoMatch: "seller.detail.criteriaPhotoMatch",
 };
 
 function AiCheckPanel({
@@ -356,6 +357,7 @@ function AiCheckPanel({
   onRecheck: () => void;
   recheckDisabled: boolean;
 }) {
+  const { t } = useT();
   const ui = check?.verdict ? VERDICT_UI[check.verdict] : null;
 
   return (
@@ -363,7 +365,7 @@ function AiCheckPanel({
       <div className="mb-4 flex flex-wrap items-center gap-2">
         <Sparkles className="size-5 text-primary" />
         <h2 className="font-heading text-lg font-bold tracking-tight">
-          ИИ-проверка
+          {t("seller.detail.aiTitle")}
         </h2>
         {!loading && (
           <Button
@@ -374,7 +376,7 @@ function AiCheckPanel({
             disabled={recheckDisabled}
           >
             <RefreshCw className="size-4" />
-            Проверить заново
+            {t("seller.detail.recheck")}
           </Button>
         )}
       </div>
@@ -382,8 +384,7 @@ function AiCheckPanel({
       {/* Технический текст ошибки продавцу не поможет — он не в его власти. */}
       {check?.error && (
         <p className="mb-4 rounded-lg bg-muted p-3 text-sm text-muted-foreground">
-          Проверка не завершилась из-за сбоя на нашей стороне. Товар опубликован,
-          но проверен не был — нажмите «Проверить заново».
+          {t("seller.detail.failedNote")}
         </p>
       )}
 
@@ -391,13 +392,13 @@ function AiCheckPanel({
         <Skeleton className="h-24 w-full" />
       ) : !ui ? (
         <p className="text-sm text-muted-foreground">
-          {check?.message ?? "Проверка ещё не выполнялась."}
+          {check?.message ?? t("seller.detail.never")}
         </p>
       ) : (
         <div className="space-y-4">
           <div className={`flex items-center gap-2 font-medium ${ui.cls}`}>
             <ui.Icon className="size-5" />
-            {ui.label}
+            {t(ui.key)}
           </div>
           {check?.summary && (
             <p className="text-sm text-muted-foreground">{check.summary}</p>
@@ -415,7 +416,7 @@ function AiCheckPanel({
                     className={`flex items-center gap-1.5 font-medium ${aspect.cls}`}
                   >
                     <aspect.Icon className="size-4" />
-                    {ASPECT_LABELS[key] ?? key}
+                    {ASPECT_KEYS[key] ? t(ASPECT_KEYS[key]) : key}
                   </div>
                   <p className="mt-1 text-xs text-muted-foreground">
                     {detail.notes}

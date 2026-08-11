@@ -46,25 +46,21 @@ function telegramUsername(link: string | null | undefined): string {
     .replace(/\/+$/, "");
 }
 
-const DAY_LABELS: Record<WorkScheduleEntry["day"], string> = {
-  Mo: "Пн",
-  Tu: "Вт",
-  We: "Ср",
-  Th: "Чт",
-  Fr: "Пт",
-  Sa: "Сб",
-  Su: "Вс",
-};
-
+/**
+ * Расписание строкой вида «Пн, Вт, Ср 09:00–18:00». Переводчик приходит
+ * параметром, а не берётся из контекста: функция вызывается и из компонентов,
+ * и из мапперов, где хуков нет.
+ */
 export function formatWorkSchedule(
   schedule: WorkScheduleEntry[] | null | undefined,
+  t: (path: string) => string,
 ): string {
   if (!schedule?.length) return "";
   const open = schedule.filter((e) => !e.isHoliday);
-  if (!open.length) return "Выходной";
+  if (!open.length) return t("seller.profile.dayOff");
   const first = open[0];
   const label = open
-    .map((e) => DAY_LABELS[e.day])
+    .map((e) => t(`weekdaysShort.${e.day}`))
     .filter(Boolean)
     .join(", ");
   return `${label} ${first.start}–${first.end}`;
@@ -134,7 +130,10 @@ export function mapShop(s: ShopRow | PublicShop): Store {
     phone: s.contact ?? "",
     telegram: telegramUsername(s.telegramLink),
     telegramLink: s.telegramLink ?? undefined,
-    workingHours: formatWorkSchedule(s.workSchedule),
+    // Строкой не собираем: подписи дней зависят от языка, а он известен только
+    // в компоненте. Отдаём расписание как есть, формат — на месте показа.
+    workSchedule: s.workSchedule ?? undefined,
+    workingHours: "",
     rating: 0,
     ratingCount: 0,
     joined: s.createdAt,

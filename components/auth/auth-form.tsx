@@ -41,8 +41,7 @@ export function AuthForm() {
           </LoginDialog>
 
           <p className="mt-4 text-center text-xs text-muted-foreground">
-            Аккаунт создаётся автоматически при первом входе. Отдельный пароль
-            не нужен.
+            {t("auth.autoAccount")}
           </p>
           <p className="mt-2 text-center text-xs text-muted-foreground">
             {t("auth.agree")}
