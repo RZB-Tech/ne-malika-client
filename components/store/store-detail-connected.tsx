@@ -3,6 +3,7 @@
 import { notFound } from "next/navigation";
 import { StoreDetail } from "@/components/store/store-detail";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ProductCardSkeleton } from "@/components/product/product-card";
 import { useShopsControllerGetPublic } from "@/lib/api/generated/endpoints/shops-public/shops-public";
 import { mapProductRow, mapShop } from "@/lib/api/mappers";
 import type { PublicShop } from "@/lib/api/types";
@@ -21,7 +22,7 @@ export function StoreDetailConnected({ id }: { id: number }) {
         <Skeleton className="h-48 w-full rounded-2xl" />
         <div className="mt-10 grid grid-cols-2 gap-4 md:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="aspect-[3/4] w-full rounded-2xl" />
+            <ProductCardSkeleton key={i} />
           ))}
         </div>
       </div>

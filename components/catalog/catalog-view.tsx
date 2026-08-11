@@ -4,8 +4,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Loader2, SearchX, SlidersHorizontal, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import { ProductCard } from "@/components/product/product-card";
+import {
+  ProductCard,
+  ProductCardSkeleton,
+} from "@/components/product/product-card";
 import { useCatalogFilters } from "./use-catalog-filters";
 import type { SortKey } from "./use-catalog-filters";
 import { useT } from "@/components/providers/i18n-provider";
@@ -258,7 +260,7 @@ export function CatalogView({
       ) : isLoading ? (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
           {Array.from({ length: 10 }).map((_, i) => (
-            <Skeleton key={i} className="aspect-[3/4] w-full rounded-2xl" />
+            <ProductCardSkeleton key={i} />
           ))}
         </div>
       ) : results.length === 0 ? (
@@ -277,7 +279,7 @@ export function CatalogView({
               отзывчивой, когда в DOM уже несколько сотен товаров.
               contain-intrinsic-size: auto — высота запоминается после первой
               отрисовки, поэтому полоса прокрутки не прыгает. */}
-          <div className="grid grid-cols-2 gap-4 [&>*]:[content-visibility:auto] [&>*]:[contain-intrinsic-size:auto_380px] sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+          <div className="grid grid-cols-2 gap-4 [&>*]:[content-visibility:auto] [&>*]:[contain-intrinsic-size:auto_480px] sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
             {results.map((p) => (
               <ProductCard key={p.id} product={p} />
             ))}
@@ -286,7 +288,7 @@ export function CatalogView({
           {isFetchingNextPage && (
             <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
               {Array.from({ length: 5 }).map((_, i) => (
-                <Skeleton key={i} className="aspect-[3/4] w-full rounded-2xl" />
+                <ProductCardSkeleton key={i} />
               ))}
             </div>
           )}
