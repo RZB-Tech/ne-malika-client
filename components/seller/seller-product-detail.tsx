@@ -40,6 +40,7 @@ import {
   type UploadedPhoto,
 } from "@/components/seller/photo-dropzone";
 import { useT } from "@/components/providers/i18n-provider";
+import { PhotoAiDialog } from "@/components/shared/photo-ai-dialog";
 import {
   useSellerAiChecksControllerGetCheck,
   useSellerAiChecksControllerRecheck,
@@ -80,6 +81,8 @@ export function SellerProductDetail({ id }: { id: number }) {
   const [photos, setPhotos] = useState<UploadedPhoto[]>([]);
   const [hydratedRowId, setHydratedRowId] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
+  // Фото, по которому продавец открыл генерацию через ИИ.
+  const [aiPhoto, setAiPhoto] = useState<UploadedPhoto | null>(null);
 
   // Заполняем форму один раз, когда товар загрузился. Приведение состояния
   // во время рендера — рекомендованная React альтернатива setState в эффекте.
@@ -325,7 +328,29 @@ export function SellerProductDetail({ id }: { id: number }) {
       {/* photos editor */}
       <Card className="p-6">
         <h2 className="mb-4 font-heading text-lg font-bold tracking-tight">{t("seller.add.section3")}</h2>
-        <PhotoDropzone photos={photos} onChange={setPhotos} />
+        <PhotoDropzone
+          photos={photos}
+          onChange={setPhotos}
+          onPhotoClick={setAiPhoto}
+        />
+        <p className="mt-2 text-xs text-muted-foreground">
+          {t("admin.form.photoHint")}
+        </p>
+
+        <PhotoAiDialog
+          photo={aiPhoto}
+          onClose={() => setAiPhoto(null)}
+          onApply={(generated) => {
+            // Первый выбранный встаёт на место исходного, остальные — в конец.
+            setPhotos((prev) => {
+              const at = prev.findIndex((x) => x.id === aiPhoto?.id);
+              if (at === -1) return [...prev, ...generated];
+              const next = [...prev];
+              next.splice(at, 1, generated[0]);
+              return [...next, ...generated.slice(1)];
+            });
+          }}
+        />
       </Card>
 
     </div>

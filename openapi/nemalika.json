@@ -1957,9 +1957,75 @@
         ]
       }
     },
-    "/api/v1/admin/image-gen/prompt": {
+    "/api/v1/image-gen/quota": {
+      "get": {
+        "operationId": "ImageGenController_quota",
+        "summary": "Доступ и остаток по генерации изображений",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImageGenQuotaDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "image-gen"
+        ],
+        "security": [
+          {
+            "access-token": []
+          }
+        ]
+      }
+    },
+    "/api/v1/image-gen/history": {
+      "get": {
+        "operationId": "ImageGenController_history",
+        "summary": "Ранее сгенерированные картинки по этой же фотографии",
+        "parameters": [
+          {
+            "name": "photoKey",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/StoredImageDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "image-gen"
+        ],
+        "security": [
+          {
+            "access-token": []
+          }
+        ]
+      }
+    },
+    "/api/v1/image-gen/prompt": {
       "post": {
-        "operationId": "AdminImageGenController_describe",
+        "operationId": "ImageGenController_describe",
         "summary": "Составить промпт по фотографии товара",
         "parameters": [],
         "requestBody": {
@@ -1978,7 +2044,7 @@
           }
         },
         "tags": [
-          "image-gen-admin"
+          "image-gen"
         ],
         "security": [
           {
@@ -1987,9 +2053,9 @@
         ]
       }
     },
-    "/api/v1/admin/image-gen/generate": {
+    "/api/v1/image-gen/generate": {
       "post": {
-        "operationId": "AdminImageGenController_generate",
+        "operationId": "ImageGenController_generate",
         "summary": "Перерисовать фотографию товара: 1–4 варианта на выбор",
         "parameters": [],
         "requestBody": {
@@ -2012,6 +2078,86 @@
                   "items": {
                     "$ref": "#/components/schemas/GeneratedImageDto"
                   }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "image-gen"
+        ],
+        "security": [
+          {
+            "access-token": []
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/image-gen/access/{userId}": {
+      "get": {
+        "operationId": "AdminImageGenController_access",
+        "summary": "Текущий доступ и расход пользователя",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImageGenQuotaDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "image-gen-admin"
+        ],
+        "security": [
+          {
+            "access-token": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "AdminImageGenController_setAccess",
+        "summary": "Выдать или снять доступ к генерации",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImageGenAccessDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImageGenQuotaDto"
                 }
               }
             }
@@ -3058,6 +3204,54 @@
           "items"
         ]
       },
+      "ImageGenQuotaDto": {
+        "type": "object",
+        "properties": {
+          "allowed": {
+            "type": "boolean",
+            "description": "Разрешена ли генерация этому пользователю"
+          },
+          "limit": {
+            "type": "number",
+            "nullable": true,
+            "description": "Сколько картинок всего разрешено. null — без ограничения",
+            "example": 50
+          },
+          "used": {
+            "type": "number",
+            "description": "Сколько уже сгенерировано"
+          }
+        },
+        "required": [
+          "allowed",
+          "limit",
+          "used"
+        ]
+      },
+      "StoredImageDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "url": {
+            "type": "string"
+          },
+          "prompt": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "url",
+          "prompt",
+          "createdAt"
+        ]
+      },
       "DescribePromptDto": {
         "type": "object",
         "properties": {
@@ -3160,6 +3354,25 @@
         "required": [
           "key",
           "url"
+        ]
+      },
+      "ImageGenAccessDto": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Включить или выключить генерацию"
+          },
+          "limit": {
+            "type": "number",
+            "nullable": true,
+            "minimum": 0,
+            "description": "Потолок числа картинок. Пусто — безлимитно",
+            "example": 50
+          }
+        },
+        "required": [
+          "enabled"
         ]
       },
       "CreateReportDto": {

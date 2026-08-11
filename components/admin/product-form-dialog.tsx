@@ -33,7 +33,7 @@ import {
   useAdminProductCardsControllerUpdate,
 } from "@/lib/api/generated/endpoints/product-cards-admin/product-cards-admin";
 import { CategorySelect } from "@/components/seller/category-select";
-import { PhotoAiDialog } from "@/components/admin/photo-ai-dialog";
+import { PhotoAiDialog } from "@/components/shared/photo-ai-dialog";
 import { useT } from "@/components/providers/i18n-provider";
 import { resolvePhotoKeys } from "@/lib/api/upload";
 import { photoUrl } from "@/lib/api/photo";

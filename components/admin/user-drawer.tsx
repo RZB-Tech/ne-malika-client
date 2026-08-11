@@ -17,6 +17,7 @@ import {
   drawerAction,
 } from "@/components/admin/detail-drawer";
 import { useT } from "@/components/providers/i18n-provider";
+import { ImageGenAccess } from "@/components/admin/image-gen-access";
 import { formatDate, formatPrice } from "@/lib/format";
 import { useAdminUsersControllerGetOne } from "@/lib/api/generated/endpoints/users-admin/users-admin";
 import { devUserActivity, IS_DEV } from "@/lib/api/dev-fixtures";
@@ -205,6 +206,14 @@ export function UserDrawer({
             >
               {user.blockReason ?? t("common.reasonMissing")}
             </DetailNote>
+          )}
+
+          {/* Генерация платная, поэтому доступ выдаётся поимённо. Админу
+              блок не показываем — у него доступ по роли. */}
+          {user.role !== "admin" && (
+            <DetailSection title={t("admin.imageGen.title")}>
+              <ImageGenAccess userId={user.id} />
+            </DetailSection>
           )}
 
           <DetailSection title={t("admin.users.recent")}>

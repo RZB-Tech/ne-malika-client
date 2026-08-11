@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Check, ImagePlus, Sparkles, Wand2, X } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -21,9 +21,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  useAdminImageGenControllerDescribe,
-  useAdminImageGenControllerGenerate,
-} from "@/lib/api/generated/endpoints/image-gen-admin/image-gen-admin";
+  useImageGenControllerDescribe,
+  useImageGenControllerGenerate,
+  useImageGenControllerHistory,
+  useImageGenControllerQuota,
+} from "@/lib/api/generated/endpoints/image-gen/image-gen";
 import type {
   GenerateImagesDtoQuality,
   GenerateImagesDtoSize,
@@ -86,6 +88,12 @@ interface Generated {
   url: string;
 }
 
+/** Ранее нарисованное по этому же фото, как его отдаёт сервер. */
+interface StoredImage extends Generated {
+  prompt: string;
+  createdAt: string;
+}
+
 /**
  * Перерисовка фотографии товара. Исходник уходит модели как основа, поэтому на
  * выходе тот же товар — иначе карточка обещала бы одно, а приезжало другое.
@@ -118,21 +126,60 @@ export function PhotoAiDialog({
   );
   const [uploading, setUploading] = useState(false);
   const [results, setResults] = useState<Generated[]>([]);
-  const [resultFormat, setResultFormat] = useState<Format>("portrait");
   const [picked, setPicked] = useState<Set<string>>(new Set());
 
-  const describeMutation = useAdminImageGenControllerDescribe();
-  const generateMutation = useAdminImageGenControllerGenerate();
+  const describeMutation = useImageGenControllerDescribe();
+  const generateMutation = useImageGenControllerGenerate();
 
   const open = photo !== null;
   const photoKey = photo?.key;
   const size = SIZES[format][tier];
 
-  const close = () => {
+  // Сброс при смене фотографии — приведение состояния во время рендера, а не
+  // в эффекте: иначе первый кадр показал бы промпт и картинки от предыдущей.
+  const [prevPhotoKey, setPrevPhotoKey] = useState(photoKey);
+  if (photoKey !== prevPhotoKey) {
+    setPrevPhotoKey(photoKey);
     setPrompt("");
     setResults([]);
     setPicked(new Set());
     setReference(null);
+  }
+
+  const quotaQuery = useImageGenControllerQuota({
+    query: { enabled: open, retry: false },
+  });
+  const quota = quotaQuery.data as unknown as
+    | { allowed: boolean; limit: number | null; used: number }
+    | undefined;
+  const left =
+    quota && quota.limit !== null ? Math.max(0, quota.limit - quota.used) : null;
+
+  // Всё, что уже нарисовано по этому фото. Раньше результат жил только в
+  // состоянии диалога и пропадал при закрытии — сами картинки при этом
+  // оставались в хранилище, терялись именно ссылки на них.
+  const historyQuery = useImageGenControllerHistory(
+    { photoKey: photoKey ?? "" },
+    { query: { enabled: open && Boolean(photoKey), retry: false } },
+  );
+  const history = historyQuery.data as unknown as StoredImage[] | undefined;
+
+  /** Свежие варианты впереди, за ними прошлые. Ключи не повторяются. */
+  const gallery = useMemo(() => {
+    const seen = new Set<string>();
+    const out: Generated[] = [];
+    for (const item of [...results, ...(history ?? [])]) {
+      if (seen.has(item.key)) continue;
+      seen.add(item.key);
+      out.push({ key: item.key, url: item.url });
+    }
+    return out;
+  }, [results, history]);
+
+  // Закрытие больше ничего не стирает: галерея приезжает с сервера, а промпт
+  // нужен, если диалог открыли повторно по тому же фото.
+  const close = () => {
+    setPicked(new Set());
     onClose();
   };
 
@@ -174,9 +221,10 @@ export function PhotoAiDialog({
           referenceKey: reference?.key,
         },
       })) as unknown as Generated[];
-      setResults(res);
-      setResultFormat(format);
+      setResults((prev) => [...res, ...prev]);
       setPicked(new Set());
+      // Квота списана, а в галерее прибавилось — обе цифры берём с сервера.
+      await Promise.all([quotaQuery.refetch(), historyQuery.refetch()]);
     } catch (err) {
       toast.error(
         err instanceof Error ? err.message : t("admin.photoAi.generateFailed"),
@@ -185,7 +233,7 @@ export function PhotoAiDialog({
   };
 
   const apply = () => {
-    const chosen = results.filter((r) => picked.has(r.key));
+    const chosen = gallery.filter((r) => picked.has(r.key));
     if (chosen.length === 0) {
       toast.error(t("admin.photoAi.pickAtLeastOne"));
       return;
@@ -421,50 +469,74 @@ export function PhotoAiDialog({
               {tier === "4K" && ` — ${t("admin.photoAi.sizeMax")}`}
             </p>
 
-            <Button
-              type="button"
-              className="gap-2"
-              onClick={generate}
-              disabled={generateMutation.isPending}
-            >
-              <Wand2 className="size-4" />
-              {t(
-                generateMutation.isPending
-                  ? "admin.photoAi.generating"
-                  : "admin.photoAi.generate",
-              )}
-            </Button>
+            <div className="flex flex-wrap items-center gap-3">
+              <Button
+                type="button"
+                className="gap-2"
+                onClick={generate}
+                disabled={generateMutation.isPending || quota?.allowed === false}
+              >
+                <Wand2 className="size-4" />
+                {t(
+                  generateMutation.isPending
+                    ? "admin.photoAi.generating"
+                    : "admin.photoAi.generate",
+                )}
+              </Button>
+
+              {/* Остаток показываем до нажатия, а не после отказа. */}
+              {quota?.allowed === false ? (
+                <span className="text-sm text-destructive">
+                  {t("admin.photoAi.noAccess")}
+                </span>
+              ) : left !== null ? (
+                <span
+                  className={cn(
+                    "tabular text-sm",
+                    left === 0 ? "text-destructive" : "text-muted-foreground",
+                  )}
+                >
+                  {t("admin.photoAi.quotaLeft", {
+                    left,
+                    limit: quota?.limit ?? 0,
+                  })}
+                </span>
+              ) : quota ? (
+                <span className="text-sm text-muted-foreground">
+                  {t("admin.photoAi.quotaUnlimited")}
+                </span>
+              ) : null}
+            </div>
 
             {generateMutation.isPending && (
               <GeneratingGrid count={count} format={format} />
             )}
 
-            {results.length > 0 && (
+            {gallery.length > 0 && (
               <div className="space-y-2">
                 <p className="text-sm text-muted-foreground">
                   {t("admin.photoAi.pickHint")}
                 </p>
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                  {results.map((r) => (
+                  {gallery.map((r) => (
                     <button
                       key={r.key}
                       type="button"
                       onClick={() => toggle(r.key)}
                       className={cn(
-                        "relative overflow-hidden rounded-xl transition-all",
-                        resultFormat === "portrait"
-                          ? "aspect-[3/4]"
-                          : "aspect-square",
+                        "relative aspect-[3/4] overflow-hidden rounded-xl bg-muted transition-all",
                         picked.has(r.key)
                           ? "ring-2 ring-primary ring-offset-2 ring-offset-popover"
                           : "ring-1 ring-foreground/10 hover:ring-foreground/25",
                       )}
                     >
+                      {/* contain: в галерее лежат и вертикальные, и квадратные
+                          картинки, и обрезка съела бы у последних надписи. */}
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={r.url}
                         alt={t("admin.photoAi.variantAlt")}
-                        className="size-full object-cover"
+                        className="size-full object-contain"
                       />
                       {picked.has(r.key) && (
                         <span className="absolute right-1.5 top-1.5 grid size-6 place-items-center rounded-full bg-primary text-primary-foreground">
@@ -474,7 +546,12 @@ export function PhotoAiDialog({
                     </button>
                   ))}
                 </div>
-                <Button type="button" onClick={apply} className="mt-2">
+                <Button
+                  type="button"
+                  onClick={apply}
+                  className="mt-2"
+                  disabled={picked.size === 0}
+                >
                   {t("admin.photoAi.apply", { count: picked.size })}
                 </Button>
               </div>

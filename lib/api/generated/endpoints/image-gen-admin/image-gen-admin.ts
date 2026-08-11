@@ -6,19 +6,27 @@
  * OpenAPI spec version: 1.0.0
  */
 import {
-  useMutation
+  useMutation,
+  useQuery
 } from '@tanstack/react-query';
 import type {
+  DataTag,
+  DefinedInitialDataOptions,
+  DefinedUseQueryResult,
   MutationFunction,
   QueryClient,
+  QueryFunction,
+  QueryKey,
+  UndefinedInitialDataOptions,
   UseMutationOptions,
-  UseMutationResult
+  UseMutationResult,
+  UseQueryOptions,
+  UseQueryResult
 } from '@tanstack/react-query';
 
 import type {
-  DescribePromptDto,
-  GenerateImagesDto,
-  GeneratedImageDto
+  ImageGenAccessDto,
+  ImageGenQuotaDto
 } from '../../schemas';
 
 import { customInstance } from '../../../mutator';
@@ -29,19 +37,32 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
+const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKey: K } => {
+  const result = { queryKey } as T & { queryKey: K };
+  for (const key of Object.keys(query)) {
+    // The explicit queryKey always wins, matching the previous
+    // `{ ...query, queryKey }` spread where it was set last.
+    if (key === 'queryKey') continue;
+    Object.defineProperty(result, key, {
+      enumerable: true,
+      configurable: true,
+      get: () => (query as Record<string, unknown>)[key],
+    });
+  }
+  return result;
+};
+
 /**
- * @summary Составить промпт по фотографии товара
+ * @summary Текущий доступ и расход пользователя
  */
-export const adminImageGenControllerDescribe = (
-    describePromptDto: BodyType<DescribePromptDto>,
+export const adminImageGenControllerAccess = (
+    userId: number,
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/admin/image-gen/prompt`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: describePromptDto, signal
+      return customInstance<ImageGenQuotaDto>(
+      {url: `/api/v1/admin/image-gen/access/${userId}`, method: 'GET', signal
     },
       options);
     }
@@ -49,11 +70,106 @@ export const adminImageGenControllerDescribe = (
 
 
 
-export const getAdminImageGenControllerDescribeMutationOptions = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminImageGenControllerDescribe>>, TError,{data: BodyType<DescribePromptDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof adminImageGenControllerDescribe>>, TError,{data: BodyType<DescribePromptDto>}, TContext> => {
+export const getAdminImageGenControllerAccessQueryKey = (userId: number,) => {
+    return [
+    `/api/v1/admin/image-gen/access/${userId}`
+    ] as const;
+    }
 
-const mutationKey = ['adminImageGenControllerDescribe'];
+
+export const getAdminImageGenControllerAccessQueryOptions = <TData = Awaited<ReturnType<typeof adminImageGenControllerAccess>>, TError = ErrorType<unknown>>(userId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminImageGenControllerAccess>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getAdminImageGenControllerAccessQueryKey(userId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof adminImageGenControllerAccess>>> = ({ signal }) => adminImageGenControllerAccess(userId, requestOptions, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: userId !== null && userId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof adminImageGenControllerAccess>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type AdminImageGenControllerAccessQueryResult = NonNullable<Awaited<ReturnType<typeof adminImageGenControllerAccess>>>
+export type AdminImageGenControllerAccessQueryError = ErrorType<unknown>
+
+
+export function useAdminImageGenControllerAccess<TData = Awaited<ReturnType<typeof adminImageGenControllerAccess>>, TError = ErrorType<unknown>>(
+ userId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminImageGenControllerAccess>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof adminImageGenControllerAccess>>,
+          TError,
+          Awaited<ReturnType<typeof adminImageGenControllerAccess>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAdminImageGenControllerAccess<TData = Awaited<ReturnType<typeof adminImageGenControllerAccess>>, TError = ErrorType<unknown>>(
+ userId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminImageGenControllerAccess>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof adminImageGenControllerAccess>>,
+          TError,
+          Awaited<ReturnType<typeof adminImageGenControllerAccess>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAdminImageGenControllerAccess<TData = Awaited<ReturnType<typeof adminImageGenControllerAccess>>, TError = ErrorType<unknown>>(
+ userId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminImageGenControllerAccess>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Текущий доступ и расход пользователя
+ */
+
+export function useAdminImageGenControllerAccess<TData = Awaited<ReturnType<typeof adminImageGenControllerAccess>>, TError = ErrorType<unknown>>(
+ userId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminImageGenControllerAccess>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getAdminImageGenControllerAccessQueryOptions(userId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+/**
+ * @summary Выдать или снять доступ к генерации
+ */
+export const adminImageGenControllerSetAccess = (
+    userId: number,
+    imageGenAccessDto: BodyType<ImageGenAccessDto>,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<ImageGenQuotaDto>(
+      {url: `/api/v1/admin/image-gen/access/${userId}`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: imageGenAccessDto, signal
+    },
+      options);
+    }
+
+
+
+
+export const getAdminImageGenControllerSetAccessMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminImageGenControllerSetAccess>>, TError,{userId: number;data: BodyType<ImageGenAccessDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof adminImageGenControllerSetAccess>>, TError,{userId: number;data: BodyType<ImageGenAccessDto>}, TContext> => {
+
+const mutationKey = ['adminImageGenControllerSetAccess'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -63,10 +179,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminImageGenControllerDescribe>>, {data: BodyType<DescribePromptDto>}> = (props) => {
-          const {data} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminImageGenControllerSetAccess>>, {userId: number;data: BodyType<ImageGenAccessDto>}> = (props) => {
+          const {userId,data} = props ?? {};
 
-          return  adminImageGenControllerDescribe(data,requestOptions)
+          return  adminImageGenControllerSetAccess(userId,data,requestOptions)
         }
 
 
@@ -76,84 +192,20 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type AdminImageGenControllerDescribeMutationResult = NonNullable<Awaited<ReturnType<typeof adminImageGenControllerDescribe>>>
-    export type AdminImageGenControllerDescribeMutationBody = BodyType<DescribePromptDto>
-    export type AdminImageGenControllerDescribeMutationError = ErrorType<unknown>
+    export type AdminImageGenControllerSetAccessMutationResult = NonNullable<Awaited<ReturnType<typeof adminImageGenControllerSetAccess>>>
+    export type AdminImageGenControllerSetAccessMutationBody = BodyType<ImageGenAccessDto>
+    export type AdminImageGenControllerSetAccessMutationError = ErrorType<unknown>
 
     /**
- * @summary Составить промпт по фотографии товара
+ * @summary Выдать или снять доступ к генерации
  */
-export const useAdminImageGenControllerDescribe = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminImageGenControllerDescribe>>, TError,{data: BodyType<DescribePromptDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
+export const useAdminImageGenControllerSetAccess = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminImageGenControllerSetAccess>>, TError,{userId: number;data: BodyType<ImageGenAccessDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof adminImageGenControllerDescribe>>,
+        Awaited<ReturnType<typeof adminImageGenControllerSetAccess>>,
         TError,
-        {data: BodyType<DescribePromptDto>},
+        {userId: number;data: BodyType<ImageGenAccessDto>},
         TContext
       > => {
-      return useMutation(getAdminImageGenControllerDescribeMutationOptions(options), queryClient);
-    }
-    /**
- * @summary Перерисовать фотографию товара: 1–4 варианта на выбор
- */
-export const adminImageGenControllerGenerate = (
-    generateImagesDto: BodyType<GenerateImagesDto>,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
-
-
-      return customInstance<GeneratedImageDto[]>(
-      {url: `/api/v1/admin/image-gen/generate`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: generateImagesDto, signal
-    },
-      options);
-    }
-
-
-
-
-export const getAdminImageGenControllerGenerateMutationOptions = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminImageGenControllerGenerate>>, TError,{data: BodyType<GenerateImagesDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof adminImageGenControllerGenerate>>, TError,{data: BodyType<GenerateImagesDto>}, TContext> => {
-
-const mutationKey = ['adminImageGenControllerGenerate'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminImageGenControllerGenerate>>, {data: BodyType<GenerateImagesDto>}> = (props) => {
-          const {data} = props ?? {};
-
-          return  adminImageGenControllerGenerate(data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type AdminImageGenControllerGenerateMutationResult = NonNullable<Awaited<ReturnType<typeof adminImageGenControllerGenerate>>>
-    export type AdminImageGenControllerGenerateMutationBody = BodyType<GenerateImagesDto>
-    export type AdminImageGenControllerGenerateMutationError = ErrorType<unknown>
-
-    /**
- * @summary Перерисовать фотографию товара: 1–4 варианта на выбор
- */
-export const useAdminImageGenControllerGenerate = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminImageGenControllerGenerate>>, TError,{data: BodyType<GenerateImagesDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof adminImageGenControllerGenerate>>,
-        TError,
-        {data: BodyType<GenerateImagesDto>},
-        TContext
-      > => {
-      return useMutation(getAdminImageGenControllerGenerateMutationOptions(options), queryClient);
+      return useMutation(getAdminImageGenControllerSetAccessMutationOptions(options), queryClient);
     }

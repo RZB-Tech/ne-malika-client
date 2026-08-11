@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { PhotoDropzone, type UploadedPhoto } from "./photo-dropzone";
+import { PhotoAiDialog } from "@/components/shared/photo-ai-dialog";
 import { CategorySelect } from "./category-select";
 import { useT } from "@/components/providers/i18n-provider";
 import { useSellerShop } from "@/lib/api/seller";
@@ -68,6 +69,8 @@ export function AddProductForm({
   const [price, setPrice] = useState("");
   const [categoryId, setCategoryId] = useState<number | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  // Фото, по которому продавец открыл генерацию через ИИ.
+  const [aiPhoto, setAiPhoto] = useState<UploadedPhoto | null>(null);
 
   const onPriceChange = (raw: string) => setPrice(formatPriceInput(raw));
 
@@ -302,7 +305,29 @@ export function AddProductForm({
       {/* Section 3: photos */}
       <Card className="p-6">
         <SectionTitle index={3}>{t("seller.add.section3")}</SectionTitle>
-        <PhotoDropzone photos={photos} onChange={setPhotos} />
+        <PhotoDropzone
+          photos={photos}
+          onChange={setPhotos}
+          onPhotoClick={setAiPhoto}
+        />
+        <p className="mt-2 text-xs text-muted-foreground">
+          {t("admin.form.photoHint")}
+        </p>
+
+        <PhotoAiDialog
+          photo={aiPhoto}
+          onClose={() => setAiPhoto(null)}
+          onApply={(generated) => {
+            // Первый выбранный встаёт на место исходного, остальные — в конец.
+            setPhotos((prev) => {
+              const at = prev.findIndex((x) => x.id === aiPhoto?.id);
+              if (at === -1) return [...prev, ...generated];
+              const next = [...prev];
+              next.splice(at, 1, generated[0]);
+              return [...next, ...generated.slice(1)];
+            });
+          }}
+        />
       </Card>
 
       <div className="flex flex-wrap justify-end gap-3 rounded-xl bg-card p-3 ring-1 ring-foreground/10">
