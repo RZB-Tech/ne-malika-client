@@ -7,6 +7,8 @@
  */
 
 export interface BroadcastAudienceCountDto {
-  /** Сколько адресатов получат рассылку сейчас */
+  /** Сколько чатов в Telegram получат рассылку */
   count: number;
+  /** Сколько браузеров подписано на уведомления */
+  push: number;
 }

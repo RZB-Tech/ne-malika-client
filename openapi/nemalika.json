@@ -1662,6 +1662,113 @@
         ]
       }
     },
+    "/api/v1/push/config": {
+      "get": {
+        "operationId": "PushController_config",
+        "summary": "Публичный ключ VAPID и доступность канала",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PushConfigDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "push"
+        ]
+      }
+    },
+    "/api/v1/push/state": {
+      "get": {
+        "operationId": "PushController_state",
+        "summary": "Есть ли у пользователя подписка",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PushStateDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "push"
+        ],
+        "security": [
+          {
+            "access-token": []
+          }
+        ]
+      }
+    },
+    "/api/v1/push/subscribe": {
+      "post": {
+        "operationId": "PushController_subscribe",
+        "summary": "Подписать браузер на уведомления",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscribePushDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "push"
+        ],
+        "security": [
+          {
+            "access-token": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "PushController_unsubscribe",
+        "summary": "Отписать браузер",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UnsubscribePushDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "push"
+        ],
+        "security": [
+          {
+            "access-token": []
+          }
+        ]
+      }
+    },
     "/api/v1/me/product-views": {
       "get": {
         "operationId": "ProductViewsController_findMine",
@@ -3028,6 +3135,13 @@
           "failed": {
             "type": "number"
           },
+          "pushDelivered": {
+            "type": "number",
+            "description": "Доставлено в браузеры"
+          },
+          "pushFailed": {
+            "type": "number"
+          },
           "createdAt": {
             "type": "string"
           },
@@ -3043,6 +3157,8 @@
           "recipients",
           "delivered",
           "failed",
+          "pushDelivered",
+          "pushFailed",
           "createdAt"
         ]
       },
@@ -3051,11 +3167,16 @@
         "properties": {
           "count": {
             "type": "number",
-            "description": "Сколько адресатов получат рассылку сейчас"
+            "description": "Сколько чатов в Telegram получат рассылку"
+          },
+          "push": {
+            "type": "number",
+            "description": "Сколько браузеров подписано на уведомления"
           }
         },
         "required": [
-          "count"
+          "count",
+          "push"
         ]
       },
       "CreateBroadcastDto": {
@@ -3096,6 +3217,73 @@
         "required": [
           "id",
           "recipients"
+        ]
+      },
+      "PushConfigDto": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Настроены ли ключи VAPID на сервере"
+          },
+          "publicKey": {
+            "type": "string",
+            "nullable": true,
+            "description": "Публичный ключ VAPID — им браузер оформляет подписку"
+          }
+        },
+        "required": [
+          "enabled",
+          "publicKey"
+        ]
+      },
+      "PushStateDto": {
+        "type": "object",
+        "properties": {
+          "subscribed": {
+            "type": "boolean",
+            "description": "Есть ли у пользователя хотя бы одна подписка"
+          }
+        },
+        "required": [
+          "subscribed"
+        ]
+      },
+      "SubscribePushDto": {
+        "type": "object",
+        "properties": {
+          "endpoint": {
+            "type": "string",
+            "description": "Адрес push-сервиса браузера из PushSubscription.endpoint"
+          },
+          "p256dh": {
+            "type": "string",
+            "description": "Ключ p256dh из PushSubscription.getKey"
+          },
+          "auth": {
+            "type": "string",
+            "description": "Ключ auth из PushSubscription.getKey"
+          },
+          "userAgent": {
+            "type": "string",
+            "description": "Чтобы человек узнал своё устройство в списке подписок"
+          }
+        },
+        "required": [
+          "endpoint",
+          "p256dh",
+          "auth"
+        ]
+      },
+      "UnsubscribePushDto": {
+        "type": "object",
+        "properties": {
+          "endpoint": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "endpoint"
         ]
       },
       "ProductViewDto": {

@@ -364,6 +364,7 @@ const ru = {
       textHint:
         "Поддерживается разметка Telegram: <b>жирный</b>, <i>курсив</i>, <a href=\"…\">ссылка</a>.",
       recipients: "Получат сейчас: {count}",
+      recipientsPush: "Браузеров подписано: {push}",
       recipientsNone:
         "Получателей нет: никто из этой группы ещё не открыл чат с ботом.",
       send: "Отправить",
@@ -790,6 +791,18 @@ const ru = {
     stateNew: "Новый",
     stateOld: "Б/у",
   },
+  push: {
+    title: "Уведомления в браузере",
+    text: "Будем присылать новости площадки прямо на этот компьютер — даже когда вкладка закрыта.",
+    enable: "Включить",
+    disable: "Отключить",
+    enabled: "Уведомления включены",
+    disabled: "Уведомления отключены",
+    blocked: "Браузер отклонил запрос",
+    blockedHint:
+      "Уведомления запрещены в настройках браузера для этого сайта — включить можно только там.",
+    failed: "Не удалось включить уведомления",
+  },
   roles: {
     user: "Покупатель",
     seller: "Продавец",
@@ -1177,6 +1190,7 @@ const uzLatn: typeof ru = {
       textHint:
         "Telegram bezaklari ishlaydi: <b>qalin</b>, <i>kursiv</i>, <a href=\"…\">havola</a>.",
       recipients: "Hozir oladi: {count}",
+      recipientsPush: "Brauzerlar obuna bo‘lgan: {push}",
       recipientsNone:
         "Qabul qiluvchilar yo‘q: bu guruhdan hali hech kim bot bilan chat ochmagan.",
       send: "Yuborish",
@@ -1610,6 +1624,18 @@ const uzLatn: typeof ru = {
     stateNew: "Yangi",
     stateOld: "Ishlatilgan",
   },
+  push: {
+    title: "Brauzerdagi bildirishnomalar",
+    text: "Platforma yangiliklarini shu kompyuterga yuboramiz — hatto varaq yopiq bo‘lsa ham.",
+    enable: "Yoqish",
+    disable: "O‘chirish",
+    enabled: "Bildirishnomalar yoqildi",
+    disabled: "Bildirishnomalar o‘chirildi",
+    blocked: "Brauzer so‘rovni rad etdi",
+    blockedHint:
+      "Bu sayt uchun bildirishnomalar brauzer sozlamalarida taqiqlangan — faqat o‘sha yerdan yoqiladi.",
+    failed: "Bildirishnomalarni yoqib bo‘lmadi",
+  },
   roles: {
     user: "Xaridor",
     seller: "Sotuvchi",
@@ -1999,6 +2025,7 @@ const uzCyrl: typeof ru = {
       textHint:
         "Телеграм безаклари ишлайди: <b>қалин</b>, <i>курсив</i>, <a href=\"…\">ҳавола</a>.",
       recipients: "Ҳозир олади: {count}",
+      recipientsPush: "Браузерлар обуна бўлган: {push}",
       recipientsNone:
         "Қабул қилувчилар йўқ: бу гуруҳдан ҳали ҳеч ким бот билан чат очмаган.",
       send: "Юбориш",
@@ -2430,6 +2457,18 @@ const uzCyrl: typeof ru = {
     rowState: "Ҳолати",
     stateNew: "Янги",
     stateOld: "Ишлатилган",
+  },
+  push: {
+    title: "Браузердаги билдиришномалар",
+    text: "Платформа янгиликларини шу компьютерга юборамиз — ҳатто варақ ёпиқ бўлса ҳам.",
+    enable: "Ёқиш",
+    disable: "Ўчириш",
+    enabled: "Билдиришномалар ёқилди",
+    disabled: "Билдиришномалар ўчирилди",
+    blocked: "Браузер сўровни рад этди",
+    blockedHint:
+      "Бу сайт учун билдиришномалар браузер созламаларида тақиқланган — фақат ўша ердан ёқилади.",
+    failed: "Билдиришномаларни ёқиб бўлмади",
   },
   roles: {
     user: "Харидор",

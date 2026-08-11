@@ -74,7 +74,11 @@ export default function AdminBroadcast() {
   );
   const sendMutation = useAdminBroadcastsControllerSend();
 
-  const count = (countQuery.data as unknown as { count?: number })?.count ?? 0;
+  const audienceCount = countQuery.data as unknown as
+    | { count?: number; push?: number }
+    | undefined;
+  const count = audienceCount?.count ?? 0;
+  const pushCount = audienceCount?.push ?? 0;
   // Ошибку запроса нельзя выдавать за нулевую аудиторию: раньше при 500 админ
   // видел «Получателей нет» и серую кнопку, а серая кнопка внутри
   // AlertDialogTrigger вообще не открывает подтверждение.
@@ -159,6 +163,13 @@ export default function AdminBroadcast() {
                     ? t("admin.broadcast.recipientsNone")
                     : t("admin.broadcast.recipients", { count })}
             </p>
+            {/* Второй канал считается отдельно: адресаты разные, и одна цифра
+                на двоих врала бы про оба. */}
+            {!countQuery.isLoading && !countFailed && (
+              <p className="tabular text-sm text-muted-foreground">
+                {t("admin.broadcast.recipientsPush", { push: pushCount })}
+              </p>
+            )}
             {countFailed && (
               <Button
                 type="button"
@@ -197,7 +208,9 @@ export default function AdminBroadcast() {
           <Button
             type="button"
             className="gap-2 self-start"
-            disabled={sendMutation.isPending || noRecipients}
+            disabled={
+              sendMutation.isPending || (noRecipients && pushCount === 0)
+            }
           >
             <Send className="size-4" />
             {t(

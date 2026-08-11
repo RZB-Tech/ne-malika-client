@@ -7,6 +7,7 @@ import { StatCard } from "@/components/shared/stat-card";
 import { BarList } from "@/components/shared/charts";
 import { useT } from "@/components/providers/i18n-provider";
 import { TelegramLinkCard } from "@/components/shared/telegram-link-card";
+import { PushCard } from "@/components/shared/push-card";
 import { formatNumber } from "@/lib/format";
 import { useAdminShopsControllerList } from "@/lib/api/generated/endpoints/shops-admin/shops-admin";
 import { useProductCardsControllerFindAll } from "@/lib/api/generated/endpoints/product-cards-public/product-cards-public";
@@ -92,6 +93,7 @@ export default function AdminStats() {
       </div>
 
       <TelegramLinkCard />
+      <PushCard />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard

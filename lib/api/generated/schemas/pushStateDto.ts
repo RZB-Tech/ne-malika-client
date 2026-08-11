@@ -5,20 +5,8 @@
  * Маркетплейс компьютерной техники — REST API для веб-витрины (Next.js) и Telegram mini-app. Покупать можно без авторизации; вход через Telegram нужен продавцу, администратору и покупателю, который хочет видеть историю просмотров на всех своих устройствах.
  * OpenAPI spec version: 1.0.0
  */
-import type { BroadcastDtoAudience } from './broadcastDtoAudience';
-import type { BroadcastDtoAuthorName } from './broadcastDtoAuthorName';
 
-export interface BroadcastDto {
-  id: number;
-  audience: BroadcastDtoAudience;
-  text: string;
-  recipients: number;
-  delivered: number;
-  failed: number;
-  /** Доставлено в браузеры */
-  pushDelivered: number;
-  pushFailed: number;
-  createdAt: string;
-  /** @nullable */
-  authorName?: BroadcastDtoAuthorName;
+export interface PushStateDto {
+  /** Есть ли у пользователя хотя бы одна подписка */
+  subscribed: boolean;
 }
