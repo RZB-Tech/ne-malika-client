@@ -294,7 +294,7 @@ export function SiteHeader() {
         )}
       >
         <Image
-          src="/header-gaming-banner.png"
+          src="/header-gaming-banner-v2.png"
           alt=""
           fill
           priority
