@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/select";
 import { PhotoDropzone, type UploadedPhoto } from "./photo-dropzone";
 import { PhotoAiDialog } from "@/components/shared/photo-ai-dialog";
+import { applyGenerated } from "@/components/shared/apply-generated";
 import { CategorySelect } from "./category-select";
 import { useT } from "@/components/providers/i18n-provider";
 import { useSellerShop } from "@/lib/api/seller";
@@ -69,13 +70,10 @@ export function AddProductForm({
   const [price, setPrice] = useState("");
   const [categoryId, setCategoryId] = useState<number | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  // Фото, по которому продавец открыл генерацию через ИИ.
   const [aiPhoto, setAiPhoto] = useState<UploadedPhoto | null>(null);
 
   const onPriceChange = (raw: string) => setPrice(formatPriceInput(raw));
 
-  // Упразднённый магазин скрыт из выдачи, и бэкенд отклоняет создание товара —
-  // не даём заполнить длинную форму впустую.
   const shopAbolished = Boolean(shop) && shop!.status !== "active";
 
   const submit = async (e: React.FormEvent) => {
@@ -107,9 +105,6 @@ export function AddProductForm({
     try {
       const keys = await resolvePhotoKeys(photos);
 
-      // Ключи характеристик ложатся в базу и показываются всем покупателям,
-      // поэтому они не переводятся: иначе у одного товара было бы «Бренд», а у
-      // соседнего — «Brend», в зависимости от языка продавца в момент создания.
       const characteristics = [
         ...(brand.trim() ? [{ key: "Бренд", value: brand.trim() }] : []),
         ...(model.trim() ? [{ key: "Модель", value: model.trim() }] : []),
@@ -135,8 +130,6 @@ export function AddProductForm({
       toast.success(t("seller.add.publish"), {
         description: t("seller.add.sentToAi"),
       });
-      // Из диалога уводить некуда — он просто закрывается, а список под ним
-      // уже обновлён сбросом кэша выше.
       if (onDone) onDone();
       else router.push("/seller/products");
     } catch (err) {
@@ -318,15 +311,21 @@ export function AddProductForm({
           photo={aiPhoto}
           onClose={() => setAiPhoto(null)}
           onApply={(generated) => {
-            // Первый выбранный встаёт на место исходного, остальные — в конец.
-            setPhotos((prev) => {
-              const at = prev.findIndex((x) => x.id === aiPhoto?.id);
-              if (at === -1) return [...prev, ...generated];
-              const next = [...prev];
-              next.splice(at, 1, generated[0]);
-              return [...next, ...generated.slice(1)];
-            });
+            const { photos: next, dropped } = applyGenerated(
+              photos,
+              aiPhoto?.id,
+              generated,
+            );
+            setPhotos(next);
+            if (dropped > 0) {
+              toast.error(t("admin.photoAi.tooManyPhotos", { count: dropped }));
+            }
           }}
+          onPhotoStored={(photoId, key) =>
+            setPhotos((prev) =>
+              prev.map((p) => (p.id === photoId ? { ...p, key } : p)),
+            )
+          }
         />
       </Card>
 

@@ -33,7 +33,7 @@ import type {
 } from "@/lib/api/generated/schemas";
 import { storedPhoto, type UploadedPhoto } from "@/components/seller/photo-dropzone";
 import { useT } from "@/components/providers/i18n-provider";
-import { uploadPhoto } from "@/lib/api/upload";
+import { dataUrlToBlob, uploadPhoto } from "@/lib/api/upload";
 import { cn } from "@/lib/utils";
 
 type Format = "portrait" | "square";
@@ -109,10 +109,16 @@ export function PhotoAiDialog({
   photo,
   onClose,
   onApply,
+  onPhotoStored,
 }: {
   photo: UploadedPhoto | null;
   onClose: () => void;
   onApply: (replacement: UploadedPhoto[]) => void;
+  /**
+   * Фото загрузили в хранилище прямо из диалога — форма должна запомнить ключ,
+   * иначе при отправке файл уедет в S3 второй раз.
+   */
+  onPhotoStored?: (photoId: string, key: string) => void;
 }) {
   const { t } = useT();
   const [prompt, setPrompt] = useState("");
@@ -125,6 +131,10 @@ export function PhotoAiDialog({
     null,
   );
   const [uploading, setUploading] = useState(false);
+  const [savingPhoto, setSavingPhoto] = useState(false);
+  // Ключ фото, загруженного прямо отсюда: в форме создания товара у снимков
+  // ключа ещё нет, а генерация работает только с тем, что лежит в хранилище.
+  const [savedKey, setSavedKey] = useState<string | null>(null);
   const [results, setResults] = useState<Generated[]>([]);
   const [picked, setPicked] = useState<Set<string>>(new Set());
 
@@ -132,18 +142,24 @@ export function PhotoAiDialog({
   const generateMutation = useImageGenControllerGenerate();
 
   const open = photo !== null;
-  const photoKey = photo?.key;
+  const photoKey = photo?.key ?? savedKey ?? undefined;
   const size = SIZES[format][tier];
 
   // Сброс при смене фотографии — приведение состояния во время рендера, а не
   // в эффекте: иначе первый кадр показал бы промпт и картинки от предыдущей.
-  const [prevPhotoKey, setPrevPhotoKey] = useState(photoKey);
-  if (photoKey !== prevPhotoKey) {
-    setPrevPhotoKey(photoKey);
+  //
+  // Сравниваем по id, а не по ключу: при закрытии родитель ставит photo=null,
+  // и раньше это выглядело как «смена фотографии» — стирался и промпт, за
+  // который уже заплачено, и ключ загруженного референса.
+  const photoId = photo?.id;
+  const [prevPhotoId, setPrevPhotoId] = useState(photoId);
+  if (photoId && photoId !== prevPhotoId) {
+    setPrevPhotoId(photoId);
     setPrompt("");
     setResults([]);
     setPicked(new Set());
     setReference(null);
+    setSavedKey(null);
   }
 
   const quotaQuery = useImageGenControllerQuota({
@@ -246,6 +262,27 @@ export function PhotoAiDialog({
     close();
   };
 
+  /**
+   * Кладёт ещё не сохранённое фото в хранилище. Нужно в форме создания товара:
+   * там ключи появляются только при отправке, и до этого генерация была
+   * недоступна вовсе.
+   */
+  const storePhoto = async () => {
+    if (!photo || photo.key || savedKey) return;
+    setSavingPhoto(true);
+    try {
+      const key = await uploadPhoto(dataUrlToBlob(photo.url));
+      setSavedKey(key);
+      onPhotoStored?.(photo.id, key);
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : t("admin.photoAi.savePhotoFailed"),
+      );
+    } finally {
+      setSavingPhoto(false);
+    }
+  };
+
   const pickReference = async (file: File | undefined) => {
     if (!file) return;
     setUploading(true);
@@ -278,9 +315,24 @@ export function PhotoAiDialog({
         </DialogHeader>
 
         {!photoKey ? (
-          <p className="text-sm text-muted-foreground">
-            {t("admin.photoAi.unsaved")}
-          </p>
+          <div className="space-y-3">
+            <p className="text-sm text-muted-foreground">
+              {t("admin.photoAi.unsaved")}
+            </p>
+            <Button
+              type="button"
+              className="gap-2"
+              onClick={storePhoto}
+              disabled={savingPhoto}
+            >
+              <ImagePlus className="size-4" />
+              {t(
+                savingPhoto
+                  ? "admin.photoAi.savingPhoto"
+                  : "admin.photoAi.savePhoto",
+              )}
+            </Button>
+          </div>
         ) : (
           <div className="space-y-4">
             <div className="flex gap-4">
@@ -299,7 +351,9 @@ export function PhotoAiDialog({
                     size="sm"
                     className="h-7 gap-1.5 text-xs"
                     onClick={describe}
-                    disabled={describeMutation.isPending}
+                    disabled={
+                      describeMutation.isPending || quota?.allowed === false
+                    }
                   >
                     <Sparkles className="size-3.5" />
                     {t(

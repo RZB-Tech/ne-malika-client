@@ -27,10 +27,13 @@ export function ProductCard({ product }: { product: Product }) {
   const snapshot = productToSnapshot(product);
 
   return (
-    <div className="group relative flex flex-col">
+    // isolate + z-20: <img> внутри ProductImage тоже z-10, и без своего
+    // контекста наложения побеждал он — на телефоне (где hover-scale не
+    // срабатывает) тап по сердцу попадал в фото и уводил на страницу товара.
+    <div className="group relative isolate flex flex-col">
       {/* Вне <Link>: это переключатели, а не переход к товару. Поверх картинки
           и со своим z-index, иначе ссылка карточки перехватывает клик. */}
-      <div className="absolute top-2 right-2 z-10 flex flex-col gap-1.5">
+      <div className="absolute top-2 right-2 z-20 flex flex-col gap-1.5">
         <FavoriteButton product={snapshot} />
         <CompareButton product={snapshot} />
       </div>

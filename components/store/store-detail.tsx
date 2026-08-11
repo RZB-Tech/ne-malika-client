@@ -88,7 +88,11 @@ export function StoreDetail({
               <div className="flex items-center gap-2">
                 <h1 className="font-heading text-2xl font-bold tracking-tight">{store.name}</h1>
                 {store.rating > 0 && (
-                  <Badge variant="secondary" className="gap-1">
+                  <Badge
+                  variant="secondary"
+                  className="gap-1"
+                  aria-label={t("store.rating")}
+                >
                     <Star className="size-3 fill-warning text-warning" />
                     <span className="tabular">{store.rating.toFixed(1)}</span>
                   </Badge>

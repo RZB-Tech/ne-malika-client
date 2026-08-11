@@ -75,6 +75,11 @@ export default function AdminBroadcast() {
   const sendMutation = useAdminBroadcastsControllerSend();
 
   const count = (countQuery.data as unknown as { count?: number })?.count ?? 0;
+  // Ошибку запроса нельзя выдавать за нулевую аудиторию: раньше при 500 админ
+  // видел «Получателей нет» и серую кнопку, а серая кнопка внутри
+  // AlertDialogTrigger вообще не открывает подтверждение.
+  const countFailed = countQuery.isError;
+  const noRecipients = countQuery.isSuccess && count === 0;
   const history =
     ((historyQuery.data as unknown as { data?: BroadcastRow[] })?.data ?? []);
 
@@ -87,12 +92,11 @@ export default function AdminBroadcast() {
     try {
       const res = (await sendMutation.mutateAsync({
         data: { audience, text: value },
-      })) as unknown as { delivered: number; recipients: number };
+      })) as unknown as { id: number; recipients: number };
+      // Доставка идёт в фоне, поэтому сообщаем о запуске, а не об итоге:
+      // сколько дошло, появится в истории, когда рассылка отработает.
       toast.success(
-        t("admin.broadcast.sent", {
-          delivered: res.delivered,
-          recipients: res.recipients,
-        }),
+        t("admin.broadcast.started", { recipients: res.recipients }),
       );
       setText("");
       await queryClient.invalidateQueries();
@@ -139,19 +143,33 @@ export default function AdminBroadcast() {
             </Select>
           </div>
 
-          <p
-            className={
-              count === 0
-                ? "text-sm text-destructive"
-                : "tabular text-sm text-muted-foreground"
-            }
-          >
-            {countQuery.isLoading
-              ? t("common.loading")
-              : count === 0
-                ? t("admin.broadcast.recipientsNone")
-                : t("admin.broadcast.recipients", { count })}
-          </p>
+          <div className="flex flex-wrap items-center gap-2">
+            <p
+              className={
+                countFailed || noRecipients
+                  ? "text-sm text-destructive"
+                  : "tabular text-sm text-muted-foreground"
+              }
+            >
+              {countQuery.isLoading
+                ? t("common.loading")
+                : countFailed
+                  ? t("admin.broadcast.countFailed")
+                  : noRecipients
+                    ? t("admin.broadcast.recipientsNone")
+                    : t("admin.broadcast.recipients", { count })}
+            </p>
+            {countFailed && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => void countQuery.refetch()}
+              >
+                {t("admin.imageGen.retry")}
+              </Button>
+            )}
+          </div>
         </div>
 
         <div className="space-y-1.5">
@@ -179,7 +197,7 @@ export default function AdminBroadcast() {
           <Button
             type="button"
             className="gap-2 self-start"
-            disabled={sendMutation.isPending || count === 0}
+            disabled={sendMutation.isPending || noRecipients}
           >
             <Send className="size-4" />
             {t(

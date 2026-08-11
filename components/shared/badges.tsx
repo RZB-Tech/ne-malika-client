@@ -52,11 +52,14 @@ export function ModerationBadge({
     published: { cls: "bg-success/12 text-success", Icon: CheckCircle2 },
     rejected: { cls: "bg-destructive/12 text-destructive", Icon: XCircle },
   };
-  const { cls, Icon } = cfg[status];
+  // Фолбэк, а не прямая деструктуризация: статус приходит с бэкенда, и
+  // незнакомое значение уронило бы весь список товаров TypeError-ом вместо
+  // одного неверного бейджа.
+  const { cls, Icon } = cfg[status] ?? cfg.moderation;
   return (
     <Badge variant="outline" className={cn("gap-1 border-transparent font-medium", cls, className)}>
       <Icon className="size-3" />
-      {t(`moderation.${status}`)}
+      {t(`moderation.${status in cfg ? status : "moderation"}`)}
     </Badge>
   );
 }

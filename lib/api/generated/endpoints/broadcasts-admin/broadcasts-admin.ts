@@ -28,11 +28,13 @@ import type {
   AdminBroadcastsControllerCountParams,
   AdminBroadcastsControllerListParams,
   BroadcastAudienceCountDto,
+  BroadcastDto,
+  BroadcastStartedDto,
   CreateBroadcastDto
 } from '../../schemas';
 
 import { customInstance } from '../../../mutator';
-import type { ErrorType , BodyType } from '../../../mutator';
+import type { ErrorType, BodyType } from '../../../mutator';
 
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
@@ -42,8 +44,6 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKey: K } => {
   const result = { queryKey } as T & { queryKey: K };
   for (const key of Object.keys(query)) {
-    // The explicit queryKey always wins, matching the previous
-    // `{ ...query, queryKey }` spread where it was set last.
     if (key === 'queryKey') continue;
     Object.defineProperty(result, key, {
       enumerable: true,
@@ -58,44 +58,45 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
  * @summary История рассылок
  */
 export const adminBroadcastsControllerList = (
-    params?: AdminBroadcastsControllerListParams,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+  params?: AdminBroadcastsControllerListParams,
+  options?: SecondParameter<typeof customInstance>, signal?: AbortSignal
 ) => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/admin/broadcasts`, method: 'GET',
-        params, signal
+  return customInstance<BroadcastDto[]>(
+    {
+      url: `/api/v1/admin/broadcasts`, method: 'GET',
+      params, signal
     },
-      options);
-    }
+    options);
+}
 
 
 
 
 export const getAdminBroadcastsControllerListQueryKey = (params?: AdminBroadcastsControllerListParams,) => {
-    return [
+  return [
     `/api/v1/admin/broadcasts`, ...(params ? [params] : [])
-    ] as const;
-    }
+  ] as const;
+}
 
 
-export const getAdminBroadcastsControllerListQueryOptions = <TData = Awaited<ReturnType<typeof adminBroadcastsControllerList>>, TError = ErrorType<unknown>>(params?: AdminBroadcastsControllerListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminBroadcastsControllerList>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getAdminBroadcastsControllerListQueryOptions = <TData = Awaited<ReturnType<typeof adminBroadcastsControllerList>>, TError = ErrorType<unknown>>(params?: AdminBroadcastsControllerListParams, options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminBroadcastsControllerList>>, TError, TData>>, request?: SecondParameter<typeof customInstance> }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getAdminBroadcastsControllerListQueryKey(params);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof adminBroadcastsControllerList>>> = ({ signal }) => adminBroadcastsControllerList(params, requestOptions, signal);
+  const queryKey = queryOptions?.queryKey ?? getAdminBroadcastsControllerListQueryKey(params);
 
 
 
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof adminBroadcastsControllerList>>> = ({ signal }) => adminBroadcastsControllerList(params, requestOptions, signal);
 
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof adminBroadcastsControllerList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof adminBroadcastsControllerList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
 export type AdminBroadcastsControllerListQueryResult = NonNullable<Awaited<ReturnType<typeof adminBroadcastsControllerList>>>
@@ -103,41 +104,45 @@ export type AdminBroadcastsControllerListQueryError = ErrorType<unknown>
 
 
 export function useAdminBroadcastsControllerList<TData = Awaited<ReturnType<typeof adminBroadcastsControllerList>>, TError = ErrorType<unknown>>(
- params: undefined |  AdminBroadcastsControllerListParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminBroadcastsControllerList>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof adminBroadcastsControllerList>>,
-          TError,
-          Awaited<ReturnType<typeof adminBroadcastsControllerList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+  params: undefined | AdminBroadcastsControllerListParams, options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminBroadcastsControllerList>>, TError, TData>> & Pick<
+      DefinedInitialDataOptions<
+        Awaited<ReturnType<typeof adminBroadcastsControllerList>>,
+        TError,
+        Awaited<ReturnType<typeof adminBroadcastsControllerList>>
+      >, 'initialData'
+    >, request?: SecondParameter<typeof customInstance>
+  }
+  , queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useAdminBroadcastsControllerList<TData = Awaited<ReturnType<typeof adminBroadcastsControllerList>>, TError = ErrorType<unknown>>(
- params?: AdminBroadcastsControllerListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminBroadcastsControllerList>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof adminBroadcastsControllerList>>,
-          TError,
-          Awaited<ReturnType<typeof adminBroadcastsControllerList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+  params?: AdminBroadcastsControllerListParams, options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminBroadcastsControllerList>>, TError, TData>> & Pick<
+      UndefinedInitialDataOptions<
+        Awaited<ReturnType<typeof adminBroadcastsControllerList>>,
+        TError,
+        Awaited<ReturnType<typeof adminBroadcastsControllerList>>
+      >, 'initialData'
+    >, request?: SecondParameter<typeof customInstance>
+  }
+  , queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useAdminBroadcastsControllerList<TData = Awaited<ReturnType<typeof adminBroadcastsControllerList>>, TError = ErrorType<unknown>>(
- params?: AdminBroadcastsControllerListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminBroadcastsControllerList>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+  params?: AdminBroadcastsControllerListParams, options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminBroadcastsControllerList>>, TError, TData>>, request?: SecondParameter<typeof customInstance> }
+  , queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary История рассылок
  */
 
 export function useAdminBroadcastsControllerList<TData = Awaited<ReturnType<typeof adminBroadcastsControllerList>>, TError = ErrorType<unknown>>(
- params?: AdminBroadcastsControllerListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminBroadcastsControllerList>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  params?: AdminBroadcastsControllerListParams, options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminBroadcastsControllerList>>, TError, TData>>, request?: SecondParameter<typeof customInstance> }
+  , queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getAdminBroadcastsControllerListQueryOptions(params,options)
+  const queryOptions = getAdminBroadcastsControllerListQueryOptions(params, options)
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
@@ -148,111 +153,114 @@ export function useAdminBroadcastsControllerList<TData = Awaited<ReturnType<type
 
 
 /**
- * @summary Отправить рассылку в Telegram
+ * @summary Запустить рассылку в Telegram (доставка идёт в фоне)
  */
 export const adminBroadcastsControllerSend = (
-    createBroadcastDto: BodyType<CreateBroadcastDto>,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+  createBroadcastDto: BodyType<CreateBroadcastDto>,
+  options?: SecondParameter<typeof customInstance>, signal?: AbortSignal
 ) => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/admin/broadcasts`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
+  return customInstance<BroadcastStartedDto>(
+    {
+      url: `/api/v1/admin/broadcasts`, method: 'POST',
+      headers: { 'Content-Type': 'application/json', },
       data: createBroadcastDto, signal
     },
-      options);
-    }
+    options);
+}
 
 
 
 
 export const getAdminBroadcastsControllerSendMutationOptions = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminBroadcastsControllerSend>>, TError,{data: BodyType<CreateBroadcastDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof adminBroadcastsControllerSend>>, TError,{data: BodyType<CreateBroadcastDto>}, TContext> => {
+  TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof adminBroadcastsControllerSend>>, TError, { data: BodyType<CreateBroadcastDto> }, TContext>, request?: SecondParameter<typeof customInstance> }
+  ): UseMutationOptions<Awaited<ReturnType<typeof adminBroadcastsControllerSend>>, TError, { data: BodyType<CreateBroadcastDto> }, TContext> => {
 
-const mutationKey = ['adminBroadcastsControllerSend'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+  const mutationKey = ['adminBroadcastsControllerSend'];
+  const { mutation: mutationOptions, request: requestOptions } = options ?
+    options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey, }, request: undefined };
 
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminBroadcastsControllerSend>>, {data: BodyType<CreateBroadcastDto>}> = (props) => {
-          const {data} = props ?? {};
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminBroadcastsControllerSend>>, { data: BodyType<CreateBroadcastDto> }> = (props) => {
+    const { data } = props ?? {};
 
-          return  adminBroadcastsControllerSend(data,requestOptions)
-        }
-
-
+    return adminBroadcastsControllerSend(data, requestOptions)
+  }
 
 
 
 
-  return  { mutationFn, ...mutationOptions }}
 
-    export type AdminBroadcastsControllerSendMutationResult = NonNullable<Awaited<ReturnType<typeof adminBroadcastsControllerSend>>>
-    export type AdminBroadcastsControllerSendMutationBody = BodyType<CreateBroadcastDto>
-    export type AdminBroadcastsControllerSendMutationError = ErrorType<unknown>
 
-    /**
- * @summary Отправить рассылку в Telegram
- */
+  return { mutationFn, ...mutationOptions }
+}
+
+export type AdminBroadcastsControllerSendMutationResult = NonNullable<Awaited<ReturnType<typeof adminBroadcastsControllerSend>>>
+export type AdminBroadcastsControllerSendMutationBody = BodyType<CreateBroadcastDto>
+export type AdminBroadcastsControllerSendMutationError = ErrorType<unknown>
+
+/**
+* @summary Запустить рассылку в Telegram (доставка идёт в фоне)
+*/
 export const useAdminBroadcastsControllerSend = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminBroadcastsControllerSend>>, TError,{data: BodyType<CreateBroadcastDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof adminBroadcastsControllerSend>>,
-        TError,
-        {data: BodyType<CreateBroadcastDto>},
-        TContext
-      > => {
-      return useMutation(getAdminBroadcastsControllerSendMutationOptions(options), queryClient);
-    }
-    /**
- * @summary Сколько адресатов получит рассылку
- */
+  TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof adminBroadcastsControllerSend>>, TError, { data: BodyType<CreateBroadcastDto> }, TContext>, request?: SecondParameter<typeof customInstance> }
+    , queryClient?: QueryClient): UseMutationResult<
+      Awaited<ReturnType<typeof adminBroadcastsControllerSend>>,
+      TError,
+      { data: BodyType<CreateBroadcastDto> },
+      TContext
+    > => {
+  return useMutation(getAdminBroadcastsControllerSendMutationOptions(options), queryClient);
+}
+/**
+* @summary Сколько адресатов получит рассылку
+*/
 export const adminBroadcastsControllerCount = (
-    params: AdminBroadcastsControllerCountParams,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+  params: AdminBroadcastsControllerCountParams,
+  options?: SecondParameter<typeof customInstance>, signal?: AbortSignal
 ) => {
 
 
-      return customInstance<BroadcastAudienceCountDto>(
-      {url: `/api/v1/admin/broadcasts/audience`, method: 'GET',
-        params, signal
+  return customInstance<BroadcastAudienceCountDto>(
+    {
+      url: `/api/v1/admin/broadcasts/audience`, method: 'GET',
+      params, signal
     },
-      options);
-    }
+    options);
+}
 
 
 
 
 export const getAdminBroadcastsControllerCountQueryKey = (params?: AdminBroadcastsControllerCountParams,) => {
-    return [
+  return [
     `/api/v1/admin/broadcasts/audience`, ...(params ? [params] : [])
-    ] as const;
-    }
+  ] as const;
+}
 
 
-export const getAdminBroadcastsControllerCountQueryOptions = <TData = Awaited<ReturnType<typeof adminBroadcastsControllerCount>>, TError = ErrorType<unknown>>(params: AdminBroadcastsControllerCountParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminBroadcastsControllerCount>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getAdminBroadcastsControllerCountQueryOptions = <TData = Awaited<ReturnType<typeof adminBroadcastsControllerCount>>, TError = ErrorType<unknown>>(params: AdminBroadcastsControllerCountParams, options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminBroadcastsControllerCount>>, TError, TData>>, request?: SecondParameter<typeof customInstance> }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getAdminBroadcastsControllerCountQueryKey(params);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof adminBroadcastsControllerCount>>> = ({ signal }) => adminBroadcastsControllerCount(params, requestOptions, signal);
+  const queryKey = queryOptions?.queryKey ?? getAdminBroadcastsControllerCountQueryKey(params);
 
 
 
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof adminBroadcastsControllerCount>>> = ({ signal }) => adminBroadcastsControllerCount(params, requestOptions, signal);
 
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof adminBroadcastsControllerCount>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof adminBroadcastsControllerCount>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
 export type AdminBroadcastsControllerCountQueryResult = NonNullable<Awaited<ReturnType<typeof adminBroadcastsControllerCount>>>
@@ -260,41 +268,45 @@ export type AdminBroadcastsControllerCountQueryError = ErrorType<unknown>
 
 
 export function useAdminBroadcastsControllerCount<TData = Awaited<ReturnType<typeof adminBroadcastsControllerCount>>, TError = ErrorType<unknown>>(
- params: AdminBroadcastsControllerCountParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminBroadcastsControllerCount>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof adminBroadcastsControllerCount>>,
-          TError,
-          Awaited<ReturnType<typeof adminBroadcastsControllerCount>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+  params: AdminBroadcastsControllerCountParams, options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminBroadcastsControllerCount>>, TError, TData>> & Pick<
+      DefinedInitialDataOptions<
+        Awaited<ReturnType<typeof adminBroadcastsControllerCount>>,
+        TError,
+        Awaited<ReturnType<typeof adminBroadcastsControllerCount>>
+      >, 'initialData'
+    >, request?: SecondParameter<typeof customInstance>
+  }
+  , queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useAdminBroadcastsControllerCount<TData = Awaited<ReturnType<typeof adminBroadcastsControllerCount>>, TError = ErrorType<unknown>>(
- params: AdminBroadcastsControllerCountParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminBroadcastsControllerCount>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof adminBroadcastsControllerCount>>,
-          TError,
-          Awaited<ReturnType<typeof adminBroadcastsControllerCount>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+  params: AdminBroadcastsControllerCountParams, options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminBroadcastsControllerCount>>, TError, TData>> & Pick<
+      UndefinedInitialDataOptions<
+        Awaited<ReturnType<typeof adminBroadcastsControllerCount>>,
+        TError,
+        Awaited<ReturnType<typeof adminBroadcastsControllerCount>>
+      >, 'initialData'
+    >, request?: SecondParameter<typeof customInstance>
+  }
+  , queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useAdminBroadcastsControllerCount<TData = Awaited<ReturnType<typeof adminBroadcastsControllerCount>>, TError = ErrorType<unknown>>(
- params: AdminBroadcastsControllerCountParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminBroadcastsControllerCount>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+  params: AdminBroadcastsControllerCountParams, options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminBroadcastsControllerCount>>, TError, TData>>, request?: SecondParameter<typeof customInstance> }
+  , queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Сколько адресатов получит рассылку
  */
 
 export function useAdminBroadcastsControllerCount<TData = Awaited<ReturnType<typeof adminBroadcastsControllerCount>>, TError = ErrorType<unknown>>(
- params: AdminBroadcastsControllerCountParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminBroadcastsControllerCount>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  params: AdminBroadcastsControllerCountParams, options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminBroadcastsControllerCount>>, TError, TData>>, request?: SecondParameter<typeof customInstance> }
+  , queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getAdminBroadcastsControllerCountQueryOptions(params,options)
+  const queryOptions = getAdminBroadcastsControllerCountQueryOptions(params, options)
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }

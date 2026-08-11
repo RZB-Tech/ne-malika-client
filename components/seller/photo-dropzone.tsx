@@ -16,7 +16,9 @@ export interface UploadedPhoto {
   compressedKb?: number;
 }
 
-const MAX = 10;
+/** Потолок фотографий у товара. Столько же требует бэкенд (photos maxItems). */
+export const MAX_PHOTOS = 10;
+const MAX = MAX_PHOTOS;
 
 /** Оборачивает сохранённый S3-ключ в элемент дропзоны (для формы редактирования). */
 export function storedPhoto(key: string, url: string, name: string): UploadedPhoto {
@@ -57,8 +59,12 @@ export function PhotoDropzone({
 }: {
   photos: UploadedPhoto[];
   onChange: (p: UploadedPhoto[]) => void;
-  /** Задан — плитка становится кликабельной. Сейчас так админка открывает
-      перерисовку через ИИ; продавцу клик по фото ничего не делает. */
+  /**
+   * Задан — плитка становится кликабельной и открывает перерисовку через ИИ.
+   * Передают все три формы товара: админская и обе продавца. У фото без `key`
+   * (только что выбранного и ещё не загруженного) диалог сам предложит
+   * сохранить его перед генерацией.
+   */
   onPhotoClick?: (photo: UploadedPhoto) => void;
 }) {
   const { t } = useT();

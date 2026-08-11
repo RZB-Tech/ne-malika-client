@@ -32,9 +32,8 @@ export function ImageGenAccess({ userId }: { userId: number }) {
   const { t } = useT();
   const queryClient = useQueryClient();
 
-  const { data, isLoading } = useAdminImageGenControllerAccess(userId, {
-    query: { retry: false },
-  });
+  const { data, isLoading, isError, refetch } =
+    useAdminImageGenControllerAccess(userId, { query: { retry: false } });
   const quota = data as unknown as Quota | undefined;
   const saveMutation = useAdminImageGenControllerSetAccess();
 
@@ -73,6 +72,22 @@ export function ImageGenAccess({ userId }: { userId: number }) {
 
   if (isLoading) return <Skeleton className="h-24 w-full" />;
 
+  // Без этой ветки форма рисовала «выключено, использовано 0» на любой ошибке
+  // загрузки — выдуманные цифры, которые администратор мог сохранить поверх
+  // настоящего лимита.
+  if (isError || !quota) {
+    return (
+      <div className="space-y-2">
+        <p className="text-sm text-destructive">
+          {t("admin.imageGen.loadFailed")}
+        </p>
+        <Button type="button" variant="outline" size="sm" onClick={() => void refetch()}>
+          {t("admin.imageGen.retry")}
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-3">
       <p className="text-sm text-muted-foreground">
@@ -109,13 +124,17 @@ export function ImageGenAccess({ userId }: { userId: number }) {
         </div>
       )}
 
+      {/* Безлимит и выключенный доступ раньше выглядели одинаково — просто
+          «Использовано: N», и отличить одно от другого было нельзя. */}
       <p className="tabular text-sm text-muted-foreground">
-        {quota?.limit === null || quota?.limit === undefined
-          ? t("admin.imageGen.used", { used: quota?.used ?? 0 })
-          : t("admin.imageGen.usedOf", {
-              used: quota.used,
-              limit: quota.limit,
-            })}
+        {!quota.allowed
+          ? `${t("admin.imageGen.used", { used: quota.used })} · ${t("admin.imageGen.disabled")}`
+          : quota.limit === null
+            ? `${t("admin.imageGen.used", { used: quota.used })} · ${t("admin.imageGen.unlimited")}`
+            : t("admin.imageGen.usedOf", {
+                used: quota.used,
+                limit: quota.limit,
+              })}
       </p>
 
       <Button

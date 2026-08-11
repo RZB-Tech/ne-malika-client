@@ -1563,7 +1563,17 @@
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BroadcastDto"
+                  }
+                }
+              }
+            }
           }
         },
         "tags": [
@@ -1577,7 +1587,7 @@
       },
       "post": {
         "operationId": "AdminBroadcastsController_send",
-        "summary": "Отправить рассылку в Telegram",
+        "summary": "Запустить рассылку в Telegram (доставка идёт в фоне)",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -1591,7 +1601,14 @@
         },
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BroadcastStartedDto"
+                }
+              }
+            }
           }
         },
         "tags": [
@@ -2890,6 +2907,50 @@
           "expiresInSec"
         ]
       },
+      "BroadcastDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "audience": {
+            "type": "string",
+            "enum": [
+              "all",
+              "sellers",
+              "buyers"
+            ]
+          },
+          "text": {
+            "type": "string"
+          },
+          "recipients": {
+            "type": "number"
+          },
+          "delivered": {
+            "type": "number"
+          },
+          "failed": {
+            "type": "number"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "authorName": {
+            "type": "object",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "audience",
+          "text",
+          "recipients",
+          "delivered",
+          "failed",
+          "createdAt"
+        ]
+      },
       "BroadcastAudienceCountDto": {
         "type": "object",
         "properties": {
@@ -2923,6 +2984,23 @@
         "required": [
           "audience",
           "text"
+        ]
+      },
+      "BroadcastStartedDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "Идентификатор записи в истории рассылок"
+          },
+          "recipients": {
+            "type": "number",
+            "description": "Сколько адресатов найдено на момент запуска"
+          }
+        },
+        "required": [
+          "id",
+          "recipients"
         ]
       },
       "ProductViewDto": {

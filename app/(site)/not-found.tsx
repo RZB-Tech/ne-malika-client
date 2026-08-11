@@ -1,0 +1,32 @@
+"use client";
+
+import Link from "next/link";
+import { SearchX } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useT } from "@/components/providers/i18n-provider";
+
+/**
+ * Страница для несуществующего товара или магазина.
+ *
+ * Без неё `notFound()` из карточки товара отдавал стандартный экран Next.js —
+ * «404 | This page could not be found.» по-английски, без шапки и без пути
+ * назад. Переводы для этого случая в словаре уже лежали и не использовались.
+ */
+export default function SiteNotFound() {
+  const { t } = useT();
+
+  return (
+    <div className="mx-auto flex max-w-md flex-col items-center px-5 py-24 text-center">
+      <SearchX className="size-12 text-muted-foreground/50" />
+      <h1 className="mt-5 font-heading text-2xl font-bold tracking-tight">
+        {t("product.notFound")}
+      </h1>
+      <p className="mt-2 text-sm text-muted-foreground">
+        {t("product.notFoundText")}
+      </p>
+      <Button asChild className="mt-6">
+        <Link href="/">{t("product.toCatalog")}</Link>
+      </Button>
+    </div>
+  );
+}

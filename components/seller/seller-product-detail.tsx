@@ -41,6 +41,7 @@ import {
 } from "@/components/seller/photo-dropzone";
 import { useT } from "@/components/providers/i18n-provider";
 import { PhotoAiDialog } from "@/components/shared/photo-ai-dialog";
+import { applyGenerated } from "@/components/shared/apply-generated";
 import {
   useSellerAiChecksControllerGetCheck,
   useSellerAiChecksControllerRecheck,
@@ -341,15 +342,21 @@ export function SellerProductDetail({ id }: { id: number }) {
           photo={aiPhoto}
           onClose={() => setAiPhoto(null)}
           onApply={(generated) => {
-            // Первый выбранный встаёт на место исходного, остальные — в конец.
-            setPhotos((prev) => {
-              const at = prev.findIndex((x) => x.id === aiPhoto?.id);
-              if (at === -1) return [...prev, ...generated];
-              const next = [...prev];
-              next.splice(at, 1, generated[0]);
-              return [...next, ...generated.slice(1)];
-            });
+            const { photos: next, dropped } = applyGenerated(
+              photos,
+              aiPhoto?.id,
+              generated,
+            );
+            setPhotos(next);
+            if (dropped > 0) {
+              toast.error(t("admin.photoAi.tooManyPhotos", { count: dropped }));
+            }
           }}
+          onPhotoStored={(photoId, key) =>
+            setPhotos((prev) =>
+              prev.map((p) => (p.id === photoId ? { ...p, key } : p)),
+            )
+          }
         />
       </Card>
 

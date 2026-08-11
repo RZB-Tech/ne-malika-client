@@ -89,6 +89,10 @@ export function CatalogView({
     price.priceMin == null &&
     price.priceMax == null &&
     !category &&
+    // Подкатегория тоже входит в queryKey: без этой проверки серверная
+    // нефильтрованная страница подставлялась бы как данные для выборки по
+    // подкатегории, и запрос за настоящими товарами не уходил бы вовсе.
+    subCategoryId == null &&
     sort === "latest";
 
   const listQuery = useInfiniteQuery({

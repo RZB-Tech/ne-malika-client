@@ -12,9 +12,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { buttonVariants } from "@/components/ui/button";
 import { useT } from "@/components/providers/i18n-provider";
-import { cn } from "@/lib/utils";
 
 /**
  * Подтверждение необратимого действия. Вместо window.confirm: тот выглядит
@@ -39,22 +37,28 @@ export function ConfirmDialog({
   children: React.ReactNode;
 }) {
   const { t } = useT();
+  const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
 
   const confirm = async (e: React.MouseEvent) => {
-    // Закрываем сами, когда действие отработало: иначе окно исчезает раньше,
-    // чем запрос ушёл, и об ошибке сообщить уже негде.
+    // Диалог управляемый, а закрытие по умолчанию отменяется: иначе окно
+    // исчезает раньше, чем запрос ушёл, и об ошибке сообщить уже негде.
+    // Раньше на этом всё и заканчивалось — preventDefault гасил встроенное
+    // закрытие Radix, а своего не было, и окно висело после успеха.
     e.preventDefault();
     setBusy(true);
     try {
       await onConfirm();
+      setOpen(false);
+    } catch {
+      // Оставляем открытым: пользователь видит тост с ошибкой и может повторить.
     } finally {
       setBusy(false);
     }
   };
 
   return (
-    <AlertDialog>
+    <AlertDialog open={open} onOpenChange={(v) => !busy && setOpen(v)}>
       <AlertDialogTrigger asChild>{children}</AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
@@ -67,13 +71,13 @@ export function ConfirmDialog({
           <AlertDialogCancel disabled={busy}>
             {t("common.cancel")}
           </AlertDialogCancel>
+          {/* variant, а не классы: Slot склеивает className простым join, без
+              tailwind-merge, и bg-primary от варианта по умолчанию побеждал
+              подмешанный bg-destructive — кнопка удаления выглядела обычной. */}
           <AlertDialogAction
             disabled={busy}
             onClick={confirm}
-            className={cn(
-              destructive &&
-                buttonVariants({ variant: "destructive" }),
-            )}
+            variant={destructive ? "destructive" : "default"}
           >
             {busy ? t("common.running") : (confirmLabel ?? t("common.confirm"))}
           </AlertDialogAction>

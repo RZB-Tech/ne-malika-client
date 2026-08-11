@@ -40,10 +40,12 @@ export function ProductStatsCard({
     // Молча прятать блок нельзя: отличить «нет статистики» от «роут отдал 403» станет невозможно.
     return (
       <Card className="p-6 text-sm text-muted-foreground">
-        {t("seller.stats.unavailable")}
+        {/* Одно сообщение, а не два: раньше к полному предложению
+            «Статистика просмотров временно недоступна» приклеивалось второе,
+            «Статистика недоступна (403)», и мысль повторялась дважды. */}
         {error instanceof Error
-          ? `: ${t("seller.stats.error", { status: error.message })}`
-          : ""}
+          ? t("seller.stats.error", { status: error.message })
+          : t("seller.stats.unavailable")}
       </Card>
     );
   }

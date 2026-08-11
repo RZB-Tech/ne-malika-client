@@ -228,7 +228,7 @@ export default function SellerProfile() {
                 city={BASE_CITY}
                 value={address}
                 onChange={setAddress}
-                placeholder="ул. Амира Темура, 15"
+                placeholder={t("seller.profile.addressPlaceholder")}
               />
             </div>
             <div className={field}>
@@ -255,7 +255,7 @@ export default function SellerProfile() {
                     const u = parseTelegramUsername(telegram);
                     if (u) setTelegram(u);
                   }}
-                  placeholder="username или ссылка t.me/…"
+                  placeholder={t("seller.profile.telegramPlaceholder")}
                   className="pl-9"
                 />
               </div>
@@ -272,7 +272,7 @@ export default function SellerProfile() {
                   </p>
                 ) : (
                   <p className="text-xs text-destructive">
-                    Не похоже на Telegram username или ссылку t.me
+                    {t("seller.profile.badTelegram")}
                   </p>
                 ))}
             </div>

@@ -47,9 +47,14 @@ function telegramUsername(link: string | null | undefined): string {
 }
 
 /**
- * Расписание строкой вида «Пн, Вт, Ср 09:00–18:00». Переводчик приходит
- * параметром, а не берётся из контекста: функция вызывается и из компонентов,
- * и из мапперов, где хуков нет.
+ * Расписание строкой вида «Пн, Вт, Ср 09:00–18:00 · Сб 10:00–14:00».
+ *
+ * Дни группируются по одинаковому времени: редактор расписания задаёт часы
+ * каждому дню отдельно, а раньше здесь бралось время первого рабочего дня и
+ * приписывалось всем — суббота с коротким днём показывалась как обычная.
+ *
+ * Переводчик приходит параметром, а не берётся из контекста: функция
+ * вызывается и из компонентов, и из мапперов, где хуков нет.
  */
 export function formatWorkSchedule(
   schedule: WorkScheduleEntry[] | null | undefined,
@@ -58,12 +63,18 @@ export function formatWorkSchedule(
   if (!schedule?.length) return "";
   const open = schedule.filter((e) => !e.isHoliday);
   if (!open.length) return t("seller.profile.dayOff");
-  const first = open[0];
-  const label = open
-    .map((e) => t(`weekdaysShort.${e.day}`))
-    .filter(Boolean)
-    .join(", ");
-  return `${label} ${first.start}–${first.end}`;
+
+  const groups = new Map<string, string[]>();
+  for (const entry of open) {
+    const hours = `${entry.start}–${entry.end}`;
+    const days = groups.get(hours) ?? [];
+    days.push(t(`weekdaysShort.${entry.day}`));
+    groups.set(hours, days);
+  }
+
+  return [...groups]
+    .map(([hours, days]) => `${days.join(", ")} ${hours}`)
+    .join(" · ");
 }
 
 /** Общая часть обеих проекций товара — публичной и полной строки таблицы. */
@@ -130,8 +141,6 @@ export function mapShop(s: ShopRow | PublicShop): Store {
     phone: s.contact ?? "",
     telegram: telegramUsername(s.telegramLink),
     telegramLink: s.telegramLink ?? undefined,
-    // Строкой не собираем: подписи дней зависят от языка, а он известен только
-    // в компоненте. Отдаём расписание как есть, формат — на месте показа.
     workSchedule: s.workSchedule ?? undefined,
     workingHours: "",
     rating: 0,
