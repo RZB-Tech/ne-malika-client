@@ -1,10 +1,8 @@
 "use client";
 
-import { Heart, History, MessageSquare, Star, UserRound } from "@/components/icons";
+import { Heart, History, Star, UserRound } from "@/components/icons";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useT } from "@/components/providers/i18n-provider";
-import { ChatPanel } from "@/components/chat/chat-panel";
-import { useChatUnread } from "@/lib/api/chats";
 import { AccountProfile } from "./account-profile";
 import { FavoritesList } from "./favorites-list";
 import { MyReviews } from "./my-reviews";
@@ -26,7 +24,6 @@ export function AccountView({
   defaultTab?: string;
 }) {
   const { t } = useT();
-  const unread = useChatUnread().data?.buyer ?? 0;
 
   return (
     <div className="mx-auto w-full max-w-[1600px] px-4 py-8 sm:px-8 lg:px-10">
@@ -51,17 +48,6 @@ export function AccountView({
             <Heart />
             {t("account.tabs.favorites")}
           </TabsTrigger>
-          <TabsTrigger value="messages" className={tab}>
-            <MessageSquare />
-            {t("account.tabs.messages")}
-            {/* Число рядом с подписью, а не точка: покупателю важно, сколько
-                продавцов ждут ответа, а не сам факт. */}
-            {unread > 0 && (
-              <span className="ml-1 inline-flex min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground tabular">
-                {unread > 99 ? "99+" : unread}
-              </span>
-            )}
-          </TabsTrigger>
           <TabsTrigger value="reviews" className={tab}>
             <Star />
             {t("account.tabs.reviews")}
@@ -77,9 +63,6 @@ export function AccountView({
         </TabsContent>
         <TabsContent value="favorites">
           <FavoritesList />
-        </TabsContent>
-        <TabsContent value="messages">
-          <ChatPanel role="buyer" />
         </TabsContent>
         <TabsContent value="reviews">
           <MyReviews />

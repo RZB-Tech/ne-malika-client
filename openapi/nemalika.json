@@ -3157,6 +3157,27 @@
         ]
       }
     },
+    "/api/v1/chats/stream": {
+      "get": {
+        "operationId": "ChatsController_stream",
+        "summary": "Поток событий переписки (SSE)",
+        "description": "Отдаёт события {chatId, kind} по мере их появления и «ping» раз в 25 секунд.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "chats"
+        ],
+        "security": [
+          {
+            "access-token": []
+          }
+        ]
+      }
+    },
     "/api/v1/chats": {
       "get": {
         "operationId": "ChatsController_list",

@@ -24,7 +24,7 @@ export default function SellerMessages() {
         </p>
       </div>
 
-      <ChatPanel role="seller" />
+      <ChatPanel role="seller" className="h-[70vh] min-h-100" />
     </div>
   );
 }

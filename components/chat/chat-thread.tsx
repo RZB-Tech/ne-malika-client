@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { Bot, Check, Send } from "@/components/icons";
+import { ArrowLeft, Bot, Check, CheckDouble, Send } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
@@ -25,10 +25,13 @@ export function ChatThread({
   chat,
   side,
   className,
+  onBack,
 }: {
   chat: ChatDto;
   side: "buyer" | "seller";
   className?: string;
+  /** Возврат к списку. Только там, где список рядом не помещается, — на телефоне. */
+  onBack?: () => void;
 }) {
   const { t, locale } = useT();
   const { data, isPending } = useChatMessages(chat.id);
@@ -58,7 +61,18 @@ export function ChatThread({
 
   return (
     <div className={cn("flex min-h-0 flex-col", className)}>
-      <header className="flex items-start gap-3 border-b border-border p-4">
+      <header className="flex items-start gap-2 border-b border-border p-3 sm:p-4">
+        {onBack && (
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={onBack}
+            aria-label={t("chat.backToList")}
+            className="-ml-1 shrink-0 md:hidden"
+          >
+            <ArrowLeft className="size-5" />
+          </Button>
+        )}
         <div className="min-w-0 flex-1">
           <p className="truncate font-medium">
             {side === "seller" ? chat.buyerName : chat.shopName}
@@ -102,6 +116,8 @@ export function ChatThread({
             own={isOwn(message, side)}
             locale={locale}
             aiLabel={t("chat.aiReply")}
+            sentLabel={t("chat.sent")}
+            readLabel={t("chat.read")}
           />
         ))}
         <div ref={bottom} />
@@ -147,11 +163,15 @@ function Bubble({
   own,
   locale,
   aiLabel,
+  sentLabel,
+  readLabel,
 }: {
   message: ChatMessageDto;
   own: boolean;
   locale: Parameters<typeof formatMessageTime>[1];
   aiLabel: string;
+  sentLabel: string;
+  readLabel: string;
 }) {
   return (
     <div className={cn("flex", own ? "justify-end" : "justify-start")}>
@@ -186,7 +206,14 @@ function Bubble({
           )}
         >
           {formatMessageTime(message.createdAt, locale)}
-          {own && message.readAt && <Check className="size-3.5" />}
+          {/* Одна галочка — отправлено, две — прочитано: привычный по
+              мессенджерам знак, который не нужно объяснять. */}
+          {own &&
+            (message.readAt ? (
+              <CheckDouble className="size-3.5" aria-label={readLabel} />
+            ) : (
+              <Check className="size-3.5 opacity-70" aria-label={sentLabel} />
+            ))}
         </span>
       </div>
     </div>

@@ -4,6 +4,7 @@ import NextTopLoader from "nextjs-toploader";
 import "./globals.css";
 import { I18nProvider } from "@/components/providers/i18n-provider";
 import { QueryProvider } from "@/components/providers/query-provider";
+import { ChatStream } from "@/components/providers/chat-stream";
 import { AuthProvider } from "@/lib/api/auth";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
@@ -98,6 +99,7 @@ export default function RootLayout({
           <AuthProvider>
             <I18nProvider>
               <TooltipProvider delayDuration={200}>
+                <ChatStream />
                 {children}
                 <Toaster position="top-center" richColors />
               </TooltipProvider>

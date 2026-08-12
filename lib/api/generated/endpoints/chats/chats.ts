@@ -60,6 +60,99 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
 };
 
 /**
+ * Отдаёт события {chatId, kind} по мере их появления и «ping» раз в 25 секунд.
+ * @summary Поток событий переписки (SSE)
+ */
+export const chatsControllerStream = (
+
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<void>(
+      {url: `/api/v1/chats/stream`, method: 'GET', signal
+    },
+      options);
+    }
+
+
+
+
+export const getChatsControllerStreamQueryKey = () => {
+    return [
+    `/api/v1/chats/stream`
+    ] as const;
+    }
+
+
+export const getChatsControllerStreamQueryOptions = <TData = Awaited<ReturnType<typeof chatsControllerStream>>, TError = ErrorType<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatsControllerStream>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getChatsControllerStreamQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof chatsControllerStream>>> = ({ signal }) => chatsControllerStream(requestOptions, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof chatsControllerStream>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ChatsControllerStreamQueryResult = NonNullable<Awaited<ReturnType<typeof chatsControllerStream>>>
+export type ChatsControllerStreamQueryError = ErrorType<unknown>
+
+
+export function useChatsControllerStream<TData = Awaited<ReturnType<typeof chatsControllerStream>>, TError = ErrorType<unknown>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatsControllerStream>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof chatsControllerStream>>,
+          TError,
+          Awaited<ReturnType<typeof chatsControllerStream>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useChatsControllerStream<TData = Awaited<ReturnType<typeof chatsControllerStream>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatsControllerStream>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof chatsControllerStream>>,
+          TError,
+          Awaited<ReturnType<typeof chatsControllerStream>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useChatsControllerStream<TData = Awaited<ReturnType<typeof chatsControllerStream>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatsControllerStream>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Поток событий переписки (SSE)
+ */
+
+export function useChatsControllerStream<TData = Awaited<ReturnType<typeof chatsControllerStream>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatsControllerStream>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getChatsControllerStreamQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+/**
  * role=buyer — те, что я начал сам; role=seller — переписки моего магазина.
  * @summary Мои переписки
  */

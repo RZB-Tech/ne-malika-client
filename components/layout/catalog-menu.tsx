@@ -103,10 +103,8 @@ export function CatalogMenu() {
   return (
     <div ref={containerRef} className="shrink-0">
       <Button
-        // Синяя на светлой шапке: это главная кнопка навигации, и она должна
-        // читаться первой, до строки поиска.
-        size="lg"
-        className={cn("hidden h-11 gap-2 rounded-xl px-3 sm:px-4 md:inline-flex")}
+        size="default"
+        className={cn("hidden h-10 gap-2 rounded-lg px-3 sm:px-4 md:inline-flex")}
         onClick={() => (open ? close() : openMenu())}
         aria-expanded={open}
         aria-haspopup="true"
@@ -117,8 +115,6 @@ export function CatalogMenu() {
           className="relative grid size-5 place-items-center"
         >
           <LayoutGrid
-            fill="currentColor"
-            strokeWidth={0}
             className={cn(
               "absolute transition-all duration-200",
               open ? "scale-75 opacity-0" : "scale-100 opacity-100",

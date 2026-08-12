@@ -72,7 +72,9 @@
     "compare": "Taqqoslash",
     "register": "Ro‘yxatdan o‘tish",
     "becomeSeller": "Sotuvchi bo‘lish",
-    "logout": "Chiqish"
+    "logout": "Chiqish",
+    "messages": "Xabarlar",
+    "messagesShort": "Chat"
   },
   "home": {
     "newTitle": "Yangi mahsulotlar",
@@ -734,7 +736,6 @@
     "tabs": {
       "history": "Tarix",
       "favorites": "Sevimlilar",
-      "messages": "Xabarlar",
       "reviews": "Sharhlarim",
       "profile": "Profil"
     },
@@ -922,6 +923,11 @@
     "backToList": "Ro‘yxatga",
     "aiReply": "Sun’iy intellekt javobi",
     "productGone": "{name} — mahsulot sotuvdan olingan",
-    "sellerSubtitle": "Xaridorlarning mahsulotlaringiz haqidagi savollari."
+    "sellerSubtitle": "Xaridorlarning mahsulotlaringiz haqidagi savollari.",
+    "buyerSubtitle": "Sotuvchilar bilan mahsulotlar haqidagi yozishmalar.",
+    "openAll": "Barcha xabarlarni ochish",
+    "sent": "Yuborildi",
+    "read": "O‘qildi",
+    "pushPrompt": "Sotuvchi javob berganda xabar beramiz — varaq yopiq bo‘lsa ham."
   }
 }

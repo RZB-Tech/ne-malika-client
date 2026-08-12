@@ -2,12 +2,20 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Heart, Home, LayoutGrid, Scale, UserRound } from "@/components/icons";
+import {
+  Heart,
+  Home,
+  LayoutGrid,
+  MessageSquare,
+  Scale,
+  UserRound,
+} from "@/components/icons";
 import { LoginDialog } from "@/components/auth/login-dialog";
 import { useT } from "@/components/providers/i18n-provider";
 import { useAuth } from "@/lib/api/auth";
 import { useFavorites } from "@/lib/favorites/use-favorites";
 import { useCompare } from "@/lib/compare/use-compare";
+import { useChatUnread } from "@/lib/api/chats";
 import { openCatalog } from "./catalog-bus";
 import { cn } from "@/lib/utils";
 
@@ -27,6 +35,7 @@ export function BottomNav() {
   const { isAuthenticated, isHydrated } = useAuth();
   const { count: favorites } = useFavorites();
   const { items: compared } = useCompare();
+  const unread = useChatUnread().data?.buyer ?? 0;
 
   return (
     <nav
@@ -41,6 +50,16 @@ export function BottomNav() {
           active={pathname === "/"}
         />
         <Item icon={LayoutGrid} label={t("nav.catalog")} onClick={openCatalog} />
+        {/* Чаты — отдельной вкладкой, а не пунктом кабинета: ответа продавца
+            ждут и возвращаются за ним, а значок с числом видно на любом
+            экране. */}
+        <Item
+          href="/messages"
+          icon={MessageSquare}
+          label={t("nav.messagesShort")}
+          count={unread}
+          active={pathname === "/messages"}
+        />
         <Item
           href="/account?tab=favorites"
           icon={Heart}

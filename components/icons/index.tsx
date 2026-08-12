@@ -94,6 +94,7 @@ import {
   Tablet01Icon,
   Tag01Icon,
   Tick02Icon,
+  TickDouble02Icon,
   TruckIcon,
   Undo02Icon,
   Upload01Icon,
@@ -154,6 +155,8 @@ export const Box = make(Package01Icon, "Box");
 export const CalendarDays = make(Calendar03Icon, "CalendarDays");
 export const Check = make(Tick02Icon, "Check");
 export const CheckIcon = Check;
+/** Две галочки — «прочитано», как в мессенджерах. */
+export const CheckDouble = make(TickDouble02Icon, "CheckDouble");
 export const CheckCircle2 = make(CheckmarkCircle02Icon, "CheckCircle2");
 export const CircleCheckIcon = CheckCircle2;
 export const ChevronDown = make(ChevronDownSrc, "ChevronDown");

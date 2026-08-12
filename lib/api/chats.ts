@@ -29,10 +29,12 @@ import { useAuth } from "@/lib/api/auth";
 
 export const CHATS_KEY = "/api/v1/chats";
 
-/** Открытая переписка обновляется часто — на неё и смотрят. */
-const THREAD_POLL_MS = 10_000;
-
-/** Значок с числом непрочитанного — редко: он лишь привлекает внимание. */
+/**
+ * Опрос — страховка, а не основной канал: о новых сообщениях вкладке сообщает
+ * живой поток (`useChatStream`). Сюда попадают только те случаи, когда поток
+ * оборвался незаметно, поэтому интервалы редкие.
+ */
+const THREAD_POLL_MS = 20_000;
 const UNREAD_POLL_MS = 60_000;
 
 export type ChatRole = ChatsControllerListRole;

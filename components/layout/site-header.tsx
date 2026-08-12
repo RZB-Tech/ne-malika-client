@@ -9,6 +9,7 @@ import {
   Heart,
   Keyboard,
   Laptop,
+  MessageSquare,
   Monitor,
   Package,
   ShoppingBasket,
@@ -25,6 +26,7 @@ import { SearchBar, SearchBarSkeleton } from "@/components/shared/search-bar";
 import { LanguageSwitch } from "@/components/shared/language-switch";
 import { LoginDialog } from "@/components/auth/login-dialog";
 import { UserMenu } from "@/components/auth/user-menu";
+import { ChatDrawer, useBuyerUnread } from "@/components/chat/chat-drawer";
 import { CatalogMenu } from "./catalog-menu";
 import { useT } from "@/components/providers/i18n-provider";
 import { useAuth } from "@/lib/api/auth";
@@ -252,6 +254,7 @@ export function SiteHeader() {
             </Link>
           </Button>
 
+          <MessagesAction />
           <FavoritesAction />
           <CartAction />
         </nav>
@@ -371,6 +374,32 @@ function ActionBody({
         {label}
       </span>
     </>
+  );
+}
+
+/**
+ * Переписка с продавцами. В отличие от соседей ведёт не на страницу, а
+ * открывает панель справа: отвечают между делом, не отрываясь от каталога.
+ */
+function MessagesAction() {
+  const { t } = useT();
+  const unread = useBuyerUnread();
+
+  return (
+    <ChatDrawer>
+      <Button
+        variant="ghost"
+        size="lg"
+        title={t("nav.messages")}
+        className={cn(ACTION_CLASS, "hidden md:flex")}
+      >
+        <ActionBody
+          icon={MessageSquare}
+          label={t("nav.messages")}
+          count={unread}
+        />
+      </Button>
+    </ChatDrawer>
   );
 }
 

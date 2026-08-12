@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowLeft } from "@/components/icons";
-import { Button } from "@/components/ui/button";
 import { useT } from "@/components/providers/i18n-provider";
 import { useChats, type ChatRole } from "@/lib/api/chats";
 import type { ChatDto } from "@/lib/api/generated/schemas";
@@ -23,9 +21,15 @@ import { cn } from "@/lib/utils";
 export function ChatPanel({
   role,
   className,
+  onActiveChange,
 }: {
   role: ChatRole;
   className?: string;
+  /**
+   * Открыта ли переписка. Нужно странице: на телефоне она прячет свою строку
+   * заголовка, чтобы над разговором не стояло двух шапок подряд.
+   */
+  onActiveChange?: (open: boolean) => void;
 }) {
   const { t } = useT();
   const { data, isPending } = useChats(role);
@@ -36,10 +40,18 @@ export function ChatPanel({
   // последнее сообщение обновляются опросом, и сохранённая копия устарела бы.
   const active = chats.find((chat) => chat.id === activeId) ?? null;
 
+  const select = (id: number | null) => {
+    setActiveId(id);
+    onActiveChange?.(id !== null);
+  };
+
   return (
+    // Высоту задаёт вызывающий: на телефоне это весь экран, в кабинете
+    // продавца — часть страницы. Зашитая сюда, она в одном из мест обязательно
+    // мешала бы.
     <div
       className={cn(
-        "flex h-[70vh] min-h-100 overflow-hidden rounded-2xl border border-border bg-card",
+        "flex overflow-hidden rounded-2xl border border-border bg-card",
         className,
       )}
     >
@@ -54,27 +66,22 @@ export function ChatPanel({
           chats={chats}
           side={role}
           activeId={activeId}
-          onSelect={(chat) => setActiveId(chat.id)}
+          onSelect={(chat) => select(chat.id)}
           isLoading={isPending}
         />
       </div>
 
       <div className={cn("min-w-0 flex-1", active ? "flex" : "hidden md:flex")}>
         {active ? (
-          <div className="flex min-h-0 w-full flex-col">
-            <div className="border-b border-border p-2 md:hidden">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setActiveId(null)}
-                className="gap-1.5"
-              >
-                <ArrowLeft className="size-4" />
-                {t("chat.backToList")}
-              </Button>
-            </div>
-            <ChatThread chat={active} side={role} className="flex-1" />
-          </div>
+          // Возврат к списку — стрелкой в самой шапке переписки, а не отдельной
+          // полосой над ней: две строки подряд с одинаковым смыслом занимают
+          // десятую часть экрана телефона и ничего не добавляют.
+          <ChatThread
+            chat={active}
+            side={role}
+            onBack={() => select(null)}
+            className="min-h-0 w-full"
+          />
         ) : (
           <p className="m-auto px-6 text-center text-sm text-muted-foreground">
             {t("chat.pickChat")}
