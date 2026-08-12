@@ -13,6 +13,7 @@ import {
   chatsControllerUnread,
 } from "@/lib/api/generated/endpoints/chats/chats";
 import type {
+  ChatMessageDto,
   ChatsControllerListRole,
   PaginatedChatMessagesDto,
   PaginatedChatsDto,
@@ -84,13 +85,84 @@ function useInvalidateChats() {
   return () => queryClient.invalidateQueries({ queryKey: [CHATS_KEY] });
 }
 
-export function useSendMessage(chatId: number | null) {
-  const invalidate = useInvalidateChats();
+/**
+ * Отправка сообщения.
+ *
+ * Реплика встаёт в ленту сразу, не дожидаясь ответа сервера. Раньше она ждала
+ * два круга: POST, а следом полную перезагрузку ленты по инвалидации — и на
+ * телефоне это выглядело как «сообщение отправляется секунду-две». Сервер
+ * ничего не решает о содержимом: текст уже известен, id и время он лишь
+ * проставит, и настоящий ответ подменит временную запись на месте.
+ *
+ * `side` нужен, чтобы пузырь сразу встал на свою сторону: лента различает
+ * своё и чужое по `kind`.
+ */
+export function useSendMessage(chatId: number | null, side: ChatRole) {
+  const queryClient = useQueryClient();
+  const messagesKey = [CHATS_KEY, "messages", chatId] as const;
 
   return useMutation({
     mutationFn: (text: string) =>
       chatsControllerSend(chatId!, { text: text.trim() }),
-    onSuccess: invalidate,
+
+    onMutate: (text: string) => {
+      const previous =
+        queryClient.getQueryData<PaginatedChatMessagesDto>(messagesKey);
+
+      /** Отрицательный id не столкнётся с настоящим и виден в отладке как временный. */
+      const pendingId = -Date.now();
+      const pending: ChatMessageDto = {
+        id: pendingId,
+        kind: side,
+        text: text.trim(),
+        readAt: null,
+        createdAt: new Date().toISOString(),
+      };
+
+      queryClient.setQueryData<PaginatedChatMessagesDto>(
+        messagesKey,
+        (old) => old && { ...old, data: [pending, ...old.data] },
+      );
+
+      /**
+       * Отменяем уже начатую загрузку ленты, но не ждём её: ответ на запрос,
+       * ушедший до нажатия, не знает о новой реплике и стёр бы её. Ожидание
+       * же здесь стоило секунды — ровно той задержки, ради которой всё
+       * и затевалось.
+       */
+      void queryClient.cancelQueries({ queryKey: messagesKey });
+
+      return { previous, pendingId };
+    },
+
+    onSuccess: (message, _text, context) => {
+      queryClient.setQueryData<PaginatedChatMessagesDto>(
+        messagesKey,
+        (old) =>
+          old && {
+            ...old,
+            data: old.data.map((row) =>
+              row.id === context?.pendingId ? message : row,
+            ),
+          },
+      );
+    },
+
+    /** Не дошло — убираем пузырь, иначе человек считает сообщение отправленным. */
+    onError: (_error, _text, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(messagesKey, context.previous);
+      }
+    },
+
+    /**
+     * Ленту не трогаем — она уже точная. Обновляем только список переписок и
+     * счётчики: там поменялись последняя реплика и время.
+     */
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: [CHATS_KEY, "list"] });
+      void queryClient.invalidateQueries({ queryKey: [CHATS_KEY, "unread"] });
+    },
   });
 }
 

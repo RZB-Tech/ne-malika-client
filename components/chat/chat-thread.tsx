@@ -36,7 +36,7 @@ export function ChatThread({
 }) {
   const { t, locale } = useT();
   const { data, isPending } = useChatMessages(chat.id);
-  const send = useSendMessage(chat.id);
+  const send = useSendMessage(chat.id, side);
 
   const [text, setText] = useState("");
   const bottom = useRef<HTMLDivElement | null>(null);

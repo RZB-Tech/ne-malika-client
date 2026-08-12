@@ -222,13 +222,11 @@ function ChannelRow({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center">
-      <span className="mt-0.5 shrink-0 text-muted-foreground sm:mt-0">
-        {icon}
-      </span>
+    <div className="flex items-start gap-3 p-4">
+      <span className="mt-0.5 shrink-0 text-muted-foreground">{icon}</span>
 
       <div className="min-w-0 flex-1">
-        <p className="flex items-center gap-2 text-sm font-medium">
+        <p className="flex flex-wrap items-center gap-2 text-sm font-medium">
           {title}
           {active && (
             <span className="rounded-full bg-primary/12 px-2 py-0.5 text-[11px] font-medium text-primary">

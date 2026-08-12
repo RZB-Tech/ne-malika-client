@@ -115,10 +115,10 @@ function DrawerBody({
             />
           </div>
 
-          {chats.length > 0 && (
+          {chats.length > 0 && side === "buyer" && (
             <div className="border-t border-border p-3">
               <Button asChild variant="outline" className="w-full" onClick={onClose}>
-                <Link href={side === "seller" ? "/seller/messages" : "/messages"}>
+                <Link href="/messages">
                   {t("chat.openAll")}
                 </Link>
               </Button>

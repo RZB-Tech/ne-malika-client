@@ -2,7 +2,6 @@
 
 import {
   LayoutDashboard,
-  MessageSquare,
   Package,
   Star,
   Store,
@@ -17,7 +16,6 @@ import { useT } from "@/components/providers/i18n-provider";
 import { StoreAvatar } from "@/components/shared/store-avatar";
 import { AddProductDialog } from "@/components/seller/add-product-dialog";
 import { useSellerShop } from "@/lib/api/seller";
-import { useChatUnread } from "@/lib/api/chats";
 import { hueFromId } from "@/lib/api/mappers";
 import { photoUrl } from "@/lib/api/photo";
 
@@ -32,19 +30,12 @@ export default function SellerLayout({ children }: { children: React.ReactNode }
 function SellerLayoutInner({ children }: { children: React.ReactNode }) {
   const { t } = useT();
   const { shop } = useSellerShop();
-  const unread = useChatUnread().data?.seller ?? 0;
 
   const items: NavItem[] = [
     { href: "/seller", label: t("seller.nav.dashboard"), icon: LayoutDashboard, exact: true },
     ...(shop
       ? [
           { href: "/seller/products", label: t("seller.nav.products"), icon: Package },
-          {
-            href: "/seller/messages",
-            label: t("seller.nav.messages"),
-            icon: MessageSquare,
-            badge: unread,
-          },
           { href: "/seller/reviews", label: t("seller.nav.reviews"), icon: Star },
         ]
       : []),
