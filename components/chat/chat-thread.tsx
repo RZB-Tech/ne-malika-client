@@ -27,12 +27,14 @@ export function ChatThread({
   side,
   className,
   onBack,
+  hideHeader = false,
 }: {
   chat: ChatDto;
   side: "buyer" | "seller";
   className?: string;
   /** Возврат к списку. Только там, где список рядом не помещается, — на телефоне. */
   onBack?: () => void;
+  hideHeader?: boolean;
 }) {
   const { t, locale } = useT();
   const { data, isPending } = useChatMessages(chat.id);
@@ -58,7 +60,7 @@ export function ChatThread({
 
   return (
     <div className={cn("flex min-h-0 flex-col", className)}>
-      <header className="flex items-start gap-2 border-b border-border p-3 sm:p-4">
+      {!hideHeader && <header className="flex items-start gap-2 border-b border-border p-3 sm:p-4">
         {onBack && (
           <Button
             variant="ghost"
@@ -90,7 +92,7 @@ export function ChatThread({
             </p>
           )}
         </div>
-      </header>
+      </header>}
 
       <div className="chat-message-background min-h-0 flex-1 space-y-3 overflow-y-auto p-4">
         {isPending && messages.length === 0 && (
