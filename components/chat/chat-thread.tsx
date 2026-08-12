@@ -92,7 +92,7 @@ export function ChatThread({
         </div>
       </header>
 
-      <div className="min-h-0 flex-1 space-y-3 overflow-y-auto p-4">
+      <div className="chat-message-background min-h-0 flex-1 space-y-3 overflow-y-auto p-4">
         {isPending && messages.length === 0 && (
           <>
             <Skeleton className="h-12 w-2/3 rounded-2xl" />

@@ -6,7 +6,7 @@ import { ArrowLeft } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { useT } from "@/components/providers/i18n-provider";
 import { ChatPanel } from "./chat-panel";
-import { ChatPushPrompt } from "./chat-push-prompt";
+import { NotifyPrompt } from "./notify-prompt";
 import { cn } from "@/lib/utils";
 
 /**
@@ -49,7 +49,7 @@ export function MessagesView() {
         {t("chat.buyerSubtitle")}
       </p>
 
-      {!threadOpen && <ChatPushPrompt className="mx-3 mt-3 md:mx-0 md:mt-5" />}
+      {!threadOpen && <NotifyPrompt className="mx-3 mt-3 md:mx-0 md:mt-5" />}
 
       <ChatPanel
         role="buyer"

@@ -1,6 +1,7 @@
 "use client";
 
 import { ChatPanel } from "@/components/chat/chat-panel";
+import { NotifyPrompt } from "@/components/chat/notify-prompt";
 import { useT } from "@/components/providers/i18n-provider";
 
 /**
@@ -23,6 +24,8 @@ export default function SellerMessages() {
           {t("chat.sellerSubtitle")}
         </p>
       </div>
+
+      <NotifyPrompt />
 
       <ChatPanel role="seller" className="h-[70vh] min-h-100" />
     </div>

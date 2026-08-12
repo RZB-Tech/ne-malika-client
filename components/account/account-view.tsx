@@ -3,6 +3,7 @@
 import { Heart, History, Star, UserRound } from "@/components/icons";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useT } from "@/components/providers/i18n-provider";
+import { NotificationsCard } from "@/components/shared/notifications-card";
 import { AccountProfile } from "./account-profile";
 import { FavoritesList } from "./favorites-list";
 import { MyReviews } from "./my-reviews";
@@ -63,8 +64,9 @@ export function AccountView({
         <TabsContent value="reviews">
           <MyReviews />
         </TabsContent>
-        <TabsContent value="profile">
+        <TabsContent value="profile" className="space-y-4">
           <AccountProfile />
+          <NotificationsCard />
         </TabsContent>
       </Tabs>
     </div>

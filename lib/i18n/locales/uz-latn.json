@@ -836,6 +836,19 @@
     "blockedHint": "Bu sayt uchun bildirishnomalar brauzer sozlamalarida taqiqlangan — faqat o‘sha yerdan yoqiladi.",
     "failed": "Bildirishnomalarni yoqib bo‘lmadi"
   },
+  "notify": {
+    "title": "Bildirishnomalar",
+    "text": "Sotuvchilar javobi va platforma yangiliklari qayerga kelishini tanlang.",
+    "on": "Yoqilgan",
+    "browser": "Brauzerda",
+    "browserHint": "Shu qurilmaga keladi — hatto sayt yopiq bo‘lganda ham.",
+    "telegram": "Telegramda",
+    "telegramHint": "Bot bilan suhbatga keladi — telefonga ham, kompyuterga ham.",
+    "telegramOpen": "Botni ochish",
+    "telegramOpenHint": "Botda «Start» tugmasini bosing — boshqa hech narsa kerak emas.",
+    "telegramOn": "Telegramda bildirishnomalar yoqildi",
+    "telegramOff": "Telegramda bildirishnomalar o‘chirildi"
+  },
   "roles": {
     "user": "Xaridor",
     "seller": "Sotuvchi",

@@ -10,8 +10,7 @@ import { StatCard } from "@/components/shared/stat-card";
 import { ProductImage } from "@/components/shared/product-image";
 import { ModerationBadge } from "@/components/shared/badges";
 import { useT } from "@/components/providers/i18n-provider";
-import { TelegramLinkCard } from "@/components/shared/telegram-link-card";
-import { PushCard } from "@/components/shared/push-card";
+import { NotificationsCard } from "@/components/shared/notifications-card";
 import { openAddProduct } from "@/components/seller/add-product-bus";
 import { priceText } from "@/lib/format";
 import { useSellerProducts } from "@/lib/api/seller";
@@ -81,8 +80,7 @@ export default function SellerDashboard() {
         )}
       </div>
 
-      <TelegramLinkCard variant="seller" />
-      <PushCard />
+      <NotificationsCard />
 
       {shop.status !== "active" && (
         <Card className="border-destructive/40 bg-destructive/5 p-4 text-sm">
