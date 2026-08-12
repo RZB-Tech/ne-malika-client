@@ -11,7 +11,7 @@ import {
   Star,
   Store,
   Users,
-} from "lucide-react";
+} from "@/components/icons";
 import { RequireRole } from "@/components/auth/require-role";
 import {
   DashboardShell,

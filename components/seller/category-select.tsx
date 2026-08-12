@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Check, ChevronDown, Search } from "lucide-react";
+import { Check, ChevronDown, Search } from "@/components/icons";
 import {
   Popover,
   PopoverContent,

@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Upload } from "lucide-react";
+import { Upload } from "@/components/icons";
 import { TelegramIcon } from "@/components/icons/telegram-icon";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";

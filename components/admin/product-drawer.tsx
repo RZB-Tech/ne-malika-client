@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Ban, ExternalLink, Pencil, RotateCcw, Trash2 } from "lucide-react";
+import { Ban, ExternalLink, Pencil, RotateCcw, Trash2 } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { ProductImage } from "@/components/shared/product-image";
 import { AbolishDialog } from "@/components/admin/abolish-dialog";

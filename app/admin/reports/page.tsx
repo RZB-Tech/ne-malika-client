@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Ban, Store } from "lucide-react";
+import { Ban, Store } from "@/components/icons";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";

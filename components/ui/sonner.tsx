@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { Toaster as Sonner, type ToasterProps } from "sonner"
-import { CircleCheckIcon, InfoIcon, TriangleAlertIcon, OctagonXIcon, Loader2Icon } from "lucide-react"
+import { CircleCheckIcon, InfoIcon, TriangleAlertIcon, OctagonXIcon, Loader2Icon } from "@/components/icons";
 
 // Mirror the `.dark` class on <html> — the app's single source of theme truth.
 function useIsDark() {

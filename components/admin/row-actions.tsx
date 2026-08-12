@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import type { LucideIcon } from "lucide-react";
-import { MoreHorizontal } from "lucide-react";
+import type { AppIcon } from "@/components/icons";
+import { MoreHorizontal } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -29,7 +29,7 @@ import { useT } from "@/components/providers/i18n-provider";
  */
 export interface RowAction {
   label: string;
-  icon: LucideIcon;
+  icon: AppIcon;
   /** Переход — пункт становится ссылкой. */
   href?: string;
   onSelect?: () => void;

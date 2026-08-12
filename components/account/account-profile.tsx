@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { LayoutDashboard, LogOut, Store, UserRound } from "lucide-react";
+import { LayoutDashboard, LogOut, Store, UserRound } from "@/components/icons";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";

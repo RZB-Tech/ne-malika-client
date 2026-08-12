@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Phone } from "lucide-react";
+import { Phone } from "@/components/icons";
 import { useT } from "@/components/providers/i18n-provider";
 import { trackContact } from "@/lib/metrika";
 import { cn } from "@/lib/utils";

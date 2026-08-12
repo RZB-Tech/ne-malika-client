@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useMemo } from "react";
-import { Package, PlusCircle, Store, Tag } from "lucide-react";
+import { Package, PlusCircle, Store, Tag } from "@/components/icons";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";

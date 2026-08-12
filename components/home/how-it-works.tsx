@@ -1,6 +1,6 @@
 "use client";
 
-import { Search, Handshake } from "lucide-react";
+import { Search, Handshake } from "@/components/icons";
 import { TelegramIcon } from "@/components/icons/telegram-icon";
 import { useT } from "@/components/providers/i18n-provider";
 

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Check, Sparkles, Trash2, X } from "lucide-react";
+import { Check, Sparkles, Trash2, X } from "@/components/icons";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";

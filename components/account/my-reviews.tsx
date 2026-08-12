@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Pencil, Star, Trash2 } from "lucide-react";
+import { Pencil, Star, Trash2 } from "@/components/icons";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";

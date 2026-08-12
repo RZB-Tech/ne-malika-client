@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { RotateCcw, ShieldCheck, ShieldOff, Store, UserX } from "lucide-react";
+import { RotateCcw, ShieldCheck, ShieldOff, Store, UserX } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";

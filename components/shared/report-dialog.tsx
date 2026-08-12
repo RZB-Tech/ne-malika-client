@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Flag } from "lucide-react";
+import { Flag } from "@/components/icons";
 import { toast } from "sonner";
 import {
   Dialog,

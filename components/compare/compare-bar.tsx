@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Scale, X } from "lucide-react";
+import { Scale, X } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { ProductImage } from "@/components/shared/product-image";
 import { useT } from "@/components/providers/i18n-provider";

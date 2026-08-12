@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { Flag, Package, Store } from "lucide-react";
+import { Flag, Package, Store } from "@/components/icons";
 import { Card } from "@/components/ui/card";
 import { StatCard } from "@/components/shared/stat-card";
 import { BarList } from "@/components/shared/charts";

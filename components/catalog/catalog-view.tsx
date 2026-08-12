@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { Loader2, SearchX, X } from "lucide-react";
+import { Loader2, SearchX, X } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import {
   ProductCard,

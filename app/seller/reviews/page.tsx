@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
-import { Star } from "lucide-react";
+import { Star } from "@/components/icons";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { RatingStars } from "@/components/shared/rating-stars";

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Send } from "lucide-react";
+import { Send } from "@/components/icons";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -79,9 +79,6 @@ export default function AdminBroadcast() {
     | undefined;
   const count = audienceCount?.count ?? 0;
   const pushCount = audienceCount?.push ?? 0;
-  // Ошибку запроса нельзя выдавать за нулевую аудиторию: раньше при 500 админ
-  // видел «Получателей нет» и серую кнопку, а серая кнопка внутри
-  // AlertDialogTrigger вообще не открывает подтверждение.
   const countFailed = countQuery.isError;
   const noRecipients = countQuery.isSuccess && count === 0;
   const history =
@@ -97,8 +94,6 @@ export default function AdminBroadcast() {
       const res = (await sendMutation.mutateAsync({
         data: { audience, text: value },
       })) as unknown as { id: number; recipients: number };
-      // Доставка идёт в фоне, поэтому сообщаем о запуске, а не об итоге:
-      // сколько дошло, появится в истории, когда рассылка отработает.
       toast.success(
         t("admin.broadcast.started", { recipients: res.recipients }),
       );
@@ -198,7 +193,6 @@ export default function AdminBroadcast() {
           </p>
         </div>
 
-        {/* Подтверждение обязательное: отправленное сообщение уже не отозвать. */}
         <ConfirmDialog
           title={t("admin.broadcast.confirmTitle")}
           description={t("admin.broadcast.confirmText", { count })}

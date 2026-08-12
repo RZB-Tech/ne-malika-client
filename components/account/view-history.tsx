@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Cloud, History, Trash2, X } from "lucide-react";
+import { Cloud, History, Trash2, X } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";

@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { Eye } from "lucide-react";
+import { Eye } from "@/components/icons";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useT } from "@/components/providers/i18n-provider";

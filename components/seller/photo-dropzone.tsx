@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
-import { ImagePlus, Star, X } from "lucide-react";
+import { ImagePlus, Star, X } from "@/components/icons";
 import { cn } from "@/lib/utils";
 import { useT } from "@/components/providers/i18n-provider";
 

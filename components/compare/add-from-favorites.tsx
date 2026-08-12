@@ -1,6 +1,6 @@
 "use client";
 
-import { Heart, Plus } from "lucide-react";
+import { Heart, Plus } from "@/components/icons";
 import { toast } from "sonner";
 import { ProductImage } from "@/components/shared/product-image";
 import { useT } from "@/components/providers/i18n-provider";

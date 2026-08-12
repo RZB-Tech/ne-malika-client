@@ -10,7 +10,7 @@ import {
   RotateCcw,
   Search,
   Trash2,
-} from "lucide-react";
+} from "@/components/icons";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";

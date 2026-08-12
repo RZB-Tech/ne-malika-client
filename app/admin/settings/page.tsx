@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Coins, Sparkles } from "lucide-react";
+import { Coins, Sparkles } from "@/components/icons";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";

@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { useT } from "@/components/providers/i18n-provider";
 

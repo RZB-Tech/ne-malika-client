@@ -14,8 +14,8 @@ import {
   ShoppingBasket,
   Smartphone,
   UserRound,
-  type LucideIcon,
-} from "lucide-react";
+  type AppIcon,
+} from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
@@ -43,7 +43,7 @@ const QUICK_CATEGORIES = 6;
 
 const FALLBACK_QUICK_CATEGORIES: Array<{
   query: string;
-  icon: LucideIcon;
+  icon: AppIcon;
   name: Record<Locale, string>;
 }> = [
   {

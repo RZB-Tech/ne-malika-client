@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Check, ChevronDown, Search } from "lucide-react";
+import { Check, ChevronDown, Search } from "@/components/icons";
 import { Input } from "@/components/ui/input";
 import { StoreAvatar } from "@/components/shared/store-avatar";
 import { hueFromId } from "@/lib/api/mappers";

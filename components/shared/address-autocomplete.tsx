@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Loader2, MapPin } from "lucide-react";
+import { Loader2, MapPin } from "@/components/icons";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import {

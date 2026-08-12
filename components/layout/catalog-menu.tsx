@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ChevronLeft, ChevronRight, LayoutGrid, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, LayoutGrid, X } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { CategoryIcon } from "@/components/shared/category-icon";
@@ -44,6 +44,8 @@ export function CatalogMenu() {
   );
 
   const active = roots.find((r) => r.id === activeId) ?? roots[0];
+  const activeHasGroups =
+    active?.children.some((child) => child.children.length > 0) ?? false;
 
   const openMenu = useCallback(() => {
     clearTimeout(unmountTimer.current);
@@ -61,6 +63,15 @@ export function CatalogMenu() {
   }, []);
 
   useEffect(() => () => clearTimeout(unmountTimer.current), []);
+
+  useEffect(() => {
+    if (!open) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [open]);
 
   // На телефоне кнопки каталога в шапке нет — там её место занимает нижняя
   // панель навигации, и открывает она то же самое меню.
@@ -131,14 +142,14 @@ export function CatalogMenu() {
           {/* Затемнение — только под панелью, шапка остаётся кликабельной. */}
           <div
             data-state={open ? "open" : "closed"}
-            className="absolute inset-x-0 top-full z-40 h-screen bg-black/40 duration-200 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0"
+            className="absolute inset-x-0 top-full z-40 h-screen bg-black/40 duration-200 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0 lg:top-17 lg:h-[calc(100dvh-4.25rem)]"
             aria-hidden
           />
           <div
             data-state={open ? "open" : "closed"}
-            className="absolute inset-x-0 top-full z-50 overflow-hidden rounded-b-2xl border-b border-border bg-card shadow-xl duration-200 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-top-2 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-top-2"
+            className="absolute inset-x-0 top-full z-50 overflow-hidden rounded-b-2xl border-b border-border bg-card shadow-xl duration-200 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-top-2 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-top-2 lg:top-17 lg:h-[calc(100dvh-4.25rem)] lg:rounded-none lg:border-b-0 lg:shadow-none"
           >
-            <div className="mx-auto max-h-[min(70vh,40rem)] max-w-[1600px] overflow-y-auto px-4 py-4 sm:px-8 lg:max-h-none lg:overflow-hidden lg:px-10 lg:py-5">
+            <div className="mx-auto max-h-[min(70vh,40rem)] max-w-[1600px] overflow-y-auto px-4 py-4 sm:px-8 lg:h-full lg:max-h-none lg:overflow-hidden lg:px-10 lg:py-5">
               {roots.length === 0 ? (
                 <p className="py-8 text-center text-sm text-muted-foreground">
                   {isLoading ? t("common.loading") : t("common.nothingFound")}
@@ -182,59 +193,110 @@ export function CatalogMenu() {
                   </div>
 
                   {/* Широкий экран: разделы и подкатегории рядом. */}
-                  <div className="hidden h-[min(52vh,26rem)] lg:grid lg:grid-cols-[17rem_minmax(0,1fr)]">
-                    <ScrollArea className="h-full border-r border-border pr-4">
-                      <ul className="pr-3">
-                        {roots.map((root) => (
-                          <li key={root.id}>
-                            <Link
-                              href={categoryHref(root)}
-                              onClick={close}
-                              onMouseEnter={() => setActiveId(root.id)}
-                              onFocus={() => setActiveId(root.id)}
-                              className={cn(
-                                "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
-                                root.id === active?.id
-                                  ? "bg-muted font-medium text-foreground"
-                                  : "text-muted-foreground hover:bg-muted/60 hover:text-foreground",
-                              )}
-                            >
-                              <CategoryIcon
-                                name={root.icon}
-                                className="size-4"
-                              />
-                              <span className="min-w-0 flex-1 truncate">
-                                {root.name[locale]}
-                              </span>
-                              <ChevronRight className="size-4 opacity-40" />
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    </ScrollArea>
+                  <div className="hidden h-full lg:grid lg:grid-cols-[19rem_minmax(0,1fr)]">
+                    <div className="flex min-h-0 flex-col border-r border-border pr-5">
+                      <Button
+                        asChild
+                        variant="outline"
+                        size="lg"
+                        className="mb-4 h-14 w-full justify-start gap-3 rounded-xl px-4"
+                      >
+                        <Link href="/" onClick={close}>
+                          <LayoutGrid data-icon="inline-start" />
+                          <span className="flex-1 text-left">
+                            {t("catalog.allSections")}
+                          </span>
+                          <ChevronRight data-icon="inline-end" />
+                        </Link>
+                      </Button>
+
+                      <ScrollArea className="min-h-0 flex-1">
+                        <ul className="pr-3">
+                          {roots.map((root) => (
+                            <li key={root.id}>
+                              <Link
+                                href={categoryHref(root)}
+                                onClick={close}
+                                onMouseEnter={() => setActiveId(root.id)}
+                                onFocus={() => setActiveId(root.id)}
+                                className={cn(
+                                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors",
+                                  root.id === active?.id
+                                    ? "bg-muted font-medium text-primary"
+                                    : "text-foreground hover:bg-muted/60",
+                                )}
+                              >
+                                <CategoryIcon
+                                  name={root.icon}
+                                  className="size-4 text-muted-foreground"
+                                />
+                                <span className="min-w-0 flex-1 truncate">
+                                  {root.name[locale]}
+                                </span>
+                                <ChevronRight className="size-4 opacity-35" />
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      </ScrollArea>
+                    </div>
 
                     {active && (
-                      <div className="min-w-0 overflow-y-auto px-8 pb-4">
-                        <Link
-                          href={categoryHref(active)}
-                          onClick={close}
-                          className="inline-flex font-heading text-xl font-bold tracking-tight hover:text-primary"
-                        >
-                          {active.name[locale]}
-                        </Link>
-                        <div className="mt-4 grid grid-cols-2 gap-x-10 gap-y-1 xl:grid-cols-3">
-                          {active.children.map((child) => (
-                            <Link
-                              key={child.id}
-                              href={categoryHref(active, child)}
-                              onClick={close}
-                              className="rounded-md px-2 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                            >
-                              {child.name[locale]}
-                            </Link>
-                          ))}
+                      <ScrollArea className="h-full min-w-0 pl-9">
+                        <div className="pr-8 pb-12">
+                          <Link
+                            href={categoryHref(active)}
+                            onClick={close}
+                            className="inline-flex font-heading text-3xl font-bold tracking-tight hover:text-primary"
+                          >
+                            {active.name[locale]}
+                          </Link>
+
+                          {activeHasGroups ? (
+                            <div className="mt-7 columns-2 gap-12 xl:columns-3">
+                              {active.children.map((child) => (
+                                <section
+                                  key={child.id}
+                                  className="mb-8 break-inside-avoid"
+                                >
+                                  <Link
+                                    href={categoryHref(active, child)}
+                                    onClick={close}
+                                    className="font-semibold text-foreground hover:text-primary"
+                                  >
+                                    {child.name[locale]}
+                                  </Link>
+                                  <div className="mt-2 flex flex-col gap-1.5">
+                                    {child.children.map((leaf) => (
+                                      <Link
+                                        key={leaf.id}
+                                        href={categoryHref(active, leaf)}
+                                        onClick={close}
+                                        className="text-sm leading-5 text-muted-foreground hover:text-primary"
+                                      >
+                                        {leaf.name[locale]}
+                                      </Link>
+                                    ))}
+                                  </div>
+                                </section>
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="mt-7 grid grid-cols-2 gap-x-14 gap-y-3 xl:grid-cols-3">
+                              {active.children.map((child) => (
+                                <Link
+                                  key={child.id}
+                                  href={categoryHref(active, child)}
+                                  onClick={close}
+                                  className="text-sm leading-5 text-muted-foreground hover:text-primary"
+                                >
+                                  {child.name[locale]}
+                                </Link>
+                              ))}
+                            </div>
+                          )}
                         </div>
-                      </div>
+                      </ScrollArea>
                     )}
                   </div>
                 </>

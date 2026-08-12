@@ -3156,6 +3156,251 @@
           }
         ]
       }
+    },
+    "/api/v1/chats": {
+      "get": {
+        "operationId": "ChatsController_list",
+        "summary": "Мои переписки",
+        "description": "role=buyer — те, что я начал сам; role=seller — переписки моего магазина.",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Номер страницы",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Размер страницы",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "role",
+            "required": false,
+            "in": "query",
+            "description": "«buyer» — мои переписки как покупателя, «seller» — переписки моего магазина",
+            "schema": {
+              "default": "buyer",
+              "enum": [
+                "buyer",
+                "seller"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedChatsDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "chats"
+        ],
+        "security": [
+          {
+            "access-token": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "ChatsController_start",
+        "summary": "Написать продавцу",
+        "description": "Находит начатый разговор о том же товаре или заводит новый и сразу отправляет первое сообщение.",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartChatDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatStartedDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Свой же магазин"
+          },
+          "404": {
+            "description": "Товар не найден или недоступен"
+          }
+        },
+        "tags": [
+          "chats"
+        ],
+        "security": [
+          {
+            "access-token": []
+          }
+        ]
+      }
+    },
+    "/api/v1/chats/unread": {
+      "get": {
+        "operationId": "ChatsController_unread",
+        "summary": "Сколько непрочитанного в обеих ролях",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatUnreadDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "chats"
+        ],
+        "security": [
+          {
+            "access-token": []
+          }
+        ]
+      }
+    },
+    "/api/v1/chats/{id}/messages": {
+      "get": {
+        "operationId": "ChatsController_messages",
+        "summary": "Сообщения переписки",
+        "description": "Свежие первыми. Запрос заодно отмечает входящие прочитанными: ленту запрашивают, только когда переписка открыта на экране.",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Номер страницы",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Размер страницы",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedChatMessagesDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Переписка не найдена или чужая"
+          }
+        },
+        "tags": [
+          "chats"
+        ],
+        "security": [
+          {
+            "access-token": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "ChatsController_send",
+        "summary": "Отправить сообщение",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendMessageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatMessageDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Переписка не найдена или чужая"
+          }
+        },
+        "tags": [
+          "chats"
+        ],
+        "security": [
+          {
+            "access-token": []
+          }
+        ]
+      }
     }
   },
   "info": {
@@ -4731,6 +4976,215 @@
         },
         "required": [
           "reason"
+        ]
+      },
+      "ChatDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "example": 7
+          },
+          "shopId": {
+            "type": "number",
+            "example": 3
+          },
+          "shopName": {
+            "type": "string",
+            "example": "TechnoDom"
+          },
+          "shopPhoto": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid"
+          },
+          "buyerId": {
+            "type": "number",
+            "example": 42
+          },
+          "buyerName": {
+            "type": "string",
+            "example": "Азиз Рахимов"
+          },
+          "productCardId": {
+            "type": "number",
+            "nullable": true,
+            "description": "Товар, с которого начался разговор. null — товар снят"
+          },
+          "productName": {
+            "type": "string",
+            "nullable": true
+          },
+          "productPhoto": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid"
+          },
+          "lastMessageText": {
+            "type": "string",
+            "nullable": true
+          },
+          "lastMessageAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "unread": {
+            "type": "number",
+            "description": "Непрочитанные сообщения для той стороны, которая запросила",
+            "example": 2
+          }
+        },
+        "required": [
+          "id",
+          "shopId",
+          "shopName",
+          "shopPhoto",
+          "buyerId",
+          "buyerName",
+          "productCardId",
+          "productName",
+          "productPhoto",
+          "lastMessageText",
+          "lastMessageAt",
+          "unread"
+        ]
+      },
+      "PaginatedChatsDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ChatDto"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PaginationMetaDto"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "ChatUnreadDto": {
+        "type": "object",
+        "properties": {
+          "buyer": {
+            "type": "number",
+            "description": "Непрочитанное в моих покупательских переписках"
+          },
+          "seller": {
+            "type": "number",
+            "description": "Непрочитанное в переписках моего магазина"
+          }
+        },
+        "required": [
+          "buyer",
+          "seller"
+        ]
+      },
+      "ChatMessageDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "example": 1024
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "buyer",
+              "seller",
+              "ai"
+            ],
+            "description": "Чей голос. «ai» — автоответ от имени магазина"
+          },
+          "text": {
+            "type": "string"
+          },
+          "readAt": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "text",
+          "readAt",
+          "createdAt"
+        ]
+      },
+      "PaginatedChatMessagesDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ChatMessageDto"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PaginationMetaDto"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "StartChatDto": {
+        "type": "object",
+        "properties": {
+          "productCardId": {
+            "type": "number",
+            "description": "Товар, о котором спрашивают. Без него разговор идёт с магазином целиком",
+            "example": 12
+          },
+          "shopId": {
+            "type": "number",
+            "description": "Магазин. Обязателен, если товар не указан",
+            "example": 3
+          },
+          "text": {
+            "type": "string",
+            "maxLength": 2000,
+            "example": "Здравствуйте! Ещё в наличии?"
+          }
+        },
+        "required": [
+          "text"
+        ]
+      },
+      "ChatStartedDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "id переписки — начатой сейчас или найденной"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "SendMessageDto": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "maxLength": 2000,
+            "example": "Да, могу отложить до завтра"
+          }
+        },
+        "required": [
+          "text"
         ]
       }
     }

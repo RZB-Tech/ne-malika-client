@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Loader2, MessageSquarePlus, Pencil, Star, Trash2 } from "lucide-react";
+import { Loader2, MessageSquarePlus, Pencil, Star, Trash2 } from "@/components/icons";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Scale, Trash2, X } from "lucide-react";
+import { Scale, Trash2, X } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ProductImage } from "@/components/shared/product-image";

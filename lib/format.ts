@@ -49,6 +49,26 @@ export function formatDate(iso: string, locale: Locale): string {
 }
 
 /**
+ * Время сообщения в переписке: сегодняшнее — одними часами, прежнее — с датой.
+ * Год не показываем никогда: разговор, которому больше года, всё равно читают
+ * не ради года.
+ */
+export function formatMessageTime(iso: string, locale: Locale): string {
+  const date = new Date(iso);
+  const now = new Date();
+  const sameDay =
+    date.getFullYear() === now.getFullYear() &&
+    date.getMonth() === now.getMonth() &&
+    date.getDate() === now.getDate();
+
+  return new Intl.DateTimeFormat(localeTag[locale], {
+    hour: "2-digit",
+    minute: "2-digit",
+    ...(sameDay ? {} : { day: "numeric", month: "short" }),
+  }).format(date);
+}
+
+/**
  * Цена в поле ввода: только целые сомы с разделителями разрядов.
  * Строку трактуем как пользовательский ввод (выкидываем всё нечисловое),
  * число — как значение с бэкенда (`price` приходит как "1500000.00",

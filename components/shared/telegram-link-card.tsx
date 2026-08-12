@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell } from "lucide-react";
+import { Bell } from "@/components/icons";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { TelegramIcon } from "@/components/icons/telegram-icon";

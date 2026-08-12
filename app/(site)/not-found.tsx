@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { SearchX } from "lucide-react";
+import { SearchX } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { useT } from "@/components/providers/i18n-provider";
 

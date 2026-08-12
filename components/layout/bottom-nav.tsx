@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Heart, Home, LayoutGrid, Scale, UserRound } from "lucide-react";
+import { Heart, Home, LayoutGrid, Scale, UserRound } from "@/components/icons";
 import { LoginDialog } from "@/components/auth/login-dialog";
 import { useT } from "@/components/providers/i18n-provider";
 import { useAuth } from "@/lib/api/auth";

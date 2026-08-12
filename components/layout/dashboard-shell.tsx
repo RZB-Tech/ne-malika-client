@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
-import { ArrowLeft, type LucideIcon } from "lucide-react";
+import { ArrowLeft, type AppIcon } from "@/components/icons";
 import {
   Sidebar,
   SidebarContent,
@@ -29,10 +29,12 @@ import { useT } from "@/components/providers/i18n-provider";
 export interface NavItem {
   href: string;
   label: string;
-  icon: LucideIcon;
+  icon: AppIcon;
   exact?: boolean;
   /** Если задан — пункт открывает окно вместо перехода по href. */
   onSelect?: () => void;
+  /** Непрочитанное рядом с подписью. Ноль не показываем. */
+  badge?: number;
 }
 
 /** Плашка владельца раздела. В свёрнутом меню от неё остаётся только аватар. */
@@ -187,6 +189,13 @@ function NavMenu({ items }: { items: NavItem[] }) {
               <Link href={item.href}>
                 <item.icon />
                 <span>{item.label}</span>
+                {item.badge ? (
+                  // Прижат вправо и исчезает в свёрнутом меню: там от пункта
+                  // остаётся один значок, и число рядом с ним не помещается.
+                  <span className="ml-auto inline-flex min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[11px] font-semibold text-primary-foreground tabular group-data-[collapsible=icon]:hidden">
+                    {item.badge > 99 ? "99+" : item.badge}
+                  </span>
+                ) : null}
               </Link>
             )}
           </SidebarMenuButton>

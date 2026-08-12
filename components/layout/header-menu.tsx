@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { History, Menu, Scale, Store } from "lucide-react";
+import { History, Menu, Scale, Store } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,

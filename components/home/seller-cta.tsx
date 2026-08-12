@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, BarChart3, Store } from "lucide-react";
+import { ArrowRight, BarChart3, Store } from "@/components/icons";
 import { TelegramIcon } from "@/components/icons/telegram-icon";
 import { Button } from "@/components/ui/button";
 import { useT } from "@/components/providers/i18n-provider";

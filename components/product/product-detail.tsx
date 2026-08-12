@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { MapPin, Store as StoreIcon, Truck } from "lucide-react";
+import { MapPin, Store as StoreIcon, Truck } from "@/components/icons";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ProductImage } from "@/components/shared/product-image";
 import { AvailabilityBadge } from "@/components/shared/badges";
 import { TelegramButton } from "@/components/product/telegram-button";
+import { WriteToSellerButton } from "@/components/chat/write-to-seller-button";
 import { FavoriteButton } from "@/components/product/favorite-button";
 import { CompareButton } from "@/components/product/compare-button";
 import { RevealPhone } from "@/components/product/reveal-phone";
@@ -248,6 +249,13 @@ export function ProductDetail({
                   className="w-full"
                 />
               )}
+              {/* Рядом с телеграмом, а не вместо: внутренний чат оставляет
+                  разговор на площадке, но выбирать способ связи покупателю. */}
+              <WriteToSellerButton
+                productId={Number(product.id)}
+                shopId={Number(product.storeId)}
+                className="w-full"
+              />
               <Button asChild variant="outline" className="gap-2">
                 <Link href={`/store/${store.slug}`}>
                   <StoreIcon className="size-4" />

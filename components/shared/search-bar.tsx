@@ -3,7 +3,7 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { ChevronDown, Search, X } from "lucide-react";
+import { ChevronDown, Search, X } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {

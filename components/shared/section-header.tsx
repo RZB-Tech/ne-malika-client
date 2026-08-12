@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight } from "@/components/icons";
 import { cn } from "@/lib/utils";
 
 export function SectionHeader({

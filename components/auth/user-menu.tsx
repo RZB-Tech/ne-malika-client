@@ -3,7 +3,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { useRouter } from "next/navigation";
-import { History, LayoutDashboard, LogOut, Store } from "lucide-react";
+import { History, LayoutDashboard, LogOut, Store } from "@/components/icons";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {

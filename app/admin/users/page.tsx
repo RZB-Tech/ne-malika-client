@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { ShieldCheck, ShieldOff, Store, UserX, RotateCcw } from "lucide-react";
+import { ShieldCheck, ShieldOff, Store, UserX, RotateCcw } from "@/components/icons";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";

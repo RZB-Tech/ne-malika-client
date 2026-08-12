@@ -151,6 +151,7 @@
     "nav": {
       "dashboard": "Bosh sahifa",
       "products": "Mening mahsulotlarim",
+      "messages": "Xabarlar",
       "reviews": "Sharhlar",
       "addProduct": "Mahsulot qo‘shish",
       "profile": "Profil",
@@ -733,6 +734,7 @@
     "tabs": {
       "history": "Tarix",
       "favorites": "Sevimlilar",
+      "messages": "Xabarlar",
       "reviews": "Sharhlarim",
       "profile": "Profil"
     },
@@ -904,5 +906,22 @@
   "footer": {
     "rights": "Barcha huquqlar himoyalangan.",
     "disclaimer": "Platforma mahsulotlar to‘lovi va yetkazib berishda ishtirok etmaydi."
+  },
+  "chat": {
+    "writeToSeller": "Sotuvchiga yozish",
+    "firstMessageHint": "Yozishmalar saytda qoladi: javob shu yerga va bildirishnomalarga keladi.",
+    "firstMessagePlaceholder": "Assalomu alaykum! Mahsulot hali bormi?",
+    "placeholder": "Xabar…",
+    "send": "Yuborish",
+    "sendFailed": "Xabarni yuborib bo‘lmadi",
+    "empty": "Hozircha yozishmalar yo‘q",
+    "emptyBuyer": "Mahsulot kartasidan sotuvchiga yozing — suhbat shu yerda paydo bo‘ladi.",
+    "emptySeller": "Xaridor yozishi bilan suhbat shu yerda paydo bo‘ladi.",
+    "emptyThread": "Hozircha xabarlar yo‘q — birinchi bo‘lib yozing.",
+    "pickChat": "Chapdan yozishmani tanlang",
+    "backToList": "Ro‘yxatga",
+    "aiReply": "Sun’iy intellekt javobi",
+    "productGone": "{name} — mahsulot sotuvdan olingan",
+    "sellerSubtitle": "Xaridorlarning mahsulotlaringiz haqidagi savollari."
   }
 }

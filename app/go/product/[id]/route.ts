@@ -32,8 +32,6 @@ export async function GET(
 
   const shop = await getPublicShop(product.shopId);
   const username = shop ? parseTelegramUsername(shop.telegramLink) : null;
-  // Телеграма у магазина нет (или бэкенд молчит) — открываем карточку: там
-  // остаётся телефон и ссылка на магазин.
   if (!username) return NextResponse.redirect(fallback);
 
   const raw = req.nextUrl.searchParams.get("l");

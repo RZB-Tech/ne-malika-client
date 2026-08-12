@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Check, ImagePlus, Sparkles, Wand2, X } from "lucide-react";
+import { Check, ImagePlus, Sparkles, Wand2, X } from "@/components/icons";
 import { toast } from "sonner";
 import {
   Dialog,

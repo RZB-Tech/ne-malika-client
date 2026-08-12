@@ -11,7 +11,7 @@ import {
   Phone,
   Search,
   Star,
-} from "lucide-react";
+} from "@/components/icons";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";

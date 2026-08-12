@@ -28,11 +28,11 @@ import {
   Webcam,
   Wifi,
   Wrench,
-  type LucideIcon,
-} from "lucide-react";
+  type AppIcon,
+} from "@/components/icons";
 
 /** Ключи — значения поля icon у корневых категорий (см. таблицу categories). */
-const map: Record<string, LucideIcon> = {
+const map: Record<string, AppIcon> = {
   PcCase,
   Laptop,
   Monitor,
@@ -80,6 +80,6 @@ export function CategoryIcon({
   return <Icon className={className} strokeWidth={strokeWidth} />;
 }
 
-export function getCategoryIcon(name: string): LucideIcon {
+export function getCategoryIcon(name: string): AppIcon {
   return map[name] ?? Box;
 }

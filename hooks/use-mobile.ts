@@ -18,7 +18,6 @@ export function useIsMobile() {
   return React.useSyncExternalStore(
     subscribe,
     () => window.matchMedia(MOBILE_QUERY).matches,
-    // На сервере ширины нет — считаем десктопом, как и раньше при isMobile === undefined.
     () => false,
   )
 }

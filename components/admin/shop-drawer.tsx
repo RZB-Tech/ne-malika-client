@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Ban, ExternalLink, RotateCcw, Trash2, UserX } from "lucide-react";
+import { Ban, ExternalLink, RotateCcw, Trash2, UserX } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { StoreAvatar } from "@/components/shared/store-avatar";

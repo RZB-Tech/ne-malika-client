@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { useT } from "@/components/providers/i18n-provider";
 import type { Availability, ModerationStatus } from "@/lib/data";
 import type { UserRole } from "@/lib/api/types";
-import { CheckCircle2, Clock, Package, XCircle } from "lucide-react";
+import { CheckCircle2, Clock, Package, XCircle } from "@/components/icons";
 
 export function AvailabilityBadge({
   status,
@@ -52,9 +52,6 @@ export function ModerationBadge({
     published: { cls: "bg-success/12 text-success", Icon: CheckCircle2 },
     rejected: { cls: "bg-destructive/12 text-destructive", Icon: XCircle },
   };
-  // Фолбэк, а не прямая деструктуризация: статус приходит с бэкенда, и
-  // незнакомое значение уронило бы весь список товаров TypeError-ом вместо
-  // одного неверного бейджа.
   const { cls, Icon } = cfg[status] ?? cfg.moderation;
   return (
     <Badge variant="outline" className={cn("gap-1 border-transparent font-medium", cls, className)}>
