@@ -2,14 +2,11 @@
 
 import { MessageSquare } from "@/components/icons";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ProductImage } from "@/components/shared/product-image";
-import { StoreAvatar } from "@/components/shared/store-avatar";
 import { useT } from "@/components/providers/i18n-provider";
-import { hueFromId } from "@/lib/api/mappers";
-import { photoUrl } from "@/lib/api/photo";
 import { formatMessageTime } from "@/lib/format";
 import type { ChatDto } from "@/lib/api/generated/schemas";
 import { cn } from "@/lib/utils";
+import { ChatAvatar } from "./chat-avatar";
 
 /**
  * Список переписок. Одинаковый для обеих сторон, меняется только «кто напротив»:
@@ -71,23 +68,7 @@ export function ChatList({
               chat.id === activeId && "bg-muted",
             )}
           >
-            {side === "seller" ? (
-              <ProductImage
-                hue={hueFromId(chat.productCardId ?? chat.id)}
-                categorySlug=""
-                src={photoUrl(chat.productPhoto) ?? undefined}
-                alt={chat.productName ?? chat.shopName}
-                className="size-10 shrink-0 rounded-lg"
-                iconClassName="size-4"
-              />
-            ) : (
-              <StoreAvatar
-                name={chat.shopName}
-                hue={hueFromId(chat.shopId)}
-                src={photoUrl(chat.shopPhoto)}
-                className="size-10 shrink-0 rounded-lg text-xs"
-              />
-            )}
+            <ChatAvatar chat={chat} side={side} />
 
             <span className="min-w-0 flex-1">
               <span className="flex items-baseline gap-2">

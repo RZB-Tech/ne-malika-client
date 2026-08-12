@@ -11,6 +11,7 @@ import { useChatMessages, useSendMessage } from "@/lib/api/chats";
 import { formatMessageTime } from "@/lib/format";
 import type { ChatDto, ChatMessageDto } from "@/lib/api/generated/schemas";
 import { cn } from "@/lib/utils";
+import { ChatAvatar } from "./chat-avatar";
 
 /** Столько же принимает бэкенд — обрезать текст молча нельзя. */
 const MESSAGE_MAX = 2000;
@@ -69,6 +70,7 @@ export function ChatThread({
             <ArrowLeft className="size-5" />
           </Button>
         )}
+        <ChatAvatar chat={chat} side={side} className="size-9" />
         <div className="min-w-0 flex-1">
           <p className="truncate font-medium">
             {side === "seller" ? chat.buyerName : chat.shopName}

@@ -14,6 +14,8 @@ export interface ChatDto {
   shopPhoto: string | null;
   buyerId: number;
   buyerName: string;
+  /** @nullable */
+  buyerPhoto: string | null;
   /**
      * Товар, с которого начался разговор. null — товар снят
      * @nullable

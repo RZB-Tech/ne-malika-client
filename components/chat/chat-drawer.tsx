@@ -36,7 +36,7 @@ export function ChatDrawer({
   /** Кнопка-открывашка. Своя у шапки, своя у нижней панели. */
   children: React.ReactNode;
 }) {
-  const { isAuthenticated, isHydrated } = useAuth();
+  const { isAuthenticated, isHydrated, isSeller } = useAuth();
   const [open, setOpen] = useState(false);
 
   if (!isHydrated || !isAuthenticated) {
@@ -54,15 +54,24 @@ export function ChatDrawer({
       <DrawerContent
         className={cn("flex flex-col p-0 sm:max-w-md", className)}
       >
-        <DrawerBody onClose={() => setOpen(false)} />
+        <DrawerBody
+          side={isSeller ? "seller" : "buyer"}
+          onClose={() => setOpen(false)}
+        />
       </DrawerContent>
     </Drawer>
   );
 }
 
-function DrawerBody({ onClose }: { onClose: () => void }) {
+function DrawerBody({
+  side,
+  onClose,
+}: {
+  side: "buyer" | "seller";
+  onClose: () => void;
+}) {
   const { t } = useT();
-  const { data, isPending } = useChats("buyer");
+  const { data, isPending } = useChats(side);
   const [activeId, setActiveId] = useState<number | null>(null);
 
   const chats = data?.data ?? [];
@@ -84,18 +93,22 @@ function DrawerBody({ onClose }: { onClose: () => void }) {
           <MessageSquare className="ml-1 size-5 text-primary" />
         )}
         <DrawerTitle className="min-w-0 flex-1 truncate text-base">
-          {active ? active.shopName : t("nav.messages")}
+          {active
+            ? side === "seller"
+              ? active.buyerName
+              : active.shopName
+            : t("nav.messages")}
         </DrawerTitle>
       </DrawerHeader>
 
       {active ? (
-        <ChatThread chat={active} side="buyer" className="min-h-0 flex-1" />
+        <ChatThread chat={active} side={side} className="min-h-0 flex-1" />
       ) : (
         <>
           <div className="min-h-0 flex-1 overflow-y-auto">
             <ChatList
               chats={chats}
-              side="buyer"
+              side={side}
               activeId={activeId}
               onSelect={(chat) => setActiveId(chat.id)}
               isLoading={isPending}
@@ -105,7 +118,9 @@ function DrawerBody({ onClose }: { onClose: () => void }) {
           {chats.length > 0 && (
             <div className="border-t border-border p-3">
               <Button asChild variant="outline" className="w-full" onClick={onClose}>
-                <Link href="/messages">{t("chat.openAll")}</Link>
+                <Link href={side === "seller" ? "/seller/messages" : "/messages"}>
+                  {t("chat.openAll")}
+                </Link>
               </Button>
             </div>
           )}
@@ -117,5 +132,7 @@ function DrawerBody({ onClose }: { onClose: () => void }) {
 
 /** Счётчик непрочитанного для кнопки в шапке. */
 export function useBuyerUnread(): number {
-  return useChatUnread().data?.buyer ?? 0;
+  const { isSeller } = useAuth();
+  const unread = useChatUnread().data;
+  return (isSeller ? unread?.seller : unread?.buyer) ?? 0;
 }

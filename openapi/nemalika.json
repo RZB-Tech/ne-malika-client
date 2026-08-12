@@ -5027,6 +5027,11 @@
             "type": "string",
             "example": "Азиз Рахимов"
           },
+          "buyerPhoto": {
+            "type": "string",
+            "nullable": true,
+            "format": "uri"
+          },
           "productCardId": {
             "type": "number",
             "nullable": true,
@@ -5062,6 +5067,7 @@
           "shopPhoto",
           "buyerId",
           "buyerName",
+          "buyerPhoto",
           "productCardId",
           "productName",
           "productPhoto",
