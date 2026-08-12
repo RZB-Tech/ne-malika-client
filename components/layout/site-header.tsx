@@ -165,7 +165,7 @@ export function SiteHeader() {
   return (
     <header
       data-compact={isCompact}
-      className="sticky top-0 z-50 mx-auto w-full max-w-[1600px] rounded-b-3xl bg-card [overflow-anchor:none]"
+      className="sticky top-0 z-50 mx-auto w-full max-w-[1600px] bg-card [overflow-anchor:none] md:rounded-b-3xl"
     >
       <div
         className={cn(
@@ -176,12 +176,17 @@ export function SiteHeader() {
         <Logo showText={false} className="md:hidden" />
         <Logo className="mr-1 hidden md:inline-flex" />
 
+        <div className="min-w-0 flex-1 md:hidden">
+          <Suspense fallback={<SearchBarSkeleton appearance="marketplace" />}>
+            <SearchBar appearance="marketplace" />
+          </Suspense>
+        </div>
+
         <CatalogMenu />
 
-        {/* На телефоне поиск занимает отдельную строку ниже: рядом с бургером,
-            знаком и входом ему остаётся сотня точек, и от поля видно одну
-            букву. Строка поиска читает адрес страницы, а он известен только в
-            браузере, поэтому граница Suspense — без неё весь сайт, включая
+        {/* На телефоне логотип и поиск стоят в одной строке. Строка поиска
+            читает адрес страницы, а он известен только в браузере, поэтому
+            граница Suspense нужна и здесь: без неё весь сайт, включая
             статические страницы, пришлось бы рендерить на клиенте. */}
         <div className="hidden min-w-0 flex-1 md:block">
           <Suspense fallback={<SearchBarSkeleton appearance="marketplace" />}>
@@ -254,14 +259,6 @@ export function SiteHeader() {
         </nav>
       </div>
 
-      {/* Поиск во всю ширину — телефонная строка. Прячется вместе с шапкой при
-          прокрутке вниз, как и всё остальное: место на экране дороже. */}
-      <div className="px-5 pb-3 md:hidden">
-        <Suspense fallback={<SearchBarSkeleton appearance="marketplace" />}>
-          <SearchBar appearance="marketplace" />
-        </Suspense>
-      </div>
-
       {/* Вторая строка: на телефоне разделы, язык и тема живут в бургере,
           поэтому там её просто нет. */}
       <div
@@ -317,7 +314,7 @@ export function SiteHeader() {
       <div
         aria-hidden={isCompact}
         className={cn(
-          "relative mx-auto w-full max-w-[1600px] overflow-hidden rounded-b-3xl bg-primary transition-[height,opacity] duration-200 ease-out",
+          "relative mx-auto hidden w-full max-w-[1600px] overflow-hidden rounded-b-3xl bg-primary transition-[height,opacity] duration-200 ease-out md:block",
           isCompact
             ? "invisible h-0 pointer-events-none opacity-0"
             : "h-18 opacity-100",
