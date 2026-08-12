@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { StoreDetail } from "@/components/store/store-detail";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ProductCardSkeleton } from "@/components/product/product-card";
+import { PageContainer } from "@/components/layout/page-container";
 import { useShopsControllerGetPublic } from "@/lib/api/generated/endpoints/shops-public/shops-public";
 import { mapProductRow, mapShop } from "@/lib/api/mappers";
 import type { PublicShop } from "@/lib/api/types";
@@ -18,14 +19,14 @@ export function StoreDetailConnected({ id }: { id: number }) {
 
   if (isLoading) {
     return (
-      <div className="mx-auto max-w-[1600px] px-5 py-6 sm:px-8 lg:px-10">
+      <PageContainer className="py-6">
         <Skeleton className="h-48 w-full rounded-2xl" />
         <div className="mt-10 grid grid-cols-2 gap-4 md:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
             <ProductCardSkeleton key={i} />
           ))}
         </div>
-      </div>
+      </PageContainer>
     );
   }
 

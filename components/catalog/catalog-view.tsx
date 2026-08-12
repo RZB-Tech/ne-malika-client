@@ -2,8 +2,10 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { Loader2, SearchX, X } from "@/components/icons";
+import { Loader2, RefreshCw, SearchX, TriangleAlert, X } from "@/components/icons";
 import { Button } from "@/components/ui/button";
+import { PageContainer } from "@/components/layout/page-container";
+import { StatusPanel } from "@/components/shared/status-panel";
 import {
   ProductCard,
   ProductCardSkeleton,
@@ -81,6 +83,7 @@ export function CatalogView({
     hasNextPage,
     isFetchingNextPage,
     fetchNextPage,
+    refetch,
   } = listQuery;
 
   const results = useMemo(
@@ -129,7 +132,7 @@ export function CatalogView({
   }, [fetchNextPage]);
 
   return (
-    <div className="mx-auto max-w-[1600px] px-5 py-8 sm:px-8 lg:px-10">
+    <PageContainer className="py-8">
       {categoryLabel && (
         <div className="mb-4">
           <button
@@ -143,15 +146,18 @@ export function CatalogView({
       )}
 
       {isError ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-card py-24 text-center">
-          <SearchX className="size-10 text-muted-foreground/50" />
-          <h3 className="mt-4 font-heading text-lg font-semibold">
-            {t("catalog.emptyTitle")}
-          </h3>
-          <p className="mt-1 max-w-xs text-sm text-muted-foreground">
-            {t("catalog.loadError")}
-          </p>
-        </div>
+        <StatusPanel
+          tone="error"
+          icon={<TriangleAlert className="size-5" />}
+          title={t("catalog.errorTitle")}
+          description={t("catalog.loadError")}
+          action={
+            <Button type="button" variant="outline" onClick={() => void refetch()}>
+              <RefreshCw data-icon="inline-start" />
+              {t("common.retry")}
+            </Button>
+          }
+        />
       ) : isLoading ? (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
           {Array.from({ length: 10 }).map((_, i) => (
@@ -159,11 +165,11 @@ export function CatalogView({
           ))}
         </div>
       ) : results.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-card py-24 text-center">
-          <SearchX className="size-10 text-muted-foreground/50" />
-          <h3 className="mt-4 font-heading text-lg font-semibold">{t("catalog.emptyTitle")}</h3>
-          <p className="mt-1 max-w-xs text-sm text-muted-foreground">{t("catalog.emptyText")}</p>
-        </div>
+        <StatusPanel
+          icon={<SearchX className="size-5" />}
+          title={t("catalog.emptyTitle")}
+          description={t("catalog.emptyText")}
+        />
       ) : (
         <>
           <div className="grid grid-cols-2 gap-4 [&>*]:[content-visibility:auto] [&>*]:[contain-intrinsic-size:auto_480px] sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
@@ -198,6 +204,6 @@ export function CatalogView({
           )}
         </>
       )}
-    </div>
+    </PageContainer>
   );
 }

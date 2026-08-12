@@ -67,6 +67,8 @@ export default function RootLayout({
       <body suppressHydrationWarning className="flex min-h-full flex-col">
         <noscript>
           <div>
+            {/* A raw image is required by Yandex Metrika when JavaScript is disabled. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={`https://mc.yandex.ru/watch/${YANDEX_METRIKA_ID}`}
               style={{ position: "absolute", left: "-9999px" }}

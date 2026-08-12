@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Bell, X } from "@/components/icons";
 import { TelegramIcon } from "@/components/icons/telegram-icon";
@@ -11,7 +11,12 @@ import {
   useNotificationChannels,
   useSetTelegramNotifications,
 } from "@/lib/api/notify";
-import { isPushSupported, permissionState, subscribeToPush } from "@/lib/api/push";
+import {
+  hasPushSubscription,
+  isPushSupported,
+  permissionState,
+  subscribeToPush,
+} from "@/lib/api/push";
 import { cn } from "@/lib/utils";
 
 /**
@@ -61,6 +66,13 @@ export function NotifyPrompt({ className }: { className?: string }) {
   );
   const [dismissed, setDismissed] = useState(isDismissed);
   const [busy, setBusy] = useState(false);
+  const [deviceSubscribed, setDeviceSubscribed] = useState<boolean | null>(
+    null,
+  );
+
+  useEffect(() => {
+    void hasPushSubscription().then(setDeviceSubscribed);
+  }, []);
 
   const permission = requested ?? permissionState();
 
@@ -74,12 +86,13 @@ export function NotifyPrompt({ className }: { className?: string }) {
     data?.telegram.available === true && data.telegram.enabled === false;
 
   const alreadyOn =
-    data?.push.subscribed === true || data?.telegram.enabled === true;
+    deviceSubscribed === true || data?.telegram.enabled === true;
 
   const hidden =
     !isHydrated ||
     !isAuthenticated ||
     !data ||
+    deviceSubscribed === null ||
     dismissed ||
     alreadyOn ||
     (!canPush && !canTelegram);
@@ -95,7 +108,10 @@ export function NotifyPrompt({ className }: { className?: string }) {
         body: t("push.confirmBody"),
       });
       setRequested(result);
-      if (result === "granted") toast.success(t("push.enabled"));
+      if (result === "granted") {
+        setDeviceSubscribed(true);
+        toast.success(t("push.enabled"));
+      }
       else if (result === "denied") toast.error(t("push.blocked"));
     } catch {
       toast.error(t("push.failed"));

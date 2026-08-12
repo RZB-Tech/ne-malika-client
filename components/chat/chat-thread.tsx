@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
-import { ArrowLeft, Bot, Check, CheckDouble, Send } from "@/components/icons";
+import { Bot, Check, CheckDouble, Send } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
@@ -11,7 +10,7 @@ import { useChatMessages, useSendMessage } from "@/lib/api/chats";
 import { formatMessageTime } from "@/lib/format";
 import type { ChatDto, ChatMessageDto } from "@/lib/api/generated/schemas";
 import { cn } from "@/lib/utils";
-import { ChatAvatar } from "./chat-avatar";
+import { ChatConversationHeader } from "./chat-conversation-header";
 
 /** Столько же принимает бэкенд — обрезать текст молча нельзя. */
 const MESSAGE_MAX = 2000;
@@ -60,39 +59,14 @@ export function ChatThread({
 
   return (
     <div className={cn("flex min-h-0 flex-col", className)}>
-      {!hideHeader && <header className="flex items-start gap-2 border-b border-border p-3 sm:p-4">
-        {onBack && (
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            onClick={onBack}
-            aria-label={t("chat.backToList")}
-            className="-ml-1 shrink-0 md:hidden"
-          >
-            <ArrowLeft className="size-5" />
-          </Button>
-        )}
-        <ChatAvatar chat={chat} side={side} className="size-9" />
-        <div className="min-w-0 flex-1">
-          <p className="truncate font-medium">
-            {side === "seller" ? chat.buyerName : chat.shopName}
-          </p>
-          {chat.productName && (
-            <p className="truncate text-xs text-muted-foreground">
-              {chat.productCardId ? (
-                <Link
-                  href={`/product/${chat.productCardId}`}
-                  className="hover:text-primary"
-                >
-                  {chat.productName}
-                </Link>
-              ) : (
-                <span>{t("chat.productGone", { name: chat.productName })}</span>
-              )}
-            </p>
-          )}
-        </div>
-      </header>}
+      {!hideHeader && (
+        <ChatConversationHeader
+          chat={chat}
+          side={side}
+          onBack={onBack}
+          backButtonClassName="md:hidden"
+        />
+      )}
 
       <div className="chat-message-background min-h-0 flex-1 space-y-3 overflow-y-auto p-4">
         {isPending && messages.length === 0 && (

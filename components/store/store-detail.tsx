@@ -13,6 +13,7 @@ import {
   Star,
 } from "@/components/icons";
 import { Card } from "@/components/ui/card";
+import { PageContainer } from "@/components/layout/page-container";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -62,7 +63,7 @@ export function StoreDetail({
   ];
 
   return (
-    <div className="mx-auto max-w-[1600px] px-5 py-6 sm:px-8 lg:px-10">
+    <PageContainer className="py-6">
       <nav className="mb-5 flex items-center gap-1 text-sm text-muted-foreground">
         <Link href="/" className="hover:text-foreground">{t("brand.name")}</Link>
         <ChevronRight className="size-3.5" />
@@ -174,6 +175,6 @@ export function StoreDetail({
         target={{ shopId: Number(store.id) }}
         ownerId={store.ownerId}
       />
-    </div>
+    </PageContainer>
   );
 }

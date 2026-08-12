@@ -132,7 +132,7 @@ export function DashboardShell({
           ref={scrollRef}
           className="flex-1 overflow-y-auto bg-card md:rounded-tl-2xl"
         >
-          <div className="mx-auto w-full px-4 py-8 sm:px-6">
+          <div className="mx-auto w-full max-w-[1600px] px-4 py-8 sm:px-6 lg:px-10">
             {children}
           </div>
         </div>

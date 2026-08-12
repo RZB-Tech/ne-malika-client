@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { MapPin, Store as StoreIcon, Truck } from "@/components/icons";
 import { Card } from "@/components/ui/card";
+import { PageContainer } from "@/components/layout/page-container";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ProductImage } from "@/components/shared/product-image";
@@ -55,7 +56,7 @@ export function ProductDetail({
   ];
 
   return (
-    <div className="mx-auto max-w-[1600px] px-5 py-6 sm:px-8 lg:px-10">
+    <PageContainer className="py-6">
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
         <div className="min-w-0">
           <div className="grid max-w-4xl grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-[76px_minmax(0,1fr)]">
@@ -260,6 +261,6 @@ export function ProductDetail({
           </Card>
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 }

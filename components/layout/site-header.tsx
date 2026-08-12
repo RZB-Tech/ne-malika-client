@@ -12,7 +12,7 @@ import {
   MessageSquare,
   Monitor,
   Package,
-  ShoppingBasket,
+  Scale,
   Smartphone,
   UserRound,
   type AppIcon,
@@ -249,7 +249,7 @@ export function SiteHeader() {
 
           <MessagesAction />
           <FavoritesAction />
-          <CartAction />
+          <CompareAction />
         </nav>
       </div>
 
@@ -417,7 +417,7 @@ function FavoritesAction() {
   );
 }
 
-function CartAction() {
+function CompareAction() {
   const { t } = useT();
   const { items } = useCompare();
 
@@ -428,10 +428,10 @@ function CartAction() {
       size="lg"
       className={cn(ACTION_CLASS, "hidden md:flex")}
     >
-      <Link href="/compare" title={t("nav.cart")}>
+      <Link href="/compare" title={t("nav.compare")}>
         <ActionBody
-          icon={ShoppingBasket}
-          label={t("nav.cart")}
+          icon={Scale}
+          label={t("nav.compare")}
           count={items.length}
         />
       </Link>

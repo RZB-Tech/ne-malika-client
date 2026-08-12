@@ -9,13 +9,15 @@
           "200": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "App"
+        ]
       }
     },
     "/api/v1/auth/telegram": {
       "post": {
         "operationId": "AuthController_telegramAuth",
-        "summary": "Вход через Telegram Mini App (initData)",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -42,6 +44,7 @@
             "description": "Невалидная подпись или срок истёк"
           }
         },
+        "summary": "Вход через Telegram Mini App (initData)",
         "tags": [
           "auth"
         ]
@@ -50,7 +53,6 @@
     "/api/v1/auth/telegram/widget": {
       "post": {
         "operationId": "AuthController_widgetAuth",
-        "summary": "Вход через Telegram Login Widget (браузер)",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -77,6 +79,7 @@
             "description": "Невалидная подпись или срок истёк"
           }
         },
+        "summary": "Вход через Telegram Login Widget (браузер)",
         "tags": [
           "auth"
         ]
@@ -85,7 +88,6 @@
     "/api/v1/auth/refresh": {
       "post": {
         "operationId": "AuthController_refresh",
-        "summary": "Обновление access-токена по httpOnly refresh-cookie",
         "parameters": [],
         "responses": {
           "200": {
@@ -102,6 +104,7 @@
             "description": "Refresh-токен отсутствует или недействителен"
           }
         },
+        "summary": "Обновление access-токена по httpOnly refresh-cookie",
         "tags": [
           "auth"
         ]
@@ -110,13 +113,13 @@
     "/api/v1/auth/logout": {
       "post": {
         "operationId": "AuthController_logout",
-        "summary": "Выход — очищает refresh-cookie",
         "parameters": [],
         "responses": {
           "200": {
             "description": ""
           }
         },
+        "summary": "Выход — очищает refresh-cookie",
         "tags": [
           "auth"
         ]
@@ -125,7 +128,6 @@
     "/api/v1/admin/users": {
       "get": {
         "operationId": "AdminUsersController_list",
-        "summary": "Все пользователи с их магазином и числом товаров",
         "parameters": [
           {
             "name": "page",
@@ -156,20 +158,20 @@
             "description": ""
           }
         },
-        "tags": [
-          "users-admin"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Все пользователи с их магазином и числом товаров",
+        "tags": [
+          "users-admin"
         ]
       }
     },
     "/api/v1/admin/users/{id}": {
       "get": {
         "operationId": "AdminUsersController_getOne",
-        "summary": "Карточка пользователя и его последние изменённые товары",
         "parameters": [
           {
             "name": "id",
@@ -185,20 +187,20 @@
             "description": ""
           }
         },
-        "tags": [
-          "users-admin"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Карточка пользователя и его последние изменённые товары",
+        "tags": [
+          "users-admin"
         ]
       }
     },
     "/api/v1/admin/users/{id}/role": {
       "patch": {
         "operationId": "AdminUsersController_setRole",
-        "summary": "Выдать или снять права администратора",
         "parameters": [
           {
             "name": "id",
@@ -224,20 +226,20 @@
             "description": ""
           }
         },
-        "tags": [
-          "users-admin"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Выдать или снять права администратора",
+        "tags": [
+          "users-admin"
         ]
       }
     },
     "/api/v1/admin/users/{id}/block": {
       "patch": {
         "operationId": "AdminUsersController_block",
-        "summary": "Заблокировать продавца. В отличие от упразднения магазина закрывает вход в кабинет",
         "parameters": [
           {
             "name": "id",
@@ -263,20 +265,20 @@
             "description": ""
           }
         },
-        "tags": [
-          "users-admin"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Заблокировать продавца. В отличие от упразднения магазина закрывает вход в кабинет",
+        "tags": [
+          "users-admin"
         ]
       }
     },
     "/api/v1/admin/users/{id}/unblock": {
       "patch": {
         "operationId": "AdminUsersController_unblock",
-        "summary": "Снять блокировку с продавца",
         "parameters": [
           {
             "name": "id",
@@ -292,20 +294,20 @@
             "description": ""
           }
         },
-        "tags": [
-          "users-admin"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Снять блокировку с продавца",
+        "tags": [
+          "users-admin"
         ]
       }
     },
     "/api/v1/shops/{id}": {
       "get": {
         "operationId": "ShopsController_getPublic",
-        "summary": "Карточка магазина с его активными товарами",
         "parameters": [
           {
             "name": "id",
@@ -324,6 +326,7 @@
             "description": "Магазин не найден или упразднён"
           }
         },
+        "summary": "Карточка магазина с его активными товарами",
         "tags": [
           "shops-public"
         ]
@@ -332,25 +335,24 @@
     "/api/v1/seller/shops": {
       "get": {
         "operationId": "SellerShopsController_list",
-        "summary": "Список собственных магазинов",
         "parameters": [],
         "responses": {
           "200": {
             "description": ""
           }
         },
-        "tags": [
-          "shops-seller"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Список собственных магазинов",
+        "tags": [
+          "shops-seller"
         ]
       },
       "post": {
         "operationId": "SellerShopsController_create",
-        "summary": "Создать магазин (покупатель при этом становится продавцом)",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -373,20 +375,20 @@
             "description": "У пользователя уже есть магазин"
           }
         },
-        "tags": [
-          "shops-seller"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Создать магазин (покупатель при этом становится продавцом)",
+        "tags": [
+          "shops-seller"
         ]
       }
     },
     "/api/v1/seller/shops/{id}": {
       "get": {
         "operationId": "SellerShopsController_getOne",
-        "summary": "Получить свой магазин по id",
         "parameters": [
           {
             "name": "id",
@@ -402,18 +404,18 @@
             "description": "Магазин не найден или не принадлежит вам"
           }
         },
-        "tags": [
-          "shops-seller"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Получить свой магазин по id",
+        "tags": [
+          "shops-seller"
         ]
       },
       "put": {
         "operationId": "SellerShopsController_update",
-        "summary": "Обновить свой магазин",
         "parameters": [
           {
             "name": "id",
@@ -439,18 +441,18 @@
             "description": ""
           }
         },
-        "tags": [
-          "shops-seller"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Обновить свой магазин",
+        "tags": [
+          "shops-seller"
         ]
       },
       "delete": {
         "operationId": "SellerShopsController_remove",
-        "summary": "Удалить свой магазин (каскадно удаляет его товары)",
         "parameters": [
           {
             "name": "id",
@@ -466,20 +468,20 @@
             "description": ""
           }
         },
-        "tags": [
-          "shops-seller"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Удалить свой магазин (каскадно удаляет его товары)",
+        "tags": [
+          "shops-seller"
         ]
       }
     },
     "/api/v1/admin/shops": {
       "get": {
         "operationId": "AdminShopsController_list",
-        "summary": "Все магазины с числом товаров, с поиском по магазину и владельцу",
         "parameters": [
           {
             "name": "page",
@@ -520,20 +522,20 @@
             "description": ""
           }
         },
-        "tags": [
-          "shops-admin"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Все магазины с числом товаров, с поиском по магазину и владельцу",
+        "tags": [
+          "shops-admin"
         ]
       }
     },
     "/api/v1/admin/shops/{id}/abolish": {
       "patch": {
         "operationId": "AdminShopsController_abolish",
-        "summary": "Упразднить магазин с обязательной причиной",
         "parameters": [
           {
             "name": "id",
@@ -559,20 +561,20 @@
             "description": ""
           }
         },
-        "tags": [
-          "shops-admin"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Упразднить магазин с обязательной причиной",
+        "tags": [
+          "shops-admin"
         ]
       }
     },
     "/api/v1/admin/shops/{id}/restore": {
       "patch": {
         "operationId": "AdminShopsController_restore",
-        "summary": "Вернуть упразднённый магазин в работу",
         "parameters": [
           {
             "name": "id",
@@ -588,20 +590,20 @@
             "description": ""
           }
         },
-        "tags": [
-          "shops-admin"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Вернуть упразднённый магазин в работу",
+        "tags": [
+          "shops-admin"
         ]
       }
     },
     "/api/v1/admin/shops/{id}": {
       "delete": {
         "operationId": "AdminShopsController_remove",
-        "summary": "Удалить магазин навсегда (каскадом удаляет товары, владелец снова покупатель)",
         "parameters": [
           {
             "name": "id",
@@ -617,20 +619,20 @@
             "description": ""
           }
         },
-        "tags": [
-          "shops-admin"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Удалить магазин навсегда (каскадом удаляет товары, владелец снова покупатель)",
+        "tags": [
+          "shops-admin"
         ]
       }
     },
     "/api/v1/categories": {
       "get": {
         "operationId": "CategoriesController_findAll",
-        "summary": "Дерево категорий каталога: корни с вложенными подкатегориями",
         "parameters": [],
         "responses": {
           "200": {
@@ -647,6 +649,7 @@
             }
           }
         },
+        "summary": "Дерево категорий каталога: корни с вложенными подкатегориями",
         "tags": [
           "categories"
         ]
@@ -655,7 +658,6 @@
     "/api/v1/product-cards": {
       "get": {
         "operationId": "ProductCardsController_findAll",
-        "summary": "Список товаров с фильтрами, поиском и пагинацией",
         "parameters": [
           {
             "name": "page",
@@ -727,11 +729,11 @@
             "required": false,
             "in": "query",
             "schema": {
+              "type": "string",
               "enum": [
                 "new",
                 "old"
-              ],
-              "type": "string"
+              ]
             }
           },
           {
@@ -769,12 +771,12 @@
             "in": "query",
             "schema": {
               "default": "newest",
+              "type": "string",
               "enum": [
                 "price_asc",
                 "price_desc",
                 "newest"
-              ],
-              "type": "string"
+              ]
             }
           }
         ],
@@ -783,6 +785,7 @@
             "description": ""
           }
         },
+        "summary": "Список товаров с фильтрами, поиском и пагинацией",
         "tags": [
           "product-cards-public"
         ]
@@ -791,13 +794,13 @@
     "/api/v1/product-cards/sitemap": {
       "get": {
         "operationId": "ProductCardsController_sitemap",
-        "summary": "id и дата изменения всех активных товаров (для sitemap)",
         "parameters": [],
         "responses": {
           "200": {
             "description": ""
           }
         },
+        "summary": "id и дата изменения всех активных товаров (для sitemap)",
         "tags": [
           "product-cards-public"
         ]
@@ -806,7 +809,6 @@
     "/api/v1/product-cards/{id}": {
       "get": {
         "operationId": "ProductCardsController_getPublic",
-        "summary": "Карточка товара",
         "parameters": [
           {
             "name": "id",
@@ -822,6 +824,7 @@
             "description": "Товар не найден или упразднён"
           }
         },
+        "summary": "Карточка товара",
         "tags": [
           "product-cards-public"
         ]
@@ -830,7 +833,6 @@
     "/api/v1/seller/shops/{shopId}/product-cards": {
       "get": {
         "operationId": "SellerProductCardsController_list",
-        "summary": "Список товаров своего магазина (включая упразднённые)",
         "parameters": [
           {
             "name": "shopId",
@@ -846,18 +848,18 @@
             "description": ""
           }
         },
-        "tags": [
-          "product-cards-seller"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Список товаров своего магазина (включая упразднённые)",
+        "tags": [
+          "product-cards-seller"
         ]
       },
       "post": {
         "operationId": "SellerProductCardsController_create",
-        "summary": "Создать товар в своём магазине",
         "parameters": [
           {
             "name": "shopId",
@@ -883,20 +885,20 @@
             "description": ""
           }
         },
-        "tags": [
-          "product-cards-seller"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Создать товар в своём магазине",
+        "tags": [
+          "product-cards-seller"
         ]
       }
     },
     "/api/v1/seller/product-cards/{id}": {
       "put": {
         "operationId": "SellerProductCardsController_update",
-        "summary": "Обновить свой товар",
         "parameters": [
           {
             "name": "id",
@@ -922,18 +924,18 @@
             "description": ""
           }
         },
-        "tags": [
-          "product-cards-seller"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Обновить свой товар",
+        "tags": [
+          "product-cards-seller"
         ]
       },
       "delete": {
         "operationId": "SellerProductCardsController_remove",
-        "summary": "Удалить свой товар",
         "parameters": [
           {
             "name": "id",
@@ -949,20 +951,20 @@
             "description": ""
           }
         },
-        "tags": [
-          "product-cards-seller"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Удалить свой товар",
+        "tags": [
+          "product-cards-seller"
         ]
       }
     },
     "/api/v1/seller/product-cards/{id}/ai-check": {
       "get": {
         "operationId": "SellerAiChecksController_getCheck",
-        "summary": "Результат последней ИИ-проверки своего товара",
         "parameters": [
           {
             "name": "id",
@@ -978,20 +980,20 @@
             "description": ""
           }
         },
-        "tags": [
-          "product-cards-seller"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Результат последней ИИ-проверки своего товара",
+        "tags": [
+          "product-cards-seller"
         ]
       }
     },
     "/api/v1/seller/product-cards/{id}/recheck": {
       "post": {
         "operationId": "SellerAiChecksController_recheck",
-        "summary": "Отправить свой товар на повторную ИИ-проверку",
         "parameters": [
           {
             "name": "id",
@@ -1007,20 +1009,20 @@
             "description": ""
           }
         },
-        "tags": [
-          "product-cards-seller"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Отправить свой товар на повторную ИИ-проверку",
+        "tags": [
+          "product-cards-seller"
         ]
       }
     },
     "/api/v1/admin/product-cards": {
       "get": {
         "operationId": "AdminProductCardsController_findAll",
-        "summary": "Все товары с фильтром по статусу — включая скрытые и упразднённые",
         "parameters": [
           {
             "name": "page",
@@ -1061,13 +1063,13 @@
             "in": "query",
             "description": "Без параметра возвращаются товары во всех статусах",
             "schema": {
+              "type": "string",
               "enum": [
                 "active",
                 "hidden",
                 "abolished",
                 "pending"
-              ],
-              "type": "string"
+              ]
             }
           },
           {
@@ -1095,20 +1097,20 @@
             "description": ""
           }
         },
-        "tags": [
-          "product-cards-admin"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Все товары с фильтром по статусу — включая скрытые и упразднённые",
+        "tags": [
+          "product-cards-admin"
         ]
       }
     },
     "/api/v1/admin/product-cards/ai-review": {
       "get": {
         "operationId": "AdminProductCardsController_aiReview",
-        "summary": "Очередь ручной модерации: проверки со сбоем сервиса или вердиктом fail",
         "parameters": [
           {
             "name": "page",
@@ -1139,20 +1141,20 @@
             "description": ""
           }
         },
-        "tags": [
-          "product-cards-admin"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Очередь ручной модерации: проверки со сбоем сервиса или вердиктом fail",
+        "tags": [
+          "product-cards-admin"
         ]
       }
     },
     "/api/v1/admin/product-cards/shops/{shopId}": {
       "post": {
         "operationId": "AdminProductCardsController_create",
-        "summary": "Создать товар в любом магазине",
         "parameters": [
           {
             "name": "shopId",
@@ -1178,20 +1180,20 @@
             "description": ""
           }
         },
-        "tags": [
-          "product-cards-admin"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Создать товар в любом магазине",
+        "tags": [
+          "product-cards-admin"
         ]
       }
     },
     "/api/v1/admin/product-cards/{id}": {
       "put": {
         "operationId": "AdminProductCardsController_update",
-        "summary": "Отредактировать любой товар",
         "parameters": [
           {
             "name": "id",
@@ -1217,18 +1219,18 @@
             "description": ""
           }
         },
-        "tags": [
-          "product-cards-admin"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Отредактировать любой товар",
+        "tags": [
+          "product-cards-admin"
         ]
       },
       "delete": {
         "operationId": "AdminProductCardsController_remove",
-        "summary": "Удалить товар безвозвратно. Для обратимой блокировки — abolish",
         "parameters": [
           {
             "name": "id",
@@ -1244,20 +1246,20 @@
             "description": ""
           }
         },
-        "tags": [
-          "product-cards-admin"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Удалить товар безвозвратно. Для обратимой блокировки — abolish",
+        "tags": [
+          "product-cards-admin"
         ]
       }
     },
     "/api/v1/admin/product-cards/{id}/recheck": {
       "post": {
         "operationId": "AdminProductCardsController_recheck",
-        "summary": "Отправить товар на ИИ-проверку заново",
         "parameters": [
           {
             "name": "id",
@@ -1273,20 +1275,20 @@
             "description": ""
           }
         },
-        "tags": [
-          "product-cards-admin"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Отправить товар на ИИ-проверку заново",
+        "tags": [
+          "product-cards-admin"
         ]
       }
     },
     "/api/v1/admin/product-cards/{id}/abolish": {
       "patch": {
         "operationId": "AdminProductCardsController_abolish",
-        "summary": "Упразднить товар с обязательной причиной",
         "parameters": [
           {
             "name": "id",
@@ -1312,20 +1314,20 @@
             "description": ""
           }
         },
-        "tags": [
-          "product-cards-admin"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Упразднить товар с обязательной причиной",
+        "tags": [
+          "product-cards-admin"
         ]
       }
     },
     "/api/v1/admin/product-cards/{id}/restore": {
       "patch": {
         "operationId": "AdminProductCardsController_restore",
-        "summary": "Вернуть товар, автоматически скрытый ИИ-проверкой, в публичную выдачу",
         "parameters": [
           {
             "name": "id",
@@ -1341,60 +1343,20 @@
             "description": ""
           }
         },
-        "tags": [
-          "product-cards-admin"
-        ],
         "security": [
           {
             "access-token": []
           }
-        ]
-      }
-    },
-    "/api/v1/admin/product-cards/activate-all": {
-      "post": {
-        "operationId": "AdminProductCardsController_activateAll",
-        "summary": "Обслуживание: снять скрытие со всех товаров разом",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
+        ],
+        "summary": "Вернуть товар, автоматически скрытый ИИ-проверкой, в публичную выдачу",
         "tags": [
           "product-cards-admin"
-        ],
-        "security": [
-          {
-            "access-token": []
-          }
-        ]
-      }
-    },
-    "/api/v1/admin/product-cards/ai-checks/pass-all": {
-      "post": {
-        "operationId": "AdminProductCardsController_passAllAiChecks",
-        "summary": "Обслуживание: пометить все ИИ-проверки как пройденные",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "product-cards-admin"
-        ],
-        "security": [
-          {
-            "access-token": []
-          }
         ]
       }
     },
     "/api/v1/admin/settings": {
       "get": {
         "operationId": "AdminSettingsController_get",
-        "summary": "Текущие настройки платформы",
         "parameters": [],
         "responses": {
           "200": {
@@ -1408,18 +1370,18 @@
             }
           }
         },
-        "tags": [
-          "settings"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Текущие настройки платформы",
+        "tags": [
+          "settings"
         ]
       },
       "patch": {
         "operationId": "AdminSettingsController_update",
-        "summary": "Изменить настройки платформы",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -1443,20 +1405,20 @@
             }
           }
         },
-        "tags": [
-          "settings"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Изменить настройки платформы",
+        "tags": [
+          "settings"
         ]
       }
     },
     "/api/v1/seller/uploads": {
       "post": {
         "operationId": "SellerFilesController_createUploadUrl",
-        "summary": "Получить presigned-ссылку для прямой загрузки фото в S3",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -1480,20 +1442,20 @@
             }
           }
         },
-        "tags": [
-          "files"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Получить presigned-ссылку для прямой загрузки фото в S3",
+        "tags": [
+          "files"
         ]
       }
     },
     "/api/v1/files/{key}": {
       "get": {
         "operationId": "FilesController_getFile",
-        "summary": "Получить файл из S3 по ключу",
         "parameters": [
           {
             "name": "key",
@@ -1537,6 +1499,7 @@
             "description": "Файл не найден"
           }
         },
+        "summary": "Получить файл из S3 по ключу",
         "tags": [
           "files"
         ]
@@ -1545,7 +1508,6 @@
     "/api/v1/admin/broadcasts": {
       "get": {
         "operationId": "AdminBroadcastsController_list",
-        "summary": "История рассылок",
         "parameters": [
           {
             "name": "page",
@@ -1586,18 +1548,18 @@
             }
           }
         },
-        "tags": [
-          "broadcasts-admin"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "История рассылок",
+        "tags": [
+          "broadcasts-admin"
         ]
       },
       "post": {
         "operationId": "AdminBroadcastsController_send",
-        "summary": "Запустить рассылку в Telegram (доставка идёт в фоне)",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -1621,20 +1583,20 @@
             }
           }
         },
-        "tags": [
-          "broadcasts-admin"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Запустить рассылку в Telegram (доставка идёт в фоне)",
+        "tags": [
+          "broadcasts-admin"
         ]
       }
     },
     "/api/v1/admin/broadcasts/audience": {
       "get": {
         "operationId": "AdminBroadcastsController_count",
-        "summary": "Сколько адресатов получит рассылку",
         "parameters": [
           {
             "name": "audience",
@@ -1662,20 +1624,84 @@
             }
           }
         },
-        "tags": [
-          "broadcasts-admin"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Сколько адресатов получит рассылку",
+        "tags": [
+          "broadcasts-admin"
+        ]
+      }
+    },
+    "/api/v1/notifications/channels": {
+      "get": {
+        "operationId": "NotificationsController_channels",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationChannelsDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Состояние каналов уведомлений",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/api/v1/notifications/telegram": {
+      "patch": {
+        "operationId": "NotificationsController_telegram",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetTelegramNotificationsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationChannelsDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Включить или выключить уведомления в Telegram",
+        "tags": [
+          "notifications"
         ]
       }
     },
     "/api/v1/push/config": {
       "get": {
         "operationId": "PushController_config",
-        "summary": "Публичный ключ VAPID и доступность канала",
         "parameters": [],
         "responses": {
           "200": {
@@ -1689,6 +1715,7 @@
             }
           }
         },
+        "summary": "Публичный ключ VAPID и доступность канала",
         "tags": [
           "push"
         ]
@@ -1697,7 +1724,6 @@
     "/api/v1/push/state": {
       "get": {
         "operationId": "PushController_state",
-        "summary": "Есть ли у пользователя подписка",
         "parameters": [],
         "responses": {
           "200": {
@@ -1711,20 +1737,20 @@
             }
           }
         },
-        "tags": [
-          "push"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Есть ли у пользователя подписка",
+        "tags": [
+          "push"
         ]
       }
     },
     "/api/v1/push/subscribe": {
       "post": {
         "operationId": "PushController_subscribe",
-        "summary": "Подписать браузер на уведомления",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -1741,18 +1767,18 @@
             "description": ""
           }
         },
-        "tags": [
-          "push"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Подписать браузер на уведомления",
+        "tags": [
+          "push"
         ]
       },
       "delete": {
         "operationId": "PushController_unsubscribe",
-        "summary": "Отписать браузер",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -1769,21 +1795,21 @@
             "description": ""
           }
         },
-        "tags": [
-          "push"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Отписать браузер",
+        "tags": [
+          "push"
         ]
       }
     },
     "/api/v1/ai-compare": {
       "get": {
-        "operationId": "AiCompareController_compare",
-        "summary": "ИИ-сравнение товаров по составляющим",
         "description": "Разбирает 2–4 товара по железу: строка на составляющую, плюсы и минусы каждого и итог. Бесплатно для покупателя. Повтор с теми же товарами отдаётся из кэша.",
+        "operationId": "AiCompareController_compare",
         "parameters": [
           {
             "name": "ids",
@@ -1819,6 +1845,7 @@
             "description": "ИИ-функции выключены: нет ключа"
           }
         },
+        "summary": "ИИ-сравнение товаров по составляющим",
         "tags": [
           "ai-compare"
         ]
@@ -1827,7 +1854,6 @@
     "/api/v1/me/product-views": {
       "get": {
         "operationId": "ProductViewsController_findMine",
-        "summary": "История просмотров, свежие сверху",
         "parameters": [
           {
             "name": "page",
@@ -1865,18 +1891,18 @@
             }
           }
         },
-        "tags": [
-          "me-product-views"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "История просмотров, свежие сверху",
+        "tags": [
+          "me-product-views"
         ]
       },
       "post": {
         "operationId": "ProductViewsController_record",
-        "summary": "Отметить просмотр карточки товара",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -1893,38 +1919,38 @@
             "description": "Товар не найден или недоступен"
           }
         },
-        "tags": [
-          "me-product-views"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Отметить просмотр карточки товара",
+        "tags": [
+          "me-product-views"
         ]
       },
       "delete": {
         "operationId": "ProductViewsController_clear",
-        "summary": "Очистить историю целиком",
         "parameters": [],
         "responses": {
           "200": {
             "description": ""
           }
         },
-        "tags": [
-          "me-product-views"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Очистить историю целиком",
+        "tags": [
+          "me-product-views"
         ]
       }
     },
     "/api/v1/me/product-views/sync": {
       "post": {
         "operationId": "ProductViewsController_sync",
-        "summary": "Перенести историю, накопленную до входа (localStorage)",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -1941,20 +1967,20 @@
             "description": ""
           }
         },
-        "tags": [
-          "me-product-views"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Перенести историю, накопленную до входа (localStorage)",
+        "tags": [
+          "me-product-views"
         ]
       }
     },
     "/api/v1/me/product-views/{productCardId}": {
       "delete": {
         "operationId": "ProductViewsController_remove",
-        "summary": "Убрать один товар из истории",
         "parameters": [
           {
             "name": "productCardId",
@@ -1970,20 +1996,20 @@
             "description": "Товара нет в истории"
           }
         },
-        "tags": [
-          "me-product-views"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Убрать один товар из истории",
+        "tags": [
+          "me-product-views"
         ]
       }
     },
     "/api/v1/me/favorites": {
       "get": {
         "operationId": "FavoritesController_findMine",
-        "summary": "Избранное, недавно добавленные сверху",
         "parameters": [
           {
             "name": "page",
@@ -2021,18 +2047,18 @@
             }
           }
         },
-        "tags": [
-          "me-favorites"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Избранное, недавно добавленные сверху",
+        "tags": [
+          "me-favorites"
         ]
       },
       "post": {
         "operationId": "FavoritesController_add",
-        "summary": "Добавить товар в избранное",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -2049,38 +2075,38 @@
             "description": "Товар не найден или недоступен"
           }
         },
-        "tags": [
-          "me-favorites"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Добавить товар в избранное",
+        "tags": [
+          "me-favorites"
         ]
       },
       "delete": {
         "operationId": "FavoritesController_clear",
-        "summary": "Очистить избранное целиком",
         "parameters": [],
         "responses": {
           "200": {
             "description": ""
           }
         },
-        "tags": [
-          "me-favorites"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Очистить избранное целиком",
+        "tags": [
+          "me-favorites"
         ]
       }
     },
     "/api/v1/me/favorites/sync": {
       "post": {
         "operationId": "FavoritesController_sync",
-        "summary": "Перенести избранное, накопленное до входа (localStorage)",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -2097,20 +2123,20 @@
             "description": ""
           }
         },
-        "tags": [
-          "me-favorites"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Перенести избранное, накопленное до входа (localStorage)",
+        "tags": [
+          "me-favorites"
         ]
       }
     },
     "/api/v1/me/favorites/{productCardId}": {
       "delete": {
         "operationId": "FavoritesController_remove",
-        "summary": "Убрать товар из избранного",
         "parameters": [
           {
             "name": "productCardId",
@@ -2126,20 +2152,20 @@
             "description": "Товара нет в избранном"
           }
         },
-        "tags": [
-          "me-favorites"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Убрать товар из избранного",
+        "tags": [
+          "me-favorites"
         ]
       }
     },
     "/api/v1/image-gen/balance": {
       "get": {
         "operationId": "ImageGenController_balance",
-        "summary": "Остаток кредитов магазина на ИИ",
         "parameters": [],
         "responses": {
           "200": {
@@ -2153,20 +2179,20 @@
             }
           }
         },
-        "tags": [
-          "image-gen"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Остаток кредитов магазина на ИИ",
+        "tags": [
+          "image-gen"
         ]
       }
     },
     "/api/v1/image-gen/history": {
       "get": {
         "operationId": "ImageGenController_history",
-        "summary": "Ранее сгенерированные картинки по этой же фотографии",
         "parameters": [
           {
             "name": "photoKey",
@@ -2192,20 +2218,20 @@
             }
           }
         },
-        "tags": [
-          "image-gen"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Ранее сгенерированные картинки по этой же фотографии",
+        "tags": [
+          "image-gen"
         ]
       }
     },
     "/api/v1/image-gen/prompt": {
       "post": {
         "operationId": "ImageGenController_describe",
-        "summary": "Составить промпт по фотографии товара",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -2222,20 +2248,20 @@
             "description": ""
           }
         },
-        "tags": [
-          "image-gen"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Составить промпт по фотографии товара",
+        "tags": [
+          "image-gen"
         ]
       }
     },
     "/api/v1/image-gen/description": {
       "post": {
         "operationId": "ImageGenController_rewriteDescription",
-        "summary": "Исправить описание товара, сверяясь с его фотографией",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -2259,20 +2285,20 @@
             }
           }
         },
-        "tags": [
-          "image-gen"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Исправить описание товара, сверяясь с его фотографией",
+        "tags": [
+          "image-gen"
         ]
       }
     },
     "/api/v1/image-gen/generate": {
       "post": {
         "operationId": "ImageGenController_generate",
-        "summary": "Перерисовать фотографию товара: 1–4 варианта на выбор",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -2299,20 +2325,20 @@
             }
           }
         },
-        "tags": [
-          "image-gen"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Перерисовать фотографию товара: 1–4 варианта на выбор",
+        "tags": [
+          "image-gen"
         ]
       }
     },
     "/api/v1/admin/shops/{shopId}/credits": {
       "get": {
         "operationId": "AdminCreditsController_balance",
-        "summary": "Баланс кредитов магазина",
         "parameters": [
           {
             "name": "shopId",
@@ -2335,18 +2361,18 @@
             }
           }
         },
-        "tags": [
-          "credits-admin"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Баланс кредитов магазина",
+        "tags": [
+          "credits-admin"
         ]
       },
       "post": {
         "operationId": "AdminCreditsController_grant",
-        "summary": "Начислить кредиты магазину",
         "parameters": [
           {
             "name": "shopId",
@@ -2379,20 +2405,20 @@
             }
           }
         },
-        "tags": [
-          "credits-admin"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Начислить кредиты магазину",
+        "tags": [
+          "credits-admin"
         ]
       }
     },
     "/api/v1/admin/shops/{shopId}/credits/history": {
       "get": {
         "operationId": "AdminCreditsController_history",
-        "summary": "История начислений и списаний",
         "parameters": [
           {
             "name": "shopId",
@@ -2431,20 +2457,20 @@
             "description": ""
           }
         },
-        "tags": [
-          "credits-admin"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "История начислений и списаний",
+        "tags": [
+          "credits-admin"
         ]
       }
     },
     "/api/v1/admin/credits/preview": {
       "get": {
         "operationId": "AdminCreditsPreviewController_preview",
-        "summary": "Сколько кредитов даст сумма",
         "parameters": [
           {
             "name": "amountUsd",
@@ -2467,20 +2493,20 @@
             }
           }
         },
-        "tags": [
-          "credits-admin"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Сколько кредитов даст сумма",
+        "tags": [
+          "credits-admin"
         ]
       }
     },
     "/api/v1/reports": {
       "post": {
         "operationId": "ReportsController_create",
-        "summary": "Оставить жалобу на магазин или товар (без авторизации)",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -2500,6 +2526,7 @@
             "description": "Магазин или товар не найден"
           }
         },
+        "summary": "Оставить жалобу на магазин или товар (без авторизации)",
         "tags": [
           "reports"
         ]
@@ -2508,7 +2535,6 @@
     "/api/v1/admin/reports": {
       "get": {
         "operationId": "AdminReportsController_findAll",
-        "summary": "Список жалоб с фильтрами по магазину/товару (администратор)",
         "parameters": [
           {
             "name": "page",
@@ -2557,20 +2583,20 @@
             "description": ""
           }
         },
-        "tags": [
-          "reports"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Список жалоб с фильтрами по магазину/товару (администратор)",
+        "tags": [
+          "reports"
         ]
       }
     },
     "/api/v1/reviews": {
       "get": {
         "operationId": "ReviewsController_list",
-        "summary": "Опубликованные отзывы о товаре или магазине",
         "parameters": [
           {
             "name": "page",
@@ -2621,13 +2647,13 @@
             "description": ""
           }
         },
+        "summary": "Опубликованные отзывы о товаре или магазине",
         "tags": [
           "reviews"
         ]
       },
       "post": {
         "operationId": "ReviewsController_create",
-        "summary": "Оставить отзыв (публикуется после проверки)",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -2650,20 +2676,20 @@
             "description": "Отзыв уже был оставлен"
           }
         },
-        "tags": [
-          "reviews"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Оставить отзыв (публикуется после проверки)",
+        "tags": [
+          "reviews"
         ]
       }
     },
     "/api/v1/reviews/summary": {
       "get": {
         "operationId": "ReviewsController_summary",
-        "summary": "Средняя оценка и разбивка по звёздам",
         "parameters": [
           {
             "name": "page",
@@ -2714,6 +2740,7 @@
             "description": ""
           }
         },
+        "summary": "Средняя оценка и разбивка по звёздам",
         "tags": [
           "reviews"
         ]
@@ -2722,7 +2749,6 @@
     "/api/v1/reviews/mine": {
       "get": {
         "operationId": "ReviewsController_mine",
-        "summary": "Мои отзывы, включая ожидающие проверки",
         "parameters": [
           {
             "name": "page",
@@ -2773,20 +2799,20 @@
             "description": ""
           }
         },
-        "tags": [
-          "reviews"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Мои отзывы, включая ожидающие проверки",
+        "tags": [
+          "reviews"
         ]
       }
     },
     "/api/v1/reviews/{id}": {
       "patch": {
         "operationId": "ReviewsController_update",
-        "summary": "Изменить свой отзыв — он снова уходит на проверку",
         "parameters": [
           {
             "name": "id",
@@ -2812,18 +2838,18 @@
             "description": ""
           }
         },
-        "tags": [
-          "reviews"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Изменить свой отзыв — он снова уходит на проверку",
+        "tags": [
+          "reviews"
         ]
       },
       "delete": {
         "operationId": "ReviewsController_remove",
-        "summary": "Удалить свой отзыв",
         "parameters": [
           {
             "name": "id",
@@ -2839,20 +2865,20 @@
             "description": ""
           }
         },
-        "tags": [
-          "reviews"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Удалить свой отзыв",
+        "tags": [
+          "reviews"
         ]
       }
     },
     "/api/v1/admin/reviews": {
       "get": {
         "operationId": "AdminReviewsController_list",
-        "summary": "Отзывы с фильтром по статусу — очередь модерации",
         "parameters": [
           {
             "name": "page",
@@ -2903,12 +2929,12 @@
             "in": "query",
             "schema": {
               "example": "pending",
+              "type": "string",
               "enum": [
                 "pending",
                 "approved",
                 "rejected"
-              ],
-              "type": "string"
+              ]
             }
           }
         ],
@@ -2917,40 +2943,40 @@
             "description": ""
           }
         },
-        "tags": [
-          "reviews-admin"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Отзывы с фильтром по статусу — очередь модерации",
+        "tags": [
+          "reviews-admin"
         ]
       }
     },
     "/api/v1/admin/reviews/stats": {
       "get": {
         "operationId": "AdminReviewsController_stats",
-        "summary": "Сколько отзывов ждёт проверки, принято и отклонено",
         "parameters": [],
         "responses": {
           "200": {
             "description": ""
           }
         },
-        "tags": [
-          "reviews-admin"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Сколько отзывов ждёт проверки, принято и отклонено",
+        "tags": [
+          "reviews-admin"
         ]
       }
     },
     "/api/v1/admin/reviews/{id}/approve": {
       "post": {
         "operationId": "AdminReviewsController_approve",
-        "summary": "Опубликовать отзыв",
         "parameters": [
           {
             "name": "id",
@@ -2966,20 +2992,20 @@
             "description": ""
           }
         },
-        "tags": [
-          "reviews-admin"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Опубликовать отзыв",
+        "tags": [
+          "reviews-admin"
         ]
       }
     },
     "/api/v1/admin/reviews/{id}/recheck": {
       "post": {
         "operationId": "AdminReviewsController_recheck",
-        "summary": "Прогнать отзыв через ИИ-проверку заново",
         "parameters": [
           {
             "name": "id",
@@ -2995,20 +3021,20 @@
             "description": ""
           }
         },
-        "tags": [
-          "reviews-admin"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Прогнать отзыв через ИИ-проверку заново",
+        "tags": [
+          "reviews-admin"
         ]
       }
     },
     "/api/v1/admin/reviews/{id}/reject": {
       "post": {
         "operationId": "AdminReviewsController_reject",
-        "summary": "Отклонить отзыв с причиной — её увидит автор",
         "parameters": [
           {
             "name": "id",
@@ -3034,20 +3060,20 @@
             "description": ""
           }
         },
-        "tags": [
-          "reviews-admin"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Отклонить отзыв с причиной — её увидит автор",
+        "tags": [
+          "reviews-admin"
         ]
       }
     },
     "/api/v1/admin/reviews/{id}": {
       "delete": {
         "operationId": "AdminReviewsController_remove",
-        "summary": "Удалить отзыв безвозвратно",
         "parameters": [
           {
             "name": "id",
@@ -3063,20 +3089,20 @@
             "description": ""
           }
         },
-        "tags": [
-          "reviews-admin"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Удалить отзыв безвозвратно",
+        "tags": [
+          "reviews-admin"
         ]
       }
     },
     "/api/v1/seller/reviews": {
       "get": {
         "operationId": "SellerReviewsController_list",
-        "summary": "Отзывы о моём магазине и его товарах",
         "parameters": [
           {
             "name": "page",
@@ -3127,62 +3153,62 @@
             "description": ""
           }
         },
-        "tags": [
-          "reviews-seller"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Отзывы о моём магазине и его товарах",
+        "tags": [
+          "reviews-seller"
         ]
       }
     },
     "/api/v1/seller/reviews/summary": {
       "get": {
         "operationId": "SellerReviewsController_summary",
-        "summary": "Моя средняя оценка и разбивка по звёздам",
         "parameters": [],
         "responses": {
           "200": {
             "description": ""
           }
         },
-        "tags": [
-          "reviews-seller"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Моя средняя оценка и разбивка по звёздам",
+        "tags": [
+          "reviews-seller"
         ]
       }
     },
     "/api/v1/chats/stream": {
       "get": {
-        "operationId": "ChatsController_stream",
-        "summary": "Поток событий переписки (SSE)",
         "description": "Отдаёт события {chatId, kind} по мере их появления и «ping» раз в 25 секунд.",
+        "operationId": "ChatsController_stream",
         "parameters": [],
         "responses": {
           "200": {
             "description": ""
           }
         },
-        "tags": [
-          "chats"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Поток событий переписки (SSE)",
+        "tags": [
+          "chats"
         ]
       }
     },
     "/api/v1/chats": {
       "get": {
-        "operationId": "ChatsController_list",
-        "summary": "Мои переписки",
         "description": "role=buyer — те, что я начал сам; role=seller — переписки моего магазина.",
+        "operationId": "ChatsController_list",
         "parameters": [
           {
             "name": "page",
@@ -3214,11 +3240,11 @@
             "description": "«buyer» — мои переписки как покупателя, «seller» — переписки моего магазина",
             "schema": {
               "default": "buyer",
+              "type": "string",
               "enum": [
                 "buyer",
                 "seller"
-              ],
-              "type": "string"
+              ]
             }
           }
         ],
@@ -3234,19 +3260,19 @@
             }
           }
         },
-        "tags": [
-          "chats"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Мои переписки",
+        "tags": [
+          "chats"
         ]
       },
       "post": {
-        "operationId": "ChatsController_start",
-        "summary": "Написать продавцу",
         "description": "Находит начатый разговор о том же товаре или заводит новый и сразу отправляет первое сообщение.",
+        "operationId": "ChatsController_start",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -3276,20 +3302,20 @@
             "description": "Товар не найден или недоступен"
           }
         },
-        "tags": [
-          "chats"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Написать продавцу",
+        "tags": [
+          "chats"
         ]
       }
     },
     "/api/v1/chats/unread": {
       "get": {
         "operationId": "ChatsController_unread",
-        "summary": "Сколько непрочитанного в обеих ролях",
         "parameters": [],
         "responses": {
           "200": {
@@ -3303,21 +3329,21 @@
             }
           }
         },
-        "tags": [
-          "chats"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Сколько непрочитанного в обеих ролях",
+        "tags": [
+          "chats"
         ]
       }
     },
     "/api/v1/chats/{id}/messages": {
       "get": {
-        "operationId": "ChatsController_messages",
-        "summary": "Сообщения переписки",
         "description": "Свежие первыми. Запрос заодно отмечает входящие прочитанными: ленту запрашивают, только когда переписка открыта на экране.",
+        "operationId": "ChatsController_messages",
         "parameters": [
           {
             "name": "id",
@@ -3366,18 +3392,18 @@
             "description": "Переписка не найдена или чужая"
           }
         },
-        "tags": [
-          "chats"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Сообщения переписки",
+        "tags": [
+          "chats"
         ]
       },
       "post": {
         "operationId": "ChatsController_send",
-        "summary": "Отправить сообщение",
         "parameters": [
           {
             "name": "id",
@@ -3413,13 +3439,14 @@
             "description": "Переписка не найдена или чужая"
           }
         },
-        "tags": [
-          "chats"
-        ],
         "security": [
           {
             "access-token": []
           }
+        ],
+        "summary": "Отправить сообщение",
+        "tags": [
+          "chats"
         ]
       }
     }
@@ -3633,6 +3660,7 @@
           "reason": {
             "type": "string",
             "minLength": 5,
+            "maxLength": 1000,
             "description": "Причина — видна продавцу",
             "example": "Множественные жалобы на мошенничество"
           }
@@ -3869,6 +3897,7 @@
           },
           "description": {
             "type": "string",
+            "maxLength": 10000,
             "example": "Состояние отличное, гарантия до 2027 года"
           },
           "categoryId": {
@@ -3935,6 +3964,7 @@
           },
           "description": {
             "type": "string",
+            "maxLength": 10000,
             "example": "Состояние отличное, гарантия до 2027 года"
           },
           "categoryId": {
@@ -4168,6 +4198,84 @@
         "required": [
           "id",
           "recipients"
+        ]
+      },
+      "PushChannelDto": {
+        "type": "object",
+        "properties": {
+          "available": {
+            "type": "boolean",
+            "description": "Настроены ли ключи VAPID — без них канал недоступен всем"
+          },
+          "publicKey": {
+            "type": "string",
+            "nullable": true,
+            "description": "Публичный ключ VAPID — им браузер оформляет подписку"
+          },
+          "subscribed": {
+            "type": "boolean",
+            "description": "Подписан ли этот человек хотя бы с одного устройства"
+          }
+        },
+        "required": [
+          "available",
+          "publicKey",
+          "subscribed"
+        ]
+      },
+      "TelegramChannelDto": {
+        "type": "object",
+        "properties": {
+          "available": {
+            "type": "boolean",
+            "description": "Настроен ли бот на сервере"
+          },
+          "linked": {
+            "type": "boolean",
+            "description": "Открыт ли чат с ботом. Без него писать первым Telegram не даёт"
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "Согласен ли человек получать уведомления в Telegram"
+          },
+          "url": {
+            "type": "string",
+            "nullable": true,
+            "description": "Готовая ссылка на бота. Собрана на сервере: username знает только он"
+          }
+        },
+        "required": [
+          "available",
+          "linked",
+          "enabled",
+          "url"
+        ]
+      },
+      "NotificationChannelsDto": {
+        "type": "object",
+        "properties": {
+          "push": {
+            "$ref": "#/components/schemas/PushChannelDto"
+          },
+          "telegram": {
+            "$ref": "#/components/schemas/TelegramChannelDto"
+          }
+        },
+        "required": [
+          "push",
+          "telegram"
+        ]
+      },
+      "SetTelegramNotificationsDto": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Включить или выключить уведомления в Telegram"
+          }
+        },
+        "required": [
+          "enabled"
         ]
       },
       "PushConfigDto": {
@@ -4923,6 +5031,7 @@
           "context": {
             "type": "string",
             "minLength": 5,
+            "maxLength": 2000,
             "example": "Продавец не отвечает, товар не соответствует фото"
           },
           "shop_id": {

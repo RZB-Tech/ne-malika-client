@@ -18,7 +18,12 @@ export function useCategories() {
     },
   });
 
-  return { roots: query.data ?? [], isLoading: query.isLoading };
+  return {
+    roots: query.data ?? [],
+    isLoading: query.isLoading,
+    isError: query.isError,
+    refetch: query.refetch,
+  };
 }
 
 /** Плоский поиск по дереву — форма правки знает только id сохранённой категории. */

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, MessageSquare } from "@/components/icons";
+import { MessageSquare } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import {
   Drawer,
@@ -17,7 +17,7 @@ import { useAuth } from "@/lib/api/auth";
 import { useChatUnread, useChats } from "@/lib/api/chats";
 import { ChatList } from "./chat-list";
 import { ChatThread } from "./chat-thread";
-import { ChatAvatar } from "./chat-avatar";
+import { ChatConversationHeader } from "./chat-conversation-header";
 import { cn } from "@/lib/utils";
 
 /**
@@ -80,49 +80,28 @@ function DrawerBody({
 
   return (
     <>
-      <DrawerHeader className="flex-row items-center gap-2 border-b border-border p-3 text-left">
-        {active ? (
-          <>
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              onClick={() => setActiveId(null)}
-              aria-label={t("chat.backToList")}
-              className="shrink-0"
-            >
-              <ArrowLeft className="size-4" />
-            </Button>
-            <ChatAvatar chat={active} side={side} className="size-9" />
-            <div className="min-w-0 flex-1">
-              <DrawerTitle className="truncate text-base">
-                {side === "seller" ? active.buyerName : active.shopName}
-              </DrawerTitle>
-              {active.productName && (
-                <p className="truncate text-xs text-muted-foreground">
-                  {active.productCardId ? (
-                    <Link
-                      href={`/product/${active.productCardId}`}
-                      className="hover:text-primary"
-                      onClick={onClose}
-                    >
-                      {active.productName}
-                    </Link>
-                  ) : (
-                    t("chat.productGone", { name: active.productName })
-                  )}
-                </p>
-              )}
-            </div>
-          </>
-        ) : (
-          <>
-            <MessageSquare className="ml-1 size-5 text-primary" />
-            <DrawerTitle className="min-w-0 flex-1 truncate text-base">
-              {t("nav.messages")}
+      {active ? (
+        <>
+          <DrawerHeader className="sr-only">
+            <DrawerTitle>
+              {side === "seller" ? active.buyerName : active.shopName}
             </DrawerTitle>
-          </>
-        )}
-      </DrawerHeader>
+          </DrawerHeader>
+          <ChatConversationHeader
+            chat={active}
+            side={side}
+            onBack={() => setActiveId(null)}
+            onNavigate={onClose}
+          />
+        </>
+      ) : (
+        <DrawerHeader className="flex-row items-center gap-2 border-b border-border p-3 text-left">
+          <MessageSquare className="ml-1 size-5 text-primary" />
+          <DrawerTitle className="min-w-0 flex-1 truncate text-base">
+            {t("nav.messages")}
+          </DrawerTitle>
+        </DrawerHeader>
+      )}
 
       {active ? (
         <ChatThread

@@ -2,10 +2,18 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ChevronLeft, ChevronRight, LayoutGrid, X } from "@/components/icons";
+import {
+  ChevronLeft,
+  ChevronRight,
+  LayoutGrid,
+  RefreshCw,
+  TriangleAlert,
+  X,
+} from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { CategoryIcon } from "@/components/shared/category-icon";
+import { StatusPanel } from "@/components/shared/status-panel";
 import { useT } from "@/components/providers/i18n-provider";
 import { useCategories } from "@/lib/api/categories";
 import { onOpenCatalog } from "./catalog-bus";
@@ -30,7 +38,7 @@ function categoryHref(root: CategoryDto, child?: CategoryDto): string {
  */
 export function CatalogMenu() {
   const { t, locale } = useT();
-  const { roots, isLoading } = useCategories();
+  const { roots, isLoading, isError, refetch } = useCategories();
 
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -130,13 +138,47 @@ export function CatalogMenu() {
           />
           <div
             data-state={open ? "open" : "closed"}
-            className="absolute inset-x-0 top-full z-50 overflow-hidden rounded-b-2xl border-b border-border bg-card shadow-xl duration-200 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-top-2 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-top-2 lg:top-17 lg:h-[calc(100dvh-4.25rem)] lg:rounded-none lg:border-b-0 lg:shadow-none"
+            className={cn(
+              "absolute inset-x-0 top-full z-50 overflow-hidden rounded-b-2xl border-b border-border bg-card shadow-xl duration-200 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-top-2 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-top-2 lg:top-17",
+              roots.length > 0 &&
+                "lg:h-[calc(100dvh-4.25rem)] lg:rounded-none lg:border-b-0 lg:shadow-none",
+            )}
           >
-            <div className="mx-auto max-h-[min(70vh,40rem)] max-w-[1600px] overflow-y-auto px-4 py-4 sm:px-8 lg:h-full lg:max-h-none lg:overflow-hidden lg:px-10 lg:py-5">
-              {roots.length === 0 ? (
-                <p className="py-8 text-center text-sm text-muted-foreground">
-                  {isLoading ? t("common.loading") : t("common.nothingFound")}
-                </p>
+            <div
+              className={cn(
+                "mx-auto max-h-[min(70vh,40rem)] max-w-[1600px] overflow-y-auto px-4 py-4 sm:px-8 lg:px-10 lg:py-5",
+                roots.length > 0 &&
+                  "lg:h-full lg:max-h-none lg:overflow-hidden",
+              )}
+            >
+              {isError ? (
+                <StatusPanel
+                  compact
+                  tone="error"
+                  icon={<TriangleAlert className="size-5" />}
+                  title={t("catalog.errorTitle")}
+                  description={t("catalog.categoriesLoadError")}
+                  action={
+                    <div className="flex flex-wrap justify-center gap-2">
+                      <Button
+                        type="button"
+                        size="sm"
+                        onClick={() => void refetch()}
+                      >
+                        <RefreshCw data-icon="inline-start" />
+                        {t("common.retry")}
+                      </Button>
+                      <Button type="button" size="sm" variant="outline" onClick={close}>
+                        {t("common.close")}
+                      </Button>
+                    </div>
+                  }
+                />
+              ) : roots.length === 0 ? (
+                <StatusPanel
+                  compact
+                  title={isLoading ? t("common.loading") : t("common.nothingFound")}
+                />
               ) : (
                 <>
                   <div className="lg:hidden">

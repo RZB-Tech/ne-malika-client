@@ -3,6 +3,7 @@
 import { Heart, History, Star, UserRound } from "@/components/icons";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useT } from "@/components/providers/i18n-provider";
+import { PageContainer } from "@/components/layout/page-container";
 import { NotificationsCard } from "@/components/shared/notifications-card";
 import { AccountProfile } from "./account-profile";
 import { FavoritesList } from "./favorites-list";
@@ -27,7 +28,7 @@ export function AccountView({
   const { t } = useT();
 
   return (
-    <div className="mx-auto w-full max-w-[1600px] px-4 py-8 sm:px-8 lg:px-10">
+    <PageContainer className="py-8">
       <h1 className="font-heading text-2xl font-bold tracking-tight sm:text-3xl">
         {t("account.title")}
       </h1>
@@ -64,11 +65,11 @@ export function AccountView({
         <TabsContent value="reviews">
           <MyReviews />
         </TabsContent>
-        <TabsContent value="profile" className="space-y-4">
+        <TabsContent value="profile" className="flex flex-col gap-4">
           <AccountProfile />
           <NotificationsCard />
         </TabsContent>
       </Tabs>
-    </div>
+    </PageContainer>
   );
 }

@@ -19,6 +19,9 @@ yarn.lock
 # testing
 /coverage
 
+# local architecture reports
+/graphify-out/
+
 # next.js
 /.next/
 /out/

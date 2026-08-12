@@ -3,6 +3,7 @@
 import { LanguageSwitch } from "@/components/shared/language-switch";
 import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
 import { useT } from "@/components/providers/i18n-provider";
+import { PageContainer } from "./page-container";
 
 export function SiteFooter() {
   const { t } = useT();
@@ -10,7 +11,7 @@ export function SiteFooter() {
 
   return (
     <footer className="mt-auto border-t border-border bg-card">
-      <div className="mx-auto flex max-w-[1600px] flex-col items-center justify-center text-center gap-1 px-5 py-8 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-center sm:gap-2 sm:px-8 lg:px-10">
+      <PageContainer className="flex flex-col items-center justify-center gap-1 py-8 text-center text-xs text-muted-foreground sm:flex-row sm:gap-2">
         <span>
           © {year} {t("brand.name")}. {t("footer.rights")}
         </span>
@@ -18,7 +19,7 @@ export function SiteFooter() {
           ·
         </span>
         <span>{t("footer.disclaimer")}</span>
-      </div>
+      </PageContainer>
 
       <div className="flex items-center justify-center gap-1 pb-8 md:hidden">
         <LanguageSwitch />
