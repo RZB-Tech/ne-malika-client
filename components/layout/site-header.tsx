@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
 import { Logo } from "@/components/shared/logo";
 import { CategoryIcon } from "@/components/shared/category-icon";
 import { SearchBar, SearchBarSkeleton } from "@/components/shared/search-bar";
@@ -159,9 +160,6 @@ export function SiteHeader() {
       cancelAnimationFrame(animationFrame);
     };
   }, []);
-  const [marketCity, ...marketPlaceParts] = t("common.market").split(" · ");
-  const marketPlace = marketPlaceParts.join(" · ");
-
   return (
     <header
       data-compact={isCompact}
@@ -300,13 +298,11 @@ export function SiteHeader() {
           </nav>
 
           <div className="ml-auto flex shrink-0 items-center gap-1 pl-3">
-            <span className="hidden items-center text-xs xl:flex">
-              <span className="text-muted-foreground">{marketCity} ·</span>
-              <span className="ml-1 font-semibold text-primary">
-                {marketPlace}
-              </span>
-            </span>
             <LanguageSwitch />
+            <AnimatedThemeToggler
+              aria-label={t("common.theme")}
+              className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors outline-none hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 [&_svg]:size-[1.15rem]"
+            />
           </div>
         </div>
       </div>
