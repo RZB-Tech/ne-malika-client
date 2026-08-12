@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, LayoutGrid, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { CategoryIcon } from "@/components/shared/category-icon";
 import { useT } from "@/components/providers/i18n-provider";
 import { useCategories } from "@/lib/api/categories";
@@ -135,9 +136,9 @@ export function CatalogMenu() {
           />
           <div
             data-state={open ? "open" : "closed"}
-            className="absolute inset-x-0 top-full z-50 border-b border-border bg-card shadow-lg duration-200 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-top-4 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-top-4"
+            className="absolute inset-x-0 top-full z-50 overflow-hidden rounded-b-2xl border-b border-border bg-card shadow-xl duration-200 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-top-2 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-top-2"
           >
-            <div className="mx-auto max-h-[min(70vh,40rem)] max-w-[1600px] overflow-y-auto px-4 py-4 sm:px-8 lg:px-10">
+            <div className="mx-auto max-h-[min(70vh,40rem)] max-w-[1600px] overflow-y-auto px-4 py-4 sm:px-8 lg:max-h-none lg:overflow-hidden lg:px-10 lg:py-5">
               {roots.length === 0 ? (
                 <p className="py-8 text-center text-sm text-muted-foreground">
                   {isLoading ? t("common.loading") : t("common.nothingFound")}
@@ -181,49 +182,53 @@ export function CatalogMenu() {
                   </div>
 
                   {/* Широкий экран: разделы и подкатегории рядом. */}
-                  <div className="hidden gap-8 lg:grid lg:grid-cols-[16rem_1fr]">
-                    <ul className="max-h-[min(60vh,34rem)] overflow-y-auto pr-2">
-                      {roots.map((root) => (
-                        <li key={root.id}>
-                          <Link
-                            href={categoryHref(root)}
-                            onClick={close}
-                            onMouseEnter={() => setActiveId(root.id)}
-                            onFocus={() => setActiveId(root.id)}
-                            className={cn(
-                              "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
-                              root.id === active?.id
-                                ? "bg-muted font-medium text-foreground"
-                                : "text-muted-foreground hover:bg-muted/60",
-                            )}
-                          >
-                            <CategoryIcon
-                              name={root.icon}
-                              className="size-4"
-                            />
-                            <span className="flex-1">{root.name[locale]}</span>
-                            <ChevronRight className="size-4 opacity-50" />
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
+                  <div className="hidden h-[min(52vh,26rem)] lg:grid lg:grid-cols-[17rem_minmax(0,1fr)]">
+                    <ScrollArea className="h-full border-r border-border pr-4">
+                      <ul className="pr-3">
+                        {roots.map((root) => (
+                          <li key={root.id}>
+                            <Link
+                              href={categoryHref(root)}
+                              onClick={close}
+                              onMouseEnter={() => setActiveId(root.id)}
+                              onFocus={() => setActiveId(root.id)}
+                              className={cn(
+                                "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
+                                root.id === active?.id
+                                  ? "bg-muted font-medium text-foreground"
+                                  : "text-muted-foreground hover:bg-muted/60 hover:text-foreground",
+                              )}
+                            >
+                              <CategoryIcon
+                                name={root.icon}
+                                className="size-4"
+                              />
+                              <span className="min-w-0 flex-1 truncate">
+                                {root.name[locale]}
+                              </span>
+                              <ChevronRight className="size-4 opacity-40" />
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </ScrollArea>
 
                     {active && (
-                      <div className="min-w-0">
+                      <div className="min-w-0 overflow-y-auto px-8 pb-4">
                         <Link
                           href={categoryHref(active)}
                           onClick={close}
-                          className="font-heading text-lg font-bold tracking-tight hover:text-primary"
+                          className="inline-flex font-heading text-xl font-bold tracking-tight hover:text-primary"
                         >
                           {active.name[locale]}
                         </Link>
-                        <div className="mt-4 columns-2 gap-8 xl:columns-3">
+                        <div className="mt-4 grid grid-cols-2 gap-x-10 gap-y-1 xl:grid-cols-3">
                           {active.children.map((child) => (
                             <Link
                               key={child.id}
                               href={categoryHref(active, child)}
                               onClick={close}
-                              className="mb-2 block break-inside-avoid text-sm text-muted-foreground hover:text-primary"
+                              className="rounded-md px-2 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                             >
                               {child.name[locale]}
                             </Link>
