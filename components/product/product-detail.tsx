@@ -36,7 +36,6 @@ export function ProductDetail({
   const [active, setActive] = useState(0);
   const snapshot = productToSnapshot(product);
 
-  // Prefer real photos; fall back to deterministic tinted tiles.
   const photos = product.photoUrls ?? [];
   const gallery =
     photos.length > 0
@@ -58,16 +57,8 @@ export function ProductDetail({
   return (
     <div className="mx-auto max-w-[1600px] px-5 py-6 sm:px-8 lg:px-10">
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
-        {/* left: gallery + details */}
         <div className="min-w-0">
-          {/* Ограничена по ширине: в широкой колонке 4:3 фото иначе разъезжается
-              на всю строку. */}
-          {/* min-w-0 на треках обязателен: у элементов грида ширина по
-              умолчанию `auto`, и лента миниатюр ниже растягивала колонку под
-              себя — страница уезжала вбок на телефоне. */}
           <div className="grid max-w-4xl grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-[76px_minmax(0,1fr)]">
-            {/* На телефоне это горизонтальная лента со своей прокруткой,
-                на планшете и шире — колонка слева от фото. */}
             <div className="order-2 flex min-w-0 gap-3 overflow-x-auto pb-1 sm:order-1 sm:flex-col sm:overflow-x-visible sm:pb-0">
               {gallery.map((g, i) => (
                 <button
@@ -108,18 +99,14 @@ export function ProductDetail({
             </div>
           </div>
 
-          {/* description */}
           <section className="mt-10">
             <h2 className="font-heading text-xl font-bold tracking-tight">{t("product.description")}</h2>
-            {/* Описание размечено markdown: списком характеристик его пишет и
-                ИИ-правка, и сами продавцы. */}
             <Markdown
               text={product.description}
               className="mt-3 max-w-2xl leading-relaxed text-muted-foreground"
             />
           </section>
 
-          {/* specs */}
           {product.specs.length > 0 && (
             <section className="mt-10">
               <h2 className="font-heading text-xl font-bold tracking-tight">{t("product.specs")}</h2>
@@ -140,15 +127,12 @@ export function ProductDetail({
             </section>
           )}
 
-          {/* Отзывы под характеристиками: сначала товар, потом чужое мнение
-              о нём. Оценка в правой панели уже видна сверху. */}
           <ReviewsSection
             target={{ productId: Number(product.id) }}
             ownerId={store.ownerId}
           />
         </div>
 
-        {/* right: buy panel */}
         <div className="lg:self-start">
           <Card className="p-5">
             <div className="mb-2 flex items-center gap-2">
@@ -159,8 +143,6 @@ export function ProductDetail({
               {product.name}
             </h1>
 
-            {/* Оценка сразу под названием: решение о покупке принимают здесь,
-                а до отзывов внизу страницы ещё надо долистать. */}
             {(product.ratingCount ?? 0) > 0 && (
               <div className="mt-2 flex items-center gap-2 text-sm">
                 <RatingStars value={product.rating ?? 0} />
@@ -176,8 +158,6 @@ export function ProductDetail({
             <div className="mt-4 flex items-end gap-3">
               <span className="font-heading text-3xl font-bold tabular">
                 {product.price === null ? (
-                  // Кегль мельче: «Цена договорная» в 3xl перекрикивает
-                  // название товара, а сказать этой строке нечего.
                   <span className="text-2xl">{t("product.negotiableFull")}</span>
                 ) : (
                   <>
@@ -206,7 +186,6 @@ export function ProductDetail({
 
             <Separator className="my-5" />
 
-            {/* seller */}
             <Link href={`/store/${store.slug}`} className="group flex items-center gap-3">
               <StoreAvatar
                 name={store.name}
@@ -249,8 +228,6 @@ export function ProductDetail({
                   className="w-full"
                 />
               )}
-              {/* Рядом с телеграмом, а не вместо: внутренний чат оставляет
-                  разговор на площадке, но выбирать способ связи покупателю. */}
               <WriteToSellerButton
                 productId={Number(product.id)}
                 shopId={Number(product.storeId)}

@@ -1,7 +1,3 @@
-// Direct-to-S3 photo upload via presigned POST.
-// 1) ask the backend for a presigned POST (returns key + url + fields)
-// 2) POST the file as multipart/form-data straight to S3
-// The returned `key` (uuid) is what we store in product_cards.photos / shops.photo.
 
 import { sellerFilesControllerCreateUploadUrl } from "./generated/endpoints/files/files";
 import type {
@@ -36,7 +32,6 @@ export async function uploadPhoto(blob: Blob): Promise<string> {
   })) as unknown as UploadUrlResponseDto;
 
   const form = new FormData();
-  // Presigned POST requires the policy fields BEFORE the file field.
   Object.entries(presigned.fields).forEach(([k, v]) => form.append(k, v));
   form.append("file", blob);
 

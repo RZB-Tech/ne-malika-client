@@ -33,10 +33,7 @@ export function AddressAutocomplete({
   const [loading, setLoading] = useState(false);
   const boxRef = useRef<HTMLDivElement>(null);
   const acRef = useRef<AbortController | null>(null);
-  // Skip the fetch triggered by our own onChange after picking a suggestion.
   const skipRef = useRef(false);
-  // Suggestions are a reaction to typing. Until the user types, `value` changes
-  // come from the parent (mount, form hydration) and must not open the list.
   const typedRef = useRef(false);
 
   useEffect(() => {

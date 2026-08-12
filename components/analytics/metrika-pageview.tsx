@@ -16,7 +16,6 @@ import { trackPageview } from "@/lib/metrika";
 export function MetrikaPageview() {
   const pathname = usePathname();
 
-  // Первый путь уже посчитан вызовом `init` — отправляем только переходы.
   const previous = useRef<string | null>(null);
 
   useEffect(() => {

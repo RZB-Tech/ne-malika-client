@@ -122,8 +122,6 @@ export function ProductDrawer({
 
           {product.description && (
             <DetailSection title={t("product.description")}>
-              {/* Тем же разбором, что и витрина: администратор должен видеть
-                  карточку такой, какой её увидит покупатель. */}
               <Markdown
                 text={product.description}
                 className="text-sm text-muted-foreground"

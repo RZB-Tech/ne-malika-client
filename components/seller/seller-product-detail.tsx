@@ -86,11 +86,8 @@ export function SellerProductDetail({ id }: { id: number }) {
   const [photos, setPhotos] = useState<UploadedPhoto[]>([]);
   const [hydratedRowId, setHydratedRowId] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
-  // Фото, по которому продавец открыл генерацию через ИИ.
   const [aiPhoto, setAiPhoto] = useState<UploadedPhoto | null>(null);
 
-  // Заполняем форму один раз, когда товар загрузился. Приведение состояния
-  // во время рендера — рекомендованная React альтернатива setState в эффекте.
   if (row && row.id !== hydratedRowId) {
     setHydratedRowId(row.id);
     setName(row.name);
@@ -150,8 +147,6 @@ export function SellerProductDetail({ id }: { id: number }) {
         },
       });
       await queryClient.invalidateQueries();
-      // Сбрасываем метку — форма перезаполнится с сервера, и свежезагруженные
-      // фото начнут показываться по ключу, а не как локальный data:-URL.
       setHydratedRowId(null);
       toast.success(t("seller.detail.saved"));
     } catch (err) {
@@ -198,17 +193,12 @@ export function SellerProductDetail({ id }: { id: number }) {
           <ProductImage
             hue={product.hue}
             categorySlug={product.categorySlug}
-            // Превью берём из редактируемого списка, а не из строки с сервера,
-            // чтобы главное фото менялось сразу при правке галереи.
             src={photos[0]?.url ?? null}
             alt={product.name}
-            // self-start: без него flex растягивает блок по высоте формы.
-            // natural: высоту задаёт само фото — ни обрезки, ни полей сверху и снизу.
             fit="natural"
             className="w-full shrink-0 self-start rounded-xl sm:w-80 lg:w-[26rem]"
             iconClassName="size-14"
           />
-          {/* max-w: на широком экране поля иначе растягиваются на всю карточку и выглядят пустыми. */}
           <div className="min-w-0 flex-1 space-y-4 lg:max-w-2xl">
             <div className="flex flex-wrap items-center gap-2">
               <ModerationBadge status={product.moderation} />
@@ -307,7 +297,6 @@ export function SellerProductDetail({ id }: { id: number }) {
 
       {shop && <ProductStatsCard productId={id} shopId={shop.id} />}
 
-      {/* characteristics editor */}
       <Card className="p-6">
         <h2 className="mb-4 font-heading text-lg font-bold tracking-tight">{t("seller.add.section2")}</h2>
         <div className="space-y-3">
@@ -347,7 +336,6 @@ export function SellerProductDetail({ id }: { id: number }) {
         </Button>
       </Card>
 
-      {/* AI check */}
       <AiCheckPanel
         check={aiCheckQuery.data}
         loading={aiCheckQuery.isLoading}
@@ -355,7 +343,6 @@ export function SellerProductDetail({ id }: { id: number }) {
         recheckDisabled={recheckMutation.isPending || row.status === "abolished"}
       />
 
-      {/* photos editor */}
       <Card className="p-6">
         <h2 className="mb-4 font-heading text-lg font-bold tracking-tight">{t("seller.add.section3")}</h2>
         <PhotoDropzone
@@ -442,7 +429,6 @@ function AiCheckPanel({
         )}
       </div>
 
-      {/* Технический текст ошибки продавцу не поможет — он не в его власти. */}
       {check?.error && (
         <p className="mb-4 rounded-lg bg-muted p-3 text-sm text-muted-foreground">
           {t("seller.detail.failedNote")}

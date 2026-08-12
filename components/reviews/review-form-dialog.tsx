@@ -43,8 +43,6 @@ export function ReviewFormDialog({
   const [rating, setRating] = useState(existing?.rating ?? 0);
   const [text, setText] = useState(existing?.text ?? "");
 
-  // Форма наполняется при открытии, а не эффектом: пока диалог закрыт, его
-  // состояние никого не интересует, а эффект перетирал бы набранное.
   const [wasOpen, setWasOpen] = useState(open);
   if (open !== wasOpen) {
     setWasOpen(open);
@@ -66,8 +64,6 @@ export function ReviewFormDialog({
       toast.success(t("reviews.form.sent"));
       onOpenChange(false);
     } catch (err) {
-      // Сервер объясняет отказ по-человечески — «отзыв уже оставлен», «нельзя
-      // о своём магазине». Показываем его текст, а не общее «не получилось».
       toast.error(err instanceof Error ? err.message : t("reviews.form.failed"));
     }
   };

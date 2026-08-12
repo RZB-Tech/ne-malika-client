@@ -8,7 +8,7 @@ export type SellerStatus = "active" | "pending" | "blocked";
 export interface Category {
   slug: string;
   name: Record<Locale, string>;
-  icon: string; // lucide icon name
+  icon: string;
   subcategories: { slug: string; name: Record<Locale, string> }[];
 }
 
@@ -30,10 +30,9 @@ export interface Store {
   workSchedule?: WorkScheduleEntry[];
   rating: number;
   ratingCount: number;
-  joined: string; // ISO
+  joined: string;
   status: SellerStatus;
   storeViews: number;
-  // Populated when the store comes from the backend.
   telegramLink?: string;
   photoUrl?: string | null;
   location?: number[] | null;
@@ -68,12 +67,11 @@ export interface Product {
   hue: number;
   views: number;
   telegramClicks: number;
-  createdAt: string; // ISO
+  createdAt: string;
   isNew?: boolean;
   isPromo?: boolean;
   moderation: ModerationStatus;
   hidden?: boolean;
-  // Populated when the product comes from the backend (real S3 photos).
   imageUrl?: string | null;
   photoUrls?: string[];
   /** Сырые ключи S3. Личные списки хранят их, а не собранные URL. */

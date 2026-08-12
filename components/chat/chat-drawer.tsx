@@ -39,7 +39,6 @@ export function ChatDrawer({
   const { isAuthenticated, isHydrated } = useAuth();
   const [open, setOpen] = useState(false);
 
-  // Гостю показывать нечего: переписка привязана к человеку.
   if (!isHydrated || !isAuthenticated) {
     return <LoginDialog redirectTo={null}>{children}</LoginDialog>;
   }
@@ -49,8 +48,6 @@ export function ChatDrawer({
       direction="right"
       open={open}
       onOpenChange={setOpen}
-      // Панель во всю высоту, поэтому без «резинки» и перетаскивания: жест вниз
-      // здесь ничего не значит, а прокрутку ленты он ломает.
       handleOnly
     >
       <DrawerTrigger asChild>{children}</DrawerTrigger>
@@ -69,8 +66,6 @@ function DrawerBody({ onClose }: { onClose: () => void }) {
   const [activeId, setActiveId] = useState<number | null>(null);
 
   const chats = data?.data ?? [];
-  // Ищем в свежем списке: счётчики и последняя реплика приходят опросом, и
-  // сохранённая копия чата устарела бы прямо на глазах.
   const active = chats.find((chat) => chat.id === activeId) ?? null;
 
   return (

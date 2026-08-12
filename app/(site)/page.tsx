@@ -11,11 +11,9 @@ import {
   absoluteUrl,
 } from "@/lib/seo";
 
-// Витрина обновляется по мере появления товаров; держим свежей, но кешируем.
 export const revalidate = 120;
 
 export const metadata: Metadata = {
-  // Title витрины важнее шаблона "%s · neMalika": сюда выносим главный запрос.
   title: {
     absolute:
       "neMalika — компьютерный рынок Малика (Malika) в Ташкенте онлайн",
@@ -33,8 +31,6 @@ export const metadata: Metadata = {
   },
 };
 
-// Разметка организации + сайта. WebSite/SearchAction подсказывает поисковику
-// строку поиска по сайту; Organization закрепляет бренд и привязку к рынку.
 const jsonLd = [
   {
     "@context": "https://schema.org",
@@ -71,9 +67,6 @@ const jsonLd = [
 ];
 
 export default async function HomePage() {
-  // Первая страница каталога рендерится на сервере → товары и ссылки на них
-  // попадают в исходный HTML, который видит краулер. Дальше фильтры/пагинацию
-  // подхватывает клиентский CatalogView.
   const initial = await getPublicProducts();
 
   return (

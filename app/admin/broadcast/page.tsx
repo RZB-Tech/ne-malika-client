@@ -62,8 +62,6 @@ export default function AdminBroadcast() {
     useState<CreateBroadcastDtoAudience>("sellers");
   const [text, setText] = useState("");
 
-  // Число адресатов считает сервер: «доступен» — это не роль, а наличие
-  // открытого чата с ботом, и клиент об этом знать не должен.
   const countQuery = useAdminBroadcastsControllerCount(
     { audience },
     { query: { retry: false } },
@@ -158,8 +156,6 @@ export default function AdminBroadcast() {
                     ? t("admin.broadcast.recipientsNone")
                     : t("admin.broadcast.recipients", { count })}
             </p>
-            {/* Второй канал считается отдельно: адресаты разные, и одна цифра
-                на двоих врала бы про оба. */}
             {!countQuery.isLoading && !countFailed && (
               <p className="tabular text-sm text-muted-foreground">
                 {t("admin.broadcast.recipientsPush", { push: pushCount })}
@@ -233,19 +229,24 @@ export default function AdminBroadcast() {
               {t("admin.broadcast.historyEmpty")}
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <Table>
+            <Table className="min-w-[760px] table-fixed">
                 <TableHeader>
                   <TableRow className="hover:bg-transparent">
-                    <TableHead>{t("admin.broadcast.colDate")}</TableHead>
-                    <TableHead>{t("admin.broadcast.colAudience")}</TableHead>
-                    <TableHead className="min-w-[280px]">
+                    <TableHead className="w-44">
+                      {t("admin.broadcast.colDate")}
+                    </TableHead>
+                    <TableHead className="w-32">
+                      {t("admin.broadcast.colAudience")}
+                    </TableHead>
+                    <TableHead>
                       {t("admin.broadcast.colText")}
                     </TableHead>
-                    <TableHead className="text-right">
+                    <TableHead className="w-28 text-right">
                       {t("admin.broadcast.colResult")}
                     </TableHead>
-                    <TableHead>{t("admin.broadcast.colAuthor")}</TableHead>
+                    <TableHead className="w-28">
+                      {t("admin.broadcast.colAuthor")}
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -260,8 +261,13 @@ export default function AdminBroadcast() {
                             ?.labelKey ?? "admin.broadcast.audienceAll",
                         )}
                       </TableCell>
-                      <TableCell className="text-sm">
-                        <span className="line-clamp-2">{row.text}</span>
+                      <TableCell className="whitespace-normal text-sm">
+                        <span
+                          className="line-clamp-2 break-words"
+                          title={row.text}
+                        >
+                          {row.text}
+                        </span>
                       </TableCell>
                       <TableCell className="tabular whitespace-nowrap text-right text-sm">
                         {row.delivered} / {row.recipients}
@@ -272,8 +278,7 @@ export default function AdminBroadcast() {
                     </TableRow>
                   ))}
                 </TableBody>
-              </Table>
-            </div>
+            </Table>
           )}
         </Card>
       </div>

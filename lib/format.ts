@@ -23,8 +23,6 @@ export function priceText(
   locale: Locale,
   t: (key: string) => string,
 ): string {
-  // Строку принимаем тоже: numeric с бэкенда приходит как "1500000.00", и
-  // приводить его к числу в каждом месте показа — лишний повод ошибиться.
   if (value === null || value === undefined || value === "") {
     return t("product.negotiable");
   }

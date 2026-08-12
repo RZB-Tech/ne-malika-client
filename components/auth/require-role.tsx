@@ -31,7 +31,6 @@ export function RequireRole({
   const allowed = Boolean(user && roles.includes(user.role as UserRole));
 
   useEffect(() => {
-    // До гидратации состояние всегда «разлогинен» — редиректить рано.
     if (!isHydrated) return;
     if (!isAuthenticated) {
       router.replace("/");
@@ -39,10 +38,6 @@ export function RequireRole({
     }
     if (allowed) return;
 
-    // Роль зашита в выданный access-токен: администратор мог выдать права уже
-    // после входа, и локально они появятся только после перевыпуска. Раньше
-    // это чинилось лишь созданием магазина — единственным местом, которое
-    // дёргало refresh.
     if (!refreshTried.current) {
       refreshTried.current = true;
       void refreshSession().finally(() => setRefreshDone(true));

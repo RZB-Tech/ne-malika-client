@@ -31,42 +31,30 @@ const PRELOAD_MARGIN = "600px 0px";
 export function CatalogView({
   initialData,
 }: {
-  // Первая страница каталога, отрендеренная на сервере (SEO). Используется как
-  // initialData react-query только когда текущие параметры совпадают с теми, под
-  // которые её собрали (page 1, без фильтров, сортировка latest) — иначе
-  // гидратация покажет не тот список.
   initialData?: Paginated<PublicProductCard>;
 } = {}) {
   const { t, locale } = useT();
   const { roots } = useCategories();
 
-  // Фильтры живут в URL и редактируются из шторки в шапке — здесь их только
-  // читают и показывают чипсами.
   const { q, category, setCategory, subCategoryId } = useCatalogFilters();
 
   const params: ProductCardsControllerFindAllParams = useMemo(
     () => ({
       limit: PAGE_SIZE,
       q: q || undefined,
-      // Выбранный лист уже задаёт ветку целиком — раздел в запросе лишний.
       ...(subCategoryId
         ? { category_id: subCategoryId }
         : category
           ? { category }
           : {}),
-      // Сортировка всегда по новизне: выбор убран вместе с панелью фильтров.
       sort: 'newest' as const,
     }),
     [q, category, subCategoryId],
   );
 
-  // Совпадают ли текущие параметры с серверным первым запросом. Только тогда
-  // отданный сервером initialData валиден для этого ключа.
   const isInitialParams = !q && !category && subCategoryId == null;
 
   const listQuery = useInfiniteQuery({
-    // Фильтры в ключе: их смена — это другой кеш, а не дозагрузка к текущему.
-    // Лента при этом сбрасывается сама, без ручного reset.
     queryKey: ["/api/v1/product-cards", "infinite", params] as const,
     queryFn: ({ pageParam, signal }) =>
       productCardsControllerFindAll(
@@ -77,9 +65,6 @@ export function CatalogView({
     initialPageParam: 1,
     getNextPageParam: (last) =>
       last.meta.page < last.meta.totalPages ? last.meta.page + 1 : undefined,
-    // Главный предохранитель для бэкенда: у infinite-запроса любой refetch
-    // перезапрашивает ВСЕ загруженные страницы разом. Без этого возврат на
-    // вкладку после десяти подгрузок бил бы десятью запросами сразу.
     staleTime: 2 * 60_000,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
@@ -104,9 +89,6 @@ export function CatalogView({
     [data],
   );
 
-  // Сколько страниц уже подтянулось само. Сбрасывается вместе с фильтрами —
-  // приведение состояния во время рендера, чтобы новая выдача не отрисовалась
-  // со счётчиком от предыдущей.
   const filterKey = `${q}|${category}|${subCategoryId}`;
   const [autoLoads, setAutoLoads] = useState(0);
   const [prevFilterKey, setPrevFilterKey] = useState(filterKey);
@@ -115,9 +97,6 @@ export function CatalogView({
     setAutoLoads(0);
   }
 
-  // Подпись выбранного раздела. Категорию выбирают в меню шапки, а сбросить
-  // её больше негде: панель фильтров убрана, и без этой плашки выдача молча
-  // оставалась бы суженной.
   const categoryLabel = useMemo(() => {
     const leaf = findCategory(roots, subCategoryId);
     if (leaf) return `${leaf.root.name[locale]} · ${leaf.category.name[locale]}`;
@@ -126,8 +105,6 @@ export function CatalogView({
 
   const canAutoLoad = hasNextPage && autoLoads < MAX_AUTO_PAGES;
 
-  // IntersectionObserver, а не обработчик scroll: браузер сам считает пересечение
-  // вне основного потока — на скролле ничего не пересчитывается и не дёргается.
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     const el = sentinelRef.current;
@@ -136,8 +113,6 @@ export function CatalogView({
     const io = new IntersectionObserver(
       ([entry]) => {
         if (!entry.isIntersecting) return;
-        // Одна подгрузка на одно появление: пока страница летит, наблюдатель
-        // отключён, иначе дрожание на пиксель слало бы запросы пачками.
         io.disconnect();
         setAutoLoads((n) => n + 1);
         fetchNextPage();
@@ -191,11 +166,6 @@ export function CatalogView({
         </div>
       ) : (
         <>
-          {/* content-visibility: карточки за пределами экрана браузер не
-              раскладывает и не рисует. Именно это держит длинную ленту
-              отзывчивой, когда в DOM уже несколько сотен товаров.
-              contain-intrinsic-size: auto — высота запоминается после первой
-              отрисовки, поэтому полоса прокрутки не прыгает. */}
           <div className="grid grid-cols-2 gap-4 [&>*]:[content-visibility:auto] [&>*]:[contain-intrinsic-size:auto_480px] sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
             {results.map((p) => (
               <ProductCard key={p.id} product={p} />
@@ -212,8 +182,6 @@ export function CatalogView({
 
           {hasNextPage && (
             <div className="mt-8 flex justify-center">
-              {/* Пустой маркер, за которым следит IntersectionObserver. Пока
-                  автодогрузка не исчерпана, до кнопки дело не доходит. */}
               <div ref={sentinelRef} aria-hidden className="h-px w-px" />
               {!canAutoLoad && !isFetchingNextPage && (
                 <Button variant="outline" onClick={loadMore}>

@@ -36,7 +36,6 @@ export function useCatalogFilters() {
     [router, pathname, searchParams],
   );
 
-  // Смена раздела сбрасывает подкатегорию: она принадлежала прежнему разделу.
   const setCategory = useCallback(
     (slug: string | null) => setParams({ category: slug, sub: null }),
     [setParams],

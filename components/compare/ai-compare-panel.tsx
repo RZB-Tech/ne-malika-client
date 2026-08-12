@@ -73,8 +73,6 @@ export function AiComparePanel() {
         {enough ? t("aiCompare.lead") : t("aiCompare.needMore")}
       </p>
 
-      {/* Сначала причина отказа, потом кнопка: иначе человек нажимает «ещё раз»,
-          не прочитав, что именно не вышло. */}
       {isError && !isFetching && (
         <p className="mt-3 flex items-start gap-2 text-sm text-destructive">
           <CircleAlert className="mt-0.5 size-4 shrink-0" />
@@ -87,7 +85,6 @@ export function AiComparePanel() {
           type="button"
           disabled={!enough}
           onClick={() => {
-            // Первое нажатие включает запрос, следующие — повтор после отказа.
             if (asked) void refetch();
             setAsked(true);
           }}

@@ -6,25 +6,19 @@ import axios, {
 import { clearAuth, getAccessToken, setAccessToken } from "./token-store";
 import { defaultLocale, STORAGE_KEY } from "@/lib/i18n/config";
 
-// Origin only — the generated operations already carry the `/api/v1` prefix.
 export const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
 
 export const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
-  // Needed so the httpOnly refresh cookie is sent to /auth/refresh & /auth/logout.
   withCredentials: true,
 });
 
-// --- Attach the bearer access token to every outgoing request. ---------------
 axiosInstance.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   const token = getAccessToken();
   if (token) {
     config.headers.set("Authorization", `Bearer ${token}`);
   }
-  // Язык берём из localStorage, а не из React-контекста: интерцептор живёт вне
-  // дерева компонентов. По этому заголовку бэкенд переводит тексты ошибок —
-  // без него узбекский интерфейс показывал бы русские сообщения в тостах.
   config.headers.set("Accept-Language", readLocale());
   return config;
 });
@@ -35,12 +29,8 @@ function readLocale(): string {
   return localStorage.getItem(STORAGE_KEY) ?? defaultLocale;
 }
 
-// --- Silent refresh on 401 ---------------------------------------------------
-// Must match the path the backend scopes the httpOnly refresh cookie to
-// (`path: '/api/v1/auth'` in auth.controller.ts) or the cookie is never sent.
 const REFRESH_URL = "/api/v1/auth/refresh";
 
-// A single in-flight refresh is shared by all requests that 401 at once.
 let refreshPromise: Promise<string | null> | null = null;
 
 async function runRefresh(): Promise<string | null> {
@@ -53,8 +43,6 @@ async function runRefresh(): Promise<string | null> {
     setAccessToken(data.accessToken);
     return data.accessToken;
   } catch (err) {
-    // Only a rejected refresh token means the session is really over. A network
-    // failure or a 5xx must not discard a refresh cookie that is still valid.
     if (axios.isAxiosError(err) && err.response?.status === 401) {
       clearAuth();
     }
@@ -85,9 +73,6 @@ axiosInstance.interceptors.response.use(
       }
     }
 
-    // Nest кладёт объяснение в тело ответа, а axios оставляет в message только
-    // «Request failed with status code 502». Подменяем текст здесь, иначе
-    // каждый toast в приложении показывал бы код вместо причины.
     const body = error.response?.data as
       | { message?: string | string[] }
       | undefined;
@@ -100,9 +85,6 @@ axiosInstance.interceptors.response.use(
   },
 );
 
-// --- Orval mutator -----------------------------------------------------------
-// Orval calls this for every operation. It must return a promise of the
-// response body and support cancellation via the returned promise's `.cancel`.
 export const customInstance = <T>(
   config: AxiosRequestConfig,
   options?: AxiosRequestConfig,

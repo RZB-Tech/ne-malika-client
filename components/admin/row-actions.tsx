@@ -58,7 +58,6 @@ export function RowActionsMenu({ actions }: { actions: RowAction[] }) {
           <MoreHorizontal className="size-4" />
         </Button>
       </DropdownMenuTrigger>
-      {/* Фиксированная ширина: иначе длинные пункты переносятся на две строки. */}
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuGroup>
           {actions.map((action) => (
@@ -122,7 +121,6 @@ function ActionItem({ action, Item }: { action: RowAction; Item: MenuItem }) {
         description={action.withReason.description}
         onConfirm={action.withReason.onConfirm}
       >
-        {/* preventDefault: без него меню закроется раньше, чем откроется диалог. */}
         <Item variant={variant} onSelect={(e: Event) => e.preventDefault()}>
           <action.icon className="size-4" />
           {action.label}

@@ -33,14 +33,11 @@ export function RatingStars({
       aria-hidden
     >
       {[1, 2, 3, 4, 5].map((position) => {
-        // Доля закраски этой звезды: 1 — целиком, 0 — пустая.
         const fill = Math.min(1, Math.max(0, value - position + 1));
         return (
           <span key={position} className="relative inline-flex">
             <Star className={cn(icon, "text-muted-foreground/35")} />
             {fill > 0 && (
-              // Обрезка по ширине, а не половинчатая иконка: так одинаково
-              // выглядит любая дробь, включая 4,3.
               <span
                 className="absolute inset-0 overflow-hidden"
                 style={{ width: `${fill * 100}%` }}

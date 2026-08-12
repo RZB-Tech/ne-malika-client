@@ -75,8 +75,6 @@ export function ViewHistory() {
           <div key={item.id}>
             <ProductCard product={toProduct(item)} />
 
-            {/* Под карточкой, а не поверх: правый верхний угол занят сердцем
-                и кнопкой сравнения. */}
             <div className="mt-1.5 flex items-center justify-between gap-2 px-1">
               <span className="truncate text-xs text-muted-foreground">
                 {t("account.history.viewedAt", {

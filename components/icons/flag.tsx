@@ -19,8 +19,6 @@ const RU = (
   </>
 );
 
-// Узбекистан: полосы, полумесяц и звёзды. Полумесяц смещён к центру — по краям
-// круглой обрезки его бы срезало.
 const UZ = (
   <>
     <rect width="24" height="24" fill="#fff" />
@@ -28,10 +26,8 @@ const UZ = (
     <rect y="7.6" width="24" height="0.9" fill="#ce1126" />
     <rect y="15.5" width="24" height="0.9" fill="#ce1126" />
     <rect y="16.4" width="24" height="7.6" fill="#1eb53a" />
-    {/* Полумесяц = белый круг минус круг цвета полосы. */}
     <circle cx="7.5" cy="5" r="2.2" fill="#fff" />
     <circle cx="8.6" cy="4.7" r="1.9" fill="#0099b5" />
-    {/* Звёзды на таком размере читаются только как точки. */}
     <circle cx="11.2" cy="3.6" r="0.45" fill="#fff" />
     <circle cx="11.2" cy="6.2" r="0.45" fill="#fff" />
     <circle cx="13.2" cy="4.9" r="0.45" fill="#fff" />
@@ -56,8 +52,6 @@ export function Flag({
     <svg
       viewBox="0 0 24 24"
       aria-hidden
-      // Кольцо даёт границу белой полосе на светлом фоне — без него флаг
-      // выглядит обрезанным.
       className={cn(
         "size-4.5 shrink-0 rounded-full ring-1 ring-foreground/15",
         className,

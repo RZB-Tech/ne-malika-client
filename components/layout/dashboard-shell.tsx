@@ -66,9 +66,6 @@ export function DashboardShell({
   const pathname = usePathname();
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Прокручивается панель, а не окно, поэтому штатное восстановление скролла
-  // Next.js её не касается: без этого новый раздел открывался бы промотанным
-  // туда же, где остановились в предыдущем.
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: 0 });
   }, [pathname]);
@@ -77,8 +74,6 @@ export function DashboardShell({
     <SidebarProvider>
       <Sidebar
         collapsible="icon"
-        // Вариант в селекторе тот же, что в исходном классе, — иначе twMerge
-        // оставит оба, и border-r победит по специфичности.
         className="group-data-[side=left]:border-r-0"
       >
         <SidebarHeader className="h-16 justify-center px-4 group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:px-0">
@@ -86,11 +81,6 @@ export function DashboardShell({
           <LogoMark className="hidden text-primary group-data-[collapsible=icon]:block" />
         </SidebarHeader>
 
-        {/*
-          Без собственных отступов: у SidebarGroup и SidebarFooter уже есть
-          свои p-2. Лишний px-2 здесь сдвигал иконки меню на 8px относительно
-          плашки внизу — в свёрнутом виде это сразу бросалось в глаза.
-        */}
         <SidebarContent>
           <SidebarGroup>
             <SidebarGroupLabel>{sectionLabel}</SidebarGroupLabel>
@@ -118,14 +108,9 @@ export function DashboardShell({
           </SidebarMenu>
         </SidebarFooter>
 
-        {/* Полоса у края: клик или перетаскивание сворачивает меню. */}
         <SidebarRail />
       </Sidebar>
 
-      {/*
-        Прокрутка живёт внутри белой панели, а не на странице целиком: иначе
-        скруглённый угол уехал бы вверх при первом же скролле.
-      */}
       <SidebarInset className="h-svh overflow-hidden bg-sidebar">
         <header className="flex h-16 shrink-0 items-center gap-2 px-4 sm:px-6">
           <SidebarTrigger className="-ml-1.5 text-muted-foreground" />
@@ -178,8 +163,6 @@ function NavMenu({ items }: { items: NavItem[] }) {
             isActive={item.href === activeHref}
             tooltip={item.label}
           >
-            {/* Пункт с onSelect открывает окно вместо перехода: href у него
-                остаётся ключом и запасным адресом для контекстного меню. */}
             {item.onSelect ? (
               <button type="button" onClick={item.onSelect}>
                 <item.icon />
@@ -190,8 +173,6 @@ function NavMenu({ items }: { items: NavItem[] }) {
                 <item.icon />
                 <span>{item.label}</span>
                 {item.badge ? (
-                  // Прижат вправо и исчезает в свёрнутом меню: там от пункта
-                  // остаётся один значок, и число рядом с ним не помещается.
                   <span className="ml-auto inline-flex min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[11px] font-semibold text-primary-foreground tabular group-data-[collapsible=icon]:hidden">
                     {item.badge > 99 ? "99+" : item.badge}
                   </span>

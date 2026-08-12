@@ -54,8 +54,6 @@ export function useChatStream(): void {
         throw new Error(`поток не открылся: ${response.status}`);
       }
 
-      // Соединение живо — счётчик попыток можно обнулить: следующий разрыв
-      // должен переподключаться быстро, а не через полминуты.
       attempt = 0;
 
       const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
@@ -66,8 +64,6 @@ export function useChatStream(): void {
         if (done) break;
 
         buffer += value;
-        // Кадр SSE заканчивается пустой строкой; последний кусок может быть
-        // обрезан на полуслове — он останется в буфере до следующего чтения.
         const frames = buffer.split("\n\n");
         buffer = frames.pop() ?? "";
 
@@ -78,7 +74,6 @@ export function useChatStream(): void {
           if (!line) continue;
 
           const payload = safeParse(line.slice(5).trim());
-          // «ping» — только чтобы прокси не закрыл молчащее соединение.
           if (payload?.kind === "message" || payload?.kind === "read") {
             invalidate();
           }

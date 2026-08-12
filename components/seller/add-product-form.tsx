@@ -184,7 +184,6 @@ export function AddProductForm({
         </Card>
       )}
 
-      {/* Section 1 */}
       <Card className="p-6">
         <SectionTitle index={1}>{t("seller.add.section1")}</SectionTitle>
         <div className="grid gap-5">
@@ -255,8 +254,6 @@ export function AddProductForm({
                 className="tabular"
                 disabled={negotiable}
               />
-              {/* Поле не прячем, а гасим: так видно, что цену вообще можно
-                  указать, и галочку легко снять обратно. */}
               <label className="flex cursor-pointer items-center gap-2 pt-1 text-sm text-muted-foreground">
                 <Checkbox
                   checked={negotiable}
@@ -281,7 +278,6 @@ export function AddProductForm({
         </div>
       </Card>
 
-      {/* Section 2: specs */}
       <Card className="p-6">
         <SectionTitle index={2}>{t("seller.add.section2")}</SectionTitle>
         <div className="space-y-3">
@@ -325,7 +321,6 @@ export function AddProductForm({
         </Button>
       </Card>
 
-      {/* Section 3: photos */}
       <Card className="p-6">
         <SectionTitle index={3}>{t("seller.add.section3")}</SectionTitle>
         <PhotoDropzone

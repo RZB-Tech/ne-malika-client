@@ -49,7 +49,6 @@ export function AuthForm() {
         </div>
       </div>
 
-      {/* visual */}
       <div className="relative hidden overflow-hidden bg-[oklch(0.17_0.02_264)] lg:block">
         <LightRays
           raysOrigin="right"

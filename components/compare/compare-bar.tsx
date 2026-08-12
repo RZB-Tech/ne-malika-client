@@ -22,8 +22,6 @@ export function CompareBar() {
   const pathname = usePathname();
   const { items, remove, clear } = useCompare();
 
-  // На самой /compare скрыта — там список и так перед глазами; в переписке
-  // тоже: панель висит ровно над полем ответа и закрывает его.
   if (items.length === 0 || pathname === "/compare" || pathname === "/messages") {
     return null;
   }

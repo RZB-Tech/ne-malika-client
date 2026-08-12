@@ -45,8 +45,6 @@ export function ShopPicker({
     );
   }, [shops, q]);
 
-  // Клик мимо и Escape закрывают список: без этого он остаётся висеть поверх
-  // формы, пока не выберешь магазин.
   useEffect(() => {
     if (!open) return;
     const onPointerDown = (e: PointerEvent) => {
@@ -100,7 +98,6 @@ export function ShopPicker({
               value={q}
               onChange={(e) => setQ(e.target.value)}
               onKeyDown={(e) => {
-                // Enter выбирает первое совпадение, но не отправляет форму.
                 if (e.key === "Enter") {
                   e.preventDefault();
                   if (filtered[0]) pick(filtered[0].id);

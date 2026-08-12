@@ -6,7 +6,6 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      // Кабинеты и служебные разделы индексировать незачем.
       disallow: [
         "/admin",
         "/seller",

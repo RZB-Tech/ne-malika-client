@@ -132,8 +132,6 @@ export function PhotoAiDialog({
   );
   const [uploading, setUploading] = useState(false);
   const [savingPhoto, setSavingPhoto] = useState(false);
-  // Ключ фото, загруженного прямо отсюда: в форме создания товара у снимков
-  // ключа ещё нет, а генерация работает только с тем, что лежит в хранилище.
   const [savedKey, setSavedKey] = useState<string | null>(null);
   const [results, setResults] = useState<Generated[]>([]);
   const [picked, setPicked] = useState<Set<string>>(new Set());
@@ -145,12 +143,6 @@ export function PhotoAiDialog({
   const photoKey = photo?.key ?? savedKey ?? undefined;
   const size = SIZES[format][tier];
 
-  // Сброс при смене фотографии — приведение состояния во время рендера, а не
-  // в эффекте: иначе первый кадр показал бы промпт и картинки от предыдущей.
-  //
-  // Сравниваем по id, а не по ключу: при закрытии родитель ставит photo=null,
-  // и раньше это выглядело как «смена фотографии» — стирался и промпт, за
-  // который уже заплачено, и ключ загруженного референса.
   const photoId = photo?.id;
   const [prevPhotoId, setPrevPhotoId] = useState(photoId);
   if (photoId && photoId !== prevPhotoId) {
@@ -162,8 +154,6 @@ export function PhotoAiDialog({
     setSavedKey(null);
   }
 
-  // Остаток кредитов магазина. Показывается до нажатия кнопки, а не после
-  // отказа: узнать, что кредиты кончились, из пустого результата нельзя.
   const quotaQuery = useImageGenControllerBalance({
     query: { enabled: open, retry: false },
   });
@@ -172,9 +162,6 @@ export function PhotoAiDialog({
     | undefined;
   const left = quota?.credits ?? null;
 
-  // Всё, что уже нарисовано по этому фото. Раньше результат жил только в
-  // состоянии диалога и пропадал при закрытии — сами картинки при этом
-  // оставались в хранилище, терялись именно ссылки на них.
   const historyQuery = useImageGenControllerHistory(
     { photoKey: photoKey ?? "" },
     { query: { enabled: open && Boolean(photoKey), retry: false } },
@@ -193,8 +180,6 @@ export function PhotoAiDialog({
     return out;
   }, [results, history]);
 
-  // Закрытие больше ничего не стирает: галерея приезжает с сервера, а промпт
-  // нужен, если диалог открыли повторно по тому же фото.
   const close = () => {
     setPicked(new Set());
     onClose();
@@ -240,7 +225,6 @@ export function PhotoAiDialog({
       })) as unknown as Generated[];
       setResults((prev) => [...res, ...prev]);
       setPicked(new Set());
-      // Кредиты списаны, а в галерее прибавилось — обе цифры берём с сервера.
       await Promise.all([quotaQuery.refetch(), historyQuery.refetch()]);
     } catch (err) {
       toast.error(
@@ -539,7 +523,6 @@ export function PhotoAiDialog({
                 )}
               </Button>
 
-              {/* Остаток показываем до нажатия, а не после отказа. */}
               {quota?.allowed === false ? (
                 <span className="text-sm text-destructive">
                   {t("admin.photoAi.noAccess")}
@@ -582,8 +565,6 @@ export function PhotoAiDialog({
                           : "ring-1 ring-foreground/10 hover:ring-foreground/25",
                       )}
                     >
-                      {/* contain: в галерее лежат и вертикальные, и квадратные
-                          картинки, и обрезка съела бы у последних надписи. */}
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={r.url}

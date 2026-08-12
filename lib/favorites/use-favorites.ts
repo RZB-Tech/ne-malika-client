@@ -80,13 +80,11 @@ export function useFavorites() {
     [queryClient],
   );
 
-  // Перенос избранного устройства сразу после входа — один раз на аккаунт.
   useEffect(() => {
     const userId = user?.id;
     if (!enabled || userId === undefined || syncedUsers.has(userId)) return;
 
     const items = getLocalFavorites();
-    // Отметку ставим до запроса: в StrictMode эффект выполняется дважды.
     syncedUsers.add(userId);
     if (items.length === 0) return;
 
@@ -100,8 +98,6 @@ export function useFavorites() {
     })
       .then(() => invalidate())
       .catch(() => {
-        // Бэкенд недоступен — попробуем на следующем заходе, а пока в кабинете
-        // останется локальное избранное.
         syncedUsers.delete(userId);
       });
   }, [enabled, user?.id, syncFavorites, invalidate]);
@@ -112,8 +108,6 @@ export function useFavorites() {
     return data ? data.map(fromRemote) : local;
   }, [enabled, local, remote.data]);
 
-  // Признак «в избранном» читаем из локальной копии всегда: она обновляется
-  // мгновенно, поэтому сердце закрашивается по нажатию, не дожидаясь ответа.
   const has = useCallback(
     (id: number) =>
       items.some((p) => p.id === id) || local.some((p) => p.id === id),
@@ -139,7 +133,6 @@ export function useFavorites() {
     async (id: number) => {
       removeLocalFavorite(id);
       if (!enabled) return;
-      // 404 здесь — норма: товара могло не быть в серверном списке.
       await removeRemote({ productCardId: id }).catch(() => undefined);
       await invalidate();
     },

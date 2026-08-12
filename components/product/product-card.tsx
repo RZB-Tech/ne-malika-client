@@ -53,9 +53,6 @@ export function ProductCard({ product }: { product: Product }) {
   useEffect(() => {
     if (!hovered || photos.length < 2 || !canAutoplay()) return;
 
-    // Соседние кадры подгружаем сразу, а первый перелистывается через секунду:
-    // иначе на месте фотографии на мгновение появлялась бы пустота, пока
-    // браузер её качает.
     for (const url of photos.slice(1)) {
       const preload = new Image();
       preload.src = url;
@@ -66,28 +63,19 @@ export function ProductCard({ product }: { product: Product }) {
       PHOTO_INTERVAL_MS,
     );
     return () => clearInterval(id);
-    // Зависимость по длине, а не по массиву: у него каждый рендер новая ссылка,
-    // и перелистывание сбрасывалось бы на первом кадре бесконечно.
   }, [hovered, photos.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const leave = () => {
     setHovered(false);
-    // Возвращаем главный кадр: карточка в ленте должна выглядеть одинаково
-    // и до наведения, и после.
     setActive(0);
   };
 
   return (
-    // isolate + z-20: <img> внутри ProductImage тоже z-10, и без своего
-    // контекста наложения побеждал он — на телефоне (где hover-scale не
-    // срабатывает) тап по сердцу попадал в фото и уводил на страницу товара.
     <div
       className="group relative isolate flex flex-col rounded-2xl bg-card p-2"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={leave}
     >
-      {/* Вне <Link>: это переключатели, а не переход к товару. Поверх картинки
-          и со своим z-index, иначе ссылка карточки перехватывает клик. */}
       <div className="absolute top-2 right-2 z-20 flex flex-col gap-1.5">
         <FavoriteButton product={snapshot} />
         <CompareButton product={snapshot} />
@@ -95,10 +83,6 @@ export function ProductCard({ product }: { product: Product }) {
 
       <Link href={`/product/${product.id}`} className="flex flex-1 flex-col">
         <div className="relative overflow-hidden rounded-2xl bg-muted">
-          {/* contain, а не cover: карточки товаров у продавцов — инфографика с
-              надписями, и обрезка по высокой рамке съедала название бренда
-              («Canon PIXMA» превращался в «anon IXMA»). Вертикальные картинки
-              заполняют кадр целиком, горизонтальные ложатся с полями. */}
           <ProductImage
             hue={product.hue}
             categorySlug={product.categorySlug}
@@ -118,13 +102,9 @@ export function ProductCard({ product }: { product: Product }) {
         </div>
 
         <div className="flex flex-1 flex-col gap-1 pt-2.5">
-          {/* Цена первой строкой и самым крупным кеглем: на плитке из пяти
-              колонок покупатель сравнивает именно её, а не названия. */}
           <div className="flex flex-wrap items-baseline gap-x-2">
             <span className="tabular text-base font-bold text-foreground">
               {product.price === null ? (
-                // Товар без цены: вместо суммы одно слово — сумму назовут в
-                // переписке. Тем же кеглем, чтобы плитка не разъезжалась.
                 t("product.negotiable")
               ) : (
                 <>
@@ -142,8 +122,6 @@ export function ProductCard({ product }: { product: Product }) {
             )}
           </div>
 
-          {/* Переносится, а не ужимается: в узкой карточке на телефоне бейдж
-              съедал половину строки, и от названия магазина оставалось «Те…». */}
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
             <span className="min-w-0 max-w-full truncate font-medium text-foreground/70">
               {product.brand}
@@ -158,8 +136,6 @@ export function ProductCard({ product }: { product: Product }) {
             {product.name}
           </h3>
 
-          {/* Оценка последней строкой и только когда есть отзывы: пустые серые
-              звёзды на каждой плитке — это шум, а не информация. */}
           {(product.ratingCount ?? 0) > 0 && (
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
               <RatingStars value={product.rating ?? 0} />
@@ -169,8 +145,6 @@ export function ProductCard({ product }: { product: Product }) {
         </div>
       </Link>
 
-      {/* Вне <Link>: кнопка внутри ссылки — вложенная интерактивность, да и
-          клик по карточке не должен уводить в Telegram. */}
       <div className="pt-2.5">
         <ContactSellerButton
           productId={product.id}

@@ -62,8 +62,6 @@ export function WriteToSellerButton({
     </Button>
   );
 
-  // До гидратации считаем, что человек не вошёл: так кнопка ведёт себя
-  // одинаково на сервере и в браузере, без прыжка разметки.
   if (!isHydrated || !isAuthenticated) {
     return <LoginDialog redirectTo={null}>{button}</LoginDialog>;
   }
@@ -126,8 +124,6 @@ function ChatSheetBody({
     start.mutate(
       { productCardId: productId, shopId, text: value },
       {
-        // Список обновится сам после сброса кэша, и переписка откроется здесь
-        // же — поэтому поле чистим только при успехе.
         onSuccess: () => setText(""),
         onError: (error) =>
           toast.error(

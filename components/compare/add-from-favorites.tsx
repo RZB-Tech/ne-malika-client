@@ -37,8 +37,6 @@ export function AddFromFavorites() {
         {t("compare.sourcesHint")}
       </p>
 
-      {/* Полосой с прокруткой, а не сеткой: избранного бывает под сотню, и
-          столбец из карточек оттеснил бы саму таблицу сравнения вниз. */}
       <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
         {candidates.map((item) => (
           <button
@@ -46,7 +44,6 @@ export function AddFromFavorites() {
             type="button"
             disabled={isFull}
             onClick={() => {
-              // Отказ здесь возможен единственной причины — мест больше нет.
               if (!toggle(item)) {
                 toast.message(t("compare.limitReached", { count: max }));
               }

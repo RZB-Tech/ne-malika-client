@@ -49,8 +49,6 @@ function AiVerdictLine({
 }) {
   const { t } = useT();
 
-  // Решение человека перекрывает вердикт модели — показывать её мнение как
-  // действующее было бы враньём.
   if (byHuman) {
     return (
       <p className="mt-2 text-xs text-muted-foreground">
@@ -79,7 +77,6 @@ export default function AdminReviews() {
   const { t, locale } = useT();
   const queryClient = useQueryClient();
 
-  // Открывается на непроверенных: ради них сюда и заходят.
   const [status, setStatus] = useState<ReviewStatus>("pending");
   const [page, setPage] = useState(1);
 
@@ -149,8 +146,6 @@ export default function AdminReviews() {
         value={status}
         onValueChange={(value) => {
           setStatus(value as ReviewStatus);
-          // Страница относилась к прежней вкладке: на «отклонённых» её может
-          // просто не быть, и список открылся бы пустым.
           setPage(1);
         }}
       >
@@ -228,8 +223,6 @@ export default function AdminReviews() {
                     </p>
                   )}
 
-                  {/* Что решил ИИ и почему. Для «на проверке» это главное:
-                      сюда попадает только то, в чём модель засомневалась. */}
                   <AiVerdictLine
                     verdict={review.aiVerdict}
                     note={review.aiNote}
@@ -238,8 +231,6 @@ export default function AdminReviews() {
                 </div>
 
                 <div className="flex shrink-0 flex-wrap gap-2">
-                  {/* Нужна, когда модель была недоступна: отзыв повиснет в
-                      «на проверке», а решать его руками незачем. */}
                   <Button
                     size="sm"
                     variant="ghost"

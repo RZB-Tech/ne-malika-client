@@ -136,7 +136,6 @@ export default function AdminAiReview() {
               </div>
             </div>
 
-            {/* Сбой сервиса и отказ модели — разные ситуации, показываем по-разному. */}
             {row.error ? (
               <div className="flex gap-2 rounded-lg bg-muted p-3 text-sm">
                 <TriangleAlert className="size-4 shrink-0 text-warning" />

@@ -22,9 +22,6 @@ import { hueFromId } from "@/lib/api/mappers";
 import { photoUrl } from "@/lib/api/photo";
 
 export default function SellerLayout({ children }: { children: React.ReactNode }) {
-  // Гард снаружи: иначе хуки ниже успеют сходить за данными магазина от анонима.
-  // Покупателя пускаем — этот раздел и есть путь «стать продавцом»: он создаёт
-  // здесь магазин, и роль меняется сама.
   return (
     <RequireRole role={["user", "seller"]}>
       <SellerLayoutInner>{children}</SellerLayoutInner>
@@ -37,11 +34,6 @@ function SellerLayoutInner({ children }: { children: React.ReactNode }) {
   const { shop } = useSellerShop();
   const unread = useChatUnread().data?.seller ?? 0;
 
-  // Пока магазина нет, раздел товаров ведёт в тупик — оставляем только обзор
-  // и форму магазина.
-  //
-  // Кнопки «Добавить товар» в меню нет намеренно: добавление живёт внутри
-  // раздела «Мои товары», рядом со списком, который оно пополняет.
   const items: NavItem[] = [
     { href: "/seller", label: t("seller.nav.dashboard"), icon: LayoutDashboard, exact: true },
     ...(shop
@@ -81,7 +73,6 @@ function SellerLayoutInner({ children }: { children: React.ReactNode }) {
       brand={brand}
     >
       {children}
-      {/* Одно окно на весь кабинет — открывается событием из любой кнопки. */}
       <AddProductDialog />
     </DashboardShell>
   );

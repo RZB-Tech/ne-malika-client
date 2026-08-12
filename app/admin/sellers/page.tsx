@@ -59,8 +59,6 @@ export default function AdminSellers() {
   const { t, locale } = useT();
   const queryClient = useQueryClient();
   const [opened, setOpened] = useState<AdminShopRow | null>(null);
-  // Магазин, которому сейчас выдают кредиты. Диалог живёт снаружи таблицы,
-  // иначе он размонтировался бы вместе со строкой при обновлении списка.
   const [granting, setGranting] = useState<{ id: number; name: string } | null>(
     null,
   );
@@ -84,7 +82,6 @@ export default function AdminSellers() {
   const unblockMutation = useAdminUsersControllerUnblock();
 
   const pageData = useMemo(() => {
-    // Фикстуры фильтруем на клиенте — иначе поиск локально не проверить.
     const needle = q.trim().toLowerCase();
     const fixtures = needle
       ? devShops.filter((s) =>
@@ -120,7 +117,6 @@ export default function AdminSellers() {
     await unblockMutation.mutateAsync({ id: ownerId });
     await done(t("admin.shops.ownerUnblocked"));
   };
-  // Переспрашивает вызывающая сторона — ConfirmDialog в меню и в карточке.
   const remove = async (id: number) => {
     await removeMutation.mutateAsync({ id });
     await done(t("admin.shops.removed"));
@@ -289,7 +285,6 @@ export default function AdminSellers() {
                     <TableCell className="tabular whitespace-nowrap text-sm text-muted-foreground">
                       {formatDate(s.createdAt, locale)}
                     </TableCell>
-                    {/* Клик по меню не должен открывать карточку. */}
                     <TableCell onClick={(e) => e.stopPropagation()}>
                       <RowActionsMenu actions={actionsFor(s)} />
                     </TableCell>

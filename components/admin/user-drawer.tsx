@@ -48,7 +48,6 @@ export function UserDrawer({
 }) {
   const { t, locale } = useT();
 
-  // Подробности подгружаем только когда карточка открыта.
   const { data, isLoading } = useAdminUsersControllerGetOne(user?.id ?? 0, {
     query: {
       enabled: user !== null,

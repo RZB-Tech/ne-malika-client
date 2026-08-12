@@ -9,6 +9,7 @@ import { useT } from "@/components/providers/i18n-provider";
 import { useAuth } from "@/lib/api/auth";
 import {
   fetchPushConfig,
+  hasPushSubscription,
   isPushSupported,
   permissionState,
   subscribeToPush,
@@ -32,18 +33,16 @@ export function PushCard() {
   const [permission, setPermission] = useState<NotificationPermission | null>(
     null,
   );
+  const [subscribed, setSubscribed] = useState(false);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     if (!isPushSupported()) return;
-    // Ключ и сам факт включённого канала знает только сервер: без ключей VAPID
-    // подписаться нельзя, и карточку показывать незачем. Состояние выставляем
-    // в ответе, а не в теле эффекта: до ответа карточка всё равно скрыта, а
-    // setState прямо в эффекте — это лишний каскад рендеров.
-    void fetchPushConfig()
-      .then((config) => {
+    void Promise.all([fetchPushConfig(), hasPushSubscription()])
+      .then(([config, hasSubscription]) => {
         setSupported(true);
         setPermission(permissionState());
+        setSubscribed(hasSubscription);
         setPublicKey(config.enabled ? config.publicKey : null);
       })
       .catch(() => setPublicKey(null));
@@ -58,7 +57,10 @@ export function PushCard() {
         body: t("push.confirmBody"),
       });
       setPermission(result);
-      if (result === "granted") toast.success(t("push.enabled"));
+      if (result === "granted") {
+        setSubscribed(true);
+        toast.success(t("push.enabled"));
+      }
       else if (result === "denied") toast.error(t("push.blocked"));
     } catch (err) {
       toast.error(err instanceof Error ? err.message : t("push.failed"));
@@ -71,6 +73,7 @@ export function PushCard() {
     setBusy(true);
     try {
       await unsubscribeFromPush();
+      setSubscribed(false);
       setPermission(permissionState());
       toast.success(t("push.disabled"));
     } catch (err) {
@@ -80,8 +83,6 @@ export function PushCard() {
     }
   };
 
-  // Гостю подписываться некуда: рассылка выбирает адресатов по роли, и
-  // подписку без владельца отнести не к кому.
   if (!isAuthenticated || !supported || !publicKey) return null;
 
   return (
@@ -97,7 +98,7 @@ export function PushCard() {
         </p>
       </div>
 
-      {permission === "granted" ? (
+      {subscribed ? (
         <Button
           variant="outline"
           className="shrink-0 gap-2"

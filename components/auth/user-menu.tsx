@@ -36,12 +36,8 @@ export function UserMenu({ trigger }: { trigger?: ReactNode } = {}) {
 
   if (!user) return null;
 
-  // `telegramPhoto`/`telegramUsername` are typed as generic nullable objects in
-  // the generated schema but are really strings (or null) coming from Telegram.
   const photo = user.telegramPhoto as string | null;
   const username = user.telegramUsername as string | null;
-  // Покупателя ведём тем же путём, но зовём его иначе: магазина у него ещё
-  // нет, и «Кабинет продавца» обещал бы не то.
   const cabinetHref = isAdmin ? "/admin" : "/seller";
   const cabinetLabel = isAdmin
     ? t("nav.admin")

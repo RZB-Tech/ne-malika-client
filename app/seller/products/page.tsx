@@ -79,8 +79,6 @@ export default function SellerProducts() {
           <h1 className="font-heading text-2xl font-bold tracking-tight">{t("seller.products.title")}</h1>
           <p className="mt-1 text-sm text-muted-foreground">{t("seller.products.subtitle")}</p>
         </div>
-        {/* У упразднённого магазина товары остаются видны владельцу, но новые
-            добавлять нельзя — кнопку убираем. */}
         {shop?.status === "active" && (
           <Button className="gap-2" onClick={openAddProduct}>
             <PlusCircle className="size-4" />

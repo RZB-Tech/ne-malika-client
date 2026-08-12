@@ -1,9 +1,5 @@
 "use client";
 
-// Кабинет продавца всюду начинается с одного и того же: взять свой магазин
-// (по бизнес-правилу он один) и его товары. Раньше эта цепочка была скопирована
-// в пяти файлах вместе с приведением типов.
-
 import { useSellerShopsControllerList } from "./generated/endpoints/shops-seller/shops-seller";
 import { useSellerProductCardsControllerList } from "./generated/endpoints/product-cards-seller/product-cards-seller";
 import type { ProductCardRow, ShopRow } from "./types";

@@ -24,8 +24,6 @@ export function createLocalListStore<T extends StoredItem>({
   /** Отсеивает чужие и устаревшие записи под тем же ключом. */
   isValid: (value: unknown) => value is T;
 }): LocalListStore<T> {
-  // Пустой массив — константа: useSyncExternalStore сравнивает снапшоты по
-  // ссылке и уходит в бесконечный рендер, если каждый раз возвращать новый [].
   const EMPTY: T[] = [];
 
   let items: T[] = EMPTY;
@@ -38,13 +36,10 @@ export function createLocalListStore<T extends StoredItem>({
       const parsed: unknown = raw ? JSON.parse(raw) : null;
       items = Array.isArray(parsed) ? parsed.filter(isValid) : EMPTY;
     } catch {
-      // Испорченная запись под тем же ключом — не повод падать при старте
-      // приложения; начинаем список заново.
       items = EMPTY;
     }
   }
 
-  // Синхронно при загрузке модуля в браузере — как в token-store.
   read();
 
   function persist(next: T[]) {
@@ -53,8 +48,6 @@ export function createLocalListStore<T extends StoredItem>({
       try {
         window.localStorage.setItem(storageKey, JSON.stringify(items));
       } catch {
-        // Приватный режим или переполненное хранилище: список — не то, ради
-        // чего стоит ронять страницу товара.
       }
     }
     listeners.forEach((l) => l());

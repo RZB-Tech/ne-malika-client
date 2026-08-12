@@ -29,7 +29,6 @@ import type {
 export default function AdminStats() {
   const { t, locale } = useT();
 
-  // limit побольше: на дашборде нужен весь список для графика, не страница.
   const shopsQuery = useAdminShopsControllerList(
     { limit: 100 },
     {
@@ -40,7 +39,6 @@ export default function AdminStats() {
     },
   );
 
-  // limit: 1 — нужны только счётчики из meta, сами строки не читаем.
   const productsQuery = useProductCardsControllerFindAll(
     { limit: 1 },
     {

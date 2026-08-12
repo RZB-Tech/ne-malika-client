@@ -69,7 +69,6 @@ export function StoreDetail({
         <span className="text-foreground/70">{store.name}</span>
       </nav>
 
-      {/* banner */}
       <Card className="overflow-hidden p-0">
         <div
           className="h-28 sm:h-36"
@@ -141,7 +140,6 @@ export function StoreDetail({
         </div>
       </Card>
 
-      {/* products */}
       <div className="mt-10">
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
           <h2 className="font-heading text-xl font-bold tracking-tight">
@@ -172,8 +170,6 @@ export function StoreDetail({
         )}
       </div>
 
-      {/* Отзывы о продавце — вместе с отзывами о его товарах: ровно из них и
-          складывается оценка в шапке. */}
       <ReviewsSection
         target={{ shopId: Number(store.id) }}
         ownerId={store.ownerId}

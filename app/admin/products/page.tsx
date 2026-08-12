@@ -321,7 +321,6 @@ export default function AdminProducts() {
                   <TableCell className="tabular whitespace-nowrap text-right text-sm font-medium">
                     {priceText(p.price, locale, t)}
                   </TableCell>
-                  {/* Клик по меню не должен открывать ящик со всей карточкой. */}
                   <TableCell onClick={(e) => e.stopPropagation()}>
                     <RowActionsMenu actions={actionsFor(p)} />
                   </TableCell>

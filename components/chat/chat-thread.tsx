@@ -40,11 +40,9 @@ export function ChatThread({
   const [text, setText] = useState("");
   const bottom = useRef<HTMLDivElement | null>(null);
 
-  // Лента приходит с конца — разворачиваем: читают её сверху вниз.
   const messages = data ? [...data.data].reverse() : [];
   const lastId = messages.at(-1)?.id;
 
-  // Прокрутка к последнему сообщению: и при открытии, и когда пришло новое.
   useEffect(() => {
     bottom.current?.scrollIntoView({ block: "end" });
   }, [lastId, chat.id]);
@@ -53,8 +51,6 @@ export function ChatThread({
     e.preventDefault();
     const value = text.trim();
     if (!value || send.isPending) return;
-    // Поле очищаем сразу: ответ бэкенда ждать незачем, а при ошибке текст
-    // вернётся — иначе человек потеряет написанное.
     setText("");
     send.mutate(value, { onError: () => setText(value) });
   };
@@ -87,7 +83,6 @@ export function ChatThread({
                   {chat.productName}
                 </Link>
               ) : (
-                // Товар сняли — ссылке вести некуда, но о чём разговор, видно.
                 <span>{t("chat.productGone", { name: chat.productName })}</span>
               )}
             </p>
@@ -128,8 +123,6 @@ export function ChatThread({
           value={text}
           onChange={(e) => setText(e.target.value.slice(0, MESSAGE_MAX))}
           onKeyDown={(e) => {
-            // Enter отправляет, Shift+Enter переносит строку — как везде, где
-            // пишут короткие реплики.
             if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();
               submit(e);
@@ -184,8 +177,6 @@ function Bubble({
         )}
       >
         {message.kind === "ai" && (
-          // Подпись обязательна: отвечает магазин, но не человек, и покупатель
-          // вправе это знать до того, как поверит ответу.
           <span
             className={cn(
               "mb-1 flex items-center gap-1 text-[11px] font-medium",
@@ -206,8 +197,6 @@ function Bubble({
           )}
         >
           {formatMessageTime(message.createdAt, locale)}
-          {/* Одна галочка — отправлено, две — прочитано: привычный по
-              мессенджерам знак, который не нужно объяснять. */}
           {own &&
             (message.readAt ? (
               <CheckDouble className="size-3.5" aria-label={readLabel} />

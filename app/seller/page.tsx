@@ -133,8 +133,6 @@ export default function SellerDashboard() {
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {recent.map((p) => (
               <Link key={p.id} href={`/seller/products/${p.id}`} className="group">
-                {/* flex-row обязателен: у Card в базовых классах flex-col, и один лишь
-                    `flex` его не перебивает — карточка складывается в столбик. */}
                 <Card className="h-full flex-row items-center gap-3 p-3 transition-colors group-hover:ring-primary/40">
                   <ProductImage
                     hue={p.hue}

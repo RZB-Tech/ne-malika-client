@@ -13,7 +13,6 @@ import { contactPath } from "@/lib/metrika";
  */
 
 const METRIKA_API = "https://api-metrika.yandex.net/stat/v1/data";
-// Хвостовой слэш в переменной окружения превращает путь в `//api/v1/...`, а Nest на такое отвечает 404.
 const NEST_API = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001").replace(/\/+$/, "");
 
 /**
@@ -79,7 +78,6 @@ export async function GET(req: NextRequest) {
 
   try {
     const [totals, daily, contacts] = await Promise.all([
-      // Уники нельзя складывать по дням, поэтому за totals — отдельный запрос без разбивки.
       metrika(token, {
         ids: counterId,
         metrics: "ym:pv:pageviews,ym:pv:users",
@@ -230,7 +228,7 @@ function debug(...parts: unknown[]): void {
   void appendFile(
     resolve(process.cwd(), ".next/metrika-debug.log"),
     `${new Date().toISOString()} ${line}\n`,
-  ).catch(() => {}); // отладка не повод ронять запрос
+  ).catch(() => {});
 }
 
 async function metrika(
@@ -245,8 +243,6 @@ async function metrika(
       : { cache: "no-store" as const }),
   });
 
-  // Тело читаем один раз и текстом: на ошибке там может лежать не JSON,
-  // а `res.json()` в этом случае бросит, спрятав настоящую причину.
   const raw = await res.text();
 
   debug("[metrika] →", params.metrics, "|", params.filters ?? "без фильтра");

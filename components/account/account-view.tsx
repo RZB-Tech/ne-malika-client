@@ -35,11 +35,7 @@ export function AccountView({
       </p>
 
       <Tabs defaultValue={defaultTab} className="mt-6 gap-6">
-        {/* Во всю ширину: вкладки делят её поровну и помещаются на телефоне.
-            overflow-x-auto — страховка на случай длинных переводов. */}
         <TabsList className="w-full max-w-xl overflow-x-auto">
-          {/* Отступы по умолчанию (px-3.5) на телефоне съедают лишние ~35px,
-              и третья вкладка уезжает за край. */}
           <TabsTrigger value="history" className={tab}>
             <History />
             {t("account.tabs.history")}

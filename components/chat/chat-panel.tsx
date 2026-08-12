@@ -36,8 +36,6 @@ export function ChatPanel({
   const [activeId, setActiveId] = useState<number | null>(null);
 
   const chats = data?.data ?? [];
-  // Ищем в свежем списке, а не храним объект: счётчик непрочитанного и
-  // последнее сообщение обновляются опросом, и сохранённая копия устарела бы.
   const active = chats.find((chat) => chat.id === activeId) ?? null;
 
   const select = (id: number | null) => {
@@ -46,9 +44,6 @@ export function ChatPanel({
   };
 
   return (
-    // Высоту задаёт вызывающий: на телефоне это весь экран, в кабинете
-    // продавца — часть страницы. Зашитая сюда, она в одном из мест обязательно
-    // мешала бы.
     <div
       className={cn(
         "flex overflow-hidden rounded-2xl border border-border bg-card",
@@ -58,7 +53,6 @@ export function ChatPanel({
       <div
         className={cn(
           "w-full shrink-0 overflow-y-auto md:w-80 md:border-r md:border-border",
-          // На телефоне список уступает место переписке целиком.
           active ? "hidden md:block" : "block",
         )}
       >
@@ -73,9 +67,6 @@ export function ChatPanel({
 
       <div className={cn("min-w-0 flex-1", active ? "flex" : "hidden md:flex")}>
         {active ? (
-          // Возврат к списку — стрелкой в самой шапке переписки, а не отдельной
-          // полосой над ней: две строки подряд с одинаковым смыслом занимают
-          // десятую часть экрана телефона и ничего не добавляют.
           <ChatThread
             chat={active}
             side={role}

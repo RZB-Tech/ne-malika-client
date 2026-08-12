@@ -73,8 +73,6 @@ export function ReviewsSection({
           )}
         </h2>
 
-        {/* Кнопки нет у продавца — свой магазин оценивать нельзя, и сервер
-            такой отзыв всё равно не примет. */}
         {isHydrated && !isOwner && !mine.data && (
           <WriteButton
             authenticated={isAuthenticated}
@@ -98,9 +96,6 @@ export function ReviewsSection({
             </span>
           </div>
 
-          {/* Разбивка по звёздам: одна средняя цифра скрывает, из чего она
-              сложилась — «4,0» бывает и у ровных четвёрок, и у пятёрок с
-              двойкой. */}
           <div className="flex flex-col justify-center gap-1.5">
             {STARS.map((star) => {
               const value = summary.data?.breakdown?.[String(star)] ?? 0;
@@ -282,8 +277,6 @@ function ReviewItem({ review }: { review: PublicReview }) {
         </span>
       </div>
 
-      {/* На странице магазина видно, о каком товаре речь: оценка продавца
-          складывается из отзывов обо всех его товарах. */}
       {review.productName && (
         <p className="mt-1 text-xs text-muted-foreground">
           {t("reviews.aboutProduct", { name: review.productName })}

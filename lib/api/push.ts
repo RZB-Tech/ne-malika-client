@@ -22,6 +22,13 @@ export function permissionState(): NotificationPermission | null {
   return isPushSupported() ? Notification.permission : null;
 }
 
+/** Разрешение браузера ещё не означает, что endpoint действительно создан. */
+export async function hasPushSubscription(): Promise<boolean> {
+  if (!isPushSupported()) return false;
+  const reg = await navigator.serviceWorker.getRegistration("/");
+  return Boolean(await reg?.pushManager.getSubscription());
+}
+
 /**
  * VAPID-ключ приходит base64url, а PushManager ждёт байты.
  *
@@ -77,8 +84,6 @@ export async function subscribeToPush(
   if (permission !== "granted") return permission;
 
   const reg = await registration();
-  // Уже подписанный браузер переиспользуем: повторная подписка выдаёт новый
-  // endpoint, а старый остаётся жить на сервере и шлёт дубли.
   const existing = await reg.pushManager.getSubscription();
   const subscription =
     existing ??
@@ -95,9 +100,6 @@ export async function subscribeToPush(
     userAgent: navigator.userAgent.slice(0, 300),
   });
 
-  // Внутренний toast подтверждает действие только внутри сайта. Отдельное
-  // системное уведомление сразу показывает человеку, что Web Push действительно
-  // работает и будет появляться справа в Windows при закрытой вкладке.
   if (confirmation) {
     await reg.showNotification(confirmation.title, {
       body: confirmation.body,
@@ -121,7 +123,5 @@ export async function unsubscribeFromPush(): Promise<void> {
 
   const { endpoint } = subscription;
   await subscription.unsubscribe();
-  // Сервер чистим после браузера: если запрос упадёт, мёртвую подписку он
-  // отбросит сам по 410 при первой же отправке.
   await axiosInstance.delete("/api/v1/push/subscribe", { data: { endpoint } });
 }

@@ -41,17 +41,12 @@ export function ConfirmDialog({
   const [busy, setBusy] = useState(false);
 
   const confirm = async (e: React.MouseEvent) => {
-    // Диалог управляемый, а закрытие по умолчанию отменяется: иначе окно
-    // исчезает раньше, чем запрос ушёл, и об ошибке сообщить уже негде.
-    // Раньше на этом всё и заканчивалось — preventDefault гасил встроенное
-    // закрытие Radix, а своего не было, и окно висело после успеха.
     e.preventDefault();
     setBusy(true);
     try {
       await onConfirm();
       setOpen(false);
     } catch {
-      // Оставляем открытым: пользователь видит тост с ошибкой и может повторить.
     } finally {
       setBusy(false);
     }
@@ -71,9 +66,6 @@ export function ConfirmDialog({
           <AlertDialogCancel disabled={busy}>
             {t("common.cancel")}
           </AlertDialogCancel>
-          {/* variant, а не классы: Slot склеивает className простым join, без
-              tailwind-merge, и bg-primary от варианта по умолчанию побеждал
-              подмешанный bg-destructive — кнопка удаления выглядела обычной. */}
           <AlertDialogAction
             disabled={busy}
             onClick={confirm}

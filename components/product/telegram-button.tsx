@@ -45,7 +45,6 @@ export function TelegramButton({
         href={url}
         target="_blank"
         rel="noreferrer"
-        // Кнопка магазина живёт без товара — привязывать такой переход не к чему.
         onClick={() => productId && trackContact(productId, "telegram")}
       >
         <TelegramIcon className="size-4" />

@@ -1,11 +1,5 @@
 "use client";
 
-// Список сравнения. В отличие от истории и избранного на бэкенд не уезжает:
-// это сеансовый выбор — набрал несколько товаров, посмотрел таблицу, забыл.
-// Хранится в localStorage, чтобы пережить переход между страницами витрины.
-//
-// Порядок — тот, в котором товары добавляли: он же порядок колонок в таблице.
-
 import { createLocalListStore } from "@/lib/storage/local-list-store";
 import { isProductSnapshot, type ProductSnapshot } from "@/lib/product-snapshot";
 
@@ -37,7 +31,6 @@ export function addToCompare(
   if (store.has(product.id)) return false;
   if (store.get().length >= MAX_COMPARE) return false;
 
-  // В конец, а не в начало: колонки должны идти в порядке выбора.
   store.update((items) => [...items, { ...product, addedAt }]);
   return true;
 }

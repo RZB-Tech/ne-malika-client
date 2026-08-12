@@ -49,9 +49,6 @@ export function FixDescriptionButton({
     after: string;
   } | null>(null);
 
-  // Возврат предлагаем, только пока текст — ровно тот, что вернула модель.
-  // Стоит человеку начать править его руками, и «вернуть» стёрло бы уже его
-  // собственную работу, а не работу модели.
   const canUndo = revision !== null && text === revision.after;
 
   const run = async () => {
@@ -62,8 +59,6 @@ export function FixDescriptionButton({
 
     setBusy(true);
     try {
-      // Фото могло быть выбрано минуту назад и ещё не уехать в S3: модель
-      // читает файл оттуда, поэтому сначала догружаем.
       let key = photo.key;
       if (!key) {
         key = await uploadPhoto(dataUrlToBlob(photo.url));

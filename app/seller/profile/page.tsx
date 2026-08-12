@@ -49,14 +49,11 @@ export default function SellerProfile() {
   const [phone, setPhone] = useState("");
   const [telegram, setTelegram] = useState("");
   const [hours, setHours] = useState<WorkingHours>(defaultWorkingHours);
-  const [logo, setLogo] = useState<string | null>(null); // data URL for new upload
+  const [logo, setLogo] = useState<string | null>(null);
   const [photoKey, setPhotoKey] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [hydratedShopId, setHydratedShopId] = useState<number | null>(null);
 
-  // Populate the form once, when the shop loads. Приводим состояние прямо во
-  // время рендера (рекомендованная React альтернатива setState в эффекте):
-  // повторный рендер происходит до отрисовки, без лишнего кадра.
   if (shop && shop.id !== hydratedShopId) {
     setHydratedShopId(shop.id);
     setName(shop.name);
@@ -91,8 +88,6 @@ export default function SellerProfile() {
       return;
     }
 
-    // Из ввода (ссылка/@username/tg://…) вытаскиваем чистый username. Пустое
-    // поле допустимо; непустое, но нераспознанное — ошибка, не сохраняем мусор.
     const tgUsername = telegram.trim()
       ? parseTelegramUsername(telegram)
       : null;
@@ -126,16 +121,10 @@ export default function SellerProfile() {
         await updateMutation.mutateAsync({ id: shop.id, data: payload });
       } else {
         await createMutation.mutateAsync({ data: payload });
-        // Создание магазина повышает покупателя до продавца, но роль зашита в
-        // выданный токен — без перевыпуска разделы товаров остались бы
-        // закрытыми до следующего входа.
         await refreshSession();
       }
 
       await queryClient.invalidateQueries();
-      // The form hydrates from `shop` only once, so the freshly stored key has
-      // to be pushed into state here — otherwise dropping the data-URL preview
-      // below falls back to the previous photo.
       setPhotoKey(photo ?? null);
       setLogo(null);
       toast.success(t("seller.profile.saved"));
@@ -249,8 +238,6 @@ export default function SellerProfile() {
                   id="stg"
                   value={telegram}
                   onChange={(e) => setTelegram(e.target.value)}
-                  // Можно вставить полную ссылку — по уходу из поля оставляем
-                  // только username, кнопка перехода соберётся из него.
                   onBlur={() => {
                     const u = parseTelegramUsername(telegram);
                     if (u) setTelegram(u);

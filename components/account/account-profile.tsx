@@ -28,8 +28,6 @@ export function AccountProfile() {
         <p className="mt-1.5 max-w-sm text-sm text-muted-foreground">
           {t("account.profile.guestText")}
         </p>
-        {/* Остаёмся на странице: вошедший покупатель должен увидеть свою
-            историю здесь же, а не уехать в кабинет продавца. */}
         <LoginDialog redirectTo={null}>
           <Button size="lg" className="mt-6 gap-2">
             <TelegramIcon className="size-4" />
@@ -40,7 +38,6 @@ export function AccountProfile() {
     );
   }
 
-  // В сгенерированной схеме это nullable-объекты, но с Telegram приходят строки.
   const photo = user.telegramPhoto as string | null;
   const username = user.telegramUsername as string | null;
   const phone = user.phoneNumber as string | null;
@@ -100,8 +97,6 @@ export function AccountProfile() {
       </dl>
 
       <div className="mt-6 grid gap-2 sm:grid-cols-2">
-        {/* Покупателю ведёт туда же, но обещает другое: магазина у него нет,
-            и в /seller его ждёт форма создания. */}
         <Button asChild variant="outline" className="gap-2">
           <Link href={isAdmin ? "/admin" : "/seller"}>
             {isSeller || isAdmin ? (

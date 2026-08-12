@@ -127,8 +127,6 @@ export function GrantCreditsDialog({
             placeholder="20"
             className="tabular"
           />
-          {/* Считает сервер: множитель лежит в настройках, и клиентский
-              пересчёт разошёлся бы с фактическим начислением. */}
           <p className="text-xs text-muted-foreground">
             {validAmount && preview
               ? t("admin.credits.preview", {

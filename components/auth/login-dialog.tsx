@@ -86,7 +86,6 @@ export function LoginDialog({
         </DialogHeader>
 
         {isTelegramMiniApp ? (
-          // Inside the Telegram client (mobile or Telegram Desktop).
           <Button
             size="lg"
             disabled={loading}
@@ -97,7 +96,6 @@ export function LoginDialog({
             {t("auth.telegramLogin")}
           </Button>
         ) : (
-          // Plain browser — official Telegram OAuth popup.
           <div className="mt-2 flex flex-col items-center gap-3">
             {hasOAuth ? (
               <TelegramOAuthButton

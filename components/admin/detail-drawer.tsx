@@ -35,7 +35,6 @@ export function DetailDrawer({
 }) {
   return (
     <Drawer open={open} onOpenChange={onOpenChange} direction="right">
-      {/* max-w-md вместо стандартного sm: карточка читается в одну колонку. */}
       <DrawerContent className="data-[vaul-drawer-direction=right]:sm:max-w-md">
         <div className="flex h-full min-h-0 flex-col">
           <DrawerHeader className="gap-2 px-5 pt-5 pb-4">

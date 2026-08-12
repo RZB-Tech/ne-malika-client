@@ -171,7 +171,6 @@ export function MyReviews() {
         </div>
       )}
 
-      {/* Одно окно на весь список: цель берётся из того отзыва, который правят. */}
       {editing && (
         <ReviewFormDialog
           open

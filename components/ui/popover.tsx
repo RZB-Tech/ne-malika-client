@@ -23,9 +23,6 @@ function PopoverContent({
   sideOffset = 4,
   ...props
 }: React.ComponentProps<typeof PopoverPrimitive.Content>) {
-  // Без Portal — намеренно. Диалог блокирует прокрутку всего, что лежит вне
-  // него, а портал уносит содержимое в body: список категорий открывался, но
-  // колесо мыши на нём не работало. Оставаясь внутри диалога, он скроллится.
   return (
     <>
       <PopoverPrimitive.Content

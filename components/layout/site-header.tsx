@@ -184,19 +184,12 @@ export function SiteHeader() {
 
         <CatalogMenu />
 
-        {/* На телефоне логотип и поиск стоят в одной строке. Строка поиска
-            читает адрес страницы, а он известен только в браузере, поэтому
-            граница Suspense нужна и здесь: без неё весь сайт, включая
-            статические страницы, пришлось бы рендерить на клиенте. */}
         <div className="hidden min-w-0 flex-1 md:block">
           <Suspense fallback={<SearchBarSkeleton appearance="marketplace" />}>
             <SearchBar appearance="marketplace" />
           </Suspense>
         </div>
 
-        {/* Действия покупателя: значок и подпись под ним. Подписи важнее
-            компактности — иконка весов без слова «Сравнение» не читается
-            никем, кроме того, кто её рисовал. */}
         <nav
           aria-label={t("common.actions")}
           className="flex shrink-0 items-center gap-0.5 sm:gap-1"
@@ -260,8 +253,6 @@ export function SiteHeader() {
         </nav>
       </div>
 
-      {/* Вторая строка: на телефоне разделы, язык и тема живут в бургере,
-          поэтому там её просто нет. */}
       <div
         aria-hidden={isCompact}
         className={cn(
@@ -367,9 +358,6 @@ function ActionBody({
           </span>
         )}
       </span>
-      {/* Подпись не переносится и не жмётся: «Сравнение» в две строки поднимает
-          высоту всей шапки. На узком экране подписи нет вовсе — там и места
-          нет, и рядом стоит бургер с теми же пунктами словами. */}
       <span className="hidden truncate text-[11px] leading-none whitespace-nowrap sm:block">
         {label}
       </span>

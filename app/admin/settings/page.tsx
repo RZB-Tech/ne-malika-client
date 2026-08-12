@@ -24,8 +24,6 @@ export default function AdminSettings() {
   });
   const updateMutation = useAdminSettingsControllerUpdate();
 
-  // Строка, а не число: поле можно очистить во время правки, и «» не должно
-  // превращаться в 0 — множитель ноль означал бы деление на ноль при выдаче.
   const [markup, setMarkup] = useState<string | null>(null);
   const markupValue = markup ?? String(settings?.creditMarkup ?? 2);
 
@@ -103,7 +101,6 @@ export default function AdminSettings() {
         )}
       </Card>
 
-      {/* Множитель наценки: сумма от магазина делится на него при начислении. */}
       <Card className="p-6">
         {isLoading || !settings ? (
           <Skeleton className="h-16 w-full" />

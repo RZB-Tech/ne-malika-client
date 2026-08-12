@@ -1,9 +1,5 @@
 "use client";
 
-// Избранное устройства. Устроено как история просмотров, но кладут сюда
-// осознанно, поэтому повторное нажатие на сердце не меняет дату — список
-// отсортирован по тому, когда товар добавили.
-
 import { createLocalListStore } from "@/lib/storage/local-list-store";
 import { isProductSnapshot, type ProductSnapshot } from "@/lib/product-snapshot";
 

@@ -25,7 +25,6 @@ export function applyGenerated(
 ): ApplyResult {
   const at = sourceId ? prev.findIndex((p) => p.id === sourceId) : -1;
 
-  // Исходное фото заменяется, поэтому одно место освобождается.
   const room = MAX_PHOTOS - prev.length + (at === -1 ? 0 : 1);
   const fitting = generated.slice(0, Math.max(0, room));
   const dropped = generated.length - fitting.length;

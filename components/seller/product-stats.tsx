@@ -29,20 +29,14 @@ export function ProductStatsCard({
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["product-stats", productId, shopId],
     queryFn: () => fetchStats(productId, shopId),
-    // Ответ Метрики всё равно кэшируется на 5 минут — не дёргаем чаще.
-    // В деве не кэшируем: после клика по кнопке цифры должны меняться сразу.
     staleTime: process.env.NODE_ENV === "development" ? 0 : 5 * 60_000,
     retry: false,
   });
 
   if (isLoading) return <Skeleton className="h-28 w-full rounded-2xl" />;
   if (isError || !data) {
-    // Молча прятать блок нельзя: отличить «нет статистики» от «роут отдал 403» станет невозможно.
     return (
       <Card className="p-6 text-sm text-muted-foreground">
-        {/* Одно сообщение, а не два: раньше к полному предложению
-            «Статистика просмотров временно недоступна» приклеивалось второе,
-            «Статистика недоступна (403)», и мысль повторялась дважды. */}
         {error instanceof Error
           ? t("seller.stats.error", { status: error.message })
           : t("seller.stats.unavailable")}

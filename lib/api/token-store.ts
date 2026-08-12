@@ -1,10 +1,5 @@
 "use client";
 
-// In-memory + localStorage access-token holder shared across the app.
-// The refresh token lives in an httpOnly cookie managed by the backend, so we
-// never touch it here — we only keep the short-lived access token and the
-// current user profile so the UI can react to auth changes.
-
 import type { AuthUserDto } from "./generated/schemas";
 
 const TOKEN_KEY = "nemalika.accessToken";
@@ -27,7 +22,6 @@ function readStorage() {
   currentUser = rawUser ? (JSON.parse(rawUser) as AuthUserDto) : null;
 }
 
-// Hydrate synchronously on module load in the browser.
 readStorage();
 
 export function getAccessToken(): string | null {

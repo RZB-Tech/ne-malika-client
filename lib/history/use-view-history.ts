@@ -83,14 +83,11 @@ export function useViewHistory() {
     [queryClient],
   );
 
-  // Перенос истории устройства сразу после входа — один раз на аккаунт.
   useEffect(() => {
     const userId = user?.id;
     if (!enabled || userId === undefined || syncedUsers.has(userId)) return;
 
     const items = getLocalHistory();
-    // Отметку ставим до запроса: в StrictMode эффект выполняется дважды, и
-    // без неё вторая копия успела бы отправить те же записи.
     syncedUsers.add(userId);
     if (items.length === 0) return;
 
@@ -104,8 +101,6 @@ export function useViewHistory() {
     })
       .then(() => invalidate())
       .catch(() => {
-        // Бэкенд недоступен — попробуем на следующем заходе, а пока в кабинете
-        // останется локальная история.
         syncedUsers.delete(userId);
       });
   }, [enabled, user?.id, syncViews, invalidate]);
@@ -113,9 +108,6 @@ export function useViewHistory() {
   const items: HistoryItem[] = useMemo(() => {
     if (!enabled) return local;
     const data = remote.data?.data;
-    // Пока сервер не ответил (или ответил ошибкой) — показываем локальную
-    // историю: пустой экран у человека, который только что смотрел товары,
-    // выглядит как потеря данных.
     return data ? data.map(fromRemote) : local;
   }, [enabled, local, remote.data]);
 
@@ -123,8 +115,6 @@ export function useViewHistory() {
     async (id: number) => {
       removeLocalView(id);
       if (!enabled) return;
-      // 404 здесь — норма: товара могло не быть в серверной истории, если он
-      // попал в неё только локально.
       await removeRemote({ productCardId: id }).catch(() => undefined);
       await invalidate();
     },

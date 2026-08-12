@@ -29,8 +29,6 @@ export function CompareButton({
 
   const onClick = () => {
     const added = toggle(product);
-    // Отказ бывает единственной причины — мест больше нет. Молчать здесь
-    // нельзя: нажатие внешне ничего не изменит, и это выглядит как поломка.
     if (!added && !active) {
       toast.message(t("compare.limitReached", { count: max }));
     }
@@ -64,7 +62,6 @@ export function CompareButton({
         active
           ? "text-primary"
           : "text-muted-foreground hover:text-foreground",
-        // Полный список не прячем, а гасим: исчезнувшая кнопка выглядит как сбой.
         isFull && !active && "opacity-40",
         className,
       )}

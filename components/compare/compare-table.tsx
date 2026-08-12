@@ -29,12 +29,8 @@ export function CompareTable() {
   const { t, locale } = useT();
   const { items, ids, remove, clear } = useCompare();
 
-  // Характеристики в снимке не хранятся — тянем полные карточки одним
-  // запросом по ?ids=. Пока он летит, шапка уже рисуется из снимков.
   const { data, isPending } = useQuery({
     queryKey: ["compare", ids],
-    // Эндпоинт описан в спеке без схемы ответа, поэтому orval типизировал его
-    // как void — приводим к рукописной проекции, как и остальной код.
     queryFn: ({ signal }) =>
       productCardsControllerFindAll(
         { ids: ids.map(String), limit: ids.length },
@@ -44,7 +40,6 @@ export function CompareTable() {
     enabled: ids.length > 0,
   });
 
-  // Порядок колонок задаёт список сравнения, а не ответ бэкенда.
   const cards = useMemo(() => {
     const byId = new Map((data?.data ?? []).map((c) => [c.id, c]));
     return items.map((item) => byId.get(item.id) ?? null);
@@ -75,8 +70,6 @@ export function CompareTable() {
       },
     ];
 
-    // Характеристики у товаров разные и произвольные — собираем объединение
-    // ключей в порядке появления, пустые клетки помечаем прочерком.
     const keys: string[] = [];
     for (const card of cards) {
       for (const c of card?.characteristics ?? []) {
@@ -133,17 +126,10 @@ export function CompareTable() {
         </Button>
       </div>
 
-      {/* Таблица прокручивается внутри себя: четыре колонки не влезают в
-          телефон, но страница из-за этого ездить вбок не должна.
-          Без min-w на самой таблице: при двух товарах она должна помещаться
-          целиком, а не заставлять скроллить пустоту. */}
       <div className="overflow-x-auto rounded-2xl border border-border">
         <table className="w-full border-collapse text-sm">
           <thead>
             <tr>
-              {/* Ширину колонки задаёт только эта ячейка — у остальных её нет,
-                  иначе шапка и тело разъезжаются. Фон непрозрачный и
-                  border-r: под липкую колонку уезжают значения соседних. */}
               <th className="sticky left-0 z-20 w-24 border-r border-border bg-card p-3 text-left align-top sm:w-40 sm:p-4" />
               {items.map((item) => (
                 <th
@@ -187,14 +173,10 @@ export function CompareTable() {
           <tbody>
             {rows.map((row, i) => (
               <tr key={row.label} className="border-t border-border">
-                {/* Чередование фона — только на значениях: колонка подписей
-                    остаётся сплошной, иначе полупрозрачная полоска просвечивает
-                    уезжающими под неё цифрами. */}
                 <th
                   scope="row"
                   className={cn(
                     "sticky left-0 z-20 border-r border-border bg-card p-3 text-left align-top font-medium sm:p-4",
-                    // Различающиеся строки — то, ради чего таблицу открыли.
                     row.differs ? "text-foreground" : "text-muted-foreground",
                   )}
                 >

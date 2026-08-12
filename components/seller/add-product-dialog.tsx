@@ -27,15 +27,12 @@ export function AddProductDialog() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      {/* Форма длинная — прокручиваем её внутри окна, а не растягиваем экран. */}
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl">
         <DialogHeader>
           <DialogTitle>{t("seller.add.title")}</DialogTitle>
           <DialogDescription>{t("seller.add.subtitle")}</DialogDescription>
         </DialogHeader>
 
-        {/* key сбрасывает поля между открытиями: иначе в новое окно затекал бы
-            прошлый черновик вместе с загруженными фото. */}
         {open && (
           <AddProductForm
             key={String(open)}

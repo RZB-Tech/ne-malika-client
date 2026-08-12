@@ -9,7 +9,6 @@ import { markdownToPlainText } from "@/lib/markdown";
 import type { Store } from "@/lib/data";
 import { SITE_NAME, absoluteUrl } from "@/lib/seo";
 
-// Собирает короткую строку характеристик для description ("RAM: 16 ГБ · ...").
 function specsSummary(
   characteristics: { key: string; value: string }[] | null | undefined,
   max = 4,
@@ -20,7 +19,6 @@ function specsSummary(
     .join(" · ");
 }
 
-// title/description/OG на основе реальных данных товара — на сервере, в HTML.
 export async function generateMetadata({
   params,
 }: {
@@ -35,15 +33,11 @@ export async function generateMetadata({
     return { title: "Товар не найден", robots: { index: false, follow: true } };
   }
 
-  // Товар без цены: в описании для поисковика так и пишем — «цена договорная».
-  // Подставить сюда ноль значило бы отдать краулеру товар за 0 сум.
   const priceLine =
     product.price === null
       ? "Цена договорная."
       : `Цена ${new Intl.NumberFormat("ru-RU").format(Number(product.price))} сум.`;
   const specs = specsSummary(product.characteristics);
-  // Разметку снимаем: в сниппете поисковика звёздочки и дефисы списка занимают
-  // место и читаются как мусор.
   const descBase =
     markdownToPlainText(product.description ?? "") ||
     `${product.name} — купить на рынке Малика (Malika) в Ташкенте.`;
@@ -90,8 +84,6 @@ export default async function ProductPage({
   const numId = Number(id);
   if (!Number.isFinite(numId)) notFound();
 
-  // Товар обязателен — из кеша generateMetadata (revalidate), лишнего запроса
-  // к БД нет. Магазин догружаем параллельно; его отсутствие не роняет страницу.
   const raw = await getPublicProduct(numId);
   if (!raw) notFound();
 
@@ -101,7 +93,6 @@ export default async function ProductPage({
   const store: Store = shopRaw
     ? mapShop(shopRaw)
     : {
-        // Плейсхолдер, если магазин недоступен, — как в прежнем клиентском коде.
         id: String(product.storeId),
         slug: String(product.storeId),
         name: product.brand || "Магазин",
@@ -133,8 +124,6 @@ export default async function ProductPage({
       name: c.key,
       value: c.value,
     })),
-    // Оффер только у товара с ценой. Схема требует в offers.price число, и
-    // «договорная» как 0 — это витрина товаров за ноль в поисковой выдаче.
     offers:
       raw.price === null
         ? undefined
@@ -154,7 +143,6 @@ export default async function ProductPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      {/* Снимок для истории просмотров — из уже загруженных данных страницы. */}
       <TrackProductView
         product={{
           id: raw.id,

@@ -66,8 +66,6 @@ export function ProductFormDialog({
     <Dialog open={target !== null} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-xl">
         {target && (
-          // key сбрасывает состояние формы при смене товара: иначе в неё
-          // затекали бы поля предыдущего.
           <FormBody
             key={target.product?.id ?? "new"}
             target={target}
@@ -95,8 +93,6 @@ function FormBody({
   const createMutation = useAdminProductCardsControllerCreate();
   const updateMutation = useAdminProductCardsControllerUpdate();
 
-  // Упразднённый магазин товаров не принимает — бэкенд вернёт 403, поэтому и
-  // в списке его быть не должно.
   const activeShops = useMemo(
     () => shops.filter((s) => s.status === "active"),
     [shops],
@@ -124,7 +120,6 @@ function FormBody({
     ),
   );
   const [saving, setSaving] = useState(false);
-  // Фото, которое админ нажал для перерисовки через ИИ.
   const [aiPhoto, setAiPhoto] = useState<UploadedPhoto | null>(null);
 
   const submit = async (e: React.FormEvent) => {

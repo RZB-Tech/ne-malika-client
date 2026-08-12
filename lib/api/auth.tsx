@@ -53,7 +53,6 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-// Флаг гидратации не зависит от внешнего стора, подписка не нужна.
 const subscribeNoop = () => () => {};
 
 function readMiniAppInitData(): string | null {
@@ -67,8 +66,6 @@ function readMiniAppInitData(): string | null {
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const user = useSyncExternalStore(subscribe, getCurrentUser, () => null);
   const token = useSyncExternalStore(subscribe, getAccessToken, () => null);
-  // Серверный снапшот — false, клиентский — true, поэтому значение
-  // становится true сразу после гидратации, без setState в эффекте.
   const hydrated = useSyncExternalStore(
     subscribeNoop,
     () => true,
@@ -93,8 +90,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setAuth(res.accessToken, res.user);
       return res;
     } catch {
-      // Сессия могла истечь — молча оставляем прежний токен, вызывающий код
-      // не должен из-за этого падать.
       return null;
     }
   }, []);
@@ -107,7 +102,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  // On mount: init the Telegram client, then restore/establish a session.
   useEffect(() => {
     const wa = (
       window as unknown as {
@@ -117,18 +111,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     wa?.ready?.();
     wa?.expand?.();
 
-    // Сессия уже есть — но роль зашита в выданный токен, а её могли изменить
-    // (админ выдал права, продавец удалил магазин). Тихо перевыпускаем токены,
-    // иначе интерфейс до следующего входа показывает старую роль.
     if (getAccessToken()) {
       void refreshSession();
       return;
     }
 
-    // Локальная разработка без бэкенда: фиктивная сессия, чтобы открывался
-    // кабинет. Токен ненастоящий — все запросы к API всё равно упадут, и
-    // страницы покажут тестовые данные из dev-fixtures. В прод-сборке
-    // DEV_ROLE всегда undefined, ветка вырезается сборщиком.
     if (DEV_ROLE) {
       const devNames = {
         admin: "Локальный админ",
@@ -148,20 +135,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    // Inside Telegram — auto-authenticate with the injected initData.
     const initData = readMiniAppInitData();
     if (initData) {
       loginWithInitData(initData).catch(() => {
-        /* stay logged out on failure */
       });
       return;
     }
 
-    // Plain browser — try a silent refresh from the cookie.
     authControllerRefresh()
       .then((res) => setAuth(res.accessToken, res.user))
       .catch(() => {
-        /* no active session */
       });
   }, [loginWithInitData, refreshSession]);
 

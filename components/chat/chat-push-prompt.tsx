@@ -8,6 +8,7 @@ import { useT } from "@/components/providers/i18n-provider";
 import { useAuth } from "@/lib/api/auth";
 import {
   fetchPushConfig,
+  hasPushSubscription,
   isPushSupported,
   permissionState,
   subscribeToPush,
@@ -36,6 +37,7 @@ export function ChatPushPrompt({ className }: { className?: string }) {
   const [permission, setPermission] = useState<NotificationPermission | null>(
     null,
   );
+  const [subscribed, setSubscribed] = useState(false);
   const [dismissed, setDismissed] = useState(true);
   const [busy, setBusy] = useState(false);
 
@@ -43,10 +45,11 @@ export function ChatPushPrompt({ className }: { className?: string }) {
     if (!isPushSupported()) return;
     if (localStorage.getItem(DISMISSED_KEY)) return;
 
-    void fetchPushConfig()
-      .then((config) => {
+    void Promise.all([fetchPushConfig(), hasPushSubscription()])
+      .then(([config, hasSubscription]) => {
         setDismissed(false);
         setPermission(permissionState());
+        setSubscribed(hasSubscription);
         setPublicKey(config.enabled ? config.publicKey : null);
       })
       .catch(() => setPublicKey(null));
@@ -57,7 +60,7 @@ export function ChatPushPrompt({ className }: { className?: string }) {
     !isAuthenticated ||
     dismissed ||
     !publicKey ||
-    permission === "granted" ||
+    subscribed ||
     permission === "denied";
 
   if (hidden) return null;
@@ -70,7 +73,10 @@ export function ChatPushPrompt({ className }: { className?: string }) {
         body: t("push.confirmBody"),
       });
       setPermission(result);
-      if (result === "granted") toast.success(t("push.enabled"));
+      if (result === "granted") {
+        setSubscribed(true);
+        toast.success(t("push.enabled"));
+      }
       else if (result === "denied") toast.error(t("push.blocked"));
     } catch {
       toast.error(t("push.failed"));

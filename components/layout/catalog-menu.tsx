@@ -32,8 +32,6 @@ export function CatalogMenu() {
   const { t, locale } = useT();
   const { roots, isLoading } = useCategories();
 
-  // Два состояния вместо одного: `open` ведёт анимацию, `mounted` держит панель
-  // в DOM. Убрать её сразу по клику — значит не показать закрытие вовсе.
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [activeId, setActiveId] = useState<number | null>(null);
@@ -55,7 +53,6 @@ export function CatalogMenu() {
 
   const close = useCallback(() => {
     setOpen(false);
-    // Открытие во время закрытия отменяет снятие с DOM — иначе панель мигнёт.
     unmountTimer.current = setTimeout(() => {
       setMounted(false);
       setDrilled(false);
@@ -73,13 +70,8 @@ export function CatalogMenu() {
     };
   }, [open]);
 
-  // На телефоне кнопки каталога в шапке нет — там её место занимает нижняя
-  // панель навигации, и открывает она то же самое меню.
   useEffect(() => onOpenCatalog(openMenu), [openMenu]);
 
-  // Шапка живёт в layout и не размонтируется при переходах, поэтому панель
-  // закрывают сами обработчики: ссылки внутри — по клику, всё снаружи — по
-  // pointerdown мимо панели. Отдельно слушаем «назад/вперёд»: там клика нет.
   useEffect(() => {
     if (!open) return;
 
@@ -109,7 +101,6 @@ export function CatalogMenu() {
         aria-expanded={open}
         aria-haspopup="true"
       >
-        {/* Иконки меняются местами плавно: без этого «крестик» щёлкает. */}
         <span
           data-icon="inline-start"
           className="relative grid size-5 place-items-center"
@@ -130,12 +121,8 @@ export function CatalogMenu() {
         <span className="hidden sm:inline">{t("nav.catalog")}</span>
       </Button>
 
-      {/* Панель и затемнение позиционируются от самой шапки (`top-full`), а не
-          от окна с фиксированным отступом: у шапки теперь три уровня, и любой
-          зашитый отступ разъезжался бы при каждой правке её высоты. */}
       {mounted && (
         <>
-          {/* Затемнение — только под панелью, шапка остаётся кликабельной. */}
           <div
             data-state={open ? "open" : "closed"}
             className="absolute inset-x-0 top-full z-40 h-screen bg-black/40 duration-200 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0 lg:top-17 lg:h-[calc(100dvh-4.25rem)]"
@@ -152,7 +139,6 @@ export function CatalogMenu() {
                 </p>
               ) : (
                 <>
-                  {/* Узкий экран: либо список разделов, либо содержимое одного. */}
                   <div className="lg:hidden">
                     {drilled && active ? (
                       <MobileChildren
@@ -188,7 +174,6 @@ export function CatalogMenu() {
                     )}
                   </div>
 
-                  {/* Широкий экран: разделы и подкатегории рядом. */}
                   <div className="hidden h-full lg:grid lg:grid-cols-[19rem_minmax(0,1fr)]">
                     <div className="flex min-h-0 flex-col border-r border-border pr-5">
                       <Button

@@ -26,8 +26,6 @@ export function RevealPhone({
 
   const reveal = () => {
     setRevealed(true);
-    // Автоцель Метрики ловит только клик по готовой ссылке `tel:`, а она
-    // появляется уже после раскрытия — поэтому сам интерес отмечаем сами.
     trackContact(productId, "phone");
   };
 
@@ -48,7 +46,6 @@ export function RevealPhone({
     );
   }
 
-  // Код страны и первая цифра видны, остальное под блюром до клика.
   const head = phone.slice(0, 6);
   const tail = phone.slice(6);
 

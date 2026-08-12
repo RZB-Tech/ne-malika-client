@@ -1,11 +1,3 @@
-// Серверные (RSC / generateMetadata / sitemap) обёртки над публичным API.
-// НЕ используют axios-мьютатор из mutator.ts — тот несёт браузерный token-store
-// и интерцепторы; здесь нужен голый fetch без авторизации, только публичные
-// проекции товаров и магазинов.
-//
-// Внутри docker-сети фронтенд может ходить в бэкенд напрямую по имени сервиса
-// (API_INTERNAL_URL, напр. http://api:3000) — быстрее и не гоняет трафик через
-// публичный TLS. Если переменная не задана, падаем на публичный адрес.
 import "server-only";
 
 import type { PublicProductCard, PublicShop, Paginated } from "./types";
@@ -26,14 +18,12 @@ async function getJson<T>(
 ): Promise<T | null> {
   try {
     const res = await fetch(`${API}${path}`, {
-      // ISR: страница кешируется и переиспользуется краулерами, БД не долбим.
       next: { revalidate: revalidateSec },
       headers: { accept: "application/json" },
     });
     if (!res.ok) return null;
     return (await res.json()) as T;
   } catch {
-    // Сеть/бэкенд недоступны — вызывающий код решает (notFound / дефолт).
     return null;
   }
 }

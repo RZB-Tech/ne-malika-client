@@ -72,8 +72,6 @@ export function ChatList({
             )}
           >
             {side === "seller" ? (
-              // У покупателя аватара в переписке нет — показываем товар, о
-              // котором он спрашивал: продавцу это говорит больше, чем лицо.
               <ProductImage
                 hue={hueFromId(chat.productCardId ?? chat.id)}
                 categorySlug=""

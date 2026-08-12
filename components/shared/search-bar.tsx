@@ -89,13 +89,9 @@ export function SearchBar({
   const [syncedQuery, setSyncedQuery] = useState(urlQuery);
   if (onCatalog && urlQuery !== syncedQuery) {
     setSyncedQuery(urlQuery);
-    // Свои же правки адреса пропускаем: иначе набранный пробел исчезал бы
-    // из-под курсора, ведь в адрес уходит обрезанная строка.
     if (urlQuery !== value.trim()) setValue(urlQuery);
   }
 
-  // Остальные параметры каталога сохраняем: запрос сужает текущую выдачу, а не
-  // начинает пустую — выбранный раздел никуда не девается.
   const catalogUrl = useCallback(
     (q: string) => {
       const params = new URLSearchParams(
@@ -134,9 +130,6 @@ export function SearchBar({
     return next ? `${CATALOG_PATH}?${next}` : CATALOG_PATH;
   };
 
-  // Живой поиск: на самом каталоге набор текста обновляет адрес после паузы.
-  // На других страницах строка выдёргивала бы человека со страницы посреди
-  // слова, поэтому там переход только по Enter.
   useEffect(() => {
     if (!typed.current || !onCatalog) return;
 
@@ -237,8 +230,6 @@ export function SearchBar({
         )}
       />
       {value && (
-        // Единственный способ вернуть полный каталог: панели фильтров, где
-        // раньше был сброс, больше нет.
         <Button
           type="button"
           variant="ghost"
@@ -247,8 +238,7 @@ export function SearchBar({
           aria-label={t("common.clear")}
           className={cn(
             marketplace
-              ? // Обычным элементом строки, а не поверх неё: рядом кнопка
-                // поиска, и любой зашитый отступ разъезжался бы вместе с ней.
+              ?
                 "mr-1 shrink-0 text-muted-foreground"
               : "absolute right-2",
           )}

@@ -30,10 +30,6 @@ const jetbrains = JetBrains_Mono({
   display: "swap",
 });
 
-// Runs before paint (in <head>) to apply the persisted theme without a flash.
-// The theme is a plain `.dark` class + `color-scheme`, toggled client-side by
-// AnimatedThemeToggler and persisted under the "theme" key. Rendered by this
-// Server Component, so it never trips React's client-side <script> warning.
 const THEME_INIT = `(function(){try{var d=localStorage.getItem('theme')==='dark';var e=document.documentElement;if(d)e.classList.add('dark');e.style.colorScheme=d?'dark':'light';}catch(e){}})();`;
 
 const YANDEX_METRIKA_ID = METRIKA_COUNTER_ID;
@@ -41,8 +37,6 @@ const YANDEX_METRIKA_ID = METRIKA_COUNTER_ID;
 const YANDEX_METRIKA = `(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();for(var j=0;j<document.scripts.length;j++){if(document.scripts[j].src===r){return;}}k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window,document,'script','https://mc.yandex.ru/metrika/tag.js?id=${YANDEX_METRIKA_ID}','ym');ym(${YANDEX_METRIKA_ID},'init',{ssr:true,webvisor:true,clickmap:true,ecommerce:"dataLayer",referrer:document.referrer,url:location.href,accurateTrackBounce:true,trackLinks:true});`;
 
 export const metadata: Metadata = {
-  // Без metadataBase Next отдаёт относительные canonical/OG-URL, и краулер их
-  // не может развернуть в абсолютные — соцсети и Яндекс теряют превью.
   metadataBase: new URL(SITE_URL),
   title: {
     default: "neMalika — маркетплейс компьютерной техники",
@@ -50,8 +44,6 @@ export const metadata: Metadata = {
   },
   description:
     "Витрина компьютерной техники: комплектующие, готовые сборки и периферия от проверенных магазинов. Поиск, фильтры и связь с продавцом напрямую в Telegram.",
-  // Подтверждение прав в Яндекс.Вебмастере. Next рендерит это как
-  // <meta name="yandex-verification" content="..."> в <head>.
   verification: { yandex: "f7605f24203c66e8" },
 };
 
@@ -69,13 +61,9 @@ export default function RootLayout({
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT }} />
-        {/* Telegram Mini App SDK — exposes window.Telegram.WebApp (with initData)
-            inside the Telegram client on both mobile and Telegram Desktop. */}
         <script src="https://telegram.org/js/telegram-web-app.js" async />
         <script dangerouslySetInnerHTML={{ __html: YANDEX_METRIKA }} />
       </head>
-      {/* Extensions (asbplayer & co.) inject classes/attrs on <body> before
-          hydration — suppress the resulting attribute mismatch. */}
       <body suppressHydrationWarning className="flex min-h-full flex-col">
         <noscript>
           <div>
@@ -86,8 +74,6 @@ export default function RootLayout({
             />
           </div>
         </noscript>
-        {/* Полоса прогресса при переходах между страницами. Цвет берём из токена
-            темы, поэтому она читается и в светлой, и в тёмной. */}
         <NextTopLoader
           color="var(--primary)"
           height={2}

@@ -149,8 +149,6 @@ export function PhotoDropzone({
                     "size-full object-cover",
                     onPhotoClick && "cursor-pointer",
                   )}
-                  // Сохранённое фото может не открыться (в дев-бакете нет объекта) —
-                  // прячем «битую» картинку, остаётся ровная плитка.
                   onError={(e) => e.currentTarget.classList.add("opacity-0")}
                 />
                 {i === 0 && (

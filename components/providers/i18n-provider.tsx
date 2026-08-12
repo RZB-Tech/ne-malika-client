@@ -44,8 +44,6 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>(defaultLocale);
 
   useEffect(() => {
-    // Read the stored preference only after mount so SSR/first client render
-    // stay identical (both default locale) and hydration doesn't mismatch.
     const stored = localStorage.getItem(STORAGE_KEY) as Locale | null;
     // eslint-disable-next-line react-hooks/set-state-in-effect
     if (stored && locales.includes(stored)) setLocaleState(stored);

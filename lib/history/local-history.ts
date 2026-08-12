@@ -1,13 +1,5 @@
 "use client";
 
-// История просмотров устройства.
-//
-// Пишется всегда, в том числе анониму: покупатель на витрине не обязан входить,
-// а увидеть «что я недавно смотрел» должен. После входа накопленное уезжает на
-// бэкенд (POST /me/product-views/sync) и дальше история читается оттуда — но
-// локальную копию мы не стираем, иначе выход из аккаунта обнулял бы её на ровном
-// месте.
-
 import { createLocalListStore } from "@/lib/storage/local-list-store";
 import { isProductSnapshot, type ProductSnapshot } from "@/lib/product-snapshot";
 

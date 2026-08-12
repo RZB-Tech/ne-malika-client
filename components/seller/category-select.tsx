@@ -28,7 +28,6 @@ function buildOptions(roots: CategoryDto[], locale: Locale): Option[] {
   const options: Option[] = [];
   for (const root of roots) {
     const group = root.name[locale];
-    // Раздел без подкатегорий выбирается сам — иначе он был бы виден, но недоступен.
     const items = root.children.length > 0 ? root.children : [root];
     for (const item of items) {
       const label = item.name[locale];
@@ -129,8 +128,6 @@ export function CategorySelect({
           ) : (
             filtered.map((o, i) => (
               <div key={o.id}>
-                {/* Заголовок раздела печатаем один раз на группу. В отфильтрованном
-                    списке группы идут вперемешку, поэтому сравниваем с предыдущим. */}
                 {(i === 0 || filtered[i - 1].group !== o.group) && (
                   <p className="px-2 pb-1 pt-2 text-xs font-medium text-muted-foreground">
                     {o.group}

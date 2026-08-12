@@ -95,8 +95,6 @@ export default function AdminUsers() {
     );
   };
 
-  // Снимая админа, возвращаем ту роль, которой человек соответствует: продавец
-  // без магазина — это просто покупатель.
   const demotedRole = (u: { shopId: number | null }): UserRole =>
     u.shopId ? "seller" : "user";
 

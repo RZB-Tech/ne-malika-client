@@ -50,9 +50,6 @@ export function BottomNav() {
           active={pathname === "/"}
         />
         <Item icon={LayoutGrid} label={t("nav.catalog")} onClick={openCatalog} />
-        {/* Чаты — отдельной вкладкой, а не пунктом кабинета: ответа продавца
-            ждут и возвращаются за ним, а значок с числом видно на любом
-            экране. */}
         <Item
           href="/messages"
           icon={MessageSquare}
@@ -74,8 +71,6 @@ export function BottomNav() {
           active={pathname === "/compare"}
         />
 
-        {/* До гидратации не знаем, вошёл ли человек: рисуем «Кабинет», чтобы
-            подпись не переобувалась на глазах. */}
         {isHydrated && !isAuthenticated ? (
           <LoginDialog>
             <button type="button" className={ITEM_CLASS}>
@@ -86,8 +81,6 @@ export function BottomNav() {
           <Item
             href="/account"
             icon={UserRound}
-            // «Личный кабинет» в подпись шириной в пятую часть экрана
-            // не влезает — внизу короткое слово.
             label={t("nav.cabinet")}
             active={pathname.startsWith("/account")}
           />

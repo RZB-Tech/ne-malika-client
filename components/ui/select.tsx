@@ -82,8 +82,6 @@ function SelectContent({
         <SelectScrollUpButton />
         <SelectPrimitive.Viewport
           data-position={position}
-          // Ширину тянем по триггеру, а высоту не трогаем: `--radix-select-trigger-height`
-          // на вьюпорте обрезал бы список до высоты одной строки.
           className="p-1 data-[position=popper]:w-full data-[position=popper]:min-w-(--radix-select-trigger-width)"
         >
           {children}

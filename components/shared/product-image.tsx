@@ -37,9 +37,6 @@ export function ProductImage({
 }) {
   const [failed, setFailed] = useState(false);
 
-  // Отметку об ошибке снимаем при смене фотографии: карточка каталога
-  // перелистывает их по наведению, и одна битая ссылка иначе роняла бы на
-  // плашку-заглушку всю остальную галерею.
   const [shown, setShown] = useState(src);
   if (src !== shown) {
     setShown(src);
@@ -61,14 +58,12 @@ export function ProductImage({
         backgroundImage: `radial-gradient(120% 120% at 30% 15%, oklch(0.965 0.045 ${hue}) 0%, oklch(0.9 0.06 ${hue}) 48%, oklch(0.82 0.085 ${hue}) 100%)`,
       }}
     >
-      {/* dark-theme wash overlays the light gradient */}
       <div
         className="absolute inset-0 opacity-0 dark:opacity-100"
         style={{
           backgroundImage: `radial-gradient(120% 120% at 30% 15%, oklch(0.33 0.055 ${hue}) 0%, oklch(0.26 0.045 ${hue}) 55%, oklch(0.2 0.035 ${hue}) 100%)`,
         }}
       />
-      {/* dotted texture */}
       <div
         className="absolute inset-0 opacity-[0.18]"
         style={{
@@ -77,7 +72,6 @@ export function ProductImage({
         }}
       />
       {showImage && natural ? (
-        // In flow, not absolute: the image's own height becomes the box's height.
         /* eslint-disable-next-line @next/next/no-img-element */
         <img
           src={src!}
@@ -87,7 +81,6 @@ export function ProductImage({
         />
       ) : showImage ? (
         <>
-          {/* Neutral backdrop so letterbox areas don't show the colored tile. */}
           {fit === "contain" && (
             <div className="absolute inset-0 z-[5] bg-muted" />
           )}

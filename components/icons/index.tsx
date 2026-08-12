@@ -18,8 +18,6 @@ import {
   CancelCircleIcon,
   ChampionIcon,
   CheckmarkCircle02Icon,
-  // Шевроны переименованы: под этими же именами их ждут заготовки shadcn/ui,
-  // и без псевдонима имя столкнулось бы с экспортом ниже.
   ChevronDownIcon as ChevronDownSrc,
   ChevronLeftIcon as ChevronLeftSrc,
   ChevronRightIcon as ChevronRightSrc,

@@ -2,7 +2,6 @@ import type { MetadataRoute } from "next";
 import { getAllProductIds } from "@/lib/api/server";
 import { absoluteUrl } from "@/lib/seo";
 
-// Пересобирается раз в час — новые товары появляются в карте без передеплоя.
 export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
