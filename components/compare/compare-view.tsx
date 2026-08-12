@@ -1,6 +1,8 @@
 "use client";
 
 import { useT } from "@/components/providers/i18n-provider";
+import { AddFromFavorites } from "./add-from-favorites";
+import { AiComparePanel } from "./ai-compare-panel";
 import { CompareTable } from "./compare-table";
 
 export function CompareView() {
@@ -15,8 +17,16 @@ export function CompareView() {
         {t("compare.subtitle")}
       </p>
 
-      <div className="mt-6">
+      {/* Отступы задаёт space-y, а не обёртки: и подбор из избранного, и разбор
+          ИИ при пустом списке ничего не рисуют, а обёртка с полем оставила бы
+          от них пустую полосу.
+
+          Разбор ИИ идёт под таблицей, а не над ней: сначала то, что написал
+          продавец, слово в слово, и только потом толкование. */}
+      <div className="mt-6 space-y-6">
+        <AddFromFavorites />
         <CompareTable />
+        <AiComparePanel />
       </div>
     </div>
   );

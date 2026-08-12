@@ -262,9 +262,9 @@ export function SiteHeader() {
       <div
         aria-hidden={isCompact}
         className={cn(
-          "hidden overflow-hidden transition-[height,opacity] duration-200 ease-out lg:block",
+          "hidden overflow-hidden transition-[height,opacity] duration-300 ease-in-out motion-reduce:transition-none lg:block",
           isCompact
-            ? "invisible h-0 pointer-events-none opacity-0"
+            ? "h-0 pointer-events-none opacity-0"
             : "h-10 opacity-100",
         )}
       >
@@ -310,9 +310,9 @@ export function SiteHeader() {
       <div
         aria-hidden={isCompact}
         className={cn(
-          "relative mx-auto hidden w-full max-w-[1600px] overflow-hidden rounded-b-3xl bg-primary transition-[height,opacity] duration-200 ease-out md:block",
+          "relative mx-auto hidden w-full max-w-[1600px] overflow-hidden rounded-b-3xl bg-primary transition-[height,opacity] duration-300 ease-in-out motion-reduce:transition-none md:block",
           isCompact
-            ? "invisible h-0 pointer-events-none opacity-0"
+            ? "h-0 pointer-events-none opacity-0"
             : "h-18 opacity-100",
         )}
       >
@@ -325,6 +325,11 @@ export function SiteHeader() {
           sizes="(max-width: 1600px) 100vw, 1600px"
           className="object-cover object-left"
         />
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center px-8">
+          <p className="truncate text-center font-heading text-xl font-bold tracking-tight text-white [text-shadow:0_2px_10px_rgb(0_0_0_/_45%)] lg:text-2xl">
+            {t("common.bannerTagline")}
+          </p>
+        </div>
       </div>
     </header>
   );

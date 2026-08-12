@@ -34,13 +34,7 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
-    "**/*.mts",
-    ".next-verify/types/**/*.ts",
-    ".next-verify/dev/types/**/*.ts",
-    ".next-hover/types/**/*.ts",
-    ".next-hover/dev/types/**/*.ts",
-    ".next-hdr/types/**/*.ts",
-    ".next-hdr/dev/types/**/*.ts"
+    "**/*.mts"
   ],
   "exclude": [
     "node_modules",

@@ -1779,6 +1779,51 @@
         ]
       }
     },
+    "/api/v1/ai-compare": {
+      "get": {
+        "operationId": "AiCompareController_compare",
+        "summary": "ИИ-сравнение товаров по составляющим",
+        "description": "Разбирает 2–4 товара по железу: строка на составляющую, плюсы и минусы каждого и итог. Бесплатно для покупателя. Повтор с теми же товарами отдаётся из кэша.",
+        "parameters": [
+          {
+            "name": "ids",
+            "required": true,
+            "in": "query",
+            "description": "id товаров через запятую, от 2 до 4. Порядок задаёт порядок столбцов в ответе.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiCompareResultDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Меньше двух доступных товаров"
+          },
+          "502": {
+            "description": "Модель не ответила"
+          },
+          "503": {
+            "description": "ИИ-функции выключены: нет ключа"
+          }
+        },
+        "tags": [
+          "ai-compare"
+        ]
+      }
+    },
     "/api/v1/me/product-views": {
       "get": {
         "operationId": "ProductViewsController_findMine",
@@ -3924,6 +3969,144 @@
         },
         "required": [
           "endpoint"
+        ]
+      },
+      "AiCompareRowDto": {
+        "type": "object",
+        "properties": {
+          "component": {
+            "type": "string",
+            "description": "Составляющая: «Процессор», «Видеокарта», «Экран»…",
+            "example": "Процессор"
+          },
+          "values": {
+            "description": "Значение у каждого товара, в порядке products. «—» — продавец не указал.",
+            "example": [
+              "Ryzen 5 5600",
+              "Core i5-11400F"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "bestId": {
+            "type": "number",
+            "nullable": true,
+            "description": "id товара с лучшим значением. null — ничья или сравнивать нечего.",
+            "example": 10
+          },
+          "note": {
+            "type": "string",
+            "description": "Чем лучше — одним предложением",
+            "example": ""
+          }
+        },
+        "required": [
+          "component",
+          "values",
+          "bestId",
+          "note"
+        ]
+      },
+      "AiCompareProductDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "example": 10
+          },
+          "name": {
+            "type": "string",
+            "example": "Игровой ПК Ryzen 5"
+          },
+          "pros": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "cons": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "bestFor": {
+            "type": "string",
+            "description": "Кому этот товар подойдёт",
+            "example": "Игры в 1080p и монтаж дома"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "pros",
+          "cons",
+          "bestFor"
+        ]
+      },
+      "AiCompareVerdictDto": {
+        "type": "object",
+        "properties": {
+          "bestId": {
+            "type": "number",
+            "nullable": true,
+            "description": "id товара, который лучше по железу"
+          },
+          "valueId": {
+            "type": "number",
+            "nullable": true,
+            "description": "id товара, который выгоднее за свои деньги"
+          },
+          "text": {
+            "type": "string",
+            "description": "Итог одним абзацем"
+          }
+        },
+        "required": [
+          "bestId",
+          "valueId",
+          "text"
+        ]
+      },
+      "AiCompareResultDto": {
+        "type": "object",
+        "properties": {
+          "comparable": {
+            "type": "boolean",
+            "description": "Сравнимы ли товары по железу. false — это разные виды техники, и таблица составляющих будет пустой"
+          },
+          "summary": {
+            "type": "string",
+            "description": "Общий вывод в 2–3 предложениях"
+          },
+          "rows": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AiCompareRowDto"
+            }
+          },
+          "products": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AiCompareProductDto"
+            }
+          },
+          "verdict": {
+            "$ref": "#/components/schemas/AiCompareVerdictDto"
+          },
+          "cached": {
+            "type": "boolean",
+            "description": "Ответ отдан из кэша: те же товары уже сравнивали, к модели не ходили"
+          }
+        },
+        "required": [
+          "comparable",
+          "summary",
+          "rows",
+          "products",
+          "verdict"
         ]
       },
       "ProductViewDto": {
