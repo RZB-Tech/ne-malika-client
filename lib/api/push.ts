@@ -69,6 +69,7 @@ export async function fetchPushConfig(): Promise<PushConfig> {
  */
 export async function subscribeToPush(
   publicKey: string,
+  confirmation?: { title: string; body: string },
 ): Promise<NotificationPermission> {
   if (!isPushSupported()) return "denied";
 
@@ -93,6 +94,19 @@ export async function subscribeToPush(
     auth: json.keys?.auth ?? "",
     userAgent: navigator.userAgent.slice(0, 300),
   });
+
+  // Внутренний toast подтверждает действие только внутри сайта. Отдельное
+  // системное уведомление сразу показывает человеку, что Web Push действительно
+  // работает и будет появляться справа в Windows при закрытой вкладке.
+  if (confirmation) {
+    await reg.showNotification(confirmation.title, {
+      body: confirmation.body,
+      icon: "/icon.svg",
+      badge: "/icon.svg",
+      tag: "nemalika-push-enabled",
+      data: { url: window.location.pathname },
+    });
+  }
 
   return "granted";
 }

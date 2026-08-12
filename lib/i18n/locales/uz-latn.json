@@ -829,6 +829,8 @@
     "enable": "Yoqish",
     "disable": "O‘chirish",
     "enabled": "Bildirishnomalar yoqildi",
+    "confirmTitle": "neMalika bildirishnomalari yoqildi",
+    "confirmBody": "Endi xabarlar va yangiliklar tizim bildirishnomalarida ko‘rinadi.",
     "disabled": "Bildirishnomalar o‘chirildi",
     "blocked": "Brauzer so‘rovni rad etdi",
     "blockedHint": "Bu sayt uchun bildirishnomalar brauzer sozlamalarida taqiqlangan — faqat o‘sha yerdan yoqiladi.",

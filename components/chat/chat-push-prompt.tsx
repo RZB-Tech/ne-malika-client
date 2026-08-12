@@ -65,7 +65,10 @@ export function ChatPushPrompt({ className }: { className?: string }) {
   const enable = async () => {
     setBusy(true);
     try {
-      const result = await subscribeToPush(publicKey);
+      const result = await subscribeToPush(publicKey, {
+        title: t("push.confirmTitle"),
+        body: t("push.confirmBody"),
+      });
       setPermission(result);
       if (result === "granted") toast.success(t("push.enabled"));
       else if (result === "denied") toast.error(t("push.blocked"));
