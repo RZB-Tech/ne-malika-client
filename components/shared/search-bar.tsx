@@ -3,7 +3,7 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { Camera, ChevronDown, Search, X } from "lucide-react";
+import { ChevronDown, Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -256,12 +256,6 @@ export function SearchBar({
           <X />
         </Button>
       )}
-      {marketplace && !value && (
-        <Camera
-          aria-hidden
-          className="mr-2 size-4 shrink-0 text-muted-foreground"
-        />
-      )}
       {marketplace && (
         <Button
           type="submit"
@@ -317,15 +311,9 @@ export function SearchBarSkeleton({
         className={cn("pl-10 pr-10", marketplace && MARKETPLACE_INPUT)}
       />
       {marketplace && (
-        <>
-          <Camera
-            aria-hidden
-            className="mr-2 size-4 shrink-0 text-muted-foreground"
-          />
-          <Button disabled className={MARKETPLACE_BUTTON}>
-            <Search />
-          </Button>
-        </>
+        <Button disabled className={MARKETPLACE_BUTTON}>
+          <Search />
+        </Button>
       )}
     </div>
   );

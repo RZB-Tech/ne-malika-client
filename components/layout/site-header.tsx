@@ -17,6 +17,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Logo } from "@/components/shared/logo";
 import { CategoryIcon } from "@/components/shared/category-icon";
 import { SearchBar, SearchBarSkeleton } from "@/components/shared/search-bar";
@@ -104,6 +105,17 @@ const FALLBACK_QUICK_CATEGORIES: Array<{
 const ACTION_CLASS =
   "flex h-13 w-16 shrink-0 flex-col items-center justify-center gap-1 rounded-lg text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/40";
 
+function initials(name: string): string {
+  return (
+    name
+      .trim()
+      .split(/\s+/)
+      .slice(0, 2)
+      .map((word) => word[0]?.toUpperCase() ?? "")
+      .join("") || "?"
+  );
+}
+
 /**
  * Шапка витрины по раскладке крупных маркетплейсов: светлая, в две строки.
  *
@@ -117,9 +129,14 @@ const ACTION_CLASS =
  */
 export function SiteHeader() {
   const { t, locale } = useT();
-  const { isAuthenticated, isHydrated } = useAuth();
+  const { user, isAuthenticated, isHydrated } = useAuth();
   const { roots } = useCategories();
   const [isCompact, setIsCompact] = useState(false);
+  const username = user?.telegramUsername as string | null | undefined;
+  const photo = user?.telegramPhoto as string | null | undefined;
+  const accountLabel = username
+    ? `@${username}`
+    : user?.fullname.trim().split(/\s+/)[0] || t("nav.account");
 
   useEffect(() => {
     let animationFrame = 0;
@@ -203,12 +220,19 @@ export function SiteHeader() {
                   variant="ghost"
                   size="lg"
                   className={cn(ACTION_CLASS, "hidden text-foreground md:flex")}
-                  title={t("nav.account")}
+                  title={accountLabel}
                 >
-                  <ActionBody
-                    icon={UserRound}
-                    label={t("nav.account")}
-                  />
+                  <Avatar size="sm">
+                    {photo && user ? (
+                      <AvatarImage src={photo} alt={user.fullname} />
+                    ) : null}
+                    <AvatarFallback>
+                      {user ? initials(user.fullname) : "?"}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="max-w-16 truncate text-[11px] leading-none">
+                    {accountLabel}
+                  </span>
                 </Button>
               }
             />

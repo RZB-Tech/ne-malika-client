@@ -67,7 +67,9 @@ export function BottomNav() {
           <Item
             href="/account"
             icon={UserRound}
-            label={t("nav.account")}
+            // «Личный кабинет» в подпись шириной в пятую часть экрана
+            // не влезает — внизу короткое слово.
+            label={t("nav.cabinet")}
             active={pathname.startsWith("/account")}
           />
         )}
