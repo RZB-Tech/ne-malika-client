@@ -38,9 +38,12 @@ function urlBase64ToUint8Array(base64: string): Uint8Array<ArrayBuffer> {
 }
 
 async function registration(): Promise<ServiceWorkerRegistration> {
-  const existing = await navigator.serviceWorker.getRegistration("/sw.js");
-  if (existing) return existing;
-  return navigator.serviceWorker.register("/sw.js", { scope: "/" });
+  const registered = await navigator.serviceWorker.register("/sw.js", {
+    scope: "/",
+  });
+  if (registered.active) return registered;
+
+  return navigator.serviceWorker.ready;
 }
 
 export interface PushConfig {
@@ -98,7 +101,7 @@ export async function subscribeToPush(
 export async function unsubscribeFromPush(): Promise<void> {
   if (!isPushSupported()) return;
 
-  const reg = await navigator.serviceWorker.getRegistration("/sw.js");
+  const reg = await navigator.serviceWorker.getRegistration("/");
   const subscription = await reg?.pushManager.getSubscription();
   if (!subscription) return;
 
