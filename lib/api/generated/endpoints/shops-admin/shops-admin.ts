@@ -26,7 +26,8 @@ import type {
 
 import type {
   AdminShopsControllerListParams,
-  ReasonDto
+  ReasonDto,
+  RestrictedCategoriesDto
 } from '../../schemas';
 
 import { customInstance } from '../../../mutator';
@@ -271,6 +272,71 @@ export const useAdminShopsControllerRestore = <TError = ErrorType<unknown>,
         TContext
       > => {
       return useMutation(getAdminShopsControllerRestoreMutationOptions(options), queryClient);
+    }
+    /**
+ * @summary Выдать или отозвать доступ магазина к закрытым разделам каталога («Смартфоны» и «Планшеты»)
+ */
+export const adminShopsControllerSetRestrictedCategories = (
+    id: number,
+    restrictedCategoriesDto: BodyType<RestrictedCategoriesDto>,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<void>(
+      {url: `/api/v1/admin/shops/${id}/restricted-categories`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: restrictedCategoriesDto, signal
+    },
+      options);
+    }
+
+
+
+
+export const getAdminShopsControllerSetRestrictedCategoriesMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminShopsControllerSetRestrictedCategories>>, TError,{id: number;data: BodyType<RestrictedCategoriesDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof adminShopsControllerSetRestrictedCategories>>, TError,{id: number;data: BodyType<RestrictedCategoriesDto>}, TContext> => {
+
+const mutationKey = ['adminShopsControllerSetRestrictedCategories'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminShopsControllerSetRestrictedCategories>>, {id: number;data: BodyType<RestrictedCategoriesDto>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  adminShopsControllerSetRestrictedCategories(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AdminShopsControllerSetRestrictedCategoriesMutationResult = NonNullable<Awaited<ReturnType<typeof adminShopsControllerSetRestrictedCategories>>>
+    export type AdminShopsControllerSetRestrictedCategoriesMutationBody = BodyType<RestrictedCategoriesDto>
+    export type AdminShopsControllerSetRestrictedCategoriesMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Выдать или отозвать доступ магазина к закрытым разделам каталога («Смартфоны» и «Планшеты»)
+ */
+export const useAdminShopsControllerSetRestrictedCategories = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminShopsControllerSetRestrictedCategories>>, TError,{id: number;data: BodyType<RestrictedCategoriesDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof adminShopsControllerSetRestrictedCategories>>,
+        TError,
+        {id: number;data: BodyType<RestrictedCategoriesDto>},
+        TContext
+      > => {
+      return useMutation(getAdminShopsControllerSetRestrictedCategoriesMutationOptions(options), queryClient);
     }
     /**
  * @summary Удалить магазин навсегда (каскадом удаляет товары, владелец снова покупатель)

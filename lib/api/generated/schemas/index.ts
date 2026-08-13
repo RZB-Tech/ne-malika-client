@@ -90,6 +90,7 @@ export * from './pushStateDto';
 export * from './reasonDto';
 export * from './recordProductViewDto';
 export * from './rejectReviewDto';
+export * from './restrictedCategoriesDto';
 export * from './reviewsControllerListParams';
 export * from './reviewsControllerMineParams';
 export * from './reviewsControllerSummaryParams';

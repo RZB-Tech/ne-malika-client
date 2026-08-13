@@ -16,6 +16,8 @@ export interface CategoryDto {
      * @nullable
      */
   icon?: string | null;
+  /** Закрытый раздел: выложить товар может лишь магазин с разрешением от администратора. У подкатегорий повторяет значение корня. */
+  restricted: boolean;
   /** Подкатегории */
   children: CategoryDto[];
 }

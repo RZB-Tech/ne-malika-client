@@ -108,6 +108,8 @@ export interface ShopRow {
   /** Оценка продавца — по отзывам о магазине и обо всех его товарах. */
   ratingAvg?: number;
   ratingCount?: number;
+  /** Разрешение выкладывать товары в закрытые разделы каталога. */
+  restrictedCategoriesEnabled: boolean;
   status: EntityStatus;
   abolishReason: string | null;
   abolishedAt: string | null;
@@ -130,6 +132,8 @@ export interface AdminShopRow {
   address: string | null;
   status: EntityStatus;
   abolishReason: string | null;
+  /** Разрешение выкладывать товары в закрытые разделы каталога. */
+  restrictedCategoriesEnabled: boolean;
   createdAt: string;
   productCount: number;
   /** Владелец магазина: блокируется отдельно от самого магазина. */

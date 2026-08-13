@@ -601,6 +601,45 @@
         ]
       }
     },
+    "/api/v1/admin/shops/{id}/restricted-categories": {
+      "patch": {
+        "operationId": "AdminShopsController_setRestrictedCategories",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RestrictedCategoriesDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Выдать или отозвать доступ магазина к закрытым разделам каталога («Смартфоны» и «Планшеты»)",
+        "tags": [
+          "shops-admin"
+        ]
+      }
+    },
     "/api/v1/admin/shops/{id}": {
       "delete": {
         "operationId": "AdminShopsController_remove",
@@ -3808,6 +3847,19 @@
           }
         }
       },
+      "RestrictedCategoriesDto": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "example": true,
+            "description": "Выдать (true) или отозвать (false) право выкладывать товары в закрытые разделы каталога — «Смартфоны» и «Планшеты»"
+          }
+        },
+        "required": [
+          "enabled"
+        ]
+      },
       "CategoryNameDto": {
         "type": "object",
         "properties": {
@@ -3850,6 +3902,11 @@
             "example": "Laptop",
             "description": "Имя иконки lucide, есть только у категорий верхнего уровня"
           },
+          "restricted": {
+            "type": "boolean",
+            "example": false,
+            "description": "Закрытый раздел: выложить товар может лишь магазин с разрешением от администратора. У подкатегорий повторяет значение корня."
+          },
           "children": {
             "description": "Подкатегории",
             "type": "array",
@@ -3862,6 +3919,7 @@
           "id",
           "slug",
           "name",
+          "restricted",
           "children"
         ]
       },
