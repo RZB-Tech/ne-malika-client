@@ -30,6 +30,13 @@ export const BANNER_ASPECT_CSS = `${BANNER_PRIMARY_FORMAT.width} / ${BANNER_PRIM
 /** Допуск по соотношению сторон: 1241×400 — это опечатка, а не другой формат. */
 const ASPECT_TOLERANCE = 0.02;
 
+/**
+ * Насколько картинка может быть уже эталона. Порог по ширине нужен, чтобы
+ * баннер не растягивали из мелкого файла, но отклонять 1920×800 из-за
+ * недостающих 22 пикселей — придирка: на экране такой разницы не видно.
+ */
+const MIN_WIDTH_RATIO = 0.95;
+
 export const BANNER_MIME_TYPES = [
   "image/jpeg",
   "image/png",
@@ -86,7 +93,7 @@ export async function checkBannerImage(
   const aspect = size.width / size.height;
   const fits = BANNER_FORMATS.some(
     (f) =>
-      size.width >= f.width &&
+      size.width >= f.width * MIN_WIDTH_RATIO &&
       Math.abs(aspect - f.width / f.height) <= ASPECT_TOLERANCE,
   );
   return fits ? null : "resolution";
