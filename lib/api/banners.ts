@@ -5,13 +5,27 @@ import { photoUrl } from "./photo";
 export type Banner = BannerDto;
 
 /**
- * Требуемое разрешение картинки баннера. Те же числа продублированы в
+ * Допустимые размеры картинки баннера. Те же числа продублированы в
  * `src/modules/banners/banners.constants.ts` на бэкенде — там они попадают в
  * описание Swagger. Меняя здесь, поменяйте и там.
+ *
+ * Первый в списке — основной: по нему карусель считает высоту слота. Остальные
+ * тоже принимаются, но встают в тот же слот с полями по краям.
  */
-export const BANNER_IMAGE = { width: 1240, height: 400 } as const;
+export const BANNER_FORMATS = [
+  { width: 1942, height: 809 },
+  { width: 1240, height: 400 },
+] as const;
 
-const BANNER_ASPECT = BANNER_IMAGE.width / BANNER_IMAGE.height;
+export const BANNER_PRIMARY_FORMAT = BANNER_FORMATS[0];
+
+/** Строка для подсказок и ошибок: «1942×809 / 1240×400». */
+export const BANNER_FORMATS_LABEL = BANNER_FORMATS.map(
+  (f) => `${f.width}×${f.height}`,
+).join(" / ");
+
+/** Пропорция слота карусели в виде значения для CSS `aspect-ratio`. */
+export const BANNER_ASPECT_CSS = `${BANNER_PRIMARY_FORMAT.width} / ${BANNER_PRIMARY_FORMAT.height}`;
 
 /** Допуск по соотношению сторон: 1241×400 — это опечатка, а не другой формат. */
 const ASPECT_TOLERANCE = 0.02;
@@ -52,11 +66,11 @@ export type BannerImageProblem = "type" | "size" | "resolution";
  * Проверка выбранного файла до загрузки в S3.
  *
  * Разрешение сверяем на клиенте: сервер видит только байты и не разбирает
- * картинки, а баннер не той пропорции обрезался бы в карусели — админ узнал бы
- * об этом уже с главной страницы.
+ * картинки, а баннер произвольной пропорции встал бы в карусель с полями —
+ * админ узнал бы об этом уже с главной страницы.
  *
- * Кратно больший файл (2480×800 под ретину) проходит: важна пропорция и то,
- * что картинку не придётся растягивать.
+ * Подходит любой формат из списка, в том числе кратно больший под ретину
+ * (3884×1618): важна пропорция и то, что картинку не придётся растягивать.
  */
 export async function checkBannerImage(
   file: File,
@@ -69,11 +83,13 @@ export async function checkBannerImage(
   const size = await readImageSize(file);
   if (!size) return "type";
 
-  if (size.width < BANNER_IMAGE.width) return "resolution";
-  if (Math.abs(size.width / size.height - BANNER_ASPECT) > ASPECT_TOLERANCE) {
-    return "resolution";
-  }
-  return null;
+  const aspect = size.width / size.height;
+  const fits = BANNER_FORMATS.some(
+    (f) =>
+      size.width >= f.width &&
+      Math.abs(aspect - f.width / f.height) <= ASPECT_TOLERANCE,
+  );
+  return fits ? null : "resolution";
 }
 
 function readImageSize(

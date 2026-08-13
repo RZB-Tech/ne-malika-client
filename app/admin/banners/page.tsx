@@ -20,7 +20,11 @@ import { Switch } from "@/components/ui/switch";
 import { BannerFormDialog } from "@/components/admin/banner-form-dialog";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { useT } from "@/components/providers/i18n-provider";
-import { BANNER_IMAGE, type Banner } from "@/lib/api/banners";
+import {
+  BANNER_ASPECT_CSS,
+  BANNER_FORMATS_LABEL,
+  type Banner,
+} from "@/lib/api/banners";
 import { photoUrl } from "@/lib/api/photo";
 import {
   useAdminBannersControllerFindAll,
@@ -90,10 +94,7 @@ export default function AdminBanners() {
             {t("admin.banners.title")}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            {t("admin.banners.subtitle", {
-              width: BANNER_IMAGE.width,
-              height: BANNER_IMAGE.height,
-            })}
+            {t("admin.banners.subtitle", { sizes: BANNER_FORMATS_LABEL })}
           </p>
         </div>
         <Button onClick={() => setEditing(null)}>
@@ -147,12 +148,15 @@ export default function AdminBanners() {
                   </Button>
                 </div>
 
-                <div className="aspect-[31/10] w-44 shrink-0 overflow-hidden rounded-lg border border-border bg-muted">
+                <div
+                  style={{ aspectRatio: BANNER_ASPECT_CSS }}
+                  className="w-44 shrink-0 overflow-hidden rounded-lg border border-border bg-muted"
+                >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={photoUrl(banner.photoRu) ?? ""}
                     alt={banner.title}
-                    className="size-full object-cover"
+                    className="size-full object-contain"
                     onError={(e) => e.currentTarget.classList.add("opacity-0")}
                   />
                 </div>

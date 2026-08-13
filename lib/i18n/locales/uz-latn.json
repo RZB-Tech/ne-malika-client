@@ -644,13 +644,13 @@
     },
     "banners": {
       "title": "Bannerlar",
-      "subtitle": "Bosh sahifadagi karusel. Har bir tilga rasm, o‘lchami {width}×{height}.",
+      "subtitle": "Bosh sahifadagi karusel. Har bir tilga rasm, o‘lchami {sizes}.",
       "add": "Banner qo‘shish",
       "empty": "Hozircha banner yo‘q. Bosh sahifada darhol katalog ko‘rinadi.",
       "loadFailed": "Bannerlarni yuklab bo‘lmadi. Bo‘lim faqat administratorlar uchun.",
       "newTitle": "Yangi banner",
       "editTitle": "Bannerni tahrirlash",
-      "formHint": "Rasm har bir tilga kerak: aksiya matni to‘g‘ridan-to‘g‘ri rasmga chizilgan. O‘lchami {width}×{height} yoki shu nisbatda karrali kattaroq.",
+      "formHint": "Rasm har bir tilga kerak: aksiya matni to‘g‘ridan-to‘g‘ri rasmga chizilgan. O‘lchami {sizes} yoki shu nisbatda karrali kattaroq.",
       "name": "Nomi",
       "namePlaceholder": "Maktab bozori — 50% gacha foyda",
       "nameHint": "Faqat admin panelda ko‘rinadi; qidiruv tizimlari va skrinriderlar uchun rasmning alt matniga tushadi.",
@@ -680,7 +680,7 @@
       "err": {
         "type": "JPEG, PNG yoki WebP to‘g‘ri keladi",
         "size": "Fayl 10 MB dan katta",
-        "resolution": "{width}×{height} o‘lchami yoki shu nisbatda karrali kattarog‘i kerak"
+        "resolution": "{sizes} o‘lchami yoki shu nisbatda karrali kattarog‘i to‘g‘ri keladi"
       }
     },
     "reports": {

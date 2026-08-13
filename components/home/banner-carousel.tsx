@@ -5,7 +5,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "@/components/icons";
 import { PageContainer } from "@/components/layout/page-container";
 import { useT } from "@/components/providers/i18n-provider";
-import { bannerImageUrl, type Banner } from "@/lib/api/banners";
+import {
+  BANNER_ASPECT_CSS,
+  bannerImageUrl,
+  type Banner,
+} from "@/lib/api/banners";
 import { cn } from "@/lib/utils";
 
 /** Пауза между автопереключениями. */
@@ -124,8 +128,9 @@ export function BannerCarousel({ banners }: { banners: Banner[] }) {
 }
 
 /**
- * Один кадр. Пропорция разная: широкая полоса 31:10 на телефоне превратилась бы
- * в щель высотой в палец, поэтому там картинка кадрируется по центру.
+ * Один кадр. Высоту слота задаёт основной формат баннера, картинка вписывается
+ * целиком: обрезка по краям съедала бы текст акции, нарисованный прямо на ней.
+ * Если все баннеры одного формата — а это обычный случай, — полей не видно.
  */
 function BannerSlide({
   banner,
@@ -146,7 +151,7 @@ function BannerSlide({
       loading={eager ? "eager" : "lazy"}
       fetchPriority={eager ? "high" : "auto"}
       draggable={false}
-      className="size-full object-cover"
+      className="size-full object-contain"
     />
   ) : (
     <div className="size-full bg-muted" />
@@ -154,7 +159,8 @@ function BannerSlide({
 
   return (
     <div
-      className="w-full shrink-0 aspect-[3/2] sm:aspect-[21/9] lg:aspect-[31/10]"
+      className="w-full shrink-0"
+      style={{ aspectRatio: BANNER_ASPECT_CSS }}
       aria-hidden={hidden}
     >
       {banner.linkUrl ? (

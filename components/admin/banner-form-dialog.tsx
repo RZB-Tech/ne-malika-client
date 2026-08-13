@@ -19,7 +19,8 @@ import { Switch } from "@/components/ui/switch";
 import { useT } from "@/components/providers/i18n-provider";
 import { localeNames, locales, type Locale } from "@/lib/i18n/config";
 import {
-  BANNER_IMAGE,
+  BANNER_ASPECT_CSS,
+  BANNER_FORMATS_LABEL,
   BANNER_MIME_TYPES,
   bannerPhotoKey,
   checkBannerImage,
@@ -106,10 +107,7 @@ function FormBody({
     const problem = await checkBannerImage(file);
     if (problem) {
       toast.error(
-        t(`admin.banners.err.${problem}`, {
-          width: BANNER_IMAGE.width,
-          height: BANNER_IMAGE.height,
-        }),
+        t(`admin.banners.err.${problem}`, { sizes: BANNER_FORMATS_LABEL }),
       );
       return;
     }
@@ -188,10 +186,7 @@ function FormBody({
           {t(banner ? "admin.banners.editTitle" : "admin.banners.newTitle")}
         </DialogTitle>
         <DialogDescription>
-          {t("admin.banners.formHint", {
-            width: BANNER_IMAGE.width,
-            height: BANNER_IMAGE.height,
-          })}
+          {t("admin.banners.formHint", { sizes: BANNER_FORMATS_LABEL })}
         </DialogDescription>
       </DialogHeader>
 
@@ -275,11 +270,12 @@ function SlotPicker({
       <button
         type="button"
         onClick={() => inputRef.current?.click()}
-        className="relative aspect-[31/10] w-40 shrink-0 overflow-hidden rounded border border-border bg-muted transition-colors hover:border-primary/50"
+        style={{ aspectRatio: BANNER_ASPECT_CSS }}
+        className="relative w-40 shrink-0 overflow-hidden rounded border border-border bg-muted transition-colors hover:border-primary/50"
       >
         {slot ? (
           /* eslint-disable-next-line @next/next/no-img-element */
-          <img src={slot.preview} alt="" className="size-full object-cover" />
+          <img src={slot.preview} alt="" className="size-full object-contain" />
         ) : (
           <span className="grid size-full place-items-center text-muted-foreground">
             <ImagePlus className="size-5" />
