@@ -1,7 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { Ban, ExternalLink, RotateCcw, Trash2, UserX } from "@/components/icons";
+import {
+  Ban,
+  ExternalLink,
+  Lock,
+  RotateCcw,
+  Trash2,
+  UserX,
+} from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { StoreAvatar } from "@/components/shared/store-avatar";
@@ -29,6 +36,7 @@ export function ShopDrawer({
   onRestore,
   onBlockOwner,
   onUnblockOwner,
+  onSetRestricted,
   onRemove,
 }: {
   shop: AdminShopRow | null;
@@ -37,6 +45,8 @@ export function ShopDrawer({
   onRestore: (id: number) => Promise<void>;
   onBlockOwner: (ownerId: number, reason: string) => Promise<void>;
   onUnblockOwner: (ownerId: number) => Promise<void>;
+  /** Доступ к закрытым разделам каталога — смартфонам и планшетам. */
+  onSetRestricted: (id: number, enabled: boolean) => Promise<void>;
   onRemove: (id: number) => Promise<void>;
 }) {
   const { t, locale } = useT();
@@ -120,6 +130,28 @@ export function ShopDrawer({
               </AbolishDialog>
             )}
 
+            <Button
+              variant="ghost"
+              className={`col-span-2 ${
+                shop.restrictedCategoriesEnabled
+                  ? drawerAction.warning
+                  : drawerAction.primary
+              }`}
+              onClick={() =>
+                void onSetRestricted(
+                  shop.id,
+                  !shop.restrictedCategoriesEnabled,
+                )
+              }
+            >
+              <Lock className="size-4" />{" "}
+              {t(
+                shop.restrictedCategoriesEnabled
+                  ? "admin.shops.restrictedRevoke"
+                  : "admin.shops.restrictedGrant",
+              )}
+            </Button>
+
             <ConfirmDialog
               title={t("admin.shops.removeTitle")}
               description={t("admin.shops.removeText", {
@@ -171,6 +203,14 @@ export function ShopDrawer({
             <DetailRow
               label={t("admin.common.productCount")}
               value={shop.productCount}
+            />
+            <DetailRow
+              label={t("admin.shops.restrictedTitle")}
+              value={t(
+                shop.restrictedCategoriesEnabled
+                  ? "admin.shops.restrictedOn"
+                  : "admin.shops.restrictedOff",
+              )}
             />
           </DetailSection>
 

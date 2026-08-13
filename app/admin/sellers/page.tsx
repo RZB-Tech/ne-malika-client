@@ -6,6 +6,7 @@ import {
   Ban,
   Coins,
   ExternalLink,
+  Lock,
   RotateCcw,
   Search,
   Trash2,
@@ -187,7 +188,7 @@ export default function AdminSellers() {
         }
       : {
           label: t("admin.shops.restrictedGrant"),
-          icon: LockOpen,
+          icon: Lock,
           onSelect: () => void setRestricted(shop.id, true),
         },
     {
@@ -346,6 +347,7 @@ export default function AdminSellers() {
         onRestore={restore}
         onBlockOwner={blockOwner}
         onUnblockOwner={unblockOwner}
+        onSetRestricted={setRestricted}
         onRemove={remove}
       />
 
