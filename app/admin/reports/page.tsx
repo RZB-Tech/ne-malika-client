@@ -3,16 +3,21 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Ban, Store } from "@/components/icons";
+import { Ban, Store, Trash2 } from "@/components/icons";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AbolishDialog } from "@/components/admin/abolish-dialog";
+import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { Pagination } from "@/components/shared/pagination";
 import { useT } from "@/components/providers/i18n-provider";
 import { formatDate } from "@/lib/format";
-import { useAdminReportsControllerFindAll } from "@/lib/api/generated/endpoints/reports/reports";
+import {
+  useAdminReportsControllerFindAll,
+  useAdminReportsControllerRemove,
+} from "@/lib/api/generated/endpoints/reports/reports";
 import { useAdminProductCardsControllerAbolish } from "@/lib/api/generated/endpoints/product-cards-admin/product-cards-admin";
 import { useAdminShopsControllerAbolish } from "@/lib/api/generated/endpoints/shops-admin/shops-admin";
 import {
@@ -34,11 +39,11 @@ export default function AdminReports() {
 
   const abolishProduct = useAdminProductCardsControllerAbolish();
   const abolishShop = useAdminShopsControllerAbolish();
+  const removeReport = useAdminReportsControllerRemove();
 
   const page_ = useMemo(() => devFallbackPage(data, devReports), [data]);
   const reports = page_.data;
   const isDevData = usingDevData(data?.data);
-  const totalPages = page_.meta.totalPages;
 
   const onAbolishProduct = async (id: number, reason: string) => {
     await abolishProduct.mutateAsync({ id, data: { reason } });
@@ -49,6 +54,18 @@ export default function AdminReports() {
     await abolishShop.mutateAsync({ id, data: { reason } });
     await queryClient.invalidateQueries();
     toast.success(t("admin.reports.shopAbolished"));
+  };
+
+  /**
+   * Убрать разобранную жалобу. Если удалили последнюю на странице — уходим на
+   * предыдущую, иначе список окажется пустым, а листалка будет показывать
+   * несуществующую страницу.
+   */
+  const onRemove = async (id: number) => {
+    await removeReport.mutateAsync({ id });
+    if (reports.length === 1 && page > 1) setPage((p) => p - 1);
+    await queryClient.invalidateQueries();
+    toast.success(t("admin.reports.removed"));
   };
 
   return (
@@ -125,6 +142,22 @@ export default function AdminReports() {
                       <Store className="size-3.5" /> {t("admin.reports.onShop")}
                     </Button>
                   </AbolishDialog>
+
+                  <ConfirmDialog
+                    title={t("admin.reports.removeTitle")}
+                    description={t("admin.reports.removeText")}
+                    confirmLabel={t("common.delete")}
+                    destructive
+                    onConfirm={() => onRemove(r.id)}
+                  >
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="gap-1.5 text-muted-foreground hover:text-destructive"
+                    >
+                      <Trash2 className="size-3.5" /> {t("common.delete")}
+                    </Button>
+                  </ConfirmDialog>
                 </div>
               </div>
             </Card>
@@ -132,17 +165,12 @@ export default function AdminReports() {
         </div>
       )}
 
-      {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-3">
-          <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
-            {t("common.back")}
-          </Button>
-          <span className="text-sm text-muted-foreground tabular">{page} / {totalPages}</span>
-          <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>
-            {t("common.next")}
-          </Button>
-        </div>
-      )}
+      <Pagination
+        page={page_.meta.page}
+        totalPages={page_.meta.totalPages}
+        total={page_.meta.total}
+        onChange={setPage}
+      />
     </div>
   );
 }

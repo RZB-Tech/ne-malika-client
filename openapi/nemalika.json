@@ -2775,6 +2775,35 @@
         ]
       }
     },
+    "/api/v1/admin/reports/{id}": {
+      "delete": {
+        "operationId": "AdminReportsController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "Жалоба не найдена"
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Удалить разобранную жалобу",
+        "tags": [
+          "reports"
+        ]
+      }
+    },
     "/api/v1/reviews": {
       "get": {
         "operationId": "ReviewsController_list",

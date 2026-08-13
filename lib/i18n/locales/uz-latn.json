@@ -644,7 +644,10 @@
       "abolishShop": "Do‘konni tugatish",
       "abolishShopText": "Do‘konning barcha mahsulotlari yashiriladi.",
       "productAbolished": "Mahsulot tugatildi",
-      "shopAbolished": "Do‘kon tugatildi"
+      "shopAbolished": "Do‘kon tugatildi",
+      "removeTitle": "Shikoyat o‘chirilsinmi?",
+      "removeText": "Shikoyat navbatdan butunlay yo‘qoladi. Mahsulot yoki do‘kon bo‘yicha qabul qilingan qaror saqlanib qoladi.",
+      "removed": "Shikoyat o‘chirildi"
     },
     "aiReview": {
       "title": "AI tekshiruvi",

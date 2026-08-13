@@ -209,3 +209,65 @@ export function useAdminReportsControllerFindAll<TData = Awaited<ReturnType<type
 
 
 
+/**
+ * @summary Удалить разобранную жалобу
+ */
+export const adminReportsControllerRemove = (
+    id: number,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<unknown>(
+      {url: `/api/v1/admin/reports/${id}`, method: 'DELETE', signal
+    },
+      options);
+    }
+
+
+
+
+export const getAdminReportsControllerRemoveMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminReportsControllerRemove>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof adminReportsControllerRemove>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['adminReportsControllerRemove'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminReportsControllerRemove>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  adminReportsControllerRemove(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AdminReportsControllerRemoveMutationResult = NonNullable<Awaited<ReturnType<typeof adminReportsControllerRemove>>>
+
+    export type AdminReportsControllerRemoveMutationError = ErrorType<void>
+
+    /**
+ * @summary Удалить разобранную жалобу
+ */
+export const useAdminReportsControllerRemove = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminReportsControllerRemove>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof adminReportsControllerRemove>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getAdminReportsControllerRemoveMutationOptions(options), queryClient);
+    }
