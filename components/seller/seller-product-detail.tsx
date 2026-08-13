@@ -244,7 +244,11 @@ export function SellerProductDetail({ id }: { id: number }) {
               </div>
               <div className="space-y-1.5 sm:col-span-2">
                 <Label>{t("category.label")}</Label>
-                <CategorySelect value={categoryId} onChange={setCategoryId} />
+                <CategorySelect
+                  value={categoryId}
+                  onChange={setCategoryId}
+                  allowRestricted={shop?.restrictedCategoriesEnabled ?? false}
+                />
               </div>
               <div className="space-y-1.5 sm:col-span-2">
                 <div className="flex flex-wrap items-center justify-between gap-2">

@@ -54,6 +54,7 @@ import {
   LinkSquare02Icon,
   Loading03Icon,
   Location01Icon,
+  LockIcon,
   Logout01Icon,
   MagicWand01Icon,
   Menu01Icon,
@@ -195,6 +196,7 @@ export const Laptop = make(LaptopIcon, "Laptop");
 export const LayoutDashboard = make(DashboardSquare01Icon, "LayoutDashboard");
 export const LayoutGrid = make(GridIcon, "LayoutGrid");
 export const Loader2 = make(Loading03Icon, "Loader2");
+export const Lock = make(LockIcon, "Lock");
 export const Loader2Icon = Loader2;
 export const LogOut = make(Logout01Icon, "LogOut");
 export const MapPin = make(Location01Icon, "MapPin");

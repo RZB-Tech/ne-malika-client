@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Check, ChevronDown, Search } from "@/components/icons";
+import { Check, ChevronDown, Lock, Search } from "@/components/icons";
 import {
   Popover,
   PopoverContent,
@@ -22,6 +22,8 @@ interface Option {
   group: string;
   /** Строка для поиска: и лист, и раздел, чтобы «ноут» находил «Игровые». */
   haystack: string;
+  /** Закрытый раздел: выбрать можно только с разрешения администратора. */
+  restricted: boolean;
 }
 
 function buildOptions(roots: CategoryDto[], locale: Locale): Option[] {
@@ -36,6 +38,7 @@ function buildOptions(roots: CategoryDto[], locale: Locale): Option[] {
         label,
         group,
         haystack: `${group} ${label}`.toLowerCase(),
+        restricted: item.restricted,
       });
     }
   }
@@ -48,15 +51,25 @@ function buildOptions(roots: CategoryDto[], locale: Locale): Option[] {
  *
  * Ищем и по разделу, и по листу: подкатегории повторяются («Игровые» есть у
  * ноутбуков, мышей и мониторов), и без раздела непонятно, какая из них какая.
+ *
+ * Закрытые разделы («Смартфоны», «Планшеты») показываем всем, но без разрешения
+ * гасим: спрятать их значило бы, что продавец о такой возможности не узнает и
+ * не придёт за доступом.
  */
 export function CategorySelect({
   value,
   onChange,
   disabled,
+  allowRestricted = true,
 }: {
   value: number | null;
   onChange: (id: number | null) => void;
   disabled?: boolean;
+  /**
+   * Есть ли у магазина доступ к закрытым разделам. По умолчанию да — админской
+   * форме товара запрещать нечего, ограничение касается продавца.
+   */
+  allowRestricted?: boolean;
 }) {
   const { t, locale } = useT();
   const { roots, isLoading } = useCategories();
@@ -126,34 +139,49 @@ export function CategorySelect({
               {t("category.notFound")}
             </p>
           ) : (
-            filtered.map((o, i) => (
-              <div key={o.id}>
-                {(i === 0 || filtered[i - 1].group !== o.group) && (
-                  <p className="px-2 pb-1 pt-2 text-xs font-medium text-muted-foreground">
-                    {o.group}
-                  </p>
-                )}
-                <button
-                  type="button"
-                  onClick={() => {
-                    onChange(o.id);
-                    setOpen(false);
-                    setQuery("");
-                  }}
-                  className={cn(
-                    "flex w-full items-center justify-between gap-2 rounded-md px-2 py-1.5 text-left text-sm",
-                    o.id === value
-                      ? "bg-muted font-medium"
-                      : "hover:bg-muted/60",
+            filtered.map((o, i) => {
+              const locked = o.restricted && !allowRestricted;
+              return (
+                <div key={o.id}>
+                  {(i === 0 || filtered[i - 1].group !== o.group) && (
+                    <p className="flex flex-wrap items-baseline gap-x-1.5 px-2 pb-1 pt-2 text-xs font-medium text-muted-foreground">
+                      {o.group}
+                      {locked && (
+                        <span className="font-normal">
+                          {t("category.restrictedHint")}
+                        </span>
+                      )}
+                    </p>
                   )}
-                >
-                  <span className="truncate">{o.label}</span>
-                  {o.id === value && (
-                    <Check className="size-4 shrink-0 text-primary" />
-                  )}
-                </button>
-              </div>
-            ))
+                  <button
+                    type="button"
+                    disabled={locked}
+                    onClick={() => {
+                      onChange(o.id);
+                      setOpen(false);
+                      setQuery("");
+                    }}
+                    className={cn(
+                      "flex w-full items-center justify-between gap-2 rounded-md px-2 py-1.5 text-left text-sm",
+                      locked
+                        ? "cursor-not-allowed text-muted-foreground/60"
+                        : o.id === value
+                          ? "bg-muted font-medium"
+                          : "hover:bg-muted/60",
+                    )}
+                  >
+                    <span className="truncate">{o.label}</span>
+                    {locked ? (
+                      <Lock className="size-3.5 shrink-0 opacity-60" />
+                    ) : (
+                      o.id === value && (
+                        <Check className="size-4 shrink-0 text-primary" />
+                      )
+                    )}
+                  </button>
+                </div>
+              );
+            })
           )}
         </div>
       </PopoverContent>

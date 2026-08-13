@@ -238,7 +238,11 @@ export function AddProductForm({
 
           <div className={field}>
             <Label>{t("category.label")}</Label>
-            <CategorySelect value={categoryId} onChange={setCategoryId} />
+            <CategorySelect
+              value={categoryId}
+              onChange={setCategoryId}
+              allowRestricted={shop?.restrictedCategoriesEnabled ?? false}
+            />
           </div>
 
           <div className="grid gap-5 sm:grid-cols-2">

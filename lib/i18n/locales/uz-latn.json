@@ -539,6 +539,15 @@
       "removeTitle": "Do‘kon o‘chirilsinmi?",
       "removeText": "«{name}» va uning barcha mahsulotlari ({count}) butunlay yo‘qoladi, egasi yana xaridorga aylanadi. Qaytariladigan blok kerak bo‘lsa — «Tugatish»dan foydalaning.",
       "removed": "Do‘kon o‘chirildi, egasi yana xaridor",
+      "restrictedTitle": "Smartfon va planshetlar",
+      "restrictedGrant": "Smartfon va planshetlarni ochish",
+      "restrictedRevoke": "Smartfon va planshetlarni yopish",
+      "restrictedGranted": "Do‘kon smartfon va planshet joylashtira oladi",
+      "restrictedRevoked": "Smartfon va planshetlar do‘kon uchun yana yopiq",
+      "restrictedFailed": "Ruxsatni o‘zgartirib bo‘lmadi",
+      "restrictedOn": "Ruxsat berilgan",
+      "restrictedOff": "Ruxsat yo‘q",
+      "restrictedLabel": "yopiq bo‘limlar",
       "ownerBlockedLabel": "egasi bloklangan",
       "createdSummary": "{date} · {count} ta mahsulot",
       "contacts": "Aloqa",
@@ -862,7 +871,8 @@
     "choose": "Kategoriyani tanlang",
     "loading": "Kategoriyalar yuklanmoqda…",
     "search": "Kategoriyalar bo‘yicha qidiruv…",
-    "notFound": "Hech narsa topilmadi"
+    "notFound": "Hech narsa topilmadi",
+    "restrictedHint": "— ruxsatni administrator beradi"
   },
   "reviews": {
     "title": "Sharhlar",

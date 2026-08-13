@@ -41,6 +41,7 @@ import {
   useAdminShopsControllerList,
   useAdminShopsControllerRemove,
   useAdminShopsControllerRestore,
+  useAdminShopsControllerSetRestrictedCategories,
 } from "@/lib/api/generated/endpoints/shops-admin/shops-admin";
 import {
   useAdminUsersControllerBlock,
@@ -78,6 +79,7 @@ export default function AdminSellers() {
   const abolishMutation = useAdminShopsControllerAbolish();
   const restoreMutation = useAdminShopsControllerRestore();
   const removeMutation = useAdminShopsControllerRemove();
+  const restrictedMutation = useAdminShopsControllerSetRestrictedCategories();
   const blockMutation = useAdminUsersControllerBlock();
   const unblockMutation = useAdminUsersControllerUnblock();
 
@@ -116,6 +118,17 @@ export default function AdminSellers() {
   const unblockOwner = async (ownerId: number) => {
     await unblockMutation.mutateAsync({ id: ownerId });
     await done(t("admin.shops.ownerUnblocked"));
+  };
+  /** Доступ к закрытым разделам каталога — смартфонам и планшетам. */
+  const setRestricted = async (id: number, enabled: boolean) => {
+    await restrictedMutation.mutateAsync({ id, data: { enabled } });
+    await done(
+      t(
+        enabled
+          ? "admin.shops.restrictedGranted"
+          : "admin.shops.restrictedRevoked",
+      ),
+    );
   };
   const remove = async (id: number) => {
     await removeMutation.mutateAsync({ id });
@@ -166,6 +179,17 @@ export default function AdminSellers() {
       icon: Coins,
       onSelect: () => setGranting({ id: shop.id, name: shop.name }),
     },
+    shop.restrictedCategoriesEnabled
+      ? {
+          label: t("admin.shops.restrictedRevoke"),
+          icon: Lock,
+          onSelect: () => void setRestricted(shop.id, false),
+        }
+      : {
+          label: t("admin.shops.restrictedGrant"),
+          icon: LockOpen,
+          onSelect: () => void setRestricted(shop.id, true),
+        },
     {
       label: t("admin.shops.remove"),
       icon: Trash2,
