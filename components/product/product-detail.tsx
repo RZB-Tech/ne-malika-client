@@ -62,15 +62,32 @@ export function ProductDetail({
     <PageContainer className="py-6">
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
         <div className="min-w-0">
-          <div className="grid max-w-4xl grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-[76px_minmax(0,1fr)]">
-            <div className="order-2 flex min-w-0 gap-3 overflow-x-auto pb-1 sm:order-1 sm:flex-col sm:overflow-x-visible sm:pb-0">
+          {/**
+           * Галерея — вертикальная, как на крупных маркетплейсах: колонка
+           * миниатюр слева, крупное фото справа.
+           *
+           * Ширина ограничена, потому что левая колонка страницы шире, чем
+           * нужно фотографии: без потолка вертикальный кадр вытянулся бы на
+           * тысячу с лишним пикселей и занял бы экран целиком.
+           */}
+          <div className="grid max-w-[640px] grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-[76px_minmax(0,1fr)]">
+            {/* Много фото — колонка прокручивается, а не растёт бесконечно. */}
+            <div className="no-scrollbar order-2 flex min-w-0 gap-3 overflow-x-auto pb-1 sm:order-1 sm:max-h-[45rem] sm:flex-col sm:overflow-x-visible sm:overflow-y-auto sm:pb-0">
               {gallery.map((g, i) => (
                 <button
                   key={i}
                   onClick={() => setActive(i)}
+                  aria-current={active === i}
                   className={cn(
-                    "aspect-[5/4] w-[72px] shrink-0 overflow-hidden rounded-lg transition-opacity",
-                    active === i ? "opacity-100" : "opacity-55 hover:opacity-85",
+                    /**
+                     * Выбранное фото отмечено рамкой, а не яркостью: соседние
+                     * при затемнении читались как выключенные, хотя нажать
+                     * можно любое.
+                     */
+                    "aspect-[3/4] w-[72px] shrink-0 overflow-hidden rounded-lg transition-shadow",
+                    active === i
+                      ? "ring-2 ring-primary"
+                      : "ring-1 ring-border hover:ring-foreground/25",
                   )}
                 >
                   <ProductImage
@@ -78,6 +95,7 @@ export function ProductDetail({
                     src={g.src}
                     alt={product.name}
                     categorySlug={product.categorySlug}
+                    fit="contain"
                     className="h-full w-full"
                     iconClassName="size-5"
                   />
@@ -98,12 +116,22 @@ export function ProductDetail({
                   photos.length > 0 ? "cursor-zoom-in" : "cursor-default",
                 )}
               >
+                {/**
+                 * Вертикальный кадр 3:4 — в этой же пропорции генерируются
+                 * фото товаров (960×1280), поэтому у большинства карточек полей
+                 * не будет вовсе.
+                 *
+                 * Показываем фото целиком, а не заполняем кадр: продавцы грузят
+                 * снимки вперемешку, и обрезка съедала бы то подпись на
+                 * рекламной картинке, то часть товара.
+                 */}
                 <ProductImage
                   hue={gallery[active]?.hue ?? product.hue}
                   src={gallery[active]?.src}
                   alt={product.name}
                   categorySlug={product.categorySlug}
-                  className="aspect-[4/3] w-full rounded-2xl"
+                  fit="contain"
+                  className="aspect-[3/4] w-full rounded-2xl"
                   iconClassName="size-32"
                 />
               </button>
