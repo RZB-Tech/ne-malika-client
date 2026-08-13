@@ -420,6 +420,7 @@
       "colAuthor": "Юборган"
     },
     "credits": {
+      "creditsAction": "Кредитлар",
       "grantAction": "Кредит бериш",
       "grantTitle": "Кредит бериш",
       "grantSubtitle": "«{shop}» дўкони. Кредитлар карточка генерацияси ва промпт тузишга сарфланади.",

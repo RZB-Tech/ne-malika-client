@@ -9,6 +9,7 @@ import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -16,6 +17,7 @@ import {
   ContextMenuContent,
   ContextMenuGroup,
   ContextMenuItem,
+  ContextMenuSeparator,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import { AbolishDialog } from "@/components/admin/abolish-dialog";
@@ -51,6 +53,8 @@ export interface RowAction {
 
 export function RowActionsMenu({ actions }: { actions: RowAction[] }) {
   const { t } = useT();
+  const normal = actions.filter((a) => !a.destructive);
+  const destructive = actions.filter((a) => a.destructive);
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -60,7 +64,7 @@ export function RowActionsMenu({ actions }: { actions: RowAction[] }) {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuGroup>
-          {actions.map((action) => (
+          {normal.map((action) => (
             <ActionItem
               key={action.label}
               action={action}
@@ -68,6 +72,20 @@ export function RowActionsMenu({ actions }: { actions: RowAction[] }) {
             />
           ))}
         </DropdownMenuGroup>
+        {normal.length > 0 && destructive.length > 0 && (
+          <DropdownMenuSeparator />
+        )}
+        {destructive.length > 0 && (
+          <DropdownMenuGroup>
+            {destructive.map((action) => (
+              <ActionItem
+                key={action.label}
+                action={action}
+                Item={DropdownMenuItem}
+              />
+            ))}
+          </DropdownMenuGroup>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );
@@ -80,12 +98,14 @@ export function RowContextMenu({
   actions: RowAction[];
   children: React.ReactNode;
 }) {
+  const normal = actions.filter((a) => !a.destructive);
+  const destructive = actions.filter((a) => a.destructive);
   return (
     <ContextMenu>
       <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
       <ContextMenuContent className="w-56">
         <ContextMenuGroup>
-          {actions.map((action) => (
+          {normal.map((action) => (
             <ActionItem
               key={action.label}
               action={action}
@@ -93,6 +113,20 @@ export function RowContextMenu({
             />
           ))}
         </ContextMenuGroup>
+        {normal.length > 0 && destructive.length > 0 && (
+          <ContextMenuSeparator />
+        )}
+        {destructive.length > 0 && (
+          <ContextMenuGroup>
+            {destructive.map((action) => (
+              <ActionItem
+                key={action.label}
+                action={action}
+                Item={ContextMenuItem}
+              />
+            ))}
+          </ContextMenuGroup>
+        )}
       </ContextMenuContent>
     </ContextMenu>
   );

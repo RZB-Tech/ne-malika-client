@@ -420,6 +420,7 @@
       "colAuthor": "Yuborgan"
     },
     "credits": {
+      "creditsAction": "Kreditlar",
       "grantAction": "Kredit berish",
       "grantTitle": "Kredit berish",
       "grantSubtitle": "«{shop}» do‘koni. Kreditlar kartochka generatsiyasi va prompt tuzishga sarflanadi.",

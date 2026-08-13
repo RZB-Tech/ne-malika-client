@@ -29,8 +29,7 @@ import { StoreAvatar } from "@/components/shared/store-avatar";
 import { EntityStatusBadge } from "@/components/admin/entity-status-badge";
 import { Pagination } from "@/components/shared/pagination";
 import { ShopDrawer } from "@/components/admin/shop-drawer";
-import { GrantCreditsDialog } from "@/components/admin/grant-credits-dialog";
-import { RevokeCreditsDialog } from "@/components/admin/revoke-credits-dialog";
+import { CreditsDialog } from "@/components/admin/credits-dialog";
 import {
   RowActionsMenu,
   RowContextMenu,
@@ -62,12 +61,10 @@ export default function AdminSellers() {
   const { t, locale } = useT();
   const queryClient = useQueryClient();
   const [opened, setOpened] = useState<AdminShopRow | null>(null);
-  const [granting, setGranting] = useState<{ id: number; name: string } | null>(
-    null,
-  );
-  const [revoking, setRevoking] = useState<{ id: number; name: string } | null>(
-    null,
-  );
+  const [creditsShop, setCreditsShop] = useState<{
+    id: number;
+    name: string;
+  } | null>(null);
   const [page, setPage] = useState(1);
   const [q, setQ] = useState("");
 
@@ -180,15 +177,9 @@ export default function AdminSellers() {
           },
         },
     {
-      label: t("admin.credits.grantAction"),
+      label: t("admin.credits.creditsAction"),
       icon: Coins,
-      onSelect: () => setGranting({ id: shop.id, name: shop.name }),
-    },
-    {
-      label: t("admin.credits.revokeAction"),
-      icon: Coins,
-      destructive: true,
-      onSelect: () => setRevoking({ id: shop.id, name: shop.name }),
+      onSelect: () => setCreditsShop({ id: shop.id, name: shop.name }),
     },
     shop.restrictedCategoriesEnabled
       ? {
@@ -361,8 +352,7 @@ export default function AdminSellers() {
         onRemove={remove}
       />
 
-      <GrantCreditsDialog shop={granting} onClose={() => setGranting(null)} />
-      <RevokeCreditsDialog shop={revoking} onClose={() => setRevoking(null)} />
+      <CreditsDialog shop={creditsShop} onClose={() => setCreditsShop(null)} />
     </div>
   );
 }
