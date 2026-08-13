@@ -250,6 +250,23 @@ export function SiteHeader() {
           <MessagesAction />
           <FavoritesAction />
           <CompareAction />
+
+          {/**
+           * Язык и тема для телефона. На широком экране они стоят во второй
+           * строке шапки, но её показывают только с `lg` — на телефоне, где
+           * второй строки нет вовсе, переключиться было нечем.
+           *
+           * Только до `md`: с планшета в этот же ряд встают пять действий
+           * покупателя, и ещё две кнопки отобрали бы у строки поиска последнее
+           * место.
+           */}
+          <div className="flex shrink-0 items-center gap-0.5 md:hidden">
+            <LanguageSwitch className="h-9 gap-1 px-1.5" />
+            <AnimatedThemeToggler
+              aria-label={t("common.theme")}
+              className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors outline-none hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 [&_svg]:size-[1.15rem]"
+            />
+          </div>
         </nav>
       </div>
 
