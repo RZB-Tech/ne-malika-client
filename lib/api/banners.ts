@@ -27,6 +27,23 @@ export const BANNER_FORMATS_LABEL = BANNER_FORMATS.map(
 /** Пропорция слота карусели в виде значения для CSS `aspect-ratio`. */
 export const BANNER_ASPECT_CSS = `${BANNER_PRIMARY_FORMAT.width} / ${BANNER_PRIMARY_FORMAT.height}`;
 
+/**
+ * Потолок высоты карусели на широких экранах, px. Витрина тянется до 1600 px,
+ * и баннер 2.4:1 во всю ширину занимал бы больше 600 px — весь первый экран,
+ * из-за чего товары уезжали за сгиб.
+ *
+ * Ручка ровно одна: меняете число — меняется высота, ширина пересчитается сама
+ * по пропорции основного формата. На узких экранах ограничение не срабатывает,
+ * баннер просто занимает всю доступную ширину.
+ */
+export const BANNER_MAX_HEIGHT = 460;
+
+/** Ширина, при которой баннер упирается в потолок высоты. */
+export const BANNER_MAX_WIDTH = Math.round(
+  (BANNER_MAX_HEIGHT * BANNER_PRIMARY_FORMAT.width) /
+    BANNER_PRIMARY_FORMAT.height,
+);
+
 /** Допуск по соотношению сторон: 1241×400 — это опечатка, а не другой формат. */
 const ASPECT_TOLERANCE = 0.02;
 

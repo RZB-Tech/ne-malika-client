@@ -7,6 +7,7 @@ import { PageContainer } from "@/components/layout/page-container";
 import { useT } from "@/components/providers/i18n-provider";
 import {
   BANNER_ASPECT_CSS,
+  BANNER_MAX_WIDTH,
   bannerImageUrl,
   type Banner,
 } from "@/lib/api/banners";
@@ -61,7 +62,9 @@ export function BannerCarousel({ banners }: { banners: Banner[] }) {
       <section
         aria-roledescription="carousel"
         aria-label={t("home.banners.label")}
-        className="group relative overflow-hidden rounded-2xl bg-muted"
+        /* Ширина ограничена, чтобы упереться в потолок высоты; уже — по месту. */
+        style={{ maxWidth: BANNER_MAX_WIDTH }}
+        className="group relative mx-auto overflow-hidden rounded-2xl bg-muted"
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
         onTouchStart={(e) => {
