@@ -426,7 +426,7 @@
       "balanceFailed": "Balansni yuklab bo‘lmadi",
       "amount": "Do‘kondan olingan summa, $",
       "amountHint": "Summani kiriting — qancha kredit qo‘shilishini ko‘rsatamiz.",
-      "preview": "{credits} kredit qo‘shiladi (koeffitsient {markup})",
+      "preview": "{credits} kredit qo‘shiladi — to‘langan summaning o‘zi (×{markup} koeffitsient yechishda olinadi)",
       "note": "Izoh",
       "notePlaceholder": "To‘lov raqami yoki kelishuv",
       "grant": "Qo‘shish",
@@ -437,7 +437,7 @@
       "balance": "AI kreditlari",
       "balanceValue": "{available} kredit",
       "markupTitle": "Kreditlarga ustama",
-      "markupText": "Do‘kondan olingan summa shu koeffitsientga bo‘linadi. 2 bo‘lganda $20 to‘lov OpenRouter’dagi $10 haqiqiy sarfga teng kredit beradi — farqi platformaga qoladi.",
+      "markupText": "So‘rov tannarxi yechish paytida shu koeffitsientga ko‘paytiriladi. To‘langan summaning o‘zi qo‘shiladi: $20 — 20 000 kredit, koeffitsient 2 bo‘lganda ular OpenRouter’dagi $10 haqiqiy sarfga yetadi — farqi platformaga qoladi.",
       "markupLabel": "Koeffitsient"
     },
     "imageGen": {
