@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "sonner";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -46,7 +47,14 @@ export function ConfirmDialog({
     try {
       await onConfirm();
       setOpen(false);
-    } catch {
+    } catch (err) {
+      /**
+       * Раньше здесь стоял пустой catch, и отказ сервера выглядел как «кнопка
+       * не работает»: окно оставалось открытым, запись — на месте, причины ни
+       * на экране, ни в консоли. Сообщение сервера мутатор уже положил в
+       * error.message, показать его — единственное, чего не хватало.
+       */
+      toast.error(err instanceof Error ? err.message : t("common.actionFailed"));
     } finally {
       setBusy(false);
     }
