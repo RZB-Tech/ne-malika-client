@@ -94,6 +94,7 @@ import {
   Tag01Icon,
   Tick02Icon,
   TickDouble02Icon,
+  ToolsIcon,
   TruckIcon,
   Undo02Icon,
   Upload01Icon,
@@ -238,6 +239,8 @@ export const Store = make(Store01Icon, "Store");
 export const Sun = make(Sun03Icon, "Sun");
 export const Tablet = make(Tablet01Icon, "Tablet");
 export const Tag = make(Tag01Icon, "Tag");
+/** Плитка раздела «Услуги»: ремонт и обслуживание, а не продажа вещи. */
+export const Tools = make(ToolsIcon, "Tools");
 export const Trash2 = make(Delete02Icon, "Trash2");
 export const TriangleAlert = make(Alert02Icon, "TriangleAlert");
 export const TriangleAlertIcon = TriangleAlert;

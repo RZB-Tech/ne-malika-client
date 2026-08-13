@@ -24,6 +24,7 @@ import {
   Smartphone,
   Speaker,
   Tablet,
+  Tools,
   Usb,
   Webcam,
   Wifi,
@@ -62,6 +63,7 @@ const map: Record<string, AppIcon> = {
   Disc,
   Armchair,
   Microchip,
+  Tools,
 };
 
 export function CategoryIcon({
