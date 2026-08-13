@@ -33,10 +33,21 @@ function resolve(obj: unknown, path: string): string {
   return typeof value === "string" ? value : path;
 }
 
+/**
+ * Подстановка значений в строку перевода.
+ *
+ * Пустое значение оставляет плейсхолдер нетронутым — как и вовсе не переданный
+ * ключ. Раньше `String(undefined)` подставлял в текст слово «undefined», и
+ * пользователь читал «Подойдёт размер undefined» как настоящее сообщение;
+ * `{sizes}` на его месте хотя бы честно выглядит поломкой, а не требованием.
+ *
+ * Такое случается, когда константу переименовали, а импорт остался старым:
+ * типы это ловят, но не поймает устаревший кэш сборки.
+ */
 function interpolate(str: string, vars?: Vars): string {
   if (!vars) return str;
   return str.replace(/\{(\w+)\}/g, (_, k) =>
-    k in vars ? String(vars[k]) : `{${k}}`,
+    vars[k] === undefined || vars[k] === null ? `{${k}}` : String(vars[k]),
   );
 }
 
