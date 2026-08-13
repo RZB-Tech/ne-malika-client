@@ -7,7 +7,6 @@ import { PageContainer } from "@/components/layout/page-container";
 import { useT } from "@/components/providers/i18n-provider";
 import {
   BANNER_ASPECT_CSS,
-  BANNER_MAX_WIDTH,
   bannerImageUrl,
   type Banner,
 } from "@/lib/api/banners";
@@ -62,9 +61,7 @@ export function BannerCarousel({ banners }: { banners: Banner[] }) {
       <section
         aria-roledescription="carousel"
         aria-label={t("home.banners.label")}
-        /* Ширина ограничена, чтобы упереться в потолок высоты; уже — по месту. */
-        style={{ maxWidth: BANNER_MAX_WIDTH }}
-        className="group relative mx-auto overflow-hidden rounded-2xl bg-muted"
+        className="group relative overflow-hidden rounded-2xl bg-muted"
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
         onTouchStart={(e) => {
@@ -131,9 +128,12 @@ export function BannerCarousel({ banners }: { banners: Banner[] }) {
 }
 
 /**
- * Один кадр. Высоту слота задаёт основной формат баннера, картинка вписывается
- * целиком: обрезка по краям съедала бы текст акции, нарисованный прямо на ней.
- * Если все баннеры одного формата — а это обычный случай, — полей не видно.
+ * Один кадр — во всю ширину витрины, высоту задаёт `BANNER_SLOT_RATIO`.
+ *
+ * Картинка заполняет слот целиком (`object-cover`), а не вписывается в него:
+ * при совпадении пропорций это одно и то же, но если баннер загрузили во втором
+ * допустимом формате, вписывание оставило бы по краям пустые полосы. Заполнение
+ * вместо них слегка кадрирует — пустота в карусели заметнее обрезки.
  */
 function BannerSlide({
   banner,
@@ -154,7 +154,7 @@ function BannerSlide({
       loading={eager ? "eager" : "lazy"}
       fetchPriority={eager ? "high" : "auto"}
       draggable={false}
-      className="size-full object-contain"
+      className="size-full object-cover"
     />
   ) : (
     <div className="size-full bg-muted" />
