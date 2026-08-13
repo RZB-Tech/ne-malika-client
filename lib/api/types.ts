@@ -184,6 +184,9 @@ export interface AdminUserRow {
   shopId: number | null;
   shopName: string | null;
   shopStatus: EntityStatus | null;
+  /** Кредиты магазина. null — магазина нет, тратить не с чего. */
+  creditsBalance: number | null;
+  creditsReserved: number | null;
   productCount: number;
   lastProductAt: string | null;
 }

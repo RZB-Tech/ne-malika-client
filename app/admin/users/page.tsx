@@ -171,6 +171,9 @@ export default function AdminUsers() {
                 <TableHead>{t("admin.users.colShop")}</TableHead>
                 <TableHead>{t("admin.users.colRole")}</TableHead>
                 <TableHead className="text-right">
+                  {t("admin.users.colCredits")}
+                </TableHead>
+                <TableHead className="text-right">
                   {t("admin.users.colProducts")}
                 </TableHead>
                 <TableHead>{t("admin.users.colJoined")}</TableHead>
@@ -217,6 +220,14 @@ export default function AdminUsers() {
                     </TableCell>
                     <TableCell>
                       <RoleBadge role={u.role} />
+                    </TableCell>
+                    <TableCell className="tabular text-right text-sm">
+                      {u.shopId === null
+                        ? "—"
+                        : Math.max(
+                            0,
+                            (u.creditsBalance ?? 0) - (u.creditsReserved ?? 0),
+                          )}
                     </TableCell>
                     <TableCell className="tabular text-right text-sm">
                       {u.productCount}
