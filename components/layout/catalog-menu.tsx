@@ -146,7 +146,7 @@ export function CatalogMenu() {
           >
             <div
               className={cn(
-                "mx-auto max-h-[min(70vh,40rem)] max-w-[1600px] overflow-y-auto px-4 py-4 sm:px-8 lg:px-10 lg:py-5",
+                "mx-auto max-h-[min(70vh,40rem)] max-w-site overflow-y-auto px-4 py-4 sm:px-8 lg:py-5",
                 roots.length > 0 &&
                   "lg:h-full lg:max-h-none lg:overflow-hidden",
               )}

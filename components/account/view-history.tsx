@@ -23,7 +23,7 @@ export function ViewHistory() {
 
   if (isLoading && items.length === 0) {
     return (
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="grid grid-cols-2 justify-center gap-3 md:grid-cols-3 lg:grid-cols-[repeat(auto-fill,var(--product-card-w))]">
         {Array.from({ length: 4 }).map((_, i) => (
           <Skeleton key={i} className="h-72 rounded-xl" />
         ))}
@@ -70,7 +70,7 @@ export function ViewHistory() {
         </ConfirmDialog>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="grid grid-cols-2 justify-center gap-3 md:grid-cols-3 lg:grid-cols-[repeat(auto-fill,var(--product-card-w))]">
         {items.map((item) => (
           <div key={item.id}>
             <ProductCard product={toProduct(item)} />

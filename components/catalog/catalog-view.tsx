@@ -159,7 +159,7 @@ export function CatalogView({
           }
         />
       ) : isLoading ? (
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+        <div className="grid grid-cols-2 justify-center gap-3 md:grid-cols-3 lg:grid-cols-[repeat(auto-fill,var(--product-card-w))]">
           {Array.from({ length: 10 }).map((_, i) => (
             <ProductCardSkeleton key={i} />
           ))}
@@ -172,14 +172,14 @@ export function CatalogView({
         />
       ) : (
         <>
-          <div className="grid grid-cols-2 gap-4 [&>*]:[content-visibility:auto] [&>*]:[contain-intrinsic-size:auto_480px] sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+          <div className="grid grid-cols-2 justify-center gap-3 md:grid-cols-3 lg:grid-cols-[repeat(auto-fill,var(--product-card-w))] [&>*]:[content-visibility:auto] [&>*]:[contain-intrinsic-size:auto_428px]">
             {results.map((p) => (
               <ProductCard key={p.id} product={p} />
             ))}
           </div>
 
           {isFetchingNextPage && (
-            <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+            <div className="mt-4 grid grid-cols-2 justify-center gap-3 md:grid-cols-3 lg:grid-cols-[repeat(auto-fill,var(--product-card-w))]">
               {Array.from({ length: 5 }).map((_, i) => (
                 <ProductCardSkeleton key={i} />
               ))}

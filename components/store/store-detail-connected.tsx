@@ -21,7 +21,7 @@ export function StoreDetailConnected({ id }: { id: number }) {
     return (
       <PageContainer className="py-6">
         <Skeleton className="h-48 w-full rounded-2xl" />
-        <div className="mt-10 grid grid-cols-2 gap-4 md:grid-cols-4">
+        <div className="mt-10 grid grid-cols-2 justify-center gap-3 md:grid-cols-3 lg:grid-cols-[repeat(auto-fill,var(--product-card-w))]">
           {Array.from({ length: 4 }).map((_, i) => (
             <ProductCardSkeleton key={i} />
           ))}

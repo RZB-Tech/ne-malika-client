@@ -25,7 +25,7 @@ export function MessagesView() {
   const [threadOpen, setThreadOpen] = useState(false);
 
   return (
-    <div className="fixed inset-0 z-[60] flex flex-col bg-background md:static md:z-auto md:mx-auto md:w-full md:max-w-[1600px] md:px-8 md:py-6 lg:px-10">
+    <div className="fixed inset-0 z-[60] flex flex-col bg-background md:static md:z-auto md:mx-auto md:w-full md:max-w-site md:px-8 md:py-6">
       <header
         className={cn(
           "flex items-center gap-1 border-b border-border px-2 py-2 md:hidden",

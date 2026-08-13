@@ -72,7 +72,16 @@ export function ProductCard({ product }: { product: Product }) {
 
   return (
     <div
-      className="group relative isolate flex flex-col rounded-2xl bg-card p-2"
+      /**
+       * Высота задана жёстко (`--product-card-h`), а не сложена из содержимого:
+       * иначе карточка с рейтингом и двухстрочным названием оказывалась выше
+       * соседки без них, и ряд шёл ступенькой. Остаток высоты забирает
+       * картинка — она единственная, чей размер можно менять безнаказанно.
+       *
+       * Только с `sm`: на телефоне в ряду две колонки, карточка узкая, и
+       * фиксированная высота растянула бы её в столб.
+       */
+      className="group relative isolate flex flex-col rounded-2xl bg-card p-2 sm:h-[var(--product-card-h)]"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={leave}
     >
@@ -82,14 +91,14 @@ export function ProductCard({ product }: { product: Product }) {
       </div>
 
       <Link href={`/product/${product.id}`} className="flex flex-1 flex-col">
-        <div className="relative overflow-hidden rounded-2xl bg-muted">
+        <div className="relative overflow-hidden rounded-2xl bg-muted sm:min-h-0 sm:flex-1">
           <ProductImage
             hue={product.hue}
             categorySlug={product.categorySlug}
             src={photos[active] ?? product.imageUrl}
             alt={product.name}
             fit="contain"
-            className="aspect-[3/4] w-full transition-transform duration-300 group-hover:scale-[1.03]"
+            className="aspect-[3/4] w-full transition-transform duration-300 group-hover:scale-[1.03] sm:aspect-auto sm:h-full"
             iconClassName="size-16"
           />
           {product.isNew && (
@@ -101,7 +110,8 @@ export function ProductCard({ product }: { product: Product }) {
           )}
         </div>
 
-        <div className="flex flex-1 flex-col gap-1 pt-2.5">
+        {/* Текст не тянется: свободную высоту в карточке отдаём картинке. */}
+        <div className="flex flex-col gap-1 pt-2.5">
           <div className="flex flex-wrap items-baseline gap-x-2">
             <span className="tabular text-base font-bold text-foreground">
               {product.price === null ? (
@@ -163,8 +173,8 @@ export function ProductCard({ product }: { product: Product }) {
  */
 export function ProductCardSkeleton() {
   return (
-    <div className="flex flex-col rounded-2xl bg-card p-2">
-      <Skeleton className="aspect-[3/4] w-full rounded-2xl" />
+    <div className="flex flex-col rounded-2xl bg-card p-2 sm:h-[var(--product-card-h)]">
+      <Skeleton className="aspect-[3/4] w-full rounded-2xl sm:aspect-auto sm:min-h-0 sm:flex-1" />
       <Skeleton className="mt-2.5 h-5 w-24" />
       <Skeleton className="mt-1 h-4 w-16" />
       <Skeleton className="mt-1 h-4 w-full" />

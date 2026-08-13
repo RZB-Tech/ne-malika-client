@@ -165,11 +165,11 @@ export function SiteHeader() {
   return (
     <header
       data-compact={isCompact}
-      className="sticky top-0 z-50 mx-auto w-full max-w-[1600px] bg-card [overflow-anchor:none] md:rounded-b-3xl"
+      className="sticky top-0 z-50 mx-auto w-full max-w-site bg-card [overflow-anchor:none] md:rounded-b-3xl"
     >
       <div
         className={cn(
-          "mx-auto flex w-full max-w-[1600px] items-center gap-2 px-5 transition-[height] duration-200 ease-out sm:gap-3 sm:px-8 lg:px-10",
+          "mx-auto flex w-full max-w-site items-center gap-2 px-5 transition-[height] duration-200 ease-out sm:gap-3 sm:px-8",
           isCompact ? "h-16" : "h-17",
         )}
       >
@@ -279,7 +279,7 @@ export function SiteHeader() {
             : "h-10 opacity-100",
         )}
       >
-        <div className="mx-auto flex h-10 w-full max-w-[1600px] items-center px-5 sm:px-8 lg:px-10">
+        <div className="mx-auto flex h-10 w-full max-w-site items-center px-5 sm:px-8">
           <nav className="no-scrollbar flex min-w-0 items-center gap-1 overflow-x-auto">
             {roots.length > 0
               ? roots.slice(0, QUICK_CATEGORIES).map((root) => (
@@ -321,7 +321,7 @@ export function SiteHeader() {
       <div
         aria-hidden={isCompact}
         className={cn(
-          "relative mx-auto hidden w-full max-w-[1600px] overflow-hidden rounded-b-3xl bg-primary transition-[height,opacity] duration-300 ease-in-out motion-reduce:transition-none md:block",
+          "relative mx-auto hidden w-full max-w-site overflow-hidden rounded-b-3xl bg-primary transition-[height,opacity] duration-300 ease-in-out motion-reduce:transition-none md:block",
           isCompact
             ? "h-0 pointer-events-none opacity-0"
             : "h-18 opacity-100",
@@ -333,7 +333,7 @@ export function SiteHeader() {
           fill
           priority
           unoptimized
-          sizes="(max-width: 1600px) 100vw, 1600px"
+          sizes="(max-width: 1504px) 100vw, 1504px"
           className="object-cover object-left"
         />
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center px-8">

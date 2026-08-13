@@ -28,7 +28,7 @@ export function CompareBar() {
 
   return (
     <div className="pointer-events-none sticky bottom-0 z-40 px-4 pb-18 sm:px-8 md:pb-4">
-      <div className="pointer-events-auto mx-auto flex max-w-[1600px] items-center gap-3 rounded-2xl border border-border bg-card/95 p-3 shadow-lg backdrop-blur">
+      <div className="pointer-events-auto mx-auto flex max-w-site items-center gap-3 rounded-2xl border border-border bg-card/95 p-3 shadow-lg backdrop-blur">
         <Scale className="ml-1 hidden size-5 shrink-0 text-primary sm:block" />
 
         <div className="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto">
