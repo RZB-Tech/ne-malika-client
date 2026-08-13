@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { Ban, ExternalLink, Pencil, RotateCcw, Trash2 } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { ProductImage } from "@/components/shared/product-image";
+import { PhotoLightbox } from "@/components/shared/photo-lightbox";
 import { AbolishDialog } from "@/components/admin/abolish-dialog";
 import { EntityStatusBadge } from "@/components/admin/entity-status-badge";
 import {
@@ -37,6 +39,13 @@ export function ProductDrawer({
   onEdit: (product: AdminProductRow) => void;
 }) {
   const { t, locale } = useT();
+  /** Фото, открытое во весь экран; null — просмотрщик закрыт. */
+  const [zoomed, setZoomed] = useState<number | null>(null);
+
+  /** Все фото карточки: в drawer видна только первая, а смотреть нужно все. */
+  const photos = (product?.photos ?? [])
+    .map((key) => photoUrl(key))
+    .filter((url): url is string => Boolean(url));
 
   return (
     <DetailDrawer
@@ -107,18 +116,32 @@ export function ProductDrawer({
       {product && (
         <>
           <div className="flex items-center gap-4">
-            <ProductImage
-              hue={hueFromId(product.id)}
-              categorySlug=""
-              src={photoUrl(product.photos?.[0])}
-              alt={product.name}
-              className="size-20 shrink-0 rounded-xl"
-              iconClassName="size-6"
-            />
+            <button
+              type="button"
+              onClick={() => photos.length > 0 && setZoomed(0)}
+              aria-label={t("common.zoom")}
+              className={photos.length > 0 ? "cursor-zoom-in" : "cursor-default"}
+            >
+              <ProductImage
+                hue={hueFromId(product.id)}
+                categorySlug=""
+                src={photos[0]}
+                alt={product.name}
+                className="size-20 shrink-0 rounded-xl"
+                iconClassName="size-6"
+              />
+            </button>
             <div className="tabular text-xl font-bold">
               {priceText(product.price, locale, t)}
             </div>
           </div>
+
+          <PhotoLightbox
+            photos={photos}
+            startIndex={zoomed}
+            onClose={() => setZoomed(null)}
+            alt={product.name}
+          />
 
           {product.description && (
             <DetailSection title={t("product.description")}>

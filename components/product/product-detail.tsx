@@ -8,6 +8,7 @@ import { PageContainer } from "@/components/layout/page-container";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ProductImage } from "@/components/shared/product-image";
+import { PhotoLightbox } from "@/components/shared/photo-lightbox";
 import { AvailabilityBadge } from "@/components/shared/badges";
 import { TelegramButton } from "@/components/product/telegram-button";
 import { WriteToSellerButton } from "@/components/chat/write-to-seller-button";
@@ -35,6 +36,8 @@ export function ProductDetail({
 }) {
   const { t, locale } = useT();
   const [active, setActive] = useState(0);
+  /** Индекс фото, открытого во весь экран; null — просмотрщик закрыт. */
+  const [zoomed, setZoomed] = useState<number | null>(null);
   const snapshot = productToSnapshot(product);
 
   const photos = product.photoUrls ?? [];
@@ -82,14 +85,28 @@ export function ProductDetail({
               ))}
             </div>
             <div className="relative order-1 min-w-0 sm:order-2">
-              <ProductImage
-                hue={gallery[active]?.hue ?? product.hue}
-                src={gallery[active]?.src}
-                alt={product.name}
-                categorySlug={product.categorySlug}
-                className="aspect-[4/3] w-full rounded-2xl"
-                iconClassName="size-32"
-              />
+              {/**
+               * Крупный просмотр — только когда фото настоящее: на заглушке
+               * категории увеличивать нечего.
+               */}
+              <button
+                type="button"
+                onClick={() => photos.length > 0 && setZoomed(active)}
+                aria-label={t("common.zoom")}
+                className={cn(
+                  "block w-full",
+                  photos.length > 0 ? "cursor-zoom-in" : "cursor-default",
+                )}
+              >
+                <ProductImage
+                  hue={gallery[active]?.hue ?? product.hue}
+                  src={gallery[active]?.src}
+                  alt={product.name}
+                  categorySlug={product.categorySlug}
+                  className="aspect-[4/3] w-full rounded-2xl"
+                  iconClassName="size-32"
+                />
+              </button>
               {product.isNew && (
                 <div className="absolute left-4 top-4 flex gap-2">
                   <span className="rounded-full bg-primary px-2.5 py-1 text-xs font-medium text-primary-foreground">
@@ -99,6 +116,13 @@ export function ProductDetail({
               )}
             </div>
           </div>
+
+          <PhotoLightbox
+            photos={photos}
+            startIndex={zoomed}
+            onClose={() => setZoomed(null)}
+            alt={product.name}
+          />
 
           <section className="mt-10">
             <h2 className="font-heading text-xl font-bold tracking-tight">{t("product.description")}</h2>

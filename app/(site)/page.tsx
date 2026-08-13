@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { BannerCarousel } from "@/components/home/banner-carousel";
 import { CatalogView } from "@/components/catalog/catalog-view";
-import { getPublicProducts } from "@/lib/api/server";
+import { getBanners, getPublicProducts } from "@/lib/api/server";
 import type { Paginated, PublicProductCard } from "@/lib/api/types";
 import {
   SITE_NAME,
@@ -67,7 +68,11 @@ const jsonLd = [
 ];
 
 export default async function HomePage() {
-  const initial = await getPublicProducts();
+  /** Оба запроса разом: каталог не должен ждать баннеры, а баннеры — каталог. */
+  const [initial, banners] = await Promise.all([
+    getPublicProducts(),
+    getBanners(),
+  ]);
 
   return (
     <>
@@ -75,6 +80,7 @@ export default async function HomePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      <BannerCarousel banners={banners} />
       <Suspense>
         <CatalogView
           initialData={initial as Paginated<PublicProductCard> | undefined}

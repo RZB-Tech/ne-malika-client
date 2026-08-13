@@ -31,6 +31,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ProductImage } from "@/components/shared/product-image";
+import { PhotoLightbox } from "@/components/shared/photo-lightbox";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { FixDescriptionButton } from "@/components/shared/fix-description-button";
 import { ModerationBadge } from "@/components/shared/badges";
@@ -55,6 +56,7 @@ import { mapProductRow } from "@/lib/api/mappers";
 import { photoUrl } from "@/lib/api/photo";
 import { resolvePhotoKeys } from "@/lib/api/upload";
 import { formatPriceInput, parsePriceInput } from "@/lib/format";
+import { cn } from "@/lib/utils";
 import type { AiProductCheck } from "@/lib/api/types";
 
 type Spec = { key: string; value: string };
@@ -87,6 +89,8 @@ export function SellerProductDetail({ id }: { id: number }) {
   const [hydratedRowId, setHydratedRowId] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
   const [aiPhoto, setAiPhoto] = useState<UploadedPhoto | null>(null);
+  /** Фото, открытое во весь экран; null — просмотрщик закрыт. */
+  const [zoomed, setZoomed] = useState<number | null>(null);
 
   if (row && row.id !== hydratedRowId) {
     setHydratedRowId(row.id);
@@ -190,15 +194,25 @@ export function SellerProductDetail({ id }: { id: number }) {
 
       <Card className="p-6">
         <div className="flex flex-col gap-5 sm:flex-row">
-          <ProductImage
-            hue={product.hue}
-            categorySlug={product.categorySlug}
-            src={photos[0]?.url ?? null}
-            alt={product.name}
-            fit="natural"
-            className="w-full shrink-0 self-start rounded-xl sm:w-80 lg:w-[26rem]"
-            iconClassName="size-14"
-          />
+          <button
+            type="button"
+            onClick={() => photos.length > 0 && setZoomed(0)}
+            aria-label={t("common.zoom")}
+            className={cn(
+              "w-full shrink-0 self-start sm:w-80 lg:w-[26rem]",
+              photos.length > 0 ? "cursor-zoom-in" : "cursor-default",
+            )}
+          >
+            <ProductImage
+              hue={product.hue}
+              categorySlug={product.categorySlug}
+              src={photos[0]?.url ?? null}
+              alt={product.name}
+              fit="natural"
+              className="w-full rounded-xl"
+              iconClassName="size-14"
+            />
+          </button>
           <div className="min-w-0 flex-1 space-y-4 lg:max-w-2xl">
             <div className="flex flex-wrap items-center gap-2">
               <ModerationBadge status={product.moderation} />
@@ -380,6 +394,12 @@ export function SellerProductDetail({ id }: { id: number }) {
         />
       </Card>
 
+      <PhotoLightbox
+        photos={photos.map((p) => p.url)}
+        startIndex={zoomed}
+        onClose={() => setZoomed(null)}
+        alt={product.name}
+      />
     </div>
   );
 }

@@ -30,6 +30,7 @@ import {
   ComputerDesk01Icon,
   ComputerIcon,
   ComputerVideoIcon,
+  Copy01Icon,
   CpuIcon,
   DashboardSquare01Icon,
   Database01Icon,
@@ -48,6 +49,7 @@ import {
   HistoryIcon,
   Home01Icon,
   ImageAdd01Icon,
+  Image01Icon,
   InformationCircleIcon,
   KeyboardIcon,
   LaptopIcon,
@@ -171,6 +173,7 @@ export const CircuitBoard = make(CircuitBoardIcon, "CircuitBoard");
 export const Clock = make(Clock01Icon, "Clock");
 export const Cloud = make(CloudIcon, "Cloud");
 export const Coins = make(Coins01Icon, "Coins");
+export const Copy = make(Copy01Icon, "Copy");
 export const Cpu = make(CpuIcon, "Cpu");
 export const Database = make(Database01Icon, "Database");
 export const Disc = make(DiscIcon, "Disc");
@@ -189,6 +192,8 @@ export const Headphones = make(HeadphonesIcon, "Headphones");
 export const Heart = make(FavouriteIcon, "Heart");
 export const History = make(HistoryIcon, "History");
 export const Home = make(Home01Icon, "Home");
+/** Раздел баннеров главной: картинка как самостоятельная единица контента. */
+export const ImageIcon = make(Image01Icon, "ImageIcon");
 export const ImagePlus = make(ImageAdd01Icon, "ImagePlus");
 export const Info = make(InformationCircleIcon, "Info");
 export const InfoIcon = Info;

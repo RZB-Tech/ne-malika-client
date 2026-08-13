@@ -8,6 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ProductImage } from "@/components/shared/product-image";
+import { PhotoLightbox } from "@/components/shared/photo-lightbox";
 import { EntityStatusBadge } from "@/components/admin/entity-status-badge";
 import { Pagination } from "@/components/shared/pagination";
 import { useT } from "@/components/providers/i18n-provider";
@@ -31,6 +32,14 @@ export default function AdminAiReview() {
   const queryClient = useQueryClient();
 
   const [page, setPage] = useState(1);
+  /**
+   * Фото товара во весь экран. Здесь это не украшение: решение «одобрить или
+   * забраковать» принимается именно по картинке, а на миниатюре 64×64 не видно
+   * того, о чём пишет модель.
+   */
+  const [zoomed, setZoomed] = useState<{ photos: string[]; name: string } | null>(
+    null,
+  );
 
   const { data, isLoading, isError } = useAdminProductCardsControllerAiReview(
     { page, limit: 20 },
@@ -102,14 +111,26 @@ export default function AdminAiReview() {
         {rows.map((row) => (
           <Card key={row.checkId} className="flex flex-col gap-4 p-5">
             <div className="flex flex-wrap items-start gap-4">
-              <ProductImage
-                hue={hueFromId(row.productCardId)}
-                categorySlug=""
-                src={photoUrl(row.photos?.[0])}
-                alt={row.name}
-                className="size-16 shrink-0 rounded-xl"
-                iconClassName="size-5"
-              />
+              <button
+                type="button"
+                onClick={() => {
+                  const photos = (row.photos ?? [])
+                    .map((key) => photoUrl(key))
+                    .filter((url): url is string => Boolean(url));
+                  if (photos.length) setZoomed({ photos, name: row.name });
+                }}
+                aria-label={t("common.zoom")}
+                className="shrink-0 cursor-zoom-in"
+              >
+                <ProductImage
+                  hue={hueFromId(row.productCardId)}
+                  categorySlug=""
+                  src={photoUrl(row.photos?.[0])}
+                  alt={row.name}
+                  className="size-16 rounded-xl"
+                  iconClassName="size-5"
+                />
+              </button>
 
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
@@ -166,6 +187,13 @@ export default function AdminAiReview() {
         totalPages={pageData.meta.totalPages}
         total={pageData.meta.total}
         onChange={setPage}
+      />
+
+      <PhotoLightbox
+        photos={zoomed?.photos ?? []}
+        startIndex={zoomed ? 0 : null}
+        onClose={() => setZoomed(null)}
+        alt={zoomed?.name}
       />
     </div>
   );

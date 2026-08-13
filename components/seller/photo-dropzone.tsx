@@ -1,8 +1,9 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
-import { ImagePlus, Star, X } from "@/components/icons";
+import { ImagePlus, Search, Star, X } from "@/components/icons";
 import { cn } from "@/lib/utils";
+import { PhotoLightbox } from "@/components/shared/photo-lightbox";
 import { useT } from "@/components/providers/i18n-provider";
 
 export interface UploadedPhoto {
@@ -70,6 +71,8 @@ export function PhotoDropzone({
   const { t } = useT();
   const [drag, setDrag] = useState(false);
   const [busy, setBusy] = useState(false);
+  /** Фото, открытое во весь экран; null — просмотрщик закрыт. */
+  const [zoomed, setZoomed] = useState<number | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const add = useCallback(
@@ -163,6 +166,20 @@ export function PhotoDropzone({
                   </div>
                 )}
                 <div className="absolute right-1.5 top-1.5 flex items-center gap-1">
+                  {/**
+                   * Отдельная кнопка, а не клик по плитке: клик уже занят
+                   * перерисовкой через ИИ, а рассмотреть фото перед отправкой
+                   * нужно и там, где её нет.
+                   */}
+                  <button
+                    type="button"
+                    onClick={() => setZoomed(i)}
+                    className="grid size-7 place-items-center rounded bg-black/60 text-white transition-opacity hover:bg-black/80 [@media(hover:hover)]:size-6 [@media(hover:hover)]:opacity-0 group-hover:opacity-100"
+                    title={t("common.zoom")}
+                    aria-label={t("common.zoom")}
+                  >
+                    <Search className="size-3" />
+                  </button>
                   {i !== 0 && (
                     <button
                       type="button"
@@ -188,6 +205,12 @@ export function PhotoDropzone({
           </div>
         </>
       )}
+
+      <PhotoLightbox
+        photos={photos.map((p) => p.url)}
+        startIndex={zoomed}
+        onClose={() => setZoomed(null)}
+      />
     </div>
   );
 }

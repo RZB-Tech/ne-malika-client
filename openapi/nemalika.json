@@ -3659,6 +3659,215 @@
           "chats"
         ]
       }
+    },
+    "/api/v1/banners": {
+      "get": {
+        "operationId": "BannersController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BannerDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Баннеры главной страницы в порядке показа",
+        "tags": [
+          "banners-public"
+        ]
+      }
+    },
+    "/api/v1/admin/banners": {
+      "get": {
+        "operationId": "AdminBannersController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BannerDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Все баннеры, включая выключенные (администратор)",
+        "tags": [
+          "banners-admin"
+        ]
+      },
+      "post": {
+        "operationId": "AdminBannersController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBannerDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BannerDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Добавить баннер на главную",
+        "tags": [
+          "banners-admin"
+        ]
+      }
+    },
+    "/api/v1/admin/banners/reorder": {
+      "patch": {
+        "operationId": "AdminBannersController_reorder",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReorderBannersDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BannerDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Неизвестный или повторяющийся id"
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Задать порядок баннеров в карусели",
+        "tags": [
+          "banners-admin"
+        ]
+      }
+    },
+    "/api/v1/admin/banners/{id}": {
+      "patch": {
+        "operationId": "AdminBannersController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateBannerDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BannerDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Баннер не найден"
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Изменить баннер",
+        "tags": [
+          "banners-admin"
+        ]
+      },
+      "delete": {
+        "operationId": "AdminBannersController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "Баннер не найден"
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Удалить баннер",
+        "tags": [
+          "banners-admin"
+        ]
+      }
     }
   },
   "info": {
@@ -5587,6 +5796,176 @@
         "required": [
           "text"
         ]
+      },
+      "BannerDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "example": 1
+          },
+          "title": {
+            "type": "string",
+            "example": "Школьный базар — выгода до 50%"
+          },
+          "photoRu": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "photoUzLatn": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "photoUzCyrl": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "linkUrl": {
+            "type": "string",
+            "nullable": true,
+            "example": "/product/12"
+          },
+          "isActive": {
+            "type": "boolean",
+            "example": true
+          },
+          "sortOrder": {
+            "type": "number",
+            "example": 0
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "photoRu",
+          "photoUzLatn",
+          "photoUzCyrl",
+          "linkUrl",
+          "isActive",
+          "sortOrder"
+        ]
+      },
+      "CreateBannerDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 200,
+            "example": "Школьный базар — выгода до 50%",
+            "description": "Название для админки; оно же alt изображения"
+          },
+          "photoRu": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Ключ загруженного файла (POST /seller/uploads). Требуемое разрешение — 1240×400 или кратно больше с тем же соотношением сторон. Русская."
+          },
+          "photoUzLatn": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Ключ загруженного файла (POST /seller/uploads). Требуемое разрешение — 1240×400 или кратно больше с тем же соотношением сторон. Узбекская латиница."
+          },
+          "photoUzCyrl": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Ключ загруженного файла (POST /seller/uploads). Требуемое разрешение — 1240×400 или кратно больше с тем же соотношением сторон. Узбекская кириллица."
+          },
+          "linkUrl": {
+            "type": "string",
+            "maxLength": 500,
+            "example": "/product/12",
+            "description": "Куда ведёт клик: абсолютный https-адрес или путь от корня сайта. Пусто — баннер показывается, но не кликается"
+          },
+          "isActive": {
+            "type": "boolean",
+            "default": true,
+            "description": "Выключенный баннер остаётся в админке, но не показывается"
+          },
+          "sortOrder": {
+            "type": "number",
+            "default": 0,
+            "minimum": 0,
+            "description": "Порядок в карусели: меньше — раньше"
+          }
+        },
+        "required": [
+          "title",
+          "photoRu",
+          "photoUzLatn",
+          "photoUzCyrl"
+        ]
+      },
+      "ReorderBannersDto": {
+        "type": "object",
+        "properties": {
+          "ids": {
+            "example": [
+              3,
+              1,
+              2
+            ],
+            "description": "id баннеров в желаемом порядке показа",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          }
+        },
+        "required": [
+          "ids"
+        ]
+      },
+      "UpdateBannerDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 200,
+            "example": "Школьный базар — выгода до 50%",
+            "description": "Название для админки; оно же alt изображения"
+          },
+          "photoRu": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Ключ загруженного файла (POST /seller/uploads). Требуемое разрешение — 1240×400 или кратно больше с тем же соотношением сторон. Русская."
+          },
+          "photoUzLatn": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Ключ загруженного файла (POST /seller/uploads). Требуемое разрешение — 1240×400 или кратно больше с тем же соотношением сторон. Узбекская латиница."
+          },
+          "photoUzCyrl": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Ключ загруженного файла (POST /seller/uploads). Требуемое разрешение — 1240×400 или кратно больше с тем же соотношением сторон. Узбекская кириллица."
+          },
+          "linkUrl": {
+            "type": "string",
+            "maxLength": 500,
+            "example": "/product/12",
+            "description": "Куда ведёт клик: абсолютный https-адрес или путь от корня сайта. Пусто — баннер показывается, но не кликается"
+          },
+          "isActive": {
+            "type": "boolean",
+            "default": true,
+            "description": "Выключенный баннер остаётся в админке, но не показывается"
+          },
+          "sortOrder": {
+            "type": "number",
+            "default": 0,
+            "minimum": 0,
+            "description": "Порядок в карусели: меньше — раньше"
+          }
+        }
       }
     }
   }

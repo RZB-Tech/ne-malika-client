@@ -1,5 +1,6 @@
 import "server-only";
 
+import type { BannerDto } from "./generated/schemas";
 import type { PublicProductCard, PublicShop, Paginated } from "./types";
 
 const ORIGIN = (
@@ -56,6 +57,15 @@ export function getPublicProducts(
     sort,
   }).toString();
   return getJson<Paginated<PublicProductCard>>(`/product-cards?${qs}`, 120);
+}
+
+/**
+ * GET /banners — карусель главной. Рендерится сервером вместе с первым экраном:
+ * баннер стоит выше каталога и, догружаясь на клиенте, сдвигал бы витрину вниз
+ * уже после того, как её увидели.
+ */
+export async function getBanners(): Promise<BannerDto[]> {
+  return (await getJson<BannerDto[]>("/banners", 120)) ?? [];
 }
 
 /**
