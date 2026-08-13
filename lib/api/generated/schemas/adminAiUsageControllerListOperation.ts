@@ -6,16 +6,11 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export interface GrantCreditsDto {
-  /**
-     * Сумма, которую заплатил магазин, в долларах. Начисляется ровно она: наценка из настроек берётся при списании, а не при выдаче.
-     * @minimum 1
-     * @maximum 10000
-     */
-  amountUsd: number;
-  /**
-     * Комментарий для истории: номер платежа, договорённость
-     * @maxLength 200
-     */
-  note?: string;
-}
+export type AdminAiUsageControllerListOperation = typeof AdminAiUsageControllerListOperation[keyof typeof AdminAiUsageControllerListOperation];
+
+
+export const AdminAiUsageControllerListOperation = {
+  prompt: 'prompt',
+  description: 'description',
+  image: 'image',
+} as const;

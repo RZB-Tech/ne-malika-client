@@ -30,6 +30,8 @@ import type {
   CreditPreviewDto,
   GrantCreditsDto,
   GrantResultDto,
+  RevokeCreditsDto,
+  RevokeResultDto,
   ShopCreditsDto
 } from '../../schemas';
 
@@ -314,6 +316,71 @@ export function useAdminCreditsControllerHistory<TData = Awaited<ReturnType<type
 
 
 /**
+ * @summary Отобрать кредиты у магазина
+ */
+export const adminCreditsControllerRevoke = (
+    shopId: number,
+    revokeCreditsDto: BodyType<RevokeCreditsDto>,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<RevokeResultDto>(
+      {url: `/api/v1/admin/shops/${shopId}/credits/revoke`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: revokeCreditsDto, signal
+    },
+      options);
+    }
+
+
+
+
+export const getAdminCreditsControllerRevokeMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminCreditsControllerRevoke>>, TError,{shopId: number;data: BodyType<RevokeCreditsDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof adminCreditsControllerRevoke>>, TError,{shopId: number;data: BodyType<RevokeCreditsDto>}, TContext> => {
+
+const mutationKey = ['adminCreditsControllerRevoke'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminCreditsControllerRevoke>>, {shopId: number;data: BodyType<RevokeCreditsDto>}> = (props) => {
+          const {shopId,data} = props ?? {};
+
+          return  adminCreditsControllerRevoke(shopId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AdminCreditsControllerRevokeMutationResult = NonNullable<Awaited<ReturnType<typeof adminCreditsControllerRevoke>>>
+    export type AdminCreditsControllerRevokeMutationBody = BodyType<RevokeCreditsDto>
+    export type AdminCreditsControllerRevokeMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Отобрать кредиты у магазина
+ */
+export const useAdminCreditsControllerRevoke = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminCreditsControllerRevoke>>, TError,{shopId: number;data: BodyType<RevokeCreditsDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof adminCreditsControllerRevoke>>,
+        TError,
+        {shopId: number;data: BodyType<RevokeCreditsDto>},
+        TContext
+      > => {
+      return useMutation(getAdminCreditsControllerRevokeMutationOptions(options), queryClient);
+    }
+    /**
  * @summary Сколько кредитов даст сумма
  */
 export const adminCreditsPreviewControllerPreview = (

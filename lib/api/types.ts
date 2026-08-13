@@ -144,6 +144,36 @@ export interface AdminShopRow {
   ownerBlockReason: string | null;
 }
 
+/** GET /admin/ai-usage — журнал обращений к ИИ: кто, какой магазин, во что обошлось. */
+export interface AiUsageRow {
+  id: number;
+  operation: "prompt" | "description" | "image";
+  model: string | null;
+  images: number;
+  /** Фактическая стоимость у OpenRouter. null — он её не вернул. */
+  usd: number | null;
+  /** Снято с магазина. Ноль у администратора: за него платит площадка. */
+  credits: number;
+  estimated: boolean;
+  createdAt: string;
+  userId: number | null;
+  userName: string | null;
+  userUsername: string | null;
+  userRole: UserRole | null;
+  shopId: number | null;
+  shopName: string | null;
+}
+
+/** GET /admin/ai-usage/totals — сводка за всё время. */
+export interface AiUsageTotals {
+  requests: number;
+  images: number;
+  /** Сколько площадка потратила у OpenRouter. */
+  usd: number;
+  /** Сколько снято с магазинов. Разница с usd — заработок на ИИ. */
+  credits: number;
+}
+
 export interface AiCheckDetail {
   verdict: AiVerdict;
   notes: string;

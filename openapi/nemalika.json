@@ -2507,6 +2507,52 @@
         ]
       }
     },
+    "/api/v1/admin/shops/{shopId}/credits/revoke": {
+      "post": {
+        "operationId": "AdminCreditsController_revoke",
+        "parameters": [
+          {
+            "name": "shopId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RevokeCreditsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RevokeResultDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Отобрать кредиты у магазина",
+        "tags": [
+          "credits-admin"
+        ]
+      }
+    },
     "/api/v1/admin/credits/preview": {
       "get": {
         "operationId": "AdminCreditsPreviewController_preview",
@@ -2540,6 +2586,102 @@
         "summary": "Сколько кредитов даст сумма",
         "tags": [
           "credits-admin"
+        ]
+      }
+    },
+    "/api/v1/admin/ai-usage": {
+      "get": {
+        "operationId": "AdminAiUsageController_list",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Номер страницы",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Размер страницы",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "shopId",
+            "required": false,
+            "in": "query",
+            "description": "Только по одному магазину",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "userId",
+            "required": false,
+            "in": "query",
+            "description": "Только по одному пользователю",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "operation",
+            "required": false,
+            "in": "query",
+            "description": "Вид операции",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "prompt",
+                "description",
+                "image"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Журнал обращений к ИИ: кто и для какого магазина генерировал, во что это обошлось",
+        "tags": [
+          "ai-usage-admin"
+        ]
+      }
+    },
+    "/api/v1/admin/ai-usage/totals": {
+      "get": {
+        "operationId": "AdminAiUsageController_totals",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Итоги за всё время: число запросов, расход у OpenRouter и снятые кредиты",
+        "tags": [
+          "ai-usage-admin"
         ]
       }
     },
@@ -5031,7 +5173,7 @@
         "properties": {
           "amountUsd": {
             "type": "number",
-            "description": "Сумма, которую заплатил магазин, в долларах. Начислится делённой на множитель наценки из настроек.",
+            "description": "Сумма, которую заплатил магазин, в долларах. Начисляется ровно она: наценка из настроек берётся при списании, а не при выдаче.",
             "minimum": 1,
             "maximum": 10000,
             "example": 20
@@ -5065,6 +5207,42 @@
           "balance",
           "credits",
           "markup"
+        ]
+      },
+      "RevokeCreditsDto": {
+        "type": "object",
+        "properties": {
+          "credits": {
+            "type": "number",
+            "description": "Сколько кредитов снять. Больше доступного снять нельзя — занятое выполняющимся сейчас запросом остаётся магазину.",
+            "minimum": 1,
+            "example": 5000
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "Комментарий для истории: за что сняли"
+          }
+        },
+        "required": [
+          "credits"
+        ]
+      },
+      "RevokeResultDto": {
+        "type": "object",
+        "properties": {
+          "balance": {
+            "type": "number",
+            "description": "Остаток после списания"
+          },
+          "taken": {
+            "type": "number",
+            "description": "Сколько кредитов сняли на самом деле: могло быть меньше запрошенного"
+          }
+        },
+        "required": [
+          "balance",
+          "taken"
         ]
       },
       "CreditPreviewDto": {

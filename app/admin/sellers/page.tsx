@@ -30,6 +30,7 @@ import { EntityStatusBadge } from "@/components/admin/entity-status-badge";
 import { Pagination } from "@/components/shared/pagination";
 import { ShopDrawer } from "@/components/admin/shop-drawer";
 import { GrantCreditsDialog } from "@/components/admin/grant-credits-dialog";
+import { RevokeCreditsDialog } from "@/components/admin/revoke-credits-dialog";
 import {
   RowActionsMenu,
   RowContextMenu,
@@ -62,6 +63,9 @@ export default function AdminSellers() {
   const queryClient = useQueryClient();
   const [opened, setOpened] = useState<AdminShopRow | null>(null);
   const [granting, setGranting] = useState<{ id: number; name: string } | null>(
+    null,
+  );
+  const [revoking, setRevoking] = useState<{ id: number; name: string } | null>(
     null,
   );
   const [page, setPage] = useState(1);
@@ -179,6 +183,12 @@ export default function AdminSellers() {
       label: t("admin.credits.grantAction"),
       icon: Coins,
       onSelect: () => setGranting({ id: shop.id, name: shop.name }),
+    },
+    {
+      label: t("admin.credits.revokeAction"),
+      icon: Coins,
+      destructive: true,
+      onSelect: () => setRevoking({ id: shop.id, name: shop.name }),
     },
     shop.restrictedCategoriesEnabled
       ? {
@@ -352,6 +362,7 @@ export default function AdminSellers() {
       />
 
       <GrantCreditsDialog shop={granting} onClose={() => setGranting(null)} />
+      <RevokeCreditsDialog shop={revoking} onClose={() => setRevoking(null)} />
     </div>
   );
 }

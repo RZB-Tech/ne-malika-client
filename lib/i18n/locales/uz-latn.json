@@ -317,6 +317,7 @@
       "reports": "Shikoyatlar",
       "users": "Foydalanuvchilar",
       "aiReview": "AI tekshiruvi",
+      "aiUsage": "AI sarfi",
       "reviews": "Sharhlar",
       "broadcast": "Tarqatma"
     },
@@ -438,7 +439,19 @@
       "balanceValue": "{available} kredit",
       "markupTitle": "Kreditlarga ustama",
       "markupText": "So‘rov tannarxi yechish paytida shu koeffitsientga ko‘paytiriladi. To‘langan summaning o‘zi qo‘shiladi: $20 — 20 000 kredit, koeffitsient 2 bo‘lganda ular OpenRouter’dagi $10 haqiqiy sarfga yetadi — farqi platformaga qoladi.",
-      "markupLabel": "Koeffitsient"
+      "markupLabel": "Koeffitsient",
+      "revokeAction": "Kreditlarni olib qo‘yish",
+      "revokeTitle": "Kreditlarni olib qo‘yish",
+      "revokeSubtitle": "«{shop}» do‘koni. Kreditlar balansdan yechiladi, tarixda alohida yozuv qoladi.",
+      "revokeAmount": "Qancha yechilsin, kredit",
+      "revokeAll": "Hammasi",
+      "revokeHint": "Mavjudidan ko‘p yechib bo‘lmaydi: bajarilayotgan so‘rov band qilgani do‘konda qoladi.",
+      "revoke": "Yechish",
+      "revoking": "Yechilmoqda…",
+      "revoked": "{credits} kredit yechildi, qoldiq: {balance}",
+      "revokeFailed": "Kreditlarni yechib bo‘lmadi",
+      "badRevokeAmount": "Kamida 1 ta kredit ko‘rsating",
+      "revokeNotePlaceholder": "Nima uchun yechilyapti"
     },
     "imageGen": {
       "title": "Rasm generatsiyasi",
@@ -645,6 +658,33 @@
       "failedTitle": "Tekshiruv bajarilmadi",
       "rejectedTitle": "Model mahsulotni rad etdi",
       "noSummary": "Izohsiz"
+    },
+    "aiUsage": {
+      "title": "AI jurnali",
+      "subtitle": "Kim va qaysi do‘kon uchun sun’iy intellektga murojaat qilgan va bu platformaga qanchaga tushgan.",
+      "loadFailed": "Jurnalni yuklab bo‘lmadi.",
+      "empty": "Hozircha AI’ga murojaat bo‘lmagan.",
+      "statRequests": "So‘rovlar",
+      "statImages": "Rasmlar",
+      "statSpent": "OpenRouter’da sarflandi",
+      "statCharged": "Do‘konlardan yechildi",
+      "filterAll": "Barchasi",
+      "op": {
+        "prompt": "Foto bo‘yicha prompt",
+        "description": "Tavsifni tahrirlash",
+        "image": "Rasm generatsiyasi"
+      },
+      "colUser": "Kim",
+      "colShop": "Do‘kon",
+      "colOperation": "Amal",
+      "colCost": "Tannarx",
+      "colCredits": "Kredit",
+      "colWhen": "Qachon",
+      "userGone": "Foydalanuvchi o‘chirilgan",
+      "noUsername": "username yo‘q",
+      "platformPays": "platforma hisobidan",
+      "costUnknown": "kelmadi",
+      "estimatedHint": "Taxminiy yechildi: OpenRouter narxni qaytarmadi"
     },
     "settings": {
       "subtitle": "Platforma sozlamalari. Barcha sotuvchilar uchun darhol qo‘llanadi.",

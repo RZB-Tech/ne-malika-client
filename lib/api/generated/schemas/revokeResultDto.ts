@@ -6,16 +6,9 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export interface GrantCreditsDto {
-  /**
-     * Сумма, которую заплатил магазин, в долларах. Начисляется ровно она: наценка из настроек берётся при списании, а не при выдаче.
-     * @minimum 1
-     * @maximum 10000
-     */
-  amountUsd: number;
-  /**
-     * Комментарий для истории: номер платежа, договорённость
-     * @maxLength 200
-     */
-  note?: string;
+export interface RevokeResultDto {
+  /** Остаток после списания */
+  balance: number;
+  /** Сколько кредитов сняли на самом деле: могло быть меньше запрошенного */
+  taken: number;
 }

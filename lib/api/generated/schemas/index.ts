@@ -7,6 +7,8 @@
  */
 
 export * from './addFavoriteDto';
+export * from './adminAiUsageControllerListOperation';
+export * from './adminAiUsageControllerListParams';
 export * from './adminBroadcastsControllerCountAudience';
 export * from './adminBroadcastsControllerCountParams';
 export * from './adminBroadcastsControllerListParams';
@@ -94,6 +96,8 @@ export * from './restrictedCategoriesDto';
 export * from './reviewsControllerListParams';
 export * from './reviewsControllerMineParams';
 export * from './reviewsControllerSummaryParams';
+export * from './revokeCreditsDto';
+export * from './revokeResultDto';
 export * from './rewriteDescriptionDto';
 export * from './rewrittenDescriptionDto';
 export * from './sellerReviewsControllerListParams';

@@ -2,6 +2,7 @@
 
 import {
   BarChart3,
+  Coins,
   Flag,
   Package,
   Settings,
@@ -41,6 +42,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
     { href: "/admin/users", label: t("admin.nav.users"), icon: Users },
     { href: "/admin/products", label: t("admin.nav.products"), icon: Package },
     { href: "/admin/ai-review", label: t("admin.nav.aiReview"), icon: Sparkles },
+    { href: "/admin/ai-usage", label: t("admin.nav.aiUsage"), icon: Coins },
     { href: "/admin/broadcast", label: t("admin.nav.broadcast"), icon: Send },
     { href: "/admin/settings", label: t("admin.nav.settings"), icon: Settings },
   ];
