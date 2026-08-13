@@ -63,123 +63,150 @@ export function ProductDetail({
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
         <div className="min-w-0">
           {/**
-           * Галерея — вертикальная, как на крупных маркетплейсах: колонка
-           * миниатюр слева, крупное фото справа.
+           * Верх страницы в три колонки, как на крупных маркетплейсах: галерея,
+           * рядом с ней описание с характеристиками, справа карточка с ценой.
            *
-           * Ширина ограничена, потому что левая колонка страницы шире, чем
-           * нужно фотографии: без потолка вертикальный кадр вытянулся бы на
-           * тысячу с лишним пикселей и занял бы экран целиком.
+           * Раскладка включается по ширине окна, а не по брейкпоинту `lg`:
+           * колонке с текстом нужно хотя бы триста пикселей, иначе таблица
+           * характеристик в две колонки станет нечитаемой. Пока места нет,
+           * текст стоит под галереей, как раньше.
+           *
+           * На 1280 галерея ужимается до 480 — так текст помещается рядом уже
+           * там, а не только на самых широких экранах, где справа от фотографии
+           * иначе оставалось бы пустое поле.
            */}
-          <div className="grid max-w-[640px] grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-[76px_minmax(0,1fr)]">
-            {/* Много фото — колонка прокручивается, а не растёт бесконечно. */}
-            <div className="no-scrollbar order-2 flex min-w-0 gap-3 overflow-x-auto pb-1 sm:order-1 sm:max-h-[45rem] sm:flex-col sm:overflow-x-visible sm:overflow-y-auto sm:pb-0">
-              {gallery.map((g, i) => (
-                <button
-                  key={i}
-                  onClick={() => setActive(i)}
-                  aria-current={active === i}
-                  className={cn(
-                    /**
-                     * Выбранное фото отмечено рамкой, а не яркостью: соседние
-                     * при затемнении читались как выключенные, хотя нажать
-                     * можно любое.
-                     */
-                    "aspect-[3/4] w-[72px] shrink-0 overflow-hidden rounded-lg transition-shadow",
-                    active === i
-                      ? "ring-2 ring-primary"
-                      : "ring-1 ring-border hover:ring-foreground/25",
-                  )}
-                >
-                  <ProductImage
-                    hue={g.hue}
-                    src={g.src}
-                    alt={product.name}
-                    categorySlug={product.categorySlug}
-                    fit="contain"
-                    className="h-full w-full"
-                    iconClassName="size-5"
-                  />
-                </button>
-              ))}
-            </div>
-            <div className="relative order-1 min-w-0 sm:order-2">
+          <div className="grid gap-8 xl:grid-cols-[minmax(0,480px)_minmax(0,1fr)] min-[1440px]:grid-cols-[minmax(0,640px)_minmax(0,1fr)]">
+            <div className="min-w-0">
               {/**
-               * Крупный просмотр — только когда фото настоящее: на заглушке
-               * категории увеличивать нечего.
+               * Галерея — вертикальная, как на крупных маркетплейсах: колонка
+               * миниатюр слева, крупное фото справа.
+               *
+               * Ширина ограничена, потому что левая колонка страницы шире, чем
+               * нужно фотографии: без потолка вертикальный кадр вытянулся бы на
+               * тысячу с лишним пикселей и занял бы экран целиком.
                */}
-              <button
-                type="button"
-                onClick={() => photos.length > 0 && setZoomed(active)}
-                aria-label={t("common.zoom")}
-                className={cn(
-                  "block w-full",
-                  photos.length > 0 ? "cursor-zoom-in" : "cursor-default",
-                )}
-              >
-                {/**
-                 * Вертикальный кадр 3:4 — в этой же пропорции генерируются
-                 * фото товаров (960×1280), поэтому у большинства карточек полей
-                 * не будет вовсе.
-                 *
-                 * Показываем фото целиком, а не заполняем кадр: продавцы грузят
-                 * снимки вперемешку, и обрезка съедала бы то подпись на
-                 * рекламной картинке, то часть товара.
-                 */}
-                <ProductImage
-                  hue={gallery[active]?.hue ?? product.hue}
-                  src={gallery[active]?.src}
-                  alt={product.name}
-                  categorySlug={product.categorySlug}
-                  fit="contain"
-                  className="aspect-[3/4] w-full rounded-2xl"
-                  iconClassName="size-32"
-                />
-              </button>
-              {product.isNew && (
-                <div className="absolute left-4 top-4 flex gap-2">
-                  <span className="rounded-full bg-primary px-2.5 py-1 text-xs font-medium text-primary-foreground">
-                    {t("home.newTitle")}
-                  </span>
+              <div className="grid max-w-[640px] grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-[76px_minmax(0,1fr)]">
+                {/* Много фото — колонка прокручивается, а не растёт бесконечно. */}
+                <div className="no-scrollbar order-2 flex min-w-0 gap-3 overflow-x-auto pb-1 sm:order-1 sm:max-h-[45rem] sm:flex-col sm:overflow-x-visible sm:overflow-y-auto sm:pb-0">
+                  {gallery.map((g, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setActive(i)}
+                      aria-current={active === i}
+                      className={cn(
+                        /**
+                         * Выбранное фото отмечено рамкой, а не яркостью: соседние
+                         * при затемнении читались как выключенные, хотя нажать
+                         * можно любое.
+                         */
+                        "aspect-[3/4] w-[72px] shrink-0 overflow-hidden rounded-lg transition-shadow",
+                        active === i
+                          ? "ring-2 ring-primary"
+                          : "ring-1 ring-border hover:ring-foreground/25",
+                      )}
+                    >
+                      <ProductImage
+                        hue={g.hue}
+                        src={g.src}
+                        alt={product.name}
+                        categorySlug={product.categorySlug}
+                        fit="contain"
+                        className="h-full w-full"
+                        iconClassName="size-5"
+                      />
+                    </button>
+                  ))}
                 </div>
+                <div className="relative order-1 min-w-0 sm:order-2">
+                  {/**
+                   * Крупный просмотр — только когда фото настоящее: на заглушке
+                   * категории увеличивать нечего.
+                   */}
+                  <button
+                    type="button"
+                    onClick={() => photos.length > 0 && setZoomed(active)}
+                    aria-label={t("common.zoom")}
+                    className={cn(
+                      "block w-full",
+                      photos.length > 0 ? "cursor-zoom-in" : "cursor-default",
+                    )}
+                  >
+                    {/**
+                     * Вертикальный кадр 3:4 — в этой же пропорции генерируются
+                     * фото товаров (960×1280), поэтому у большинства карточек полей
+                     * не будет вовсе.
+                     *
+                     * Показываем фото целиком, а не заполняем кадр: продавцы грузят
+                     * снимки вперемешку, и обрезка съедала бы то подпись на
+                     * рекламной картинке, то часть товара.
+                     */}
+                    <ProductImage
+                      hue={gallery[active]?.hue ?? product.hue}
+                      src={gallery[active]?.src}
+                      alt={product.name}
+                      categorySlug={product.categorySlug}
+                      fit="contain"
+                      className="aspect-[3/4] w-full rounded-2xl"
+                      iconClassName="size-32"
+                    />
+                  </button>
+                  {product.isNew && (
+                    <div className="absolute left-4 top-4 flex gap-2">
+                      <span className="rounded-full bg-primary px-2.5 py-1 text-xs font-medium text-primary-foreground">
+                        {t("home.newTitle")}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <PhotoLightbox
+                photos={photos}
+                startIndex={zoomed}
+                onClose={() => setZoomed(null)}
+                alt={product.name}
+              />
+            </div>
+
+            {/* Средняя колонка: то, что покупатель читает, решаясь на покупку. */}
+            <div className="min-w-0 space-y-10">
+              <section>
+                <h2 className="font-heading text-xl font-bold tracking-tight">
+                  {t("product.description")}
+                </h2>
+                <Markdown
+                  text={product.description}
+                  className="mt-3 max-w-2xl leading-relaxed text-muted-foreground"
+                />
+              </section>
+
+              {product.specs.length > 0 && (
+                <section>
+                  <h2 className="font-heading text-xl font-bold tracking-tight">
+                    {t("product.specs")}
+                  </h2>
+                  <dl className="mt-4 max-w-2xl overflow-hidden rounded-xl border border-border">
+                    {product.specs.map((s, i) => (
+                      <div
+                        key={`${s.name}-${i}`}
+                        className={cn(
+                          "grid grid-cols-2 gap-4 px-4 py-3 text-sm",
+                          i % 2 === 0 ? "bg-muted/40" : "bg-transparent",
+                        )}
+                      >
+                        <dt className="text-muted-foreground">{s.name}</dt>
+                        <dd className="font-medium text-foreground">
+                          {s.value}
+                        </dd>
+                      </div>
+                    ))}
+                  </dl>
+                </section>
               )}
             </div>
           </div>
 
-          <PhotoLightbox
-            photos={photos}
-            startIndex={zoomed}
-            onClose={() => setZoomed(null)}
-            alt={product.name}
-          />
-
-          <section className="mt-10">
-            <h2 className="font-heading text-xl font-bold tracking-tight">{t("product.description")}</h2>
-            <Markdown
-              text={product.description}
-              className="mt-3 max-w-2xl leading-relaxed text-muted-foreground"
-            />
-          </section>
-
-          {product.specs.length > 0 && (
-            <section className="mt-10">
-              <h2 className="font-heading text-xl font-bold tracking-tight">{t("product.specs")}</h2>
-              <dl className="mt-4 max-w-2xl overflow-hidden rounded-xl border border-border">
-                {product.specs.map((s, i) => (
-                  <div
-                    key={`${s.name}-${i}`}
-                    className={cn(
-                      "grid grid-cols-2 gap-4 px-4 py-3 text-sm",
-                      i % 2 === 0 ? "bg-muted/40" : "bg-transparent",
-                    )}
-                  >
-                    <dt className="text-muted-foreground">{s.name}</dt>
-                    <dd className="font-medium text-foreground">{s.value}</dd>
-                  </div>
-                ))}
-              </dl>
-            </section>
-          )}
-
+          {/* Отзывы — под всем блоком: им нужна вся ширина, а не колонка. */}
           <ReviewsSection
             target={{ productId: Number(product.id) }}
             ownerId={store.ownerId}
@@ -211,7 +238,9 @@ export function ProductDetail({
             <div className="mt-4 flex items-end gap-3">
               <span className="font-heading text-3xl font-bold tabular">
                 {product.price === null ? (
-                  <span className="text-2xl">{t("product.negotiableFull")}</span>
+                  <span className="text-2xl">
+                    {t("product.negotiableFull")}
+                  </span>
                 ) : (
                   <>
                     {formatPrice(product.price, locale)}
@@ -232,14 +261,19 @@ export function ProductDetail({
               {meta.map((m) => (
                 <div key={m.label} className="rounded-lg bg-muted/50 px-3 py-2">
                   <div className="text-muted-foreground">{m.label}</div>
-                  <div className="mt-0.5 font-medium text-foreground">{m.value}</div>
+                  <div className="mt-0.5 font-medium text-foreground">
+                    {m.value}
+                  </div>
                 </div>
               ))}
             </div>
 
             <Separator className="my-5" />
 
-            <Link href={`/store/${store.slug}`} className="group flex items-center gap-3">
+            <Link
+              href={`/store/${store.slug}`}
+              className="group flex items-center gap-3"
+            >
               <StoreAvatar
                 name={store.name}
                 hue={store.logoHue}
