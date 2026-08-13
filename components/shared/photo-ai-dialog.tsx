@@ -140,19 +140,33 @@ export function PhotoAiDialog({
   const generateMutation = useImageGenControllerGenerate();
 
   const open = photo !== null;
-  const photoKey = photo?.key ?? savedKey ?? undefined;
-  const size = SIZES[format][tier];
 
-  const photoId = photo?.id;
-  const [prevPhotoId, setPrevPhotoId] = useState(photoId);
-  if (photoId && photoId !== prevPhotoId) {
-    setPrevPhotoId(photoId);
+  /**
+   * Последнее непустое фото. Radix держит содержимое смонтированным, пока идёт
+   * анимация закрытия, а `photo` к этому моменту уже null — и разметка, которая
+   * читала бы его напрямую, роняла страницу целиком.
+   *
+   * Само по себе закрытие безобидно: без ключа рисуется ветка «фото ещё не
+   * сохранено». Ломалось после кнопки «Сохранить фото»: `savedKey` переживает
+   * закрытие, поэтому `photoKey` оставался непустым, и разметка шла в ветку,
+   * которая ждёт фотографию.
+   *
+   * Смена фотографии здесь же сбрасывает всё, что относилось к предыдущей.
+   * Сравниваем по id, а не по ссылке: объект пересобирается, когда форма
+   * дописывает в него ключ хранилища, и сравнение ссылок гоняло бы рендер.
+   */
+  const [shownPhoto, setShownPhoto] = useState(photo);
+  if (photo && photo.id !== shownPhoto?.id) {
+    setShownPhoto(photo);
     setPrompt("");
     setResults([]);
     setPicked(new Set());
     setReference(null);
     setSavedKey(null);
   }
+
+  const photoKey = shownPhoto?.key ?? savedKey ?? undefined;
+  const size = SIZES[format][tier];
 
   const quotaQuery = useImageGenControllerBalance({
     query: { enabled: open, retry: false },
@@ -299,7 +313,7 @@ export function PhotoAiDialog({
           <DialogDescription>{t("admin.photoAi.subtitle")}</DialogDescription>
         </DialogHeader>
 
-        {!photoKey ? (
+        {!shownPhoto || !photoKey ? (
           <div className="space-y-3">
             <p className="text-sm text-muted-foreground">
               {t("admin.photoAi.unsaved")}
@@ -323,7 +337,7 @@ export function PhotoAiDialog({
             <div className="flex gap-4">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={photo!.url}
+                src={shownPhoto.url}
                 alt={t("admin.photoAi.sourceAlt")}
                 className="size-28 shrink-0 rounded-xl bg-muted object-cover ring-1 ring-foreground/10"
               />
