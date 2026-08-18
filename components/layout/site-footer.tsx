@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import { Store } from "@/components/icons";
 import { LanguageSwitch } from "@/components/shared/language-switch";
 import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
 import { useT } from "@/components/providers/i18n-provider";
@@ -11,6 +13,22 @@ export function SiteFooter() {
 
   return (
     <footer className="mt-auto border-t border-border bg-card">
+      {/*
+        Единственное место на витрине, где сказано, что здесь можно продавать.
+        До этого вход в продавцы жил только в выпадашке под аватаром — то есть
+        был виден лишь тому, кто уже вошёл, и не виден тому, кто как раз пришёл
+        торговать.
+      */}
+      <PageContainer className="flex justify-center border-b border-border py-5">
+        <Link
+          href="/seller/profile"
+          className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-foreground transition-colors outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/40"
+        >
+          <Store className="size-4 text-muted-foreground" />
+          {t("footer.sell")}
+        </Link>
+      </PageContainer>
+
       <PageContainer className="flex flex-col items-center justify-center gap-1 py-8 text-center text-xs text-muted-foreground sm:flex-row sm:gap-2">
         <span>
           © {year} {t("brand.name")}. {t("footer.rights")}

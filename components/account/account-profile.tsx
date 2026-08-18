@@ -98,7 +98,11 @@ export function AccountProfile() {
 
       <div className="mt-6 grid gap-2 sm:grid-cols-2">
         <Button asChild variant="outline" className="gap-2">
-          <Link href={isAdmin ? "/admin" : "/seller"}>
+          <Link
+            href={
+              isAdmin ? "/admin" : isSeller ? "/seller" : "/seller/profile"
+            }
+          >
             {isSeller || isAdmin ? (
               <LayoutDashboard className="size-4" />
             ) : (

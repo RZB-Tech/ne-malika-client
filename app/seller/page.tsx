@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo } from "react";
+import { redirect } from "next/navigation";
 import { Package, PlusCircle, Store, Tag } from "@/components/icons";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -44,23 +45,11 @@ export default function SellerDashboard() {
     );
   }
 
+  // Магазина нет — вести некуда, кроме формы его создания. Раньше здесь стоял
+  // экран «магазина нет» с единственной кнопкой на /seller/profile: лишний шаг
+  // на том самом пути, где люди и терялись.
   if (!shop) {
-    return (
-      <Card className="flex flex-col items-center gap-4 py-16 text-center">
-        <Store className="size-10 text-muted-foreground/50" />
-        <div>
-          <h2 className="font-heading text-lg font-semibold">
-            {t("seller.shop.none")}
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {t("seller.shop.noneText")}
-          </p>
-        </div>
-        <Button asChild>
-          <Link href="/seller/profile">{t("seller.shop.create")}</Link>
-        </Button>
-      </Card>
-    );
+    redirect("/seller/profile");
   }
 
   return (

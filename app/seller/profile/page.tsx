@@ -54,6 +54,16 @@ export default function SellerProfile() {
   const [saving, setSaving] = useState(false);
   const [hydratedShopId, setHydratedShopId] = useState<number | null>(null);
 
+  /**
+   * Ошибки полей, а не тосты. Тост всплывает поверх страницы и исчезает: на
+   * телефоне человек долистывал форму до конца, жал «Сохранить» и не успевал
+   * увидеть, какое из семи полей его не устроило.
+   */
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const nameRef = useRef<HTMLInputElement>(null);
+  const phoneRef = useRef<HTMLInputElement>(null);
+  const telegramRef = useRef<HTMLInputElement>(null);
+
   if (shop && shop.id !== hydratedShopId) {
     setHydratedShopId(shop.id);
     setName(shop.name);
@@ -79,20 +89,23 @@ export default function SellerProfile() {
 
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (name.trim().length < 2) {
-      toast.error(t("seller.profile.needName"));
-      return;
-    }
-    if (!shop && !phone.trim()) {
-      toast.error(t("seller.profile.needPhone"));
-      return;
-    }
 
     const tgUsername = telegram.trim()
       ? parseTelegramUsername(telegram)
       : null;
-    if (telegram.trim() && !tgUsername) {
-      toast.error(t("seller.profile.badTelegram"));
+
+    // Проверяем всё сразу: по одной ошибке за отправку человек ходит по кругу.
+    const found: Record<string, string> = {};
+    if (name.trim().length < 2) found.name = t("seller.profile.needName");
+    if (!shop && !phone.trim()) found.phone = t("seller.profile.needPhone");
+    if (telegram.trim() && !tgUsername)
+      found.telegram = t("seller.profile.badTelegram");
+
+    setErrors(found);
+    if (Object.keys(found).length > 0) {
+      const first = found.name ? nameRef : found.phone ? phoneRef : telegramRef;
+      first.current?.focus();
+      first.current?.scrollIntoView({ block: "center", behavior: "smooth" });
       return;
     }
 
@@ -153,7 +166,9 @@ export default function SellerProfile() {
   return (
     <form onSubmit={save} className="space-y-6">
       <div>
-        <h1 className="font-heading text-2xl font-bold tracking-tight">{t("seller.profile.title")}</h1>
+        <h1 className="font-heading text-2xl font-bold tracking-tight">
+          {t(shop ? "seller.profile.title" : "seller.shop.createTitle")}
+        </h1>
         <p className="mt-1 text-sm text-muted-foreground">
           {t(shop ? "seller.profile.subtitle" : "seller.shop.createSubtitle")}
         </p>
@@ -197,8 +212,21 @@ export default function SellerProfile() {
       <Card className="p-6">
         <div className="grid gap-5">
           <div className={field}>
-            <Label htmlFor="sname">{t("seller.profile.storeName")}</Label>
-            <Input id="sname" value={name} onChange={(e) => setName(e.target.value)} />
+            <Label htmlFor="sname">
+              {t("seller.profile.storeName")} <Required />
+            </Label>
+            <Input
+              id="sname"
+              ref={nameRef}
+              value={name}
+              aria-invalid={Boolean(errors.name)}
+              aria-describedby={errors.name ? "sname-err" : undefined}
+              onChange={(e) => {
+                setName(e.target.value);
+                if (errors.name) setErrors((p) => ({ ...p, name: "" }));
+              }}
+            />
+            <FieldError id="sname-err" message={errors.name} />
           </div>
           <div className={field}>
             <Label htmlFor="sdesc">{t("seller.profile.description")}</Label>
@@ -221,14 +249,23 @@ export default function SellerProfile() {
               />
             </div>
             <div className={field}>
-              <Label htmlFor="sphone">{t("seller.profile.phone")}</Label>
+              <Label htmlFor="sphone">
+                {t("seller.profile.phone")} {!shop && <Required />}
+              </Label>
               <Input
                 id="sphone"
+                ref={phoneRef}
                 type="tel"
                 value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                aria-invalid={Boolean(errors.phone)}
+                aria-describedby={errors.phone ? "sphone-err" : undefined}
+                onChange={(e) => {
+                  setPhone(e.target.value);
+                  if (errors.phone) setErrors((p) => ({ ...p, phone: "" }));
+                }}
                 placeholder="+998 90 123 45 67"
               />
+              <FieldError id="sphone-err" message={errors.phone} />
             </div>
             <div className={field}>
               <Label htmlFor="stg">{t("seller.profile.telegram")}</Label>
@@ -236,8 +273,14 @@ export default function SellerProfile() {
                 <TelegramIcon className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
                   id="stg"
+                  ref={telegramRef}
                   value={telegram}
-                  onChange={(e) => setTelegram(e.target.value)}
+                  aria-invalid={Boolean(errors.telegram)}
+                  onChange={(e) => {
+                    setTelegram(e.target.value);
+                    if (errors.telegram)
+                      setErrors((p) => ({ ...p, telegram: "" }));
+                  }}
                   onBlur={() => {
                     const u = parseTelegramUsername(telegram);
                     if (u) setTelegram(u);
@@ -249,18 +292,12 @@ export default function SellerProfile() {
               {telegram.trim() &&
                 (parseTelegramUsername(telegram) ? (
                   <p className="text-xs text-muted-foreground">
-                    Кнопка перехода:{" "}
-                    <span className="font-medium text-foreground">
-                      {telegramUrl(parseTelegramUsername(telegram)!)}
-                    </span>
-                    . Если в настройках приватности аккаунта скрыт username или
-                    ограничены сообщения от незнакомых, переход у покупателя не
-                    сработает.
+                    {t("seller.profile.telegramHint", {
+                      url: telegramUrl(parseTelegramUsername(telegram)!),
+                    })}
                   </p>
                 ) : (
-                  <p className="text-xs text-destructive">
-                    {t("seller.profile.badTelegram")}
-                  </p>
+                  <FieldError message={t("seller.profile.badTelegram")} />
                 ))}
             </div>
             <div className={`${field} sm:col-span-2`}>
@@ -271,11 +308,44 @@ export default function SellerProfile() {
         </div>
       </Card>
 
-      <div className="flex justify-end">
+      <div className="flex flex-col items-end gap-2">
         <Button type="submit" disabled={saving}>
-          {saving ? t("common.loading") : t("common.save")}
+          {saving
+            ? t("common.loading")
+            : shop
+              ? t("common.save")
+              : t("seller.shop.create")}
         </Button>
+        {!shop && (
+          <p className="text-xs text-muted-foreground">
+            {t("seller.shop.afterCreate")}
+          </p>
+        )}
       </div>
     </form>
+  );
+}
+
+/** Звёздочка обязательного поля. Читается скринридером словом, а не символом. */
+function Required() {
+  const { t } = useT();
+  return (
+    <span className="text-destructive" title={t("seller.profile.requiredMark")}>
+      <span aria-hidden>*</span>
+      <span className="sr-only">{t("seller.profile.requiredMark")}</span>
+    </span>
+  );
+}
+
+/**
+ * Ошибка под полем. Пустое сообщение ничего не рисует, поэтому вызывающий код
+ * не обвешивается условиями.
+ */
+function FieldError({ id, message }: { id?: string; message?: string }) {
+  if (!message) return null;
+  return (
+    <p id={id} role="alert" className="text-xs text-destructive">
+      {message}
+    </p>
   );
 }

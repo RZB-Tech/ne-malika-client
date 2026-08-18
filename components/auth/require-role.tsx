@@ -1,8 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { LogIn } from "@/components/icons";
+import { LoginDialog } from "@/components/auth/login-dialog";
+import { useT } from "@/components/providers/i18n-provider";
 import { useAuth } from "@/lib/api/auth";
 import type { UserRole } from "@/lib/api/types";
 
@@ -23,6 +28,7 @@ export function RequireRole({
 }) {
   const { user, isAuthenticated, isHydrated, refreshSession } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
   /** Одна попытка перевыпустить токен, прежде чем выставлять за дверь. */
   const refreshTried = useRef(false);
   const [refreshDone, setRefreshDone] = useState(false);
@@ -31,11 +37,10 @@ export function RequireRole({
   const allowed = Boolean(user && roles.includes(user.role as UserRole));
 
   useEffect(() => {
-    if (!isHydrated) return;
-    if (!isAuthenticated) {
-      router.replace("/");
-      return;
-    }
+    // Невошедшего не выгоняем: ему показывается приглашение войти. Молчаливый
+    // редирект на главную выглядел как поломка — человек, открывший ссылку на
+    // кабинет, оказывался на витрине без единого слова о том, что произошло.
+    if (!isHydrated || !isAuthenticated) return;
     if (allowed) return;
 
     if (!refreshTried.current) {
@@ -46,7 +51,9 @@ export function RequireRole({
     if (refreshDone) router.replace("/");
   }, [isHydrated, isAuthenticated, allowed, refreshDone, refreshSession, router]);
 
-  if (!isHydrated || !isAuthenticated || !allowed) {
+  if (isHydrated && !isAuthenticated) return <LoginWall next={pathname} />;
+
+  if (!isHydrated || !allowed) {
     return (
       <div className="space-y-4 p-6">
         <Skeleton className="h-8 w-48" />
@@ -56,4 +63,35 @@ export function RequireRole({
   }
 
   return <>{children}</>;
+}
+
+/**
+ * Приглашение войти вместо пустого экрана. После входа возвращает ровно туда,
+ * куда человек шёл: иначе продавец, открывший ссылку на форму магазина,
+ * оказывался бы в кабинете и искал её заново.
+ */
+function LoginWall({ next }: { next: string }) {
+  const { t } = useT();
+
+  return (
+    <div className="p-6">
+      <Card className="mx-auto flex max-w-md flex-col items-center gap-4 py-14 text-center">
+        <LogIn className="size-10 text-muted-foreground/50" />
+        <div>
+          <h2 className="font-heading text-lg font-semibold">
+            {t("auth.needLoginTitle")}
+          </h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {t("auth.needLoginText")}
+          </p>
+        </div>
+        <LoginDialog redirectTo={next}>
+          <Button className="gap-2">
+            <LogIn className="size-4" />
+            {t("nav.login")}
+          </Button>
+        </LoginDialog>
+      </Card>
+    </div>
+  );
 }

@@ -267,7 +267,9 @@
       "needPhone": "Aloqa telefonini kiriting",
       "badTelegram": "Telegramni aniqlab bo‘lmadi — username yoki t.me havolasini kiriting",
       "logoSkipped": "Logotip yuklanmadi — usiz saqlaymiz",
-      "saveFailed": "Do‘konni saqlab bo‘lmadi"
+      "saveFailed": "Do‘konni saqlab bo‘lmadi",
+      "requiredMark": "majburiy maydon",
+      "telegramHint": "O‘tish tugmasi: {url}. Agar maxfiylik sozlamalarida username yashirilgan yoki notanishlardan xabarlar yopiq bo‘lsa, xaridorda o‘tish ishlamaydi."
     },
     "shop": {
       "none": "Sizda hali do‘kon yo‘q",
@@ -280,7 +282,9 @@
       "abolishedShort": "Do‘kon administrator tomonidan tugatilgan — yangi mahsulot qo‘shib bo‘lmaydi.",
       "published": "Chop etilgan",
       "newOnes": "Yangilari",
-      "allProducts": "Barcha mahsulotlar"
+      "allProducts": "Barcha mahsulotlar",
+      "createTitle": "Do‘kon yaratish",
+      "afterCreate": "Do‘kon yaratilgach, mahsulot qo‘sha olasiz. Ma’lumotlarni istalgan vaqtda o‘zgartirish mumkin."
     },
     "detail": {
       "notFound": "Mahsulot topilmadi.",
@@ -850,7 +854,9 @@
     "telegramNotConfigured": "Telegram orqali kirish sozlanmagan (NEXT_PUBLIC_TELEGRAM_BOT_ID yo‘q).",
     "telegramDataFailed": "Telegram ma’lumotlarini olib bo‘lmadi",
     "loginFailed": "Kirib bo‘lmadi",
-    "telegramCancelled": "Telegram orqali kirish bekor qilindi"
+    "telegramCancelled": "Telegram orqali kirish bekor qilindi",
+    "needLoginTitle": "Avval kiring",
+    "needLoginText": "Bu bo‘lim Telegram orqali kirgandan so‘ng ochiladi. Sizni shu yerga qaytaramiz."
   },
   "account": {
     "title": "Shaxsiy kabinet",
@@ -1044,7 +1050,8 @@
   },
   "footer": {
     "rights": "Barcha huquqlar himoyalangan.",
-    "disclaimer": "Platforma mahsulotlar to‘lovi va yetkazib berishda ishtirok etmaydi."
+    "disclaimer": "Platforma mahsulotlar to‘lovi va yetkazib berishda ishtirok etmaydi.",
+    "sell": "neMalika’da sotish"
   },
   "chat": {
     "writeToSeller": "Sotuvchiga yozish",
