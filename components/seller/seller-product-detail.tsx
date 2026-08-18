@@ -313,7 +313,7 @@ export function SellerProductDetail({ id }: { id: number }) {
         </div>
       </Card>
 
-      {shop && <ProductStatsCard productId={id} shopId={shop.id} />}
+      <ProductStatsCard productId={id} />
 
       <Card className="p-6">
         <h2 className="mb-4 font-heading text-lg font-bold tracking-tight">{t("seller.add.section2")}</h2>

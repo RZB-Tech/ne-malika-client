@@ -8,8 +8,6 @@ import { ChatStream } from "@/components/providers/chat-stream";
 import { AuthProvider } from "@/lib/api/auth";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
-import { METRIKA_COUNTER_ID } from "@/lib/metrika";
-import { MetrikaPageview } from "@/components/analytics/metrika-pageview";
 import { SITE_URL } from "@/lib/seo";
 
 const inter = Inter({
@@ -32,9 +30,6 @@ const jetbrains = JetBrains_Mono({
 
 const THEME_INIT = `(function(){try{var d=localStorage.getItem('theme')==='dark';var e=document.documentElement;if(d)e.classList.add('dark');e.style.colorScheme=d?'dark':'light';}catch(e){}})();`;
 
-const YANDEX_METRIKA_ID = METRIKA_COUNTER_ID;
-
-const YANDEX_METRIKA = `(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();for(var j=0;j<document.scripts.length;j++){if(document.scripts[j].src===r){return;}}k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window,document,'script','https://mc.yandex.ru/metrika/tag.js?id=${YANDEX_METRIKA_ID}','ym');ym(${YANDEX_METRIKA_ID},'init',{ssr:true,webvisor:true,clickmap:true,ecommerce:"dataLayer",referrer:document.referrer,url:location.href,accurateTrackBounce:true,trackLinks:true});`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -62,27 +57,14 @@ export default function RootLayout({
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT }} />
         <script src="https://telegram.org/js/telegram-web-app.js" async />
-        <script dangerouslySetInnerHTML={{ __html: YANDEX_METRIKA }} />
       </head>
       <body suppressHydrationWarning className="flex min-h-full flex-col">
-        <noscript>
-          <div>
-            {/* A raw image is required by Yandex Metrika when JavaScript is disabled. */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={`https://mc.yandex.ru/watch/${YANDEX_METRIKA_ID}`}
-              style={{ position: "absolute", left: "-9999px" }}
-              alt=""
-            />
-          </div>
-        </noscript>
         <NextTopLoader
           color="var(--primary)"
           height={2}
           shadow={false}
           showSpinner={false}
         />
-        <MetrikaPageview />
         <QueryProvider>
           <AuthProvider>
             <I18nProvider>

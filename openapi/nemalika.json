@@ -669,6 +669,282 @@
         ]
       }
     },
+    "/api/v1/admin/shops/{shopId}/credits": {
+      "get": {
+        "operationId": "AdminCreditsController_balance",
+        "parameters": [
+          {
+            "name": "shopId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShopCreditsDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Баланс кредитов магазина",
+        "tags": [
+          "credits-admin"
+        ]
+      },
+      "post": {
+        "operationId": "AdminCreditsController_grant",
+        "parameters": [
+          {
+            "name": "shopId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GrantCreditsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GrantResultDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Начислить кредиты магазину",
+        "tags": [
+          "credits-admin"
+        ]
+      }
+    },
+    "/api/v1/admin/shops/{shopId}/credits/history": {
+      "get": {
+        "operationId": "AdminCreditsController_history",
+        "parameters": [
+          {
+            "name": "shopId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Номер страницы",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Размер страницы",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "История начислений и списаний",
+        "tags": [
+          "credits-admin"
+        ]
+      }
+    },
+    "/api/v1/admin/shops/{shopId}/credits/revoke": {
+      "post": {
+        "operationId": "AdminCreditsController_revoke",
+        "parameters": [
+          {
+            "name": "shopId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RevokeCreditsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RevokeResultDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Отобрать кредиты у магазина",
+        "tags": [
+          "credits-admin"
+        ]
+      }
+    },
+    "/api/v1/admin/credits/preview": {
+      "get": {
+        "operationId": "AdminCreditsPreviewController_preview",
+        "parameters": [
+          {
+            "name": "amountUsd",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreditPreviewDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Сколько кредитов даст сумма",
+        "tags": [
+          "credits-admin"
+        ]
+      }
+    },
+    "/api/v1/admin/settings": {
+      "get": {
+        "operationId": "AdminSettingsController_get",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppSettingsDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Текущие настройки платформы",
+        "tags": [
+          "settings"
+        ]
+      },
+      "patch": {
+        "operationId": "AdminSettingsController_update",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AppSettingsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppSettingsDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Изменить настройки платформы",
+        "tags": [
+          "settings"
+        ]
+      }
+    },
     "/api/v1/categories": {
       "get": {
         "operationId": "CategoriesController_findAll",
@@ -1393,68 +1669,6 @@
         ]
       }
     },
-    "/api/v1/admin/settings": {
-      "get": {
-        "operationId": "AdminSettingsController_get",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AppSettingsDto"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "access-token": []
-          }
-        ],
-        "summary": "Текущие настройки платформы",
-        "tags": [
-          "settings"
-        ]
-      },
-      "patch": {
-        "operationId": "AdminSettingsController_update",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AppSettingsDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AppSettingsDto"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "access-token": []
-          }
-        ],
-        "summary": "Изменить настройки платформы",
-        "tags": [
-          "settings"
-        ]
-      }
-    },
     "/api/v1/seller/uploads": {
       "post": {
         "operationId": "SellerFilesController_createUploadUrl",
@@ -2046,6 +2260,142 @@
         ]
       }
     },
+    "/api/v1/product-cards/{id}/events": {
+      "post": {
+        "description": "Боты и повторы в пределах получаса отбрасываются молча — ответ 204 не значит, что событие учтено.",
+        "operationId": "ProductStatsController_record",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "user-agent",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecordProductEventDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Принято"
+          },
+          "404": {
+            "description": "Товар не найден или скрыт"
+          }
+        },
+        "summary": "Отметить просмотр карточки или контакт с продавцом",
+        "tags": [
+          "product-stats"
+        ]
+      }
+    },
+    "/api/v1/seller/product-cards/{id}/stats": {
+      "get": {
+        "operationId": "SellerProductStatsController_stats",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "days",
+            "required": false,
+            "in": "query",
+            "description": "Глубина периода в днях, считая сегодняшний",
+            "schema": {
+              "default": 30,
+              "example": 30,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductStatsDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Товар не найден или чужой"
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Просмотры и контакты по своей карточке",
+        "tags": [
+          "product-stats-seller"
+        ]
+      }
+    },
+    "/api/v1/admin/stats/activity": {
+      "get": {
+        "description": "Товары, магазины и регистрации считаются по created_at, просмотры и контакты — из суточного агрегата. Ряд сплошной: сутки без событий приходят нулями.",
+        "operationId": "AdminStatsController_activity",
+        "parameters": [
+          {
+            "name": "days",
+            "required": false,
+            "in": "query",
+            "description": "Глубина периода в днях, считая сегодняшний",
+            "schema": {
+              "default": 30,
+              "example": 30,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminActivityDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Активность площадки по дням",
+        "tags": [
+          "stats-admin"
+        ]
+      }
+    },
     "/api/v1/me/favorites": {
       "get": {
         "operationId": "FavoritesController_findMine",
@@ -2372,220 +2722,6 @@
         "summary": "Перерисовать фотографию товара: 1–4 варианта на выбор",
         "tags": [
           "image-gen"
-        ]
-      }
-    },
-    "/api/v1/admin/shops/{shopId}/credits": {
-      "get": {
-        "operationId": "AdminCreditsController_balance",
-        "parameters": [
-          {
-            "name": "shopId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ShopCreditsDto"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "access-token": []
-          }
-        ],
-        "summary": "Баланс кредитов магазина",
-        "tags": [
-          "credits-admin"
-        ]
-      },
-      "post": {
-        "operationId": "AdminCreditsController_grant",
-        "parameters": [
-          {
-            "name": "shopId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GrantCreditsDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GrantResultDto"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "access-token": []
-          }
-        ],
-        "summary": "Начислить кредиты магазину",
-        "tags": [
-          "credits-admin"
-        ]
-      }
-    },
-    "/api/v1/admin/shops/{shopId}/credits/history": {
-      "get": {
-        "operationId": "AdminCreditsController_history",
-        "parameters": [
-          {
-            "name": "shopId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "page",
-            "required": false,
-            "in": "query",
-            "description": "Номер страницы",
-            "schema": {
-              "minimum": 1,
-              "default": 1,
-              "type": "number"
-            }
-          },
-          {
-            "name": "limit",
-            "required": false,
-            "in": "query",
-            "description": "Размер страницы",
-            "schema": {
-              "minimum": 1,
-              "maximum": 100,
-              "default": 20,
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "access-token": []
-          }
-        ],
-        "summary": "История начислений и списаний",
-        "tags": [
-          "credits-admin"
-        ]
-      }
-    },
-    "/api/v1/admin/shops/{shopId}/credits/revoke": {
-      "post": {
-        "operationId": "AdminCreditsController_revoke",
-        "parameters": [
-          {
-            "name": "shopId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RevokeCreditsDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RevokeResultDto"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "access-token": []
-          }
-        ],
-        "summary": "Отобрать кредиты у магазина",
-        "tags": [
-          "credits-admin"
-        ]
-      }
-    },
-    "/api/v1/admin/credits/preview": {
-      "get": {
-        "operationId": "AdminCreditsPreviewController_preview",
-        "parameters": [
-          {
-            "name": "amountUsd",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CreditPreviewDto"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "access-token": []
-          }
-        ],
-        "summary": "Сколько кредитов даст сумма",
-        "tags": [
-          "credits-admin"
         ]
       }
     },
@@ -4240,6 +4376,141 @@
           "enabled"
         ]
       },
+      "ShopCreditsDto": {
+        "type": "object",
+        "properties": {
+          "balance": {
+            "type": "number",
+            "description": "Начислено всего, за вычетом потраченного"
+          },
+          "reserved": {
+            "type": "number",
+            "description": "Занято выполняющимися сейчас запросами"
+          },
+          "available": {
+            "type": "number",
+            "description": "Доступно к трате: balance − reserved"
+          }
+        },
+        "required": [
+          "balance",
+          "reserved",
+          "available"
+        ]
+      },
+      "GrantCreditsDto": {
+        "type": "object",
+        "properties": {
+          "amountUsd": {
+            "type": "number",
+            "description": "Сумма, которую заплатил магазин, в долларах. Начисляется ровно она: наценка из настроек берётся при списании, а не при выдаче.",
+            "minimum": 1,
+            "maximum": 10000,
+            "example": 20
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "Комментарий для истории: номер платежа, договорённость"
+          }
+        },
+        "required": [
+          "amountUsd"
+        ]
+      },
+      "GrantResultDto": {
+        "type": "object",
+        "properties": {
+          "balance": {
+            "type": "number"
+          },
+          "credits": {
+            "type": "number",
+            "description": "Сколько кредитов начислено этой выдачей"
+          },
+          "markup": {
+            "type": "number",
+            "description": "Множитель, применённый при начислении"
+          }
+        },
+        "required": [
+          "balance",
+          "credits",
+          "markup"
+        ]
+      },
+      "RevokeCreditsDto": {
+        "type": "object",
+        "properties": {
+          "credits": {
+            "type": "number",
+            "description": "Сколько кредитов снять. Больше доступного снять нельзя — занятое выполняющимся сейчас запросом остаётся магазину.",
+            "minimum": 1,
+            "example": 5000
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "Комментарий для истории: за что сняли"
+          }
+        },
+        "required": [
+          "credits"
+        ]
+      },
+      "RevokeResultDto": {
+        "type": "object",
+        "properties": {
+          "balance": {
+            "type": "number",
+            "description": "Остаток после списания"
+          },
+          "taken": {
+            "type": "number",
+            "description": "Сколько кредитов сняли на самом деле: могло быть меньше запрошенного"
+          }
+        },
+        "required": [
+          "balance",
+          "taken"
+        ]
+      },
+      "CreditPreviewDto": {
+        "type": "object",
+        "properties": {
+          "credits": {
+            "type": "number",
+            "description": "Сколько кредитов даст указанная сумма"
+          },
+          "markup": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "credits",
+          "markup"
+        ]
+      },
+      "AppSettingsDto": {
+        "type": "object",
+        "properties": {
+          "aiChecksEnabled": {
+            "type": "boolean",
+            "description": "Автоматическая ИИ-проверка товаров при создании и редактировании",
+            "example": true
+          },
+          "creditMarkup": {
+            "type": "number",
+            "description": "Множитель наценки на кредиты: сумма от магазина делится на него. При 2 оплата $20 даёт $10 доступного расхода.",
+            "minimum": 1,
+            "maximum": 100,
+            "example": 2
+          }
+        },
+        "required": [
+          "aiChecksEnabled"
+        ]
+      },
       "CategoryNameDto": {
         "type": "object",
         "properties": {
@@ -4452,26 +4723,6 @@
             }
           }
         }
-      },
-      "AppSettingsDto": {
-        "type": "object",
-        "properties": {
-          "aiChecksEnabled": {
-            "type": "boolean",
-            "description": "Автоматическая ИИ-проверка товаров при создании и редактировании",
-            "example": true
-          },
-          "creditMarkup": {
-            "type": "number",
-            "description": "Множитель наценки на кредиты: сумма от магазина делится на него. При 2 оплата $20 даёт $10 доступного расхода.",
-            "minimum": 1,
-            "maximum": 100,
-            "example": 2
-          }
-        },
-        "required": [
-          "aiChecksEnabled"
-        ]
       },
       "CreateUploadUrlDto": {
         "type": "object",
@@ -5077,6 +5328,194 @@
           "items"
         ]
       },
+      "RecordProductEventDto": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "description": "view — открытие карточки, phone — раскрытие телефона, telegram — переход в чат",
+            "enum": [
+              "view",
+              "phone",
+              "telegram"
+            ],
+            "example": "view"
+          },
+          "visitor_id": {
+            "type": "string",
+            "description": "Анонимный id браузера (uuid из localStorage)",
+            "example": "9f1c3a54-7b2e-4c11-9a0d-2f5e8b6c1d33"
+          }
+        },
+        "required": [
+          "kind",
+          "visitor_id"
+        ]
+      },
+      "DailyPointDto": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "description": "Сутки, YYYY-MM-DD",
+            "example": "2026-08-18"
+          },
+          "views": {
+            "type": "number",
+            "description": "Просмотров за эти сутки",
+            "example": 42
+          },
+          "visitors": {
+            "type": "number",
+            "description": "Уникальных посетителей за эти сутки",
+            "example": 31
+          }
+        },
+        "required": [
+          "date",
+          "views",
+          "visitors"
+        ]
+      },
+      "ProductStatsDto": {
+        "type": "object",
+        "properties": {
+          "views": {
+            "type": "number",
+            "description": "Просмотры за период",
+            "example": 451
+          },
+          "views7d": {
+            "type": "number",
+            "description": "Просмотры за последние 7 дней",
+            "example": 88
+          },
+          "visits": {
+            "type": "number",
+            "description": "Посещений за период — сумма уникальных по дням",
+            "example": 297
+          },
+          "phoneClicks": {
+            "type": "number",
+            "description": "Раскрытий телефона за период",
+            "example": 24
+          },
+          "telegramClicks": {
+            "type": "number",
+            "description": "Переходов в Telegram за период",
+            "example": 61
+          },
+          "contactVisitors": {
+            "type": "number",
+            "description": "Посетителей, дошедших до контакта — без двойного счёта",
+            "example": 70
+          },
+          "daily": {
+            "description": "Разбивка по дням от старого к новому, без пропусков",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DailyPointDto"
+            }
+          }
+        },
+        "required": [
+          "views",
+          "views7d",
+          "visits",
+          "phoneClicks",
+          "telegramClicks",
+          "contactVisitors",
+          "daily"
+        ]
+      },
+      "ActivityPointDto": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "description": "Сутки, YYYY-MM-DD",
+            "example": "2026-08-18"
+          },
+          "products": {
+            "type": "number",
+            "description": "Добавлено товаров",
+            "example": 17
+          },
+          "shops": {
+            "type": "number",
+            "description": "Создано магазинов",
+            "example": 2
+          },
+          "users": {
+            "type": "number",
+            "description": "Зарегистрировано пользователей",
+            "example": 34
+          },
+          "views": {
+            "type": "number",
+            "description": "Просмотров карточек",
+            "example": 1204
+          },
+          "contacts": {
+            "type": "number",
+            "description": "Контактов с продавцами: телефон + Telegram",
+            "example": 96
+          }
+        },
+        "required": [
+          "date",
+          "products",
+          "shops",
+          "users",
+          "views",
+          "contacts"
+        ]
+      },
+      "AdminActivityDto": {
+        "type": "object",
+        "properties": {
+          "daily": {
+            "description": "Ряд по дням от старого к новому, без пропусков",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ActivityPointDto"
+            }
+          },
+          "productsTotal": {
+            "type": "number",
+            "description": "Итого товаров за период",
+            "example": 312
+          },
+          "shopsTotal": {
+            "type": "number",
+            "description": "Итого магазинов за период",
+            "example": 14
+          },
+          "usersTotal": {
+            "type": "number",
+            "description": "Итого пользователей за период",
+            "example": 508
+          },
+          "viewsTotal": {
+            "type": "number",
+            "description": "Итого просмотров за период",
+            "example": 24310
+          },
+          "contactsTotal": {
+            "type": "number",
+            "description": "Итого контактов за период",
+            "example": 1877
+          }
+        },
+        "required": [
+          "daily",
+          "productsTotal",
+          "shopsTotal",
+          "usersTotal",
+          "viewsTotal",
+          "contactsTotal"
+        ]
+      },
       "FavoriteDto": {
         "type": "object",
         "properties": {
@@ -5382,121 +5821,6 @@
         "required": [
           "key",
           "url"
-        ]
-      },
-      "ShopCreditsDto": {
-        "type": "object",
-        "properties": {
-          "balance": {
-            "type": "number",
-            "description": "Начислено всего, за вычетом потраченного"
-          },
-          "reserved": {
-            "type": "number",
-            "description": "Занято выполняющимися сейчас запросами"
-          },
-          "available": {
-            "type": "number",
-            "description": "Доступно к трате: balance − reserved"
-          }
-        },
-        "required": [
-          "balance",
-          "reserved",
-          "available"
-        ]
-      },
-      "GrantCreditsDto": {
-        "type": "object",
-        "properties": {
-          "amountUsd": {
-            "type": "number",
-            "description": "Сумма, которую заплатил магазин, в долларах. Начисляется ровно она: наценка из настроек берётся при списании, а не при выдаче.",
-            "minimum": 1,
-            "maximum": 10000,
-            "example": 20
-          },
-          "note": {
-            "type": "string",
-            "maxLength": 200,
-            "description": "Комментарий для истории: номер платежа, договорённость"
-          }
-        },
-        "required": [
-          "amountUsd"
-        ]
-      },
-      "GrantResultDto": {
-        "type": "object",
-        "properties": {
-          "balance": {
-            "type": "number"
-          },
-          "credits": {
-            "type": "number",
-            "description": "Сколько кредитов начислено этой выдачей"
-          },
-          "markup": {
-            "type": "number",
-            "description": "Множитель, применённый при начислении"
-          }
-        },
-        "required": [
-          "balance",
-          "credits",
-          "markup"
-        ]
-      },
-      "RevokeCreditsDto": {
-        "type": "object",
-        "properties": {
-          "credits": {
-            "type": "number",
-            "description": "Сколько кредитов снять. Больше доступного снять нельзя — занятое выполняющимся сейчас запросом остаётся магазину.",
-            "minimum": 1,
-            "example": 5000
-          },
-          "note": {
-            "type": "string",
-            "maxLength": 200,
-            "description": "Комментарий для истории: за что сняли"
-          }
-        },
-        "required": [
-          "credits"
-        ]
-      },
-      "RevokeResultDto": {
-        "type": "object",
-        "properties": {
-          "balance": {
-            "type": "number",
-            "description": "Остаток после списания"
-          },
-          "taken": {
-            "type": "number",
-            "description": "Сколько кредитов сняли на самом деле: могло быть меньше запрошенного"
-          }
-        },
-        "required": [
-          "balance",
-          "taken"
-        ]
-      },
-      "CreditPreviewDto": {
-        "type": "object",
-        "properties": {
-          "credits": {
-            "type": "number",
-            "description": "Сколько кредитов даст указанная сумма"
-          },
-          "markup": {
-            "type": "number"
-          }
-        },
-        "required": [
-          "credits",
-          "markup"
         ]
       },
       "CreateReportDto": {

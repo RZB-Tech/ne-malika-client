@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { StatCard } from "@/components/shared/stat-card";
 import { BarList } from "@/components/shared/charts";
 import { useT } from "@/components/providers/i18n-provider";
+import { ActivityCharts } from "@/components/admin/activity-charts";
 import { NotificationsCard } from "@/components/shared/notifications-card";
 import { formatNumber } from "@/lib/format";
 import { useAdminShopsControllerList } from "@/lib/api/generated/endpoints/shops-admin/shops-admin";
@@ -113,6 +114,8 @@ export default function AdminStats() {
           icon={Flag}
         />
       </div>
+
+      <ActivityCharts />
 
       <Card className="p-5">
         <h2 className="mb-5 font-medium">{t("admin.dashboard.topShops")}</h2>

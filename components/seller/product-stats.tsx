@@ -1,37 +1,22 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
 import { Eye } from "@/components/icons";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useT } from "@/components/providers/i18n-provider";
-import { getAccessToken } from "@/lib/api/token-store";
-import type { ProductStats } from "@/app/api/metrika/product-stats/route";
+import { useSellerProductStatsControllerStats } from "@/lib/api/generated/endpoints/product-stats-seller/product-stats-seller";
 
-async function fetchStats(productId: number, shopId: number): Promise<ProductStats> {
-  const token = getAccessToken();
-  const res = await fetch(
-    `/api/metrika/product-stats?productId=${productId}&shopId=${shopId}`,
-    { headers: token ? { Authorization: `Bearer ${token}` } : undefined },
-  );
-  if (!res.ok) throw new Error(String(res.status));
-  return res.json() as Promise<ProductStats>;
-}
+/** Глубина периода. Совпадает с подписью «за 30 дней» под первым числом. */
+const DAYS = 30;
 
-export function ProductStatsCard({
-  productId,
-  shopId,
-}: {
-  productId: number;
-  shopId: number;
-}) {
+export function ProductStatsCard({ productId }: { productId: number }) {
   const { t } = useT();
-  const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["product-stats", productId, shopId],
-    queryFn: () => fetchStats(productId, shopId),
-    staleTime: process.env.NODE_ENV === "development" ? 0 : 5 * 60_000,
-    retry: false,
-  });
+  const { data, isLoading, isError, error } =
+    useSellerProductStatsControllerStats(
+      productId,
+      { days: DAYS },
+      { query: { retry: false } },
+    );
 
   if (isLoading) return <Skeleton className="h-28 w-full rounded-2xl" />;
   if (isError || !data) {
@@ -44,45 +29,50 @@ export function ProductStatsCard({
     );
   }
 
-  const empty = data.pageviews30d === 0;
-
-  return (
-    <Card className="p-6">
-      <div className="flex items-center gap-2 text-sm font-medium">
-        <Eye className="size-4 text-muted-foreground" />
-        {t("seller.stats.title")}
-      </div>
-
-      {empty ? (
+  if (data.views === 0) {
+    return (
+      <Card className="p-6">
+        <Title />
         <p className="mt-3 text-sm text-muted-foreground">
           {t("seller.stats.empty")}
         </p>
-      ) : (
-        <>
-          <div className="mt-4 flex flex-wrap items-end gap-x-10 gap-y-4">
-            <Stat label={t("seller.stats.days30")} value={data.pageviews30d} />
-            <Stat label={t("seller.stats.days7")} value={data.pageviews7d} />
-            <Stat label={t("seller.stats.users30")} value={data.users30d} />
-            <Sparkline points={data.daily.map((d) => d.pageviews)} />
-          </div>
+      </Card>
+    );
+  }
 
-          <div className="mt-6 flex flex-wrap items-end gap-x-10 gap-y-4 border-t pt-5">
-            <Stat
-              label={t("seller.stats.phoneShows")}
-              value={data.contacts.phone.clicks}
-            />
-            <Stat
-              label={t("seller.stats.telegramClicks")}
-              value={data.contacts.telegram.clicks}
-            />
-            <Conversion
-              contacts={data.contacts.phone.users + data.contacts.telegram.users}
-              views={data.users30d}
-            />
-          </div>
-        </>
-      )}
+  return (
+    <Card className="p-6">
+      <Title />
+
+      <div className="mt-4 flex flex-wrap items-end gap-x-10 gap-y-4">
+        <Stat label={t("seller.stats.days30")} value={data.views} />
+        <Stat label={t("seller.stats.days7")} value={data.views7d} />
+        <Stat label={t("seller.stats.visits")} value={data.visits} />
+        <Sparkline points={data.daily.map((d) => d.views)} />
+      </div>
+
+      <div className="mt-6 flex flex-wrap items-end gap-x-10 gap-y-4 border-t pt-5">
+        <Stat
+          label={t("seller.stats.phoneShows")}
+          value={data.phoneClicks}
+        />
+        <Stat
+          label={t("seller.stats.telegramClicks")}
+          value={data.telegramClicks}
+        />
+        <Conversion reached={data.contactVisitors} visits={data.visits} />
+      </div>
     </Card>
+  );
+}
+
+function Title() {
+  const { t } = useT();
+  return (
+    <div className="flex items-center gap-2 text-sm font-medium">
+      <Eye className="size-4 text-muted-foreground" />
+      {t("seller.stats.title")}
+    </div>
   );
 }
 
@@ -99,16 +89,19 @@ function Stat({ label, value }: { label: string; value: number }) {
  * Доля посетителей, дошедших до контакта с продавцом. Единственное число здесь,
  * которое отвечает на вопрос «работает ли объявление», а не «сколько заходов».
  *
- * Считаем по людям, а не по кликам: один человек может и раскрыть телефон, и
- * уйти в Telegram, поэтому сумма контактов способна обогнать число посетителей.
+ * Числитель считается на бэкенде как «уникальные, сделавшие хоть один контакт»,
+ * а не как сумма раскрытий телефона и переходов в Telegram: один человек умеет
+ * и то и другое, и сумма способна обогнать число посетителей.
  */
-function Conversion({ contacts, views }: { contacts: number; views: number }) {
+function Conversion({ reached, visits }: { reached: number; visits: number }) {
   const { t } = useT();
-  if (views === 0) return null;
-  const percent = Math.min(100, Math.round((contacts / views) * 100));
+  if (visits === 0) return null;
+
   return (
     <div>
-      <div className="tabular text-2xl font-semibold">{percent}%</div>
+      <div className="tabular text-2xl font-semibold">
+        {Math.round((reached / visits) * 100)}%
+      </div>
       <div className="text-xs text-muted-foreground">
         {t("seller.stats.reachedContact")}
       </div>

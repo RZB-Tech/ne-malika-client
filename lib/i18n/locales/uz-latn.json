@@ -308,13 +308,13 @@
       "title": "Kartochka ko‘rishlari",
       "unavailable": "Ko‘rishlar statistikasi vaqtincha mavjud emas",
       "error": "Statistika mavjud emas ({status})",
-      "empty": "Hozircha bu kartochkani hech kim ochmagan. Ma’lumotlar birinchi ko‘rishdan keyin bir soat ichida paydo bo‘ladi.",
+      "empty": "Hozircha bu kartochkani hech kim ochmagan. Ma’lumotlar birinchi ko’rishdan so’ng darhol paydo bo’ladi.",
       "days30": "30 kunda",
       "days7": "7 kunda",
-      "users30": "noyob tashrifchilar",
       "phoneShows": "telefon ko‘rsatishlari",
       "telegramClicks": "Telegramga o‘tishlar",
-      "reachedContact": "tashrifchi aloqagacha yetdi"
+      "reachedContact": "tashrifchi aloqagacha yetdi",
+      "visits": "tashriflar"
     }
   },
   "admin": {
@@ -752,7 +752,7 @@
       "aiOff": "AI tekshiruvi o‘chirildi"
     },
     "dashboard": {
-      "note": "Ma’lumotlar bazadan. Ko‘rishlar va Telegramga o‘tishlarni Yandex.Metrika sanaydi — ular sotuvchining mahsulot kartochkasida ko‘rinadi.",
+      "note": "Ma’lumotlar bazadan. Ko‘rishlar va Telegramga o‘tishlarni bekend sanaydi — ular sotuvchining mahsulot kartochkasida ko‘rinadi.",
       "shops": "Do‘konlar",
       "activeShops": "Faol do‘konlar",
       "productsLive": "Qidiruvdagi mahsulotlar",
@@ -808,6 +808,19 @@
       "tooManyPhotos": "{count} tasi sig‘madi. Mahsulotda ko‘pi bilan 10 ta rasm.",
       "creditsLeft": "Kreditlar: {left}",
       "noAccess": "Generatsiya ulanmagan — administratorga murojaat qiling"
+    },
+    "activity": {
+      "title": "Platforma faolligi",
+      "subtitle": "Nima qo’shilgani va qanday ko’rilgani, kunlar bo’yicha",
+      "products": "tovar qo’shildi",
+      "shops": "do’kon yaratildi",
+      "users": "ro’yxatdan o’tishlar",
+      "views": "kartochka ko’rishlari",
+      "contacts": "sotuvchilar bilan aloqalar",
+      "range": "Davr",
+      "days": "{days} kun",
+      "empty": "Tanlangan davrda hodisalar bo’lmagan.",
+      "error": "Faollikni yuklab bo’lmadi"
     }
   },
   "moderation": {

@@ -3,7 +3,7 @@
 import { TelegramIcon } from "@/components/icons/telegram-icon";
 import { Button } from "@/components/ui/button";
 import { useT } from "@/components/providers/i18n-provider";
-import { trackContact } from "@/lib/metrika";
+import { trackContact } from "@/lib/analytics";
 import { buildTelegramUrl } from "@/lib/telegram";
 import { cn } from "@/lib/utils";
 import type { ComponentProps } from "react";
