@@ -1,5 +1,5 @@
 /** Счётчик Яндекс.Метрики. Публичный по своей природе — уезжает в HTML вместе со скриптом. */
-export const METRIKA_COUNTER_ID = 110545926;
+export const METRIKA_COUNTER_ID = 111713363;
 
 export type ContactKind = "phone" | "telegram";
 
