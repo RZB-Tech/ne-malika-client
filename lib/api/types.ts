@@ -147,7 +147,7 @@ export interface AdminShopRow {
 /** GET /admin/ai-usage — журнал обращений к ИИ: кто, какой магазин, во что обошлось. */
 export interface AiUsageRow {
   id: number;
-  operation: "prompt" | "description" | "image";
+  operation: "prompt" | "description" | "image" | "autofill";
   model: string | null;
   images: number;
   /** Фактическая стоимость у OpenRouter. null — он её не вернул. */

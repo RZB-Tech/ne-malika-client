@@ -732,7 +732,8 @@
       "op": {
         "prompt": "Foto bo‘yicha prompt",
         "description": "Tavsifni tahrirlash",
-        "image": "Rasm generatsiyasi"
+        "image": "Rasm generatsiyasi",
+        "autofill": "Kartochkani to‘ldirish"
       },
       "colUser": "Kim",
       "colShop": "Do‘kon",
@@ -1037,21 +1038,18 @@
       "needPhoto": "Avval mahsulot suratini qo‘shing"
     },
     "autofill": {
-      "title": "Kartochkani AI bilan to‘ldirish",
-      "subtitle": "Rasmlarni yuklang va nomini yozing — tavsif va xususiyatlarni AI rasmlar bo‘yicha o‘zi tuzadi",
       "action": "AI bilan to‘ldirish",
       "working": "AI to‘ldirmoqda…",
-      "price": "To‘ldirish uchun {price} kredit",
-      "balance": "Qoldi: {balance}",
+      "meta": "{price} kredit · rasm va nom kerak",
+      "balance": "qoldi: {balance}",
+      "hint": "AI rasmlar bo‘yicha tavsif va xususiyatlarni to‘ldiradi. Faqat rasmda ko‘rinadigan yoki siz aytgan ma’lumotni yozadi — e’lon qilishdan oldin tekshiring",
       "done": "Kartochka to‘ldirildi",
       "charged": "{credits} kredit yechildi, {left} qoldi",
-      "restored": "Avvalgi qiymatlar qaytarildi",
       "undo": "Qaytarish",
+      "restored": "Avvalgi qiymatlar qaytarildi",
       "failed": "Kartochkani to‘ldirib bo‘lmadi",
       "needPhoto": "Avval mahsulot rasmini qo‘shing",
-      "needName": "Avval mahsulot nomini yozing",
-      "needBoth": "Mahsulot rasmi va nomi kerak",
-      "hint": "AI faqat rasmda ko‘rinadigan yoki siz aytgan ma’lumotni yozadi — e’lon qilishdan oldin tekshirib chiqing"
+      "needName": "Avval mahsulot nomini yozing"
     }
   },
   "report": {

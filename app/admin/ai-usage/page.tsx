@@ -26,7 +26,7 @@ import {
 } from "@/lib/api/dev-fixtures";
 import type { AiUsageRow, AiUsageTotals, Paginated } from "@/lib/api/types";
 
-const OPERATIONS = ["prompt", "description", "image"] as const;
+const OPERATIONS = ["prompt", "description", "image", "autofill"] as const;
 type Operation = (typeof OPERATIONS)[number];
 
 /**

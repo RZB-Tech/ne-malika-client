@@ -2,18 +2,14 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { Coins, Loader2, Sparkles, Undo2 } from "@/components/icons";
-import { Card } from "@/components/ui/card";
+import { Loader2, Sparkles, Undo2 } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { useT } from "@/components/providers/i18n-provider";
 import {
   productAutofillControllerFill,
   useProductAutofillControllerPrice,
 } from "@/lib/api/generated/endpoints/product-autofill/product-autofill";
-import type {
-  AutofilledProductDto,
-  AutofillPriceDto,
-} from "@/lib/api/generated/schemas";
+import type { AutofilledProductDto } from "@/lib/api/generated/schemas";
 import { uploadPhoto, dataUrlToBlob } from "@/lib/api/upload";
 
 /** Фотография в форме: у выбранной только что ключа ещё нет. */
@@ -38,18 +34,17 @@ export interface AutofillContext {
 const MAX_PHOTOS = 3;
 
 /**
- * «Заполнить карточку с ИИ» — платная кнопка: модель смотрит фотографии и
- * пишет за продавца описание и характеристики.
+ * «Заполнить с ИИ» — платная кнопка: модель смотрит фотографии и пишет за
+ * продавца описание с характеристиками.
  *
- * Панелью, а не кнопкой в углу: это не поправка к полю, как «поправить по
- * фото», а способ заполнить карточку целиком, и продавец должен увидеть его до
- * того, как начнёт печатать вручную. Здесь же и цена — списание без объявленной
- * заранее цены выглядит как обман, даже когда оно честное.
+ * Рядом с кнопкой — строка с ценой и тем, что для неё нужно. Списание без
+ * объявленной заранее цены выглядит как обман, даже когда оно честное, а
+ * «нужны фото и название» снимает главный вопрос к неактивной с виду кнопке.
  *
  * `snapshot` с `onRestore` устроены поверх дженерика намеренно: раскладывают
- * ответ по полям обе формы по-разному (в одной бренд и модель — свои поля, в
- * другой строки характеристик), и знать про это различие кнопке незачем — она
- * лишь запоминает то, что ей дали, и возвращает по «Вернуть».
+ * ответ по полям все три формы по-разному (в одной бренд и модель — свои поля,
+ * в остальных строки характеристик), и знать про это различие кнопке незачем —
+ * она лишь запоминает то, что ей дали, и возвращает по «Вернуть».
  */
 export function ProductAutofillCard<T>({
   photos,
@@ -80,11 +75,8 @@ export function ProductAutofillCard<T>({
   const priceQuery = useProductAutofillControllerPrice({
     query: { retry: false, staleTime: 30_000 },
   });
-  const quota: AutofillPriceDto | undefined = priceQuery.data;
-  const price = quota?.price ?? null;
-  const balance = quota?.balance ?? null;
-
-  const ready = photos.length > 0 && name.trim().length >= 2;
+  const price = priceQuery.data?.price ?? null;
+  const balance = priceQuery.data?.balance ?? null;
 
   const run = async () => {
     if (photos.length === 0) {
@@ -155,72 +147,49 @@ export function ProductAutofillCard<T>({
   };
 
   return (
-    <Card className="border-primary/30 bg-primary/5 p-5">
-      <div className="flex flex-wrap items-start gap-4">
-        <span className="grid size-10 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
-          <Sparkles className="size-5" />
-        </span>
+    <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        className="h-7 gap-1.5 px-2 text-xs"
+        onClick={run}
+        disabled={busy || disabled}
+        title={t("ai.autofill.hint")}
+      >
+        {busy ? (
+          <Loader2 className="size-3.5 animate-spin" />
+        ) : (
+          <Sparkles className="size-3.5" />
+        )}
+        {busy ? t("ai.autofill.working") : t("ai.autofill.action")}
+      </Button>
 
-        <div className="min-w-0 flex-1 space-y-1">
-          <h2 className="font-heading text-base font-bold tracking-tight">
-            {t("ai.autofill.title")}
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            {t("ai.autofill.subtitle")}
-          </p>
-          {/*
-            Оговорка на виду, а не в подсказке кнопки: модель заполняет карточку,
-            под которой подпишется продавец, и отвечать за приписанную
-            характеристику придётся ему. Прочитать это он должен до нажатия.
-          */}
-          <p className="text-xs text-muted-foreground/80">
-            {t("ai.autofill.hint")}
-          </p>
-          {price !== null && (
-            <p className="flex flex-wrap items-center gap-x-3 gap-y-1 pt-1 text-xs text-muted-foreground">
-              <span className="inline-flex items-center gap-1.5 font-medium text-foreground">
-                <Coins className="size-3.5" />
-                {t("ai.autofill.price", { price })}
-              </span>
-              {balance !== null && (
-                <span className="tabular">
-                  {t("ai.autofill.balance", { balance })}
-                </span>
-              )}
-            </p>
-          )}
-        </div>
+      {before !== null && (
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="h-7 gap-1.5 px-2 text-xs text-muted-foreground"
+          onClick={undo}
+          disabled={busy}
+        >
+          <Undo2 className="size-3.5" />
+          {t("ai.autofill.undo")}
+        </Button>
+      )}
 
-        <div className="flex shrink-0 items-center gap-2">
-          {before !== null && (
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="gap-1.5 text-muted-foreground"
-              onClick={undo}
-              disabled={busy}
-            >
-              <Undo2 className="size-4" />
-              {t("ai.autofill.undo")}
-            </Button>
+      {price !== null && (
+        <p className="text-xs text-muted-foreground">
+          {t("ai.autofill.meta", { price })}
+          {balance !== null && (
+            <span className="tabular">
+              {" · "}
+              {t("ai.autofill.balance", { balance })}
+            </span>
           )}
-          <Button
-            type="button"
-            className="gap-2"
-            onClick={run}
-            disabled={busy || disabled}
-            title={ready ? undefined : t("ai.autofill.needBoth")}
-          >
-            {busy ? (
-              <Loader2 className="size-4 animate-spin" />
-            ) : (
-              <Sparkles className="size-4" />
-            )}
-            {busy ? t("ai.autofill.working") : t("ai.autofill.action")}
-          </Button>
-        </div>
-      </div>
-    </Card>
+        </p>
+      )}
+    </div>
   );
 }
