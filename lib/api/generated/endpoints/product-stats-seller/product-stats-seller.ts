@@ -36,6 +36,8 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKey: K } => {
   const result = { queryKey } as T & { queryKey: K };
   for (const key of Object.keys(query)) {
+    // The explicit queryKey always wins, matching the previous
+    // `{ ...query, queryKey }` spread where it was set last.
     if (key === 'queryKey') continue;
     Object.defineProperty(result, key, {
       enumerable: true,
@@ -50,42 +52,47 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
  * @summary Просмотры и контакты по своей карточке
  */
 export const sellerProductStatsControllerStats = (
-  id: number,
-  params?: SellerProductStatsControllerStatsParams,
-  options?: SecondParameter<typeof customInstance>, signal?: AbortSignal
+    id: number,
+    params?: SellerProductStatsControllerStatsParams,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
 
 
-  return customInstance<ProductStatsDto>(
-    {
-      url: `/api/v1/seller/product-cards/${id}/stats`, method: 'GET',
-      params, signal
+      return customInstance<ProductStatsDto>(
+      {url: `/api/v1/seller/product-cards/${id}/stats`, method: 'GET',
+        params, signal
     },
-    options);
-}
+      options);
+    }
+
+
+
 
 export const getSellerProductStatsControllerStatsQueryKey = (id: number,
-  params?: SellerProductStatsControllerStatsParams,) => {
-  return [
+    params?: SellerProductStatsControllerStatsParams,) => {
+    return [
     `/api/v1/seller/product-cards/${id}/stats`, ...(params ? [params] : [])
-  ] as const;
-}
+    ] as const;
+    }
+
 
 export const getSellerProductStatsControllerStatsQueryOptions = <TData = Awaited<ReturnType<typeof sellerProductStatsControllerStats>>, TError = ErrorType<void>>(id: number,
-  params?: SellerProductStatsControllerStatsParams, options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof sellerProductStatsControllerStats>>, TError, TData>>, request?: SecondParameter<typeof customInstance> }
+    params?: SellerProductStatsControllerStatsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof sellerProductStatsControllerStats>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
-  const { query: queryOptions, request: requestOptions } = options ?? {};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getSellerProductStatsControllerStatsQueryKey(id, params);
-
-
-
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof sellerProductStatsControllerStats>>> = ({ signal }) => sellerProductStatsControllerStats(id, params, requestOptions, signal);
+  const queryKey =  queryOptions?.queryKey ?? getSellerProductStatsControllerStatsQueryKey(id,params);
 
 
 
-  return { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof sellerProductStatsControllerStats>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof sellerProductStatsControllerStats>>> = ({ signal }) => sellerProductStatsControllerStats(id,params, requestOptions, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof sellerProductStatsControllerStats>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
 export type SellerProductStatsControllerStatsQueryResult = NonNullable<Awaited<ReturnType<typeof sellerProductStatsControllerStats>>>
@@ -93,49 +100,45 @@ export type SellerProductStatsControllerStatsQueryError = ErrorType<void>
 
 
 export function useSellerProductStatsControllerStats<TData = Awaited<ReturnType<typeof sellerProductStatsControllerStats>>, TError = ErrorType<void>>(
-  id: number,
-  params: undefined | SellerProductStatsControllerStatsParams, options: {
-    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof sellerProductStatsControllerStats>>, TError, TData>> & Pick<
-      DefinedInitialDataOptions<
-        Awaited<ReturnType<typeof sellerProductStatsControllerStats>>,
-        TError,
-        Awaited<ReturnType<typeof sellerProductStatsControllerStats>>
-      >, 'initialData'
-    >, request?: SecondParameter<typeof customInstance>
-  }
-  , queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+ id: number,
+    params: undefined |  SellerProductStatsControllerStatsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof sellerProductStatsControllerStats>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof sellerProductStatsControllerStats>>,
+          TError,
+          Awaited<ReturnType<typeof sellerProductStatsControllerStats>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useSellerProductStatsControllerStats<TData = Awaited<ReturnType<typeof sellerProductStatsControllerStats>>, TError = ErrorType<void>>(
-  id: number,
-  params?: SellerProductStatsControllerStatsParams, options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof sellerProductStatsControllerStats>>, TError, TData>> & Pick<
-      UndefinedInitialDataOptions<
-        Awaited<ReturnType<typeof sellerProductStatsControllerStats>>,
-        TError,
-        Awaited<ReturnType<typeof sellerProductStatsControllerStats>>
-      >, 'initialData'
-    >, request?: SecondParameter<typeof customInstance>
-  }
-  , queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+ id: number,
+    params?: SellerProductStatsControllerStatsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof sellerProductStatsControllerStats>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof sellerProductStatsControllerStats>>,
+          TError,
+          Awaited<ReturnType<typeof sellerProductStatsControllerStats>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useSellerProductStatsControllerStats<TData = Awaited<ReturnType<typeof sellerProductStatsControllerStats>>, TError = ErrorType<void>>(
-  id: number,
-  params?: SellerProductStatsControllerStatsParams, options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof sellerProductStatsControllerStats>>, TError, TData>>, request?: SecondParameter<typeof customInstance> }
-  , queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+ id: number,
+    params?: SellerProductStatsControllerStatsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof sellerProductStatsControllerStats>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Просмотры и контакты по своей карточке
  */
 
 export function useSellerProductStatsControllerStats<TData = Awaited<ReturnType<typeof sellerProductStatsControllerStats>>, TError = ErrorType<void>>(
-  id: number,
-  params?: SellerProductStatsControllerStatsParams, options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof sellerProductStatsControllerStats>>, TError, TData>>, request?: SecondParameter<typeof customInstance> }
-  , queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+ id: number,
+    params?: SellerProductStatsControllerStatsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof sellerProductStatsControllerStats>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getSellerProductStatsControllerStatsQueryOptions(id, params, options)
+  const queryOptions = getSellerProductStatsControllerStatsQueryOptions(id,params,options)
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }

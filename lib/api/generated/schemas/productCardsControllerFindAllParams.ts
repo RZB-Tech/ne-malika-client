@@ -46,5 +46,12 @@ category_id?: number;
  * slug категории верхнего уровня — альтернатива category_id
  */
 category?: string;
+/**
+ * random — вперемешку: витрина не должна каждый раз открываться одними и теми же товарами сверху. Порядок задаёт seed.
+ */
 sort?: ProductCardsControllerFindAllSort;
+/**
+ * Зерно для sort=random; одно зерно — один и тот же порядок
+ */
+seed?: string;
 };

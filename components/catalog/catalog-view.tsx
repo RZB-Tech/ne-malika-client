@@ -16,6 +16,7 @@ import { findCategory, useCategories } from "@/lib/api/categories";
 import { productCardsControllerFindAll } from "@/lib/api/generated/endpoints/product-cards-public/product-cards-public";
 import type { ProductCardsControllerFindAllParams } from "@/lib/api/generated/schemas";
 import { mapPublicProductCard } from "@/lib/api/mappers";
+import { randomCatalogSeed } from "@/lib/catalog-seed";
 import type { Paginated, PublicProductCard } from "@/lib/api/types";
 
 const PAGE_SIZE = 24;
@@ -32,13 +33,22 @@ const PRELOAD_MARGIN = "600px 0px";
 
 export function CatalogView({
   initialData,
+  seed: initialSeed,
 }: {
   initialData?: Paginated<PublicProductCard>;
+  /**
+   * Зерно перемешивания с сервера — то самое, с которым собран `initialData`.
+   * Держим его в состоянии, чтобы оно пережило смену фильтров: иначе выбор
+   * раздела тасовал бы витрину заново, хотя покупатель всего лишь сузил её.
+   */
+  seed?: string;
 } = {}) {
   const { t, locale } = useT();
   const { roots } = useCategories();
 
   const { q, category, setCategory, subCategoryId } = useCatalogFilters();
+
+  const [seed] = useState(() => initialSeed ?? randomCatalogSeed());
 
   const params: ProductCardsControllerFindAllParams = useMemo(
     () => ({
@@ -49,9 +59,15 @@ export function CatalogView({
         : category
           ? { category }
           : {}),
-      sort: 'newest' as const,
+      /**
+       * Витрину показываем вперемешку, но поиск — по совпадению: там сверху
+       * обязан оказаться товар, у которого совпало название, а не случайный.
+       */
+      ...(q
+        ? { sort: 'newest' as const }
+        : { sort: 'random' as const, seed }),
     }),
-    [q, category, subCategoryId],
+    [q, category, subCategoryId, seed],
   );
 
   const isInitialParams = !q && !category && subCategoryId == null;

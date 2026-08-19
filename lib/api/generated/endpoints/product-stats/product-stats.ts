@@ -20,64 +20,76 @@ import type {
 } from '../../schemas';
 
 import { customInstance } from '../../../mutator';
-import type { ErrorType, BodyType } from '../../../mutator';
+import type { ErrorType , BodyType } from '../../../mutator';
+
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
+
 
 /**
  * Боты и повторы в пределах получаса отбрасываются молча — ответ 204 не значит, что событие учтено.
  * @summary Отметить просмотр карточки или контакт с продавцом
  */
 export const productStatsControllerRecord = (
-  id: number,
-  recordProductEventDto: BodyType<RecordProductEventDto>,
-  options?: SecondParameter<typeof customInstance>, signal?: AbortSignal
+    id: number,
+    recordProductEventDto: BodyType<RecordProductEventDto>,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
 
 
-  return customInstance<void>(
-    {
-      url: `/api/v1/product-cards/${id}/events`, method: 'POST',
-      headers: { 'Content-Type': 'application/json', },
+      return customInstance<void>(
+      {url: `/api/v1/product-cards/${id}/events`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
       data: recordProductEventDto, signal
     },
-    options);
-}
+      options);
+    }
+
+
+
 
 export const getProductStatsControllerRecordMutationOptions = <TError = ErrorType<void>,
-  TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof productStatsControllerRecord>>, TError, { id: number; data: BodyType<RecordProductEventDto> }, TContext>, request?: SecondParameter<typeof customInstance> }
-  ): UseMutationOptions<Awaited<ReturnType<typeof productStatsControllerRecord>>, TError, { id: number; data: BodyType<RecordProductEventDto> }, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof productStatsControllerRecord>>, TError,{id: number;data: BodyType<RecordProductEventDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof productStatsControllerRecord>>, TError,{id: number;data: BodyType<RecordProductEventDto>}, TContext> => {
 
-  const mutationKey = ['productStatsControllerRecord'];
-  const { mutation: mutationOptions, request: requestOptions } = options ?
-    options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+const mutationKey = ['productStatsControllerRecord'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey, }, request: undefined };
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
 
-  const mutationFn: MutationFunction<Awaited<ReturnType<typeof productStatsControllerRecord>>, { id: number; data: BodyType<RecordProductEventDto> }> = (props) => {
-    const { id, data } = props ?? {};
 
-    return productStatsControllerRecord(id, data, requestOptions)
-  }
 
-  return { mutationFn, ...mutationOptions }
-}
 
-export type ProductStatsControllerRecordMutationResult = NonNullable<Awaited<ReturnType<typeof productStatsControllerRecord>>>
-export type ProductStatsControllerRecordMutationBody = BodyType<RecordProductEventDto>
-export type ProductStatsControllerRecordMutationError = ErrorType<void>
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof productStatsControllerRecord>>, {id: number;data: BodyType<RecordProductEventDto>}> = (props) => {
+          const {id,data} = props ?? {};
 
-/**
-* @summary Отметить просмотр карточки или контакт с продавцом
-*/
+          return  productStatsControllerRecord(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ProductStatsControllerRecordMutationResult = NonNullable<Awaited<ReturnType<typeof productStatsControllerRecord>>>
+    export type ProductStatsControllerRecordMutationBody = BodyType<RecordProductEventDto>
+    export type ProductStatsControllerRecordMutationError = ErrorType<void>
+
+    /**
+ * @summary Отметить просмотр карточки или контакт с продавцом
+ */
 export const useProductStatsControllerRecord = <TError = ErrorType<void>,
-  TContext = unknown>(options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof productStatsControllerRecord>>, TError, { id: number; data: BodyType<RecordProductEventDto> }, TContext>, request?: SecondParameter<typeof customInstance> }
-    , queryClient?: QueryClient): UseMutationResult<
-      Awaited<ReturnType<typeof productStatsControllerRecord>>,
-      TError,
-      { id: number; data: BodyType<RecordProductEventDto> },
-      TContext
-    > => {
-  return useMutation(getProductStatsControllerRecordMutationOptions(options), queryClient);
-}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof productStatsControllerRecord>>, TError,{id: number;data: BodyType<RecordProductEventDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof productStatsControllerRecord>>,
+        TError,
+        {id: number;data: BodyType<RecordProductEventDto>},
+        TContext
+      > => {
+      return useMutation(getProductStatsControllerRecordMutationOptions(options), queryClient);
+    }

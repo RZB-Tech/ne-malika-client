@@ -1084,14 +1084,26 @@
             "name": "sort",
             "required": false,
             "in": "query",
+            "description": "random — вперемешку: витрина не должна каждый раз открываться одними и теми же товарами сверху. Порядок задаёт seed.",
             "schema": {
               "default": "newest",
               "type": "string",
               "enum": [
                 "price_asc",
                 "price_desc",
-                "newest"
+                "newest",
+                "random"
               ]
+            }
+          },
+          {
+            "name": "seed",
+            "required": false,
+            "in": "query",
+            "description": "Зерно для sort=random; одно зерно — один и тот же порядок",
+            "schema": {
+              "example": "k3f9d1a7",
+              "type": "string"
             }
           }
         ],

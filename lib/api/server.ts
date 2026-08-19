@@ -19,7 +19,14 @@ async function getJson<T>(
 ): Promise<T | null> {
   try {
     const res = await fetch(`${API}${path}`, {
-      next: { revalidate: revalidateSec },
+      /**
+       * Ноль — ответ у каждого захода свой (перемешанная витрина), и класть его
+       * в кэш незачем: второй раз по тому же адресу никто не придёт, а место
+       * в кэше он занял бы наравне с общими ответами.
+       */
+      ...(revalidateSec > 0
+        ? { next: { revalidate: revalidateSec } }
+        : { cache: "no-store" as const }),
       headers: { accept: "application/json" },
     });
     if (!res.ok) return null;
@@ -44,19 +51,31 @@ export function getPublicShop(id: number): Promise<PublicShop | null> {
 /**
  * GET /product-cards?... — страница каталога для серверного рендера витрины.
  * Значения по умолчанию совпадают с первым запросом CatalogView (page 1,
- * limit 24, sort newest, без фильтров), чтобы initialData подошёл под ключ
- * react-query и гидратация не разошлась.
+ * limit 24, без фильтров), чтобы initialData подошёл под ключ react-query и
+ * гидратация не разошлась.
+ *
+ * `seed` — зерно перемешивания: с ним ответ уникален для захода, поэтому мимо
+ * кэша. Без него — прежний общий ответ на две минуты.
  */
 export function getPublicProducts(
-  params: { page?: number; limit?: number; sort?: string } = {},
+  params: {
+    page?: number;
+    limit?: number;
+    sort?: string;
+    seed?: string;
+  } = {},
 ): Promise<Paginated<PublicProductCard> | null> {
-  const { page = 1, limit = 24, sort = "newest" } = params;
+  const { page = 1, limit = 24, sort = "newest", seed } = params;
   const qs = new URLSearchParams({
     page: String(page),
     limit: String(limit),
     sort,
+    ...(seed ? { seed } : {}),
   }).toString();
-  return getJson<Paginated<PublicProductCard>>(`/product-cards?${qs}`, 120);
+  return getJson<Paginated<PublicProductCard>>(
+    `/product-cards?${qs}`,
+    seed ? 0 : 120,
+  );
 }
 
 /**
