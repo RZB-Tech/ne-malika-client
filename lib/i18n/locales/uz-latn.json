@@ -1035,6 +1035,23 @@
       "undo": "Qaytarish",
       "failed": "Tavsifni tuzatib bo‘lmadi",
       "needPhoto": "Avval mahsulot suratini qo‘shing"
+    },
+    "autofill": {
+      "title": "Kartochkani AI bilan to‘ldirish",
+      "subtitle": "Rasmlarni yuklang va nomini yozing — tavsif va xususiyatlarni AI rasmlar bo‘yicha o‘zi tuzadi",
+      "action": "AI bilan to‘ldirish",
+      "working": "AI to‘ldirmoqda…",
+      "price": "To‘ldirish uchun {price} kredit",
+      "balance": "Qoldi: {balance}",
+      "done": "Kartochka to‘ldirildi",
+      "charged": "{credits} kredit yechildi, {left} qoldi",
+      "restored": "Avvalgi qiymatlar qaytarildi",
+      "undo": "Qaytarish",
+      "failed": "Kartochkani to‘ldirib bo‘lmadi",
+      "needPhoto": "Avval mahsulot rasmini qo‘shing",
+      "needName": "Avval mahsulot nomini yozing",
+      "needBoth": "Mahsulot rasmi va nomi kerak",
+      "hint": "AI faqat rasmda ko‘rinadigan yoki siz aytgan ma’lumotni yozadi — e’lon qilishdan oldin tekshirib chiqing"
     }
   },
   "report": {

@@ -34,6 +34,7 @@ import { ProductImage } from "@/components/shared/product-image";
 import { PhotoLightbox } from "@/components/shared/photo-lightbox";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { FixDescriptionButton } from "@/components/shared/fix-description-button";
+import { ProductAutofillCard } from "@/components/shared/product-autofill-card";
 import { ModerationBadge } from "@/components/shared/badges";
 import { ProductStatsCard } from "@/components/seller/product-stats";
 import { CategorySelect } from "@/components/seller/category-select";
@@ -60,6 +61,23 @@ import { cn } from "@/lib/utils";
 import type { AiProductCheck } from "@/lib/api/types";
 
 type Spec = { key: string; value: string };
+
+/**
+ * Бренд и модель приходят отдельными полями ответа: в форме нового товара под
+ * них есть свои поля. Здесь их нет — карточка правится списком характеристик,
+ * куда они и попадают, первыми строками, как их пишет форма создания.
+ */
+function withBrandAndModel(result: {
+  brand: string | null;
+  model: string | null;
+  characteristics: Spec[];
+}): Spec[] {
+  return [
+    ...(result.brand ? [{ key: "Бренд", value: result.brand }] : []),
+    ...(result.model ? [{ key: "Модель", value: result.model }] : []),
+    ...result.characteristics,
+  ];
+}
 
 export function SellerProductDetail({ id }: { id: number }) {
   const { t } = useT();
@@ -191,6 +209,32 @@ export function SellerProductDetail({ id }: { id: number }) {
           {t("seller.products.backToList")}
         </Link>
       </Button>
+
+      <ProductAutofillCard
+        photos={photos}
+        name={name}
+        context={{ description, characteristics: specs, categoryId, state }}
+        snapshot={{ description, specs, categoryId, state }}
+        onApply={(result) => {
+          if (result.description) setDescription(result.description);
+          if (result.categoryId) setCategoryId(result.categoryId);
+          if (result.state) setState(result.state);
+          const next = withBrandAndModel(result);
+          if (next.length > 0) setSpecs(next);
+        }}
+        onRestore={(before) => {
+          setDescription(before.description);
+          setSpecs(before.specs);
+          setCategoryId(before.categoryId);
+          setState(before.state);
+        }}
+        onPhotoStored={(photoId, key) =>
+          setPhotos((prev) =>
+            prev.map((p) => (p.id === photoId ? { ...p, key } : p)),
+          )
+        }
+        disabled={row.status === "abolished"}
+      />
 
       <Card className="p-6">
         <div className="flex flex-col gap-5 sm:flex-row">

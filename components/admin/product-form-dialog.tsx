@@ -36,6 +36,7 @@ import {
 import { CategorySelect } from "@/components/seller/category-select";
 import { PhotoAiDialog } from "@/components/shared/photo-ai-dialog";
 import { FixDescriptionButton } from "@/components/shared/fix-description-button";
+import { ProductAutofillCard } from "@/components/shared/product-autofill-card";
 import { applyGenerated } from "@/components/shared/apply-generated";
 import { useT } from "@/components/providers/i18n-provider";
 import { resolvePhotoKeys } from "@/lib/api/upload";
@@ -193,6 +194,40 @@ function FormBody({
           )}
         </div>
       )}
+
+      {/*
+        Администратору кнопка бесплатна — за его запросы платит площадка, — но
+        нужна ему та же: карточки он заводит и правит теми же руками, что и
+        продавец, и заполнять их вручную ему незачем.
+      */}
+      <ProductAutofillCard
+        photos={photos}
+        name={name}
+        context={{ description, characteristics: specs, categoryId, state }}
+        snapshot={{ description, specs, categoryId, state }}
+        onApply={(result) => {
+          if (result.description) setDescription(result.description);
+          if (result.categoryId) setCategoryId(result.categoryId);
+          if (result.state) setState(result.state);
+          const next = [
+            ...(result.brand ? [{ key: "Бренд", value: result.brand }] : []),
+            ...(result.model ? [{ key: "Модель", value: result.model }] : []),
+            ...result.characteristics,
+          ];
+          if (next.length > 0) setSpecs(next);
+        }}
+        onRestore={(before) => {
+          setDescription(before.description);
+          setSpecs(before.specs);
+          setCategoryId(before.categoryId);
+          setState(before.state);
+        }}
+        onPhotoStored={(photoId, key) =>
+          setPhotos((prev) =>
+            prev.map((p) => (p.id === photoId ? { ...p, key } : p)),
+          )
+        }
+      />
 
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="pname">{t("admin.form.name")}</Label>

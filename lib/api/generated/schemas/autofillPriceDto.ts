@@ -6,12 +6,14 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export type AdminAiUsageControllerListOperation = typeof AdminAiUsageControllerListOperation[keyof typeof AdminAiUsageControllerListOperation];
-
-
-export const AdminAiUsageControllerListOperation = {
-  prompt: 'prompt',
-  description: 'description',
-  image: 'image',
-  autofill: 'autofill',
-} as const;
+export interface AutofillPriceDto {
+  /** Цена одного автозаполнения в кредитах */
+  price: number;
+  /** Хватает ли кредитов. У администратора всегда true */
+  allowed: boolean;
+  /**
+     * Доступный остаток. null — без ограничения (администратор)
+     * @nullable
+     */
+  balance: number | null;
+}

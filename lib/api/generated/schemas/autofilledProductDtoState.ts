@@ -6,12 +6,14 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export type AdminAiUsageControllerListOperation = typeof AdminAiUsageControllerListOperation[keyof typeof AdminAiUsageControllerListOperation];
+/**
+ * null — по фотографиям и тексту состояние не определить
+ * @nullable
+ */
+export type AutofilledProductDtoState = typeof AutofilledProductDtoState[keyof typeof AutofilledProductDtoState] | null;
 
 
-export const AdminAiUsageControllerListOperation = {
-  prompt: 'prompt',
-  description: 'description',
-  image: 'image',
-  autofill: 'autofill',
+export const AutofilledProductDtoState = {
+  new: 'new',
+  old: 'old',
 } as const;
