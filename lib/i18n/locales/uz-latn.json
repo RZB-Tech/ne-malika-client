@@ -1040,7 +1040,8 @@
     "autofill": {
       "action": "AI bilan to‘ldirish",
       "working": "AI to‘ldirmoqda…",
-      "meta": "{price} kredit · rasm va nom kerak",
+      "price": "{price} kredit",
+      "needs": "rasm va nom kerak",
       "balance": "qoldi: {balance}",
       "hint": "AI rasmlar bo‘yicha tavsif va xususiyatlarni to‘ldiradi. Faqat rasmda ko‘rinadigan yoki siz aytgan ma’lumotni yozadi — e’lon qilishdan oldin tekshiring",
       "done": "Kartochka to‘ldirildi",

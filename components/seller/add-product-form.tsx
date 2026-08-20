@@ -21,7 +21,7 @@ import {
 import { PhotoDropzone, type UploadedPhoto } from "./photo-dropzone";
 import { PhotoAiDialog } from "@/components/shared/photo-ai-dialog";
 import { FixDescriptionButton } from "@/components/shared/fix-description-button";
-import { ProductAutofillCard } from "@/components/shared/product-autofill-card";
+import { ProductAutofillButton } from "@/components/shared/product-autofill-button";
 import { applyGenerated } from "@/components/shared/apply-generated";
 import { CategorySelect } from "./category-select";
 import { useT } from "@/components/providers/i18n-provider";
@@ -30,13 +30,23 @@ import { useSellerProductCardsControllerCreate } from "@/lib/api/generated/endpo
 import { resolvePhotoKeys } from "@/lib/api/upload";
 import { formatPriceInput, parsePriceInput } from "@/lib/format";
 
-function SectionTitle({ index, children }: { index: number; children: React.ReactNode }) {
+function SectionTitle({
+  index,
+  children,
+  action,
+}: {
+  index: number;
+  children: React.ReactNode;
+  /** Кнопка справа от заголовка — например, автозаполнение раздела. */
+  action?: React.ReactNode;
+}) {
   return (
-    <div className="mb-5 flex items-center gap-3">
+    <div className="mb-5 flex flex-wrap items-center gap-x-3 gap-y-2">
       <span className="grid size-7 place-items-center rounded-full bg-primary/10 text-sm font-semibold text-primary tabular">
         {index}
       </span>
       <h2 className="font-heading text-lg font-bold tracking-tight">{children}</h2>
+      {action && <div className="ml-auto">{action}</div>}
     </div>
   );
 }
@@ -199,46 +209,54 @@ export function AddProductForm({
         </Card>
       )}
 
-      <ProductAutofillCard
-        photos={photos}
-        name={name}
-        context={{
-          description,
-          characteristics: brandModelSpecs(brand, model, specs),
-          categoryId,
-          state,
-        }}
-        snapshot={{ description, brand, model, specs, categoryId, state }}
-        onApply={(result) => {
-          if (result.description) setDescription(result.description);
-          if (result.brand) setBrand(result.brand);
-          if (result.model) setModel(result.model);
-          if (result.characteristics.length > 0) {
-            setSpecs(
-              result.characteristics.map((c) => ({ name: c.key, value: c.value })),
-            );
-          }
-          if (result.categoryId) setCategoryId(result.categoryId);
-          if (result.state) setState(result.state);
-        }}
-        onRestore={(before) => {
-          setDescription(before.description);
-          setBrand(before.brand);
-          setModel(before.model);
-          setSpecs(before.specs);
-          setCategoryId(before.categoryId);
-          setState(before.state);
-        }}
-        onPhotoStored={(photoId, key) =>
-          setPhotos((prev) =>
-            prev.map((p) => (p.id === photoId ? { ...p, key } : p)),
-          )
-        }
-        disabled={shopAbolished}
-      />
-
       <Card className="p-6">
-        <SectionTitle index={1}>{t("seller.add.section1")}</SectionTitle>
+        <SectionTitle
+          index={1}
+          action={
+            <ProductAutofillButton
+              photos={photos}
+              name={name}
+              context={{
+                description,
+                characteristics: brandModelSpecs(brand, model, specs),
+                categoryId,
+                state,
+              }}
+              snapshot={{ description, brand, model, specs, categoryId, state }}
+              onApply={(result) => {
+                if (result.description) setDescription(result.description);
+                if (result.brand) setBrand(result.brand);
+                if (result.model) setModel(result.model);
+                if (result.characteristics.length > 0) {
+                  setSpecs(
+                    result.characteristics.map((c) => ({
+                      name: c.key,
+                      value: c.value,
+                    })),
+                  );
+                }
+                if (result.categoryId) setCategoryId(result.categoryId);
+                if (result.state) setState(result.state);
+              }}
+              onRestore={(before) => {
+                setDescription(before.description);
+                setBrand(before.brand);
+                setModel(before.model);
+                setSpecs(before.specs);
+                setCategoryId(before.categoryId);
+                setState(before.state);
+              }}
+              onPhotoStored={(photoId, key) =>
+                setPhotos((prev) =>
+                  prev.map((p) => (p.id === photoId ? { ...p, key } : p)),
+                )
+              }
+              disabled={shopAbolished}
+            />
+          }
+        >
+          {t("seller.add.section1")}
+        </SectionTitle>
         <div className="grid gap-5">
           <div className={field}>
             <Label htmlFor="name">{t("seller.add.name")}</Label>

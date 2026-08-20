@@ -34,7 +34,7 @@ import { ProductImage } from "@/components/shared/product-image";
 import { PhotoLightbox } from "@/components/shared/photo-lightbox";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { FixDescriptionButton } from "@/components/shared/fix-description-button";
-import { ProductAutofillCard } from "@/components/shared/product-autofill-card";
+import { ProductAutofillButton } from "@/components/shared/product-autofill-button";
 import { ModerationBadge } from "@/components/shared/badges";
 import { ProductStatsCard } from "@/components/seller/product-stats";
 import { CategorySelect } from "@/components/seller/category-select";
@@ -210,32 +210,6 @@ export function SellerProductDetail({ id }: { id: number }) {
         </Link>
       </Button>
 
-      <ProductAutofillCard
-        photos={photos}
-        name={name}
-        context={{ description, characteristics: specs, categoryId, state }}
-        snapshot={{ description, specs, categoryId, state }}
-        onApply={(result) => {
-          if (result.description) setDescription(result.description);
-          if (result.categoryId) setCategoryId(result.categoryId);
-          if (result.state) setState(result.state);
-          const next = withBrandAndModel(result);
-          if (next.length > 0) setSpecs(next);
-        }}
-        onRestore={(before) => {
-          setDescription(before.description);
-          setSpecs(before.specs);
-          setCategoryId(before.categoryId);
-          setState(before.state);
-        }}
-        onPhotoStored={(photoId, key) =>
-          setPhotos((prev) =>
-            prev.map((p) => (p.id === photoId ? { ...p, key } : p)),
-          )
-        }
-        disabled={row.status === "abolished"}
-      />
-
       <Card className="p-6">
         <div className="flex flex-col gap-5 sm:flex-row">
           <button
@@ -263,6 +237,33 @@ export function SellerProductDetail({ id }: { id: number }) {
               {row.abolishReason && (
                 <span className="text-xs text-destructive">{row.abolishReason}</span>
               )}
+              <div className="ml-auto">
+                <ProductAutofillButton
+                  photos={photos}
+                  name={name}
+                  context={{ description, characteristics: specs, categoryId, state }}
+                  snapshot={{ description, specs, categoryId, state }}
+                  onApply={(result) => {
+                    if (result.description) setDescription(result.description);
+                    if (result.categoryId) setCategoryId(result.categoryId);
+                    if (result.state) setState(result.state);
+                    const next = withBrandAndModel(result);
+                    if (next.length > 0) setSpecs(next);
+                  }}
+                  onRestore={(before) => {
+                    setDescription(before.description);
+                    setSpecs(before.specs);
+                    setCategoryId(before.categoryId);
+                    setState(before.state);
+                  }}
+                  onPhotoStored={(photoId, key) =>
+                    setPhotos((prev) =>
+                      prev.map((p) => (p.id === photoId ? { ...p, key } : p)),
+                    )
+                  }
+                  disabled={row.status === "abolished"}
+                />
+              </div>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">

@@ -36,7 +36,7 @@ import {
 import { CategorySelect } from "@/components/seller/category-select";
 import { PhotoAiDialog } from "@/components/shared/photo-ai-dialog";
 import { FixDescriptionButton } from "@/components/shared/fix-description-button";
-import { ProductAutofillCard } from "@/components/shared/product-autofill-card";
+import { ProductAutofillButton } from "@/components/shared/product-autofill-button";
 import { applyGenerated } from "@/components/shared/apply-generated";
 import { useT } from "@/components/providers/i18n-provider";
 import { resolvePhotoKeys } from "@/lib/api/upload";
@@ -200,7 +200,7 @@ function FormBody({
         нужна ему та же: карточки он заводит и правит теми же руками, что и
         продавец, и заполнять их вручную ему незачем.
       */}
-      <ProductAutofillCard
+      <ProductAutofillButton
         photos={photos}
         name={name}
         context={{ description, characteristics: specs, categoryId, state }}

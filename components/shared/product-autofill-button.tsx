@@ -39,14 +39,19 @@ const MAX_PHOTOS = 3;
  *
  * Рядом с кнопкой — строка с ценой и тем, что для неё нужно. Списание без
  * объявленной заранее цены выглядит как обман, даже когда оно честное, а
- * «нужны фото и название» снимает главный вопрос к неактивной с виду кнопке.
+ * «нужны фото и название» снимает главный вопрос к кнопке, которая без них
+ * только ругается.
+ *
+ * Размером и видом — как «поправить по фото» рядом с описанием: обе кнопки
+ * зовут модель из формы товара, и выделять одну из них панелью значило бы
+ * обещать разницу, которой нет.
  *
  * `snapshot` с `onRestore` устроены поверх дженерика намеренно: раскладывают
  * ответ по полям все три формы по-разному (в одной бренд и модель — свои поля,
  * в остальных строки характеристик), и знать про это различие кнопке незачем —
  * она лишь запоминает то, что ей дали, и возвращает по «Вернуть».
  */
-export function ProductAutofillCard<T>({
+export function ProductAutofillButton<T>({
   photos,
   name,
   context,
@@ -75,8 +80,15 @@ export function ProductAutofillCard<T>({
   const priceQuery = useProductAutofillControllerPrice({
     query: { retry: false, staleTime: 30_000 },
   });
-  const price = priceQuery.data?.price ?? null;
-  const balance = priceQuery.data?.balance ?? null;
+  /**
+   * Прайс и остаток — но только когда платит магазин. У администратора остаток
+   * пуст: за его запросы платит площадка, и цены рядом с кнопкой быть не должно.
+   */
+  const quota = priceQuery.data;
+  const charged =
+    quota && quota.balance !== null
+      ? { price: quota.price, balance: quota.balance }
+      : null;
 
   const run = async () => {
     if (photos.length === 0) {
@@ -179,17 +191,15 @@ export function ProductAutofillCard<T>({
         </Button>
       )}
 
-      {price !== null && (
-        <p className="text-xs text-muted-foreground">
-          {t("ai.autofill.meta", { price })}
-          {balance !== null && (
-            <span className="tabular">
-              {" · "}
-              {t("ai.autofill.balance", { balance })}
-            </span>
-          )}
-        </p>
-      )}
+      <p className="text-xs text-muted-foreground">
+        {[
+          charged && t("ai.autofill.price", { price: charged.price }),
+          t("ai.autofill.needs"),
+          charged && t("ai.autofill.balance", { balance: charged.balance }),
+        ]
+          .filter(Boolean)
+          .join(" · ")}
+      </p>
     </div>
   );
 }
