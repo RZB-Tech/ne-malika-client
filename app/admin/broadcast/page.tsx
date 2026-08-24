@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
 import { Send } from "@/components/icons";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
@@ -26,7 +25,11 @@ import {
 } from "@/components/ui/table";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { TelegramLinkCard } from "@/components/shared/telegram-link-card";
+import { AdminPageHeader } from "@/components/admin/page-header";
+import { useAdminMutation } from "@/components/admin/use-admin-mutation";
 import {
+  getAdminBroadcastsControllerCountQueryKey,
+  getAdminBroadcastsControllerListQueryKey,
   useAdminBroadcastsControllerCount,
   useAdminBroadcastsControllerList,
   useAdminBroadcastsControllerSend,
@@ -57,7 +60,7 @@ interface BroadcastRow {
 
 export default function AdminBroadcast() {
   const { t, locale } = useT();
-  const queryClient = useQueryClient();
+  const run = useAdminMutation();
   const [audience, setAudience] =
     useState<CreateBroadcastDtoAudience>("sellers");
   const [text, setText] = useState("");
@@ -88,32 +91,34 @@ export default function AdminBroadcast() {
       toast.error(t("admin.broadcast.tooShort"));
       return;
     }
-    try {
-      const res = (await sendMutation.mutateAsync({
-        data: { audience, text: value },
-      })) as unknown as { id: number; recipients: number };
-      toast.success(
-        t("admin.broadcast.started", { recipients: res.recipients }),
-      );
-      setText("");
-      await queryClient.invalidateQueries();
-    } catch (err) {
-      toast.error(
-        err instanceof Error ? err.message : t("admin.broadcast.failed"),
-      );
-    }
+    let res: { id: number; recipients: number } | undefined;
+    const ok = await run(
+      async () => {
+        res = (await sendMutation.mutateAsync({
+          data: { audience, text: value },
+        })) as unknown as { id: number; recipients: number };
+      },
+      {
+        invalidate: [
+          getAdminBroadcastsControllerListQueryKey(),
+          getAdminBroadcastsControllerCountQueryKey(),
+        ],
+        errorKey: "admin.broadcast.failed",
+      },
+    );
+    if (!ok || !res) return;
+    toast.success(
+      t("admin.broadcast.started", { recipients: res.recipients }),
+    );
+    setText("");
   };
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="font-heading text-2xl font-bold tracking-tight">
-          {t("admin.broadcast.title")}
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {t("admin.broadcast.subtitle")}
-        </p>
-      </div>
+      <AdminPageHeader
+        title={t("admin.broadcast.title")}
+        subtitle={t("admin.broadcast.subtitle")}
+      />
 
       <TelegramLinkCard />
 

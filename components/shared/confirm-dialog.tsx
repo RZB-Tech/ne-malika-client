@@ -14,6 +14,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useT } from "@/components/providers/i18n-provider";
+import { apiErrorMessage } from "@/lib/api/errors";
 
 /**
  * Подтверждение необратимого действия. Вместо window.confirm: тот выглядит
@@ -34,7 +35,7 @@ export function ConfirmDialog({
   /** По умолчанию — «Подтвердить» на языке интерфейса. */
   confirmLabel?: string;
   destructive?: boolean;
-  onConfirm: () => Promise<void> | void;
+  onConfirm: () => void;
   children: React.ReactNode;
 }) {
   const { t } = useT();
@@ -54,7 +55,7 @@ export function ConfirmDialog({
        * на экране, ни в консоли. Сообщение сервера мутатор уже положил в
        * error.message, показать его — единственное, чего не хватало.
        */
-      toast.error(err instanceof Error ? err.message : t("common.actionFailed"));
+      toast.error(apiErrorMessage(err, t, "common.actionFailed"));
     } finally {
       setBusy(false);
     }

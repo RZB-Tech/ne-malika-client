@@ -89,7 +89,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const res = await authControllerRefresh();
       setAuth(res.accessToken, res.user);
       return res;
-    } catch {
+    } catch (err) {
+      // Тихий фолбэк оставлен намеренно (гость без refresh-cookie — норма),
+      // но причина должна быть видна в консоли: ротация cookie, 500 и т.д.
+      console.error("[auth] session refresh failed:", err);
       return null;
     }
   }, []);
@@ -137,14 +140,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const initData = readMiniAppInitData();
     if (initData) {
-      loginWithInitData(initData).catch(() => {
+      loginWithInitData(initData).catch((err) => {
+        // Пользователь остаётся гостем без всякого сигнала — хотя бы в логах
+        // должно быть видно, что вход в Mini App не прошёл.
+        console.error("[auth] Mini App initData login failed:", err);
       });
       return;
     }
 
     authControllerRefresh()
       .then((res) => setAuth(res.accessToken, res.user))
-      .catch(() => {
+      .catch((err) => {
+        console.error("[auth] guest refresh failed:", err);
       });
   }, [loginWithInitData, refreshSession]);
 

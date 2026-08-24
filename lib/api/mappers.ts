@@ -1,5 +1,6 @@
 import type { ModerationStatus, Product, SellerStatus, Store } from "@/lib/data";
 import { photoUrl } from "./photo";
+import { parseTelegramUsername } from "@/lib/telegram";
 import type {
   EntityStatus,
   ProductCardRow,
@@ -38,13 +39,7 @@ const SELLER_STATUS_BY_STATUS: Record<EntityStatus, SellerStatus> = {
   pending: "pending",
 };
 
-function telegramUsername(link: string | null | undefined): string {
-  if (!link) return "";
-  return link
-    .replace(/^https?:\/\/(t\.me|telegram\.me)\//i, "")
-    .replace(/^@/, "")
-    .replace(/\/+$/, "");
-}
+
 
 /**
  * Расписание строкой вида «Пн, Вт, Ср 09:00–18:00 · Сб 10:00–14:00».
@@ -88,7 +83,11 @@ function toProduct(
     id: String(pc.id),
     slug: String(pc.id),
     name: pc.name,
-    categorySlug: "",
+    /**
+     * Slug есть только у публичной проекции: без него карточки каталога
+     * теряли иконку категории и рисовали заглушку «Box».
+     */
+    categorySlug: ("categorySlug" in pc ? pc.categorySlug : null) ?? "",
     subcategory: "",
     brand: shopName,
     model: "",
@@ -143,7 +142,8 @@ export function mapShop(s: ShopRow | PublicShop): Store {
     address: s.address ?? "",
     city: "",
     phone: s.contact ?? "",
-    telegram: telegramUsername(s.telegramLink),
+    /** null — распознать не удалось (пригласительная ссылка и т.п.): кнопки не строим. */
+    telegram: (s.telegramLink && parseTelegramUsername(s.telegramLink)) ?? "",
     telegramLink: s.telegramLink ?? undefined,
     workSchedule: s.workSchedule ?? undefined,
     workingHours: "",

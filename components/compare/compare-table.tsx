@@ -7,6 +7,7 @@ import { Scale, Trash2, X } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ProductImage } from "@/components/shared/product-image";
+import { StatusPanel } from "@/components/shared/status-panel";
 import { ContactSellerButton } from "@/components/product/contact-seller-button";
 import { useT } from "@/components/providers/i18n-provider";
 import { productCardsControllerFindAll } from "@/lib/api/generated/endpoints/product-cards-public/product-cards-public";
@@ -94,18 +95,16 @@ export function CompareTable() {
 
   if (items.length === 0) {
     return (
-      <div className="flex flex-col items-center rounded-2xl border border-dashed border-border px-6 py-16 text-center">
-        <Scale className="size-10 text-muted-foreground/60" />
-        <h2 className="mt-4 font-heading text-lg font-semibold">
-          {t("compare.empty")}
-        </h2>
-        <p className="mt-1.5 max-w-sm text-sm text-muted-foreground">
-          {t("compare.emptyText")}
-        </p>
-        <Button asChild className="mt-6">
-          <Link href="/">{t("account.history.toCatalog")}</Link>
-        </Button>
-      </div>
+      <StatusPanel
+        icon={<Scale className="size-5" />}
+        title={t("compare.empty")}
+        description={t("compare.emptyText")}
+        action={
+          <Button asChild>
+            <Link href="/">{t("account.history.toCatalog")}</Link>
+          </Button>
+        }
+      />
     );
   }
 

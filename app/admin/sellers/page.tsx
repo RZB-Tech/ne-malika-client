@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
 import {
   Ban,
   Coins,
@@ -12,7 +11,6 @@ import {
   Trash2,
   UserX,
 } from "@/components/icons";
-import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -26,6 +24,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { StoreAvatar } from "@/components/shared/store-avatar";
+import { AdminPageHeader } from "@/components/admin/page-header";
+import { useAdminMutation } from "@/components/admin/use-admin-mutation";
 import { EntityStatusBadge } from "@/components/admin/entity-status-badge";
 import { Pagination } from "@/components/shared/pagination";
 import { ShopDrawer } from "@/components/admin/shop-drawer";
@@ -38,6 +38,7 @@ import {
 import { useT } from "@/components/providers/i18n-provider";
 import { formatDate } from "@/lib/format";
 import {
+  getAdminShopsControllerListQueryKey,
   useAdminShopsControllerAbolish,
   useAdminShopsControllerList,
   useAdminShopsControllerRemove,
@@ -45,6 +46,7 @@ import {
   useAdminShopsControllerSetRestrictedCategories,
 } from "@/lib/api/generated/endpoints/shops-admin/shops-admin";
 import {
+  getAdminUsersControllerListQueryKey,
   useAdminUsersControllerBlock,
   useAdminUsersControllerUnblock,
 } from "@/lib/api/generated/endpoints/users-admin/users-admin";
@@ -59,7 +61,7 @@ import type { AdminShopRow, Paginated } from "@/lib/api/types";
 
 export default function AdminSellers() {
   const { t, locale } = useT();
-  const queryClient = useQueryClient();
+  const run = useAdminMutation();
   const [opened, setOpened] = useState<AdminShopRow | null>(null);
   const [creditsShop, setCreditsShop] = useState<{
     id: number;
@@ -99,42 +101,71 @@ export default function AdminSellers() {
   const rows = pageData.data;
   const isDevData = usingDevData(data?.data);
 
-  const done = async (message: string) => {
-    await queryClient.invalidateQueries();
-    setOpened(null);
-    toast.success(message);
-  };
-
   const abolish = async (id: number, reason: string) => {
-    await abolishMutation.mutateAsync({ id, data: { reason } });
-    await done(t("admin.shops.abolished"));
+    const ok = await run(
+      () => abolishMutation.mutateAsync({ id, data: { reason } }),
+      {
+        invalidate: [getAdminShopsControllerListQueryKey()],
+        successKey: "admin.shops.abolished",
+        errorKey: "common.actionFailed",
+      },
+    );
+    if (ok) setOpened(null);
   };
   const restore = async (id: number) => {
-    await restoreMutation.mutateAsync({ id });
-    await done(t("admin.shops.restored"));
+    const ok = await run(() => restoreMutation.mutateAsync({ id }), {
+      invalidate: [getAdminShopsControllerListQueryKey()],
+      successKey: "admin.shops.restored",
+      errorKey: "common.actionFailed",
+    });
+    if (ok) setOpened(null);
   };
   const blockOwner = async (ownerId: number, reason: string) => {
-    await blockMutation.mutateAsync({ id: ownerId, data: { reason } });
-    await done(t("admin.shops.ownerBlocked"));
+    const ok = await run(
+      () => blockMutation.mutateAsync({ id: ownerId, data: { reason } }),
+      {
+        invalidate: [
+          getAdminShopsControllerListQueryKey(),
+          getAdminUsersControllerListQueryKey(),
+        ],
+        successKey: "admin.shops.ownerBlocked",
+        errorKey: "common.actionFailed",
+      },
+    );
+    if (ok) setOpened(null);
   };
   const unblockOwner = async (ownerId: number) => {
-    await unblockMutation.mutateAsync({ id: ownerId });
-    await done(t("admin.shops.ownerUnblocked"));
+    const ok = await run(() => unblockMutation.mutateAsync({ id: ownerId }), {
+      invalidate: [
+        getAdminShopsControllerListQueryKey(),
+        getAdminUsersControllerListQueryKey(),
+      ],
+      successKey: "admin.shops.ownerUnblocked",
+      errorKey: "common.actionFailed",
+    });
+    if (ok) setOpened(null);
   };
   /** Доступ к закрытым разделам каталога — смартфонам и планшетам. */
   const setRestricted = async (id: number, enabled: boolean) => {
-    await restrictedMutation.mutateAsync({ id, data: { enabled } });
-    await done(
-      t(
-        enabled
+    const ok = await run(
+      () => restrictedMutation.mutateAsync({ id, data: { enabled } }),
+      {
+        invalidate: [getAdminShopsControllerListQueryKey()],
+        successKey: enabled
           ? "admin.shops.restrictedGranted"
           : "admin.shops.restrictedRevoked",
-      ),
+        errorKey: "admin.shops.restrictedFailed",
+      },
     );
+    if (ok) setOpened(null);
   };
   const remove = async (id: number) => {
-    await removeMutation.mutateAsync({ id });
-    await done(t("admin.shops.removed"));
+    const ok = await run(() => removeMutation.mutateAsync({ id }), {
+      invalidate: [getAdminShopsControllerListQueryKey()],
+      successKey: "admin.shops.removed",
+      errorKey: "common.actionFailed",
+    });
+    if (ok) setOpened(null);
   };
 
   /** Один набор действий и для трёх точек, и для правой кнопки мыши. */
@@ -210,14 +241,10 @@ export default function AdminSellers() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="font-heading text-2xl font-bold tracking-tight">
-          {t("admin.sellers.title")}
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {t("admin.common.rowHint")}
-        </p>
-      </div>
+      <AdminPageHeader
+        title={t("admin.sellers.title")}
+        subtitle={t("admin.common.rowHint")}
+      />
 
       <div className="relative max-w-sm">
         <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />

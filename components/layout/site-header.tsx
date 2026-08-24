@@ -34,6 +34,7 @@ import { useCategories } from "@/lib/api/categories";
 import { useFavorites } from "@/lib/favorites/use-favorites";
 import { useCompare } from "@/lib/compare/use-compare";
 import type { Locale } from "@/lib/i18n/config";
+import { initials } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 /**
@@ -107,17 +108,6 @@ const FALLBACK_QUICK_CATEGORIES: Array<{
 /** Общий вид действия в шапке: значок сверху, подпись под ним. */
 const ACTION_CLASS =
   "flex h-13 w-16 shrink-0 flex-col items-center justify-center gap-1 rounded-lg text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/40";
-
-function initials(name: string): string {
-  return (
-    name
-      .trim()
-      .split(/\s+/)
-      .slice(0, 2)
-      .map((word) => word[0]?.toUpperCase() ?? "")
-      .join("") || "?"
-  );
-}
 
 /**
  * Шапка витрины по раскладке крупных маркетплейсов: светлая, в две строки.

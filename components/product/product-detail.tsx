@@ -22,7 +22,7 @@ import { Markdown } from "@/components/shared/markdown";
 import { ReviewsSection } from "@/components/reviews/reviews-section";
 import { useT } from "@/components/providers/i18n-provider";
 import { formatWorkSchedule } from "@/lib/api/mappers";
-import { formatPrice } from "@/lib/format";
+import { formatPrice, formatRating } from "@/lib/format";
 import { productToSnapshot } from "@/lib/product-snapshot";
 import { type Product, type Store } from "@/lib/data";
 import { cn } from "@/lib/utils";
@@ -227,7 +227,7 @@ export function ProductDetail({
               <div className="mt-2 flex items-center gap-2 text-sm">
                 <RatingStars value={product.rating ?? 0} />
                 <span className="font-medium tabular">
-                  {(product.rating ?? 0).toFixed(1).replace(".", ",")}
+                  {formatRating(product.rating ?? 0)}
                 </span>
                 <span className="text-muted-foreground">
                   {t("reviews.count", { count: product.ratingCount ?? 0 })}

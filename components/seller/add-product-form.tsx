@@ -26,9 +26,11 @@ import { applyGenerated } from "@/components/shared/apply-generated";
 import { CategorySelect } from "./category-select";
 import { useT } from "@/components/providers/i18n-provider";
 import { useSellerShop } from "@/lib/api/seller";
+import { apiErrorMessage } from "@/lib/api/errors";
 import { useSellerProductCardsControllerCreate } from "@/lib/api/generated/endpoints/product-cards-seller/product-cards-seller";
 import { resolvePhotoKeys } from "@/lib/api/upload";
 import { formatPriceInput, parsePriceInput } from "@/lib/format";
+import { cleanSpecs, withBrandModel } from "@/lib/product-form";
 
 function SectionTitle({
   index,
@@ -62,13 +64,11 @@ function brandModelSpecs(
   model: string,
   specs: { name: string; value: string }[],
 ): { key: string; value: string }[] {
-  return [
-    ...(brand.trim() ? [{ key: "Бренд", value: brand.trim() }] : []),
-    ...(model.trim() ? [{ key: "Модель", value: model.trim() }] : []),
-    ...specs
-      .filter((s) => s.name.trim() && s.value.trim())
-      .map((s) => ({ key: s.name.trim(), value: s.value.trim() })),
-  ];
+  return withBrandModel(
+    brand,
+    model,
+    cleanSpecs(specs.map((s) => ({ key: s.name, value: s.value }))),
+  );
 }
 
 /**
@@ -151,6 +151,7 @@ export function AddProductForm({
           price: priceNum,
           state,
           categoryId: categoryId ?? undefined,
+          // При создании пустой список не отправляем вовсе — как и раньше.
           characteristics: characteristics.length ? characteristics : undefined,
         },
       });
@@ -163,7 +164,7 @@ export function AddProductForm({
       else router.push("/seller/products");
     } catch (err) {
       toast.error(
-        err instanceof Error ? err.message : t("seller.add.createFailed"),
+        apiErrorMessage(err, t, "seller.add.createFailed"),
       );
     } finally {
       setSubmitting(false);

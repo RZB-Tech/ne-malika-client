@@ -4,7 +4,7 @@ import axios, {
   type InternalAxiosRequestConfig,
 } from "axios";
 import { clearAuth, getAccessToken, setAccessToken } from "./token-store";
-import { defaultLocale, STORAGE_KEY } from "@/lib/i18n/config";
+import { defaultLocale, locales, STORAGE_KEY, type Locale } from "@/lib/i18n/config";
 
 export const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
@@ -23,10 +23,25 @@ axiosInstance.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   return config;
 });
 
+/**
+ * Кэш языка для заголовка Accept-Language: синхронный localStorage-чтение на
+ * каждый запрос — лишний ход в главном потоке. Пишет сюда провайдер локали
+ * (единый писатель), первый чтение — ленивое, из хранилища.
+ */
+let localeCache: string | null = null;
+
+export function setRequestLocale(locale: Locale): void {
+  localeCache = locale;
+}
+
 /** Сохранённый язык интерфейса. На сервере (SSR) localStorage нет. */
 function readLocale(): string {
+  if (localeCache) return localeCache;
   if (typeof window === "undefined") return defaultLocale;
-  return localStorage.getItem(STORAGE_KEY) ?? defaultLocale;
+  const stored = localStorage.getItem(STORAGE_KEY);
+  const valid = stored && locales.includes(stored as Locale) ? stored : null;
+  localeCache = valid ?? defaultLocale;
+  return localeCache;
 }
 
 const REFRESH_URL = "/api/v1/auth/refresh";

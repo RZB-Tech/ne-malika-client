@@ -33,6 +33,7 @@ import type {
 } from "@/lib/api/generated/schemas";
 import { storedPhoto, type UploadedPhoto } from "@/components/seller/photo-dropzone";
 import { useT } from "@/components/providers/i18n-provider";
+import { apiErrorMessage } from "@/lib/api/errors";
 import { dataUrlToBlob, uploadPhoto } from "@/lib/api/upload";
 import { cn } from "@/lib/utils";
 
@@ -214,7 +215,7 @@ export function PhotoAiDialog({
       setPrompt(res.prompt);
     } catch (err) {
       toast.error(
-        err instanceof Error ? err.message : t("admin.photoAi.promptFailed"),
+        apiErrorMessage(err, t, "admin.photoAi.promptFailed"),
       );
     }
   };
@@ -242,7 +243,7 @@ export function PhotoAiDialog({
       await Promise.all([quotaQuery.refetch(), historyQuery.refetch()]);
     } catch (err) {
       toast.error(
-        err instanceof Error ? err.message : t("admin.photoAi.generateFailed"),
+        apiErrorMessage(err, t, "admin.photoAi.generateFailed"),
       );
     }
   };
@@ -275,7 +276,7 @@ export function PhotoAiDialog({
       onPhotoStored?.(photo.id, key);
     } catch (err) {
       toast.error(
-        err instanceof Error ? err.message : t("admin.photoAi.savePhotoFailed"),
+        apiErrorMessage(err, t, "admin.photoAi.savePhotoFailed"),
       );
     } finally {
       setSavingPhoto(false);
@@ -290,7 +291,7 @@ export function PhotoAiDialog({
       setReference({ key, url: URL.createObjectURL(file) });
     } catch (err) {
       toast.error(
-        err instanceof Error ? err.message : t("admin.photoAi.referenceFailed"),
+        apiErrorMessage(err, t, "admin.photoAi.referenceFailed"),
       );
     } finally {
       setUploading(false);

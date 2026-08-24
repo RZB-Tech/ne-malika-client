@@ -54,9 +54,11 @@ import {
 } from "@/lib/api/generated/endpoints/product-cards-seller/product-cards-seller";
 import { useSellerProducts } from "@/lib/api/seller";
 import { mapProductRow } from "@/lib/api/mappers";
+import { apiErrorMessage } from "@/lib/api/errors";
 import { photoUrl } from "@/lib/api/photo";
 import { resolvePhotoKeys } from "@/lib/api/upload";
 import { formatPriceInput, parsePriceInput } from "@/lib/format";
+import { cleanSpecs, withBrandModel } from "@/lib/product-form";
 import { cn } from "@/lib/utils";
 import type { AiProductCheck } from "@/lib/api/types";
 
@@ -72,11 +74,7 @@ function withBrandAndModel(result: {
   model: string | null;
   characteristics: Spec[];
 }): Spec[] {
-  return [
-    ...(result.brand ? [{ key: "Бренд", value: result.brand }] : []),
-    ...(result.model ? [{ key: "Модель", value: result.model }] : []),
-    ...result.characteristics,
-  ];
+  return withBrandModel(result.brand, result.model, result.characteristics);
 }
 
 export function SellerProductDetail({ id }: { id: number }) {
@@ -163,16 +161,14 @@ export function SellerProductDetail({ id }: { id: number }) {
           price: priceNum,
           state,
           categoryId: categoryId ?? undefined,
-          characteristics: specs
-            .filter((s) => s.key.trim() && s.value.trim())
-            .map((s) => ({ key: s.key.trim(), value: s.value.trim() })),
+          characteristics: cleanSpecs(specs),
         },
       });
       await queryClient.invalidateQueries();
       setHydratedRowId(null);
       toast.success(t("seller.detail.saved"));
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : t("seller.detail.saveFailed"));
+      toast.error(apiErrorMessage(err, t, "seller.detail.saveFailed"));
     } finally {
       setSaving(false);
     }
@@ -185,7 +181,7 @@ export function SellerProductDetail({ id }: { id: number }) {
       toast.success(t("seller.detail.recheckSent"));
     } catch (err) {
       toast.error(
-        err instanceof Error ? err.message : t("seller.detail.recheckFailed"),
+        apiErrorMessage(err, t, "seller.detail.recheckFailed"),
       );
     }
   };

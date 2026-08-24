@@ -18,13 +18,15 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ProductCard } from "@/components/product/product-card";
+import { ProductGrid } from "@/components/product/product-grid";
 import { TelegramButton } from "@/components/product/telegram-button";
 import { ReportDialog } from "@/components/shared/report-dialog";
+import { StatusPanel } from "@/components/shared/status-panel";
 import { StoreAvatar } from "@/components/shared/store-avatar";
 import { ReviewsSection } from "@/components/reviews/reviews-section";
 import { useT } from "@/components/providers/i18n-provider";
 import { formatWorkSchedule } from "@/lib/api/mappers";
-import { formatDate } from "@/lib/format";
+import { formatDate, formatRating } from "@/lib/format";
 import { type Product, type Store } from "@/lib/data";
 
 export function StoreDetail({
@@ -96,7 +98,7 @@ export function StoreDetail({
                   >
                     <Star className="size-3 fill-warning text-warning" />
                     <span className="tabular">
-                      {store.rating.toFixed(1).replace(".", ",")}
+                      {formatRating(store.rating)}
                     </span>
                     <span className="text-muted-foreground tabular">
                       · {store.ratingCount}
@@ -159,15 +161,13 @@ export function StoreDetail({
         </div>
 
         {list.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-border py-16 text-center text-sm text-muted-foreground">
-            {t("catalog.emptyTitle")}
-          </div>
+          <StatusPanel compact title={t("catalog.emptyTitle")} />
         ) : (
-          <div className="grid grid-cols-2 justify-center gap-3 md:grid-cols-3 lg:grid-cols-[repeat(auto-fill,var(--product-card-w))]">
+          <ProductGrid>
             {list.map((p) => (
               <ProductCard key={p.id} product={p} />
             ))}
-          </div>
+          </ProductGrid>
         )}
       </div>
 

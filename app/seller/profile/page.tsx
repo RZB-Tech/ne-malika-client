@@ -27,6 +27,7 @@ import {
 } from "@/lib/api/generated/endpoints/shops-seller/shops-seller";
 import { useSellerShop } from "@/lib/api/seller";
 import { useAuth } from "@/lib/api/auth";
+import { apiErrorMessage } from "@/lib/api/errors";
 import { dataUrlToBlob, uploadPhoto } from "@/lib/api/upload";
 import { hueFromId } from "@/lib/api/mappers";
 import { photoUrl } from "@/lib/api/photo";
@@ -143,7 +144,7 @@ export default function SellerProfile() {
       toast.success(t("seller.profile.saved"));
     } catch (err) {
       toast.error(
-        err instanceof Error ? err.message : t("seller.profile.saveFailed"),
+        apiErrorMessage(err, t, "seller.profile.saveFailed"),
       );
     } finally {
       setSaving(false);

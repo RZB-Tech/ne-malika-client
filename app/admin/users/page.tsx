@@ -1,9 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
 import { ShieldCheck, ShieldOff, Store, UserX, RotateCcw } from "@/components/icons";
-import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -17,6 +15,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { UserDrawer } from "@/components/admin/user-drawer";
+import { AdminPageHeader } from "@/components/admin/page-header";
+import { useAdminMutation } from "@/components/admin/use-admin-mutation";
 import { RoleBadge } from "@/components/shared/badges";
 import { Pagination } from "@/components/shared/pagination";
 import {
@@ -25,8 +25,10 @@ import {
   type RowAction,
 } from "@/components/admin/row-actions";
 import { useT } from "@/components/providers/i18n-provider";
-import { formatDate } from "@/lib/format";
+import { formatDate, initials } from "@/lib/format";
 import {
+  getAdminUsersControllerGetOneQueryKey,
+  getAdminUsersControllerListQueryKey,
   useAdminUsersControllerBlock,
   useAdminUsersControllerList,
   useAdminUsersControllerSetRole,
@@ -39,20 +41,9 @@ import {
 } from "@/lib/api/dev-fixtures";
 import type { AdminUserRow, Paginated, UserRole } from "@/lib/api/types";
 
-export function initials(name: string): string {
-  return (
-    name
-      .trim()
-      .split(/\s+/)
-      .slice(0, 2)
-      .map((w) => w[0]?.toUpperCase() ?? "")
-      .join("") || "?"
-  );
-}
-
 export default function AdminUsers() {
   const { t, locale } = useT();
-  const queryClient = useQueryClient();
+  const run = useAdminMutation();
   const [opened, setOpened] = useState<AdminUserRow | null>(null);
   const [page, setPage] = useState(1);
 
@@ -74,25 +65,47 @@ export default function AdminUsers() {
   const rows = pageData.data;
   const isDevData = usingDevData(data?.data);
 
-  const done = async (message: string) => {
-    await queryClient.invalidateQueries();
-    setOpened(null);
-    toast.success(message);
-  };
-
   const block = async (id: number, reason: string) => {
-    await blockMutation.mutateAsync({ id, data: { reason } });
-    await done(t("admin.users.blocked"));
+    const ok = await run(
+      () => blockMutation.mutateAsync({ id, data: { reason } }),
+      {
+        invalidate: [
+          getAdminUsersControllerListQueryKey(),
+          getAdminUsersControllerGetOneQueryKey(id),
+        ],
+        successKey: "admin.users.blocked",
+        errorKey: "common.actionFailed",
+      },
+    );
+    if (ok) setOpened(null);
   };
   const unblock = async (id: number) => {
-    await unblockMutation.mutateAsync({ id });
-    await done(t("admin.users.unblocked"));
+    const ok = await run(() => unblockMutation.mutateAsync({ id }), {
+      invalidate: [
+        getAdminUsersControllerListQueryKey(),
+        getAdminUsersControllerGetOneQueryKey(id),
+      ],
+      successKey: "admin.users.unblocked",
+      errorKey: "common.actionFailed",
+    });
+    if (ok) setOpened(null);
   };
   const setRole = async (id: number, role: UserRole) => {
-    await roleMutation.mutateAsync({ id, data: { role } });
-    await done(
-      t(role === "admin" ? "admin.users.adminGranted" : "admin.users.adminRevoked"),
+    const ok = await run(
+      () => roleMutation.mutateAsync({ id, data: { role } }),
+      {
+        invalidate: [
+          getAdminUsersControllerListQueryKey(),
+          getAdminUsersControllerGetOneQueryKey(id),
+        ],
+        successKey:
+          role === "admin"
+            ? "admin.users.adminGranted"
+            : "admin.users.adminRevoked",
+        errorKey: "common.actionFailed",
+      },
     );
+    if (ok) setOpened(null);
   };
 
   const demotedRole = (u: { shopId: number | null }): UserRole =>
@@ -139,14 +152,10 @@ export default function AdminUsers() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="font-heading text-2xl font-bold tracking-tight">
-          {t("admin.users.title")}
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {t("admin.users.subtitle")}
-        </p>
-      </div>
+      <AdminPageHeader
+        title={t("admin.users.title")}
+        subtitle={t("admin.users.subtitle")}
+      />
 
       {isError && !isDevData && (
         <Card className="border-destructive/40 bg-destructive/5 p-4 text-sm">

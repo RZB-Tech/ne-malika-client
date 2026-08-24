@@ -6,10 +6,36 @@ const localeTag: Record<Locale, string> = {
   "uz-Cyrl": "uz-Cyrl",
 };
 
+/**
+ * Конструкторы Intl дороги, а formatPrice вызывается на каждую плитку
+ * каталога при каждом рендере — формatterы кэшируются по локали и опциям.
+ */
+const numberFormatCache = new Map<string, Intl.NumberFormat>();
+function numberFormatter(locale: Locale, opts: Intl.NumberFormatOptions): Intl.NumberFormat {
+  const tag = localeTag[locale];
+  const key = `${tag}:${JSON.stringify(opts)}`;
+  let f = numberFormatCache.get(key);
+  if (!f) {
+    f = new Intl.NumberFormat(tag, opts);
+    numberFormatCache.set(key, f);
+  }
+  return f;
+}
+
+const dateTimeFormatCache = new Map<string, Intl.DateTimeFormat>();
+function dateFormatter(locale: Locale, opts: Intl.DateTimeFormatOptions): Intl.DateTimeFormat {
+  const tag = localeTag[locale];
+  const key = `${tag}:${JSON.stringify(opts)}`;
+  let f = dateTimeFormatCache.get(key);
+  if (!f) {
+    f = new Intl.DateTimeFormat(tag, opts);
+    dateTimeFormatCache.set(key, f);
+  }
+  return f;
+}
+
 export function formatPrice(value: number, locale: Locale): string {
-  return new Intl.NumberFormat(localeTag[locale], {
-    maximumFractionDigits: 0,
-  }).format(value);
+  return numberFormatter(locale, { maximumFractionDigits: 0 }).format(value);
 }
 
 /**
@@ -32,14 +58,14 @@ export function priceText(
 }
 
 export function formatNumber(value: number, locale: Locale): string {
-  return new Intl.NumberFormat(localeTag[locale], {
+  return numberFormatter(locale, {
     notation: value >= 10000 ? "compact" : "standard",
     maximumFractionDigits: 1,
   }).format(value);
 }
 
 export function formatDate(iso: string, locale: Locale): string {
-  return new Intl.DateTimeFormat(localeTag[locale], {
+  return dateFormatter(locale, {
     day: "numeric",
     month: "short",
     year: "numeric",
@@ -59,7 +85,7 @@ export function formatMessageTime(iso: string, locale: Locale): string {
     date.getMonth() === now.getMonth() &&
     date.getDate() === now.getDate();
 
-  return new Intl.DateTimeFormat(localeTag[locale], {
+  return dateFormatter(locale, {
     hour: "2-digit",
     minute: "2-digit",
     ...(sameDay ? {} : { day: "numeric", month: "short" }),
@@ -85,4 +111,21 @@ export function formatPriceInput(raw: string | number): string {
 /** Обратно: "1 500 000" → 1500000. */
 export function parsePriceInput(value: string): number {
   return Number(value.replace(/\D/g, "")) || 0;
+}
+
+/** Инициалы для аватара-плейсхолдера: до двух первых букв, иначе «?». */
+export function initials(name: string): string {
+  return (
+    name
+      .trim()
+      .split(/\s+/)
+      .slice(0, 2)
+      .map((w) => w[0]?.toUpperCase() ?? "")
+      .join("") || "?"
+  );
+}
+
+/** Рейтинг одной строкой с запятой: «4,5». */
+export function formatRating(value: number): string {
+  return value.toFixed(1).replace(".", ",");
 }

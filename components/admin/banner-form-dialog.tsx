@@ -26,9 +26,11 @@ import {
   checkBannerImage,
   type Banner,
 } from "@/lib/api/banners";
+import { apiErrorMessage } from "@/lib/api/errors";
 import { photoUrl } from "@/lib/api/photo";
 import { uploadPhoto } from "@/lib/api/upload";
 import {
+  getAdminBannersControllerFindAllQueryKey,
   useAdminBannersControllerCreate,
   useAdminBannersControllerUpdate,
 } from "@/lib/api/generated/endpoints/banners-admin/banners-admin";
@@ -165,14 +167,16 @@ function FormBody({
         await createMutation.mutateAsync({ data });
       }
 
-      await queryClient.invalidateQueries();
+      await queryClient.invalidateQueries({
+        queryKey: getAdminBannersControllerFindAllQueryKey(),
+      });
       toast.success(
         t(banner ? "admin.banners.updated" : "admin.banners.created"),
       );
       onDone();
     } catch (err) {
       toast.error(
-        err instanceof Error ? err.message : t("admin.banners.saveFailed"),
+        apiErrorMessage(err, t, "admin.banners.saveFailed"),
       );
     } finally {
       setSaving(false);

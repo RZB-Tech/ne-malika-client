@@ -30,6 +30,7 @@ import {
 } from "@/components/seller/photo-dropzone";
 import { ShopPicker } from "@/components/admin/shop-picker";
 import {
+  getAdminProductCardsControllerFindAllQueryKey,
   useAdminProductCardsControllerCreate,
   useAdminProductCardsControllerUpdate,
 } from "@/lib/api/generated/endpoints/product-cards-admin/product-cards-admin";
@@ -41,7 +42,9 @@ import { applyGenerated } from "@/components/shared/apply-generated";
 import { useT } from "@/components/providers/i18n-provider";
 import { resolvePhotoKeys } from "@/lib/api/upload";
 import { photoUrl } from "@/lib/api/photo";
+import { apiErrorMessage } from "@/lib/api/errors";
 import { formatPriceInput, parsePriceInput } from "@/lib/format";
+import { cleanSpecs } from "@/lib/product-form";
 import type { AdminProductRow, AdminShopRow } from "@/lib/api/types";
 
 export interface ProductFormTarget {
@@ -148,7 +151,7 @@ function FormBody({
         price: priceNum,
         state,
         categoryId: categoryId ?? undefined,
-        characteristics: specs.filter((s) => s.key.trim() && s.value.trim()),
+        characteristics: cleanSpecs(specs),
       };
 
       if (editing) {
@@ -157,11 +160,13 @@ function FormBody({
         await createMutation.mutateAsync({ shopId: shopId!, data });
       }
 
-      await queryClient.invalidateQueries();
+      await queryClient.invalidateQueries({
+        queryKey: getAdminProductCardsControllerFindAllQueryKey(),
+      });
       toast.success(t(editing ? "admin.form.updated" : "admin.form.created"));
       onDone();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : t("admin.form.saveFailed"));
+      toast.error(apiErrorMessage(err, t, "admin.form.saveFailed"));
     } finally {
       setSaving(false);
     }

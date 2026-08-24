@@ -1,22 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
+import { useState } from "react";
 import { Bell, X } from "@/components/icons";
 import { TelegramIcon } from "@/components/icons/telegram-icon";
 import { Button } from "@/components/ui/button";
 import { useT } from "@/components/providers/i18n-provider";
 import { useAuth } from "@/lib/api/auth";
-import {
-  useNotificationChannels,
-  useSetTelegramNotifications,
-} from "@/lib/api/notify";
-import {
-  hasPushSubscription,
-  isPushSupported,
-  permissionState,
-  subscribeToPush,
-} from "@/lib/api/push";
+import { useNotificationChannels } from "@/lib/api/notify";
+import { usePushChannel, useTelegramChannel } from "@/lib/api/use-push-channel";
+import { isPushSupported } from "@/lib/api/push";
 import { cn } from "@/lib/utils";
 
 /**
@@ -53,28 +45,12 @@ export function NotifyPrompt({ className }: { className?: string }) {
   const { t } = useT();
   const { isAuthenticated, isHydrated } = useAuth();
   const { data } = useNotificationChannels();
-  const setTelegram = useSetTelegramNotifications();
+  const push = usePushChannel();
+  const telegram = useTelegramChannel();
 
-  /**
-   * Разрешение читаем при отрисовке, а не храним: это живое состояние браузера,
-   * которое человек может поменять в настройках сайта, не трогая нашу вкладку.
-   * В состоянии лежит только ответ на наш собственный запрос — им и вызывается
-   * перерисовка после отказа.
-   */
-  const [requested, setRequested] = useState<NotificationPermission | null>(
-    null,
-  );
   const [dismissed, setDismissed] = useState(isDismissed);
-  const [busy, setBusy] = useState(false);
-  const [deviceSubscribed, setDeviceSubscribed] = useState<boolean | null>(
-    null,
-  );
 
-  useEffect(() => {
-    void hasPushSubscription().then(setDeviceSubscribed);
-  }, []);
-
-  const permission = requested ?? permissionState();
+  const permission = push.permission;
 
   const canPush =
     isPushSupported() &&
@@ -86,45 +62,22 @@ export function NotifyPrompt({ className }: { className?: string }) {
     data?.telegram.available === true && data.telegram.enabled === false;
 
   const alreadyOn =
-    deviceSubscribed === true || data?.telegram.enabled === true;
+    push.deviceSubscribed === true || data?.telegram.enabled === true;
 
   const hidden =
     !isHydrated ||
     !isAuthenticated ||
     !data ||
-    deviceSubscribed === null ||
+    push.deviceSubscribed === null ||
     dismissed ||
     alreadyOn ||
     (!canPush && !canTelegram);
 
   if (hidden) return null;
 
-  const enablePush = async () => {
+  const enablePush = () => {
     if (!data.push.publicKey) return;
-    setBusy(true);
-    try {
-      const result = await subscribeToPush(data.push.publicKey, {
-        title: t("push.confirmTitle"),
-        body: t("push.confirmBody"),
-      });
-      setRequested(result);
-      if (result === "granted") {
-        setDeviceSubscribed(true);
-        toast.success(t("push.enabled"));
-      }
-      else if (result === "denied") toast.error(t("push.blocked"));
-    } catch {
-      toast.error(t("push.failed"));
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  const enableTelegram = () => {
-    setTelegram.mutate(true, {
-      onSuccess: () => toast.success(t("notify.telegramOn")),
-      onError: () => toast.error(t("push.failed")),
-    });
+    void push.enable(data.push.publicKey);
   };
 
   const close = () => {
@@ -148,8 +101,8 @@ export function NotifyPrompt({ className }: { className?: string }) {
 
         <div className="mt-2 flex flex-wrap gap-2">
           {canPush && (
-            <Button size="sm" onClick={enablePush} disabled={busy}>
-              {busy ? t("common.saving") : t("notify.browser")}
+            <Button size="sm" onClick={enablePush} disabled={push.busy}>
+              {push.busy ? t("common.saving") : t("notify.browser")}
             </Button>
           )}
 
@@ -159,8 +112,8 @@ export function NotifyPrompt({ className }: { className?: string }) {
                 variant="outline"
                 size="sm"
                 className="gap-2"
-                onClick={enableTelegram}
-                disabled={setTelegram.isPending}
+                onClick={() => telegram.toggle(true)}
+                disabled={telegram.setTelegram.isPending}
               >
                 <TelegramIcon className="size-4" />
                 {t("notify.telegram")}
@@ -186,7 +139,7 @@ export function NotifyPrompt({ className }: { className?: string }) {
         variant="ghost"
         size="icon-sm"
         onClick={close}
-        aria-label={t("common.clear")}
+        aria-label={t("common.close")}
         className="shrink-0 text-muted-foreground"
       >
         <X className="size-4" />

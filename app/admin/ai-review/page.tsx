@@ -1,19 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
 import { CheckCircle2, RefreshCw, TriangleAlert, XCircle } from "@/components/icons";
-import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ProductImage } from "@/components/shared/product-image";
 import { PhotoLightbox } from "@/components/shared/photo-lightbox";
+import { AdminPageHeader } from "@/components/admin/page-header";
+import { useAdminMutation } from "@/components/admin/use-admin-mutation";
 import { EntityStatusBadge } from "@/components/admin/entity-status-badge";
 import { Pagination } from "@/components/shared/pagination";
 import { useT } from "@/components/providers/i18n-provider";
 import { formatDate, priceText } from "@/lib/format";
 import {
+  getAdminProductCardsControllerAiReviewQueryKey,
+  getAdminProductCardsControllerFindAllQueryKey,
   useAdminProductCardsControllerAiReview,
   useAdminProductCardsControllerRecheck,
   useAdminProductCardsControllerRestore,
@@ -29,7 +31,7 @@ import type { AiReviewRow, Paginated } from "@/lib/api/types";
 
 export default function AdminAiReview() {
   const { t, locale } = useT();
-  const queryClient = useQueryClient();
+  const run = useAdminMutation();
 
   const [page, setPage] = useState(1);
   /**
@@ -58,28 +60,32 @@ export default function AdminAiReview() {
   const rows = pageData.data;
   const isDevData = usingDevData(data?.data);
 
-  const approve = async (id: number) => {
-    await restoreMutation.mutateAsync({ id });
-    await queryClient.invalidateQueries();
-    toast.success(t("admin.aiReview.approved"));
-  };
+  const approve = (id: number) =>
+    run(() => restoreMutation.mutateAsync({ id }), {
+      invalidate: [
+        getAdminProductCardsControllerAiReviewQueryKey(),
+        getAdminProductCardsControllerFindAllQueryKey(),
+      ],
+      successKey: "admin.aiReview.approved",
+      errorKey: "common.actionFailed",
+    });
 
-  const recheck = async (id: number) => {
-    await recheckMutation.mutateAsync({ id });
-    await queryClient.invalidateQueries();
-    toast.success(t("admin.aiReview.requeued"));
-  };
+  const recheck = (id: number) =>
+    run(() => recheckMutation.mutateAsync({ id }), {
+      invalidate: [
+        getAdminProductCardsControllerAiReviewQueryKey(),
+        getAdminProductCardsControllerFindAllQueryKey(),
+      ],
+      successKey: "admin.aiReview.requeued",
+      errorKey: "common.actionFailed",
+    });
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="font-heading text-2xl font-bold tracking-tight">
-          {t("admin.aiReview.title")}
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {t("admin.aiReview.subtitle")}
-        </p>
-      </div>
+      <AdminPageHeader
+        title={t("admin.aiReview.title")}
+        subtitle={t("admin.aiReview.subtitle")}
+      />
 
       {isError && !isDevData && (
         <Card className="border-destructive/40 bg-destructive/5 p-4 text-sm">

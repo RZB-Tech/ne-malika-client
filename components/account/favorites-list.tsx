@@ -1,11 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { Cloud, Heart, Trash2, X } from "@/components/icons";
+import { Heart, Trash2, X } from "@/components/icons";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { StatusPanel } from "@/components/shared/status-panel";
 import { ProductCard } from "@/components/product/product-card";
+import { ProductGrid, ProductGridSkeleton } from "@/components/product/product-grid";
+import { SyncNotice } from "@/components/account/sync-notice";
 import { useT } from "@/components/providers/i18n-provider";
 import { mapPublicProductCard } from "@/lib/api/mappers";
 import { formatDate } from "@/lib/format";
@@ -17,47 +19,27 @@ export function FavoritesList() {
   const { items, isLoading, isRemote, remove, clear } = useFavorites();
 
   if (isLoading && items.length === 0) {
-    return (
-      <div className="grid grid-cols-2 justify-center gap-3 md:grid-cols-3 lg:grid-cols-[repeat(auto-fill,var(--product-card-w))]">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <Skeleton key={i} className="h-72 rounded-xl" />
-        ))}
-      </div>
-    );
+    return <ProductGridSkeleton count={4} />;
   }
 
   if (items.length === 0) {
     return (
-      <div className="flex flex-col items-center rounded-2xl border border-dashed border-border px-6 py-16 text-center">
-        <Heart className="size-10 text-muted-foreground/60" />
-        <h2 className="mt-4 font-heading text-lg font-semibold">
-          {t("favorites.empty")}
-        </h2>
-        <p className="mt-1.5 max-w-sm text-sm text-muted-foreground">
-          {t("favorites.emptyText")}
-        </p>
-        <Button asChild className="mt-6">
-          <Link href="/">{t("account.history.toCatalog")}</Link>
-        </Button>
-      </div>
+      <StatusPanel
+        icon={<Heart className="size-5" />}
+        title={t("favorites.empty")}
+        description={t("favorites.emptyText")}
+        action={
+          <Button asChild>
+            <Link href="/">{t("account.history.toCatalog")}</Link>
+          </Button>
+        }
+      />
     );
   }
 
   return (
     <div className="space-y-5">
-      <div className="flex items-start gap-3 rounded-xl bg-primary/5 px-4 py-3 text-sm">
-        <Cloud className="mt-0.5 size-4 shrink-0 text-primary" />
-        <div>
-          <p className="font-medium">
-            {isRemote
-              ? t("favorites.syncedTitle")
-              : t("favorites.localTitle")}
-          </p>
-          <p className="text-xs text-muted-foreground">
-            {isRemote ? t("favorites.syncedText") : t("favorites.localText")}
-          </p>
-        </div>
-      </div>
+      <SyncNotice isRemote={isRemote} prefix="favorites" />
 
       <div className="flex items-center justify-between gap-4">
         <span className="text-sm text-muted-foreground">
@@ -77,7 +59,7 @@ export function FavoritesList() {
         </ConfirmDialog>
       </div>
 
-      <div className="grid grid-cols-2 justify-center gap-3 md:grid-cols-3 lg:grid-cols-[repeat(auto-fill,var(--product-card-w))]">
+      <ProductGrid>
         {items.map((item) => (
           <div key={item.id}>
             <ProductCard
@@ -103,7 +85,7 @@ export function FavoritesList() {
             </div>
           </div>
         ))}
-      </div>
+      </ProductGrid>
     </div>
   );
 }

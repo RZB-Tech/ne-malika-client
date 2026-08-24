@@ -17,21 +17,10 @@ import {
   drawerAction,
 } from "@/components/admin/detail-drawer";
 import { useT } from "@/components/providers/i18n-provider";
-import { formatDate, priceText } from "@/lib/format";
+import { formatDate, initials, priceText } from "@/lib/format";
 import { useAdminUsersControllerGetOne } from "@/lib/api/generated/endpoints/users-admin/users-admin";
 import { devUserActivity, IS_DEV } from "@/lib/api/dev-fixtures";
 import type { AdminUserDetail, AdminUserRow, UserRole } from "@/lib/api/types";
-
-function initials(name: string): string {
-  return (
-    name
-      .trim()
-      .split(/\s+/)
-      .slice(0, 2)
-      .map((w) => w[0]?.toUpperCase() ?? "")
-      .join("") || "?"
-  );
-}
 
 export function UserDrawer({
   user,

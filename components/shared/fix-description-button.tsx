@@ -5,6 +5,7 @@ import { Loader2, Undo2, Wand2 } from "@/components/icons";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useT } from "@/components/providers/i18n-provider";
+import { apiErrorMessage } from "@/lib/api/errors";
 import { imageGenControllerRewriteDescription } from "@/lib/api/generated/endpoints/image-gen/image-gen";
 import { uploadPhoto, dataUrlToBlob } from "@/lib/api/upload";
 
@@ -77,7 +78,7 @@ export function FixDescriptionButton({
       toast.success(t("ai.description.done"));
     } catch (err) {
       toast.error(
-        err instanceof Error ? err.message : t("ai.description.failed"),
+        apiErrorMessage(err, t, "ai.description.failed"),
       );
     } finally {
       setBusy(false);

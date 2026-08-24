@@ -8,6 +8,8 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { Pagination } from "@/components/shared/pagination";
+import { StatusPanel } from "@/components/shared/status-panel";
 import { RatingStars } from "@/components/shared/rating-stars";
 import { ReviewFormDialog } from "@/components/reviews/review-form-dialog";
 import { ReviewStatusBadge } from "@/components/reviews/reviews-section";
@@ -73,11 +75,7 @@ export function MyReviews() {
   }
 
   if (reviews.length === 0) {
-    return (
-      <Card className="py-16 text-center text-sm text-muted-foreground">
-        {t("account.reviews.empty")}
-      </Card>
-    );
+    return <StatusPanel compact title={t("account.reviews.empty")} />;
   }
 
   return (
@@ -148,26 +146,12 @@ export function MyReviews() {
       ))}
 
       {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-3 pt-2">
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={page <= 1}
-            onClick={() => setPage((p) => p - 1)}
-          >
-            {t("common.back")}
-          </Button>
-          <span className="text-sm text-muted-foreground tabular">
-            {page} / {totalPages}
-          </span>
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={page >= totalPages}
-            onClick={() => setPage((p) => p + 1)}
-          >
-            {t("common.next")}
-          </Button>
+        <div className="flex justify-center pt-2">
+          <Pagination
+            page={page}
+            totalPages={totalPages}
+            onChange={setPage}
+          />
         </div>
       )}
 

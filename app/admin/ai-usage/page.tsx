@@ -13,6 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Pagination } from "@/components/shared/pagination";
+import { AdminPageHeader } from "@/components/admin/page-header";
 import { useT } from "@/components/providers/i18n-provider";
 import { formatDate } from "@/lib/format";
 import {
@@ -71,14 +72,10 @@ export default function AdminAiUsage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="font-heading text-2xl font-bold tracking-tight">
-          {t("admin.aiUsage.title")}
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {t("admin.aiUsage.subtitle")}
-        </p>
-      </div>
+      <AdminPageHeader
+        title={t("admin.aiUsage.title")}
+        subtitle={t("admin.aiUsage.subtitle")}
+      />
 
       <div className="grid gap-3 sm:grid-cols-4">
         <StatCard

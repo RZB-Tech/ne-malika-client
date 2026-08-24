@@ -2,24 +2,31 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
 import { Ban, Store, Trash2 } from "@/components/icons";
-import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AbolishDialog } from "@/components/admin/abolish-dialog";
+import { AdminPageHeader } from "@/components/admin/page-header";
+import { useAdminMutation } from "@/components/admin/use-admin-mutation";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { Pagination } from "@/components/shared/pagination";
 import { useT } from "@/components/providers/i18n-provider";
 import { formatDate } from "@/lib/format";
 import {
+  getAdminReportsControllerFindAllQueryKey,
   useAdminReportsControllerFindAll,
   useAdminReportsControllerRemove,
 } from "@/lib/api/generated/endpoints/reports/reports";
-import { useAdminProductCardsControllerAbolish } from "@/lib/api/generated/endpoints/product-cards-admin/product-cards-admin";
-import { useAdminShopsControllerAbolish } from "@/lib/api/generated/endpoints/shops-admin/shops-admin";
+import {
+  getAdminProductCardsControllerFindAllQueryKey,
+  useAdminProductCardsControllerAbolish,
+} from "@/lib/api/generated/endpoints/product-cards-admin/product-cards-admin";
+import {
+  getAdminShopsControllerListQueryKey,
+  useAdminShopsControllerAbolish,
+} from "@/lib/api/generated/endpoints/shops-admin/shops-admin";
 import {
   devFallbackPage,
   devReports,
@@ -29,7 +36,7 @@ import type { Paginated, ReportRow } from "@/lib/api/types";
 
 export default function AdminReports() {
   const { t, locale } = useT();
-  const queryClient = useQueryClient();
+  const run = useAdminMutation();
   const [page, setPage] = useState(1);
 
   const { data, isLoading, isError } = useAdminReportsControllerFindAll(
@@ -45,16 +52,25 @@ export default function AdminReports() {
   const reports = page_.data;
   const isDevData = usingDevData(data?.data);
 
-  const onAbolishProduct = async (id: number, reason: string) => {
-    await abolishProduct.mutateAsync({ id, data: { reason } });
-    await queryClient.invalidateQueries();
-    toast.success(t("admin.reports.productAbolished"));
-  };
-  const onAbolishShop = async (id: number, reason: string) => {
-    await abolishShop.mutateAsync({ id, data: { reason } });
-    await queryClient.invalidateQueries();
-    toast.success(t("admin.reports.shopAbolished"));
-  };
+  const onAbolishProduct = (id: number, reason: string) =>
+    run(() => abolishProduct.mutateAsync({ id, data: { reason } }), {
+      invalidate: [
+        getAdminReportsControllerFindAllQueryKey(),
+        getAdminProductCardsControllerFindAllQueryKey(),
+      ],
+      successKey: "admin.reports.productAbolished",
+      errorKey: "common.actionFailed",
+    });
+
+  const onAbolishShop = (id: number, reason: string) =>
+    run(() => abolishShop.mutateAsync({ id, data: { reason } }), {
+      invalidate: [
+        getAdminReportsControllerFindAllQueryKey(),
+        getAdminShopsControllerListQueryKey(),
+      ],
+      successKey: "admin.reports.shopAbolished",
+      errorKey: "common.actionFailed",
+    });
 
   /**
    * Убрать разобранную жалобу. Если удалили последнюю на странице — уходим на
@@ -62,22 +78,21 @@ export default function AdminReports() {
    * несуществующую страницу.
    */
   const onRemove = async (id: number) => {
-    await removeReport.mutateAsync({ id });
+    const ok = await run(() => removeReport.mutateAsync({ id }), {
+      invalidate: [getAdminReportsControllerFindAllQueryKey()],
+      successKey: "admin.reports.removed",
+      errorKey: "common.actionFailed",
+    });
+    if (!ok) return;
     if (reports.length === 1 && page > 1) setPage((p) => p - 1);
-    await queryClient.invalidateQueries();
-    toast.success(t("admin.reports.removed"));
   };
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-heading text-2xl font-bold tracking-tight">
-          {t("admin.reports.title")}
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {t("admin.reports.subtitle")}
-        </p>
-      </div>
+      <AdminPageHeader
+        title={t("admin.reports.title")}
+        subtitle={t("admin.reports.subtitle")}
+      />
 
       {isError && !isDevData && (
         <Card className="border-destructive/40 bg-destructive/5 p-4 text-sm">

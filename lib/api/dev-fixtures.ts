@@ -566,12 +566,6 @@ export function usingDevData(data: { length: number } | undefined): boolean {
   return IS_DEV && !data?.length;
 }
 
-/** Список: отдаём фикстуры, когда API промолчал, и только в dev. */
-export function devFallback<T>(data: T[] | undefined, fixtures: T[]): T[] {
-  if (data && data.length > 0) return data;
-  return IS_DEV ? fixtures : (data ?? []);
-}
-
 /** То же для страничного ответа — meta собираем из длины фикстур. */
 export function devFallbackPage<T>(
   data: Paginated<T> | undefined,

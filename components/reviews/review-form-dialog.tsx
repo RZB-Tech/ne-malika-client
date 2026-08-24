@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { RatingInput } from "@/components/shared/rating-stars";
 import { useT } from "@/components/providers/i18n-provider";
+import { apiErrorMessage } from "@/lib/api/errors";
 import { useSaveReview, type ReviewTarget } from "@/lib/api/reviews";
 import type { OwnReview } from "@/lib/api/types";
 
@@ -64,7 +65,7 @@ export function ReviewFormDialog({
       toast.success(t("reviews.form.sent"));
       onOpenChange(false);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : t("reviews.form.failed"));
+      toast.error(apiErrorMessage(err, t, "reviews.form.failed"));
     }
   };
 

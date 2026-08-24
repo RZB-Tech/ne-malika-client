@@ -13,7 +13,7 @@ import { RatingStars } from "@/components/shared/rating-stars";
 import { ReviewFormDialog } from "./review-form-dialog";
 import { useT } from "@/components/providers/i18n-provider";
 import { useAuth } from "@/lib/api/auth";
-import { formatDate } from "@/lib/format";
+import { formatDate, formatRating } from "@/lib/format";
 import {
   useDeleteReview,
   useMyReview,
@@ -88,7 +88,7 @@ export function ReviewsSection({
         <div className="mt-4 grid gap-6 rounded-2xl bg-muted/40 p-5 sm:grid-cols-[auto_minmax(0,1fr)] sm:gap-10">
           <div className="flex flex-col items-center justify-center gap-1">
             <span className="font-heading text-4xl font-bold tabular">
-              {average.toFixed(1).replace(".", ",")}
+              {formatRating(average)}
             </span>
             <RatingStars value={average} size="md" />
             <span className="text-xs text-muted-foreground">

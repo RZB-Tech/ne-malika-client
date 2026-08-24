@@ -24,7 +24,7 @@ export function AbolishDialog({
 }: {
   title: string;
   description?: string;
-  onConfirm: (reason: string) => Promise<void>;
+  onConfirm: (reason: string) => void;
   children: React.ReactNode;
 }) {
   const { t } = useT();

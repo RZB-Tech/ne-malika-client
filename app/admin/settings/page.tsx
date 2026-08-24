@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
 import { Coins, Sparkles } from "@/components/icons";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
@@ -10,14 +9,17 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
+  getAdminSettingsControllerGetQueryKey,
   useAdminSettingsControllerGet,
   useAdminSettingsControllerUpdate,
 } from "@/lib/api/generated/endpoints/settings/settings";
+import { AdminPageHeader } from "@/components/admin/page-header";
+import { useAdminMutation } from "@/components/admin/use-admin-mutation";
 import { useT } from "@/components/providers/i18n-provider";
 
 export default function AdminSettings() {
   const { t } = useT();
-  const queryClient = useQueryClient();
+  const run = useAdminMutation();
 
   const { data: settings, isLoading, isError } = useAdminSettingsControllerGet({
     query: { retry: false },
@@ -35,38 +37,39 @@ export default function AdminSettings() {
       return;
     }
     if (settings && parsed === settings.creditMarkup) return;
-    try {
-      await updateMutation.mutateAsync({
-        data: { aiChecksEnabled: settings?.aiChecksEnabled ?? true, creditMarkup: parsed },
-      });
-      await queryClient.invalidateQueries();
-      setMarkup(null);
-      toast.success(t("admin.imageGen.saved"));
-    } catch {
-      toast.error(t("admin.settings.saveFailed"));
-    }
+    const ok = await run(
+      () =>
+        updateMutation.mutateAsync({
+          data: {
+            aiChecksEnabled: settings?.aiChecksEnabled ?? true,
+            creditMarkup: parsed,
+          },
+        }),
+      {
+        invalidate: [getAdminSettingsControllerGetQueryKey()],
+        successKey: "admin.imageGen.saved",
+        errorKey: "admin.settings.saveFailed",
+      },
+    );
+    if (ok) setMarkup(null);
   };
 
-  const toggleAiChecks = async (enabled: boolean) => {
-    try {
-      await updateMutation.mutateAsync({ data: { aiChecksEnabled: enabled } });
-      await queryClient.invalidateQueries();
-      toast.success(t(enabled ? "admin.settings.aiOn" : "admin.settings.aiOff"));
-    } catch {
-      toast.error(t("admin.settings.saveFailed"));
-    }
-  };
+  const toggleAiChecks = (enabled: boolean) =>
+    run(
+      () => updateMutation.mutateAsync({ data: { aiChecksEnabled: enabled } }),
+      {
+        invalidate: [getAdminSettingsControllerGetQueryKey()],
+        successKey: enabled ? "admin.settings.aiOn" : "admin.settings.aiOff",
+        errorKey: "admin.settings.saveFailed",
+      },
+    );
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-heading text-2xl font-bold tracking-tight">
-          {t("admin.nav.settings")}
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {t("admin.settings.subtitle")}
-        </p>
-      </div>
+      <AdminPageHeader
+        title={t("admin.nav.settings")}
+        subtitle={t("admin.settings.subtitle")}
+      />
 
       {isError && (
         <Card className="border-destructive/40 bg-destructive/5 p-4 text-sm">

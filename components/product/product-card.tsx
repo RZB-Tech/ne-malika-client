@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import { ProductImage } from "@/components/shared/product-image";
 import { ContactSellerButton } from "@/components/product/contact-seller-button";
 import { FavoriteButton } from "@/components/product/favorite-button";
@@ -42,7 +42,12 @@ function canAutoplay(): boolean {
  * колонок ещё и съедает ширину. Границу задаёт сама картинка, скруглённая по
  * углам, — так же это устроено у Wildberries и Ozon.
  */
-export function ProductCard({ product }: { product: Product }) {
+/**
+ * Мемоизация не украшение: в гриде до сотни с лишним плиток, и без неё клик
+ * по сердцу (или смена локали) перерисовывал каждую целиком. Снапшоты товара
+ * стабильны между изменениями данных, поэтому memo реально отсекает каскад.
+ */
+export const ProductCard = memo(function ProductCard({ product }: { product: Product }) {
   const { t, locale } = useT();
   const snapshot = productToSnapshot(product);
 
@@ -164,7 +169,7 @@ export function ProductCard({ product }: { product: Product }) {
       </div>
     </div>
   );
-}
+});
 
 /**
  * Заглушка ровно той же высоты, что и карточка: одна картинка вместо всей

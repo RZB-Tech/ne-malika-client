@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
 import {
   Ban,
   ExternalLink,
@@ -11,7 +10,6 @@ import {
   Search,
   Trash2,
 } from "@/components/icons";
-import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -26,6 +24,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ProductImage } from "@/components/shared/product-image";
+import { AdminPageHeader } from "@/components/admin/page-header";
+import { useAdminMutation } from "@/components/admin/use-admin-mutation";
 import { Pagination } from "@/components/shared/pagination";
 import { EntityStatusBadge } from "@/components/admin/entity-status-badge";
 import {
@@ -41,6 +41,7 @@ import {
 import { useT } from "@/components/providers/i18n-provider";
 import { priceText } from "@/lib/format";
 import {
+  getAdminProductCardsControllerFindAllQueryKey,
   useAdminProductCardsControllerAbolish,
   useAdminProductCardsControllerFindAll,
   useAdminProductCardsControllerRemove,
@@ -97,7 +98,7 @@ const TABS: {
 
 export default function AdminProducts() {
   const { t, locale } = useT();
-  const queryClient = useQueryClient();
+  const run = useAdminMutation();
   const [q, setQ] = useState("");
   const [tab, setTab] = useState("all");
   const [page, setPage] = useState(1);
@@ -148,24 +149,33 @@ export default function AdminProducts() {
   const isDevData = usingDevData(data?.data);
 
   const abolish = async (id: number, reason: string) => {
-    await abolishMutation.mutateAsync({ id, data: { reason } });
-    await queryClient.invalidateQueries();
-    setOpened(null);
-    toast.success(t("admin.productList.abolished"));
+    const ok = await run(
+      () => abolishMutation.mutateAsync({ id, data: { reason } }),
+      {
+        invalidate: [getAdminProductCardsControllerFindAllQueryKey()],
+        successKey: "admin.productList.abolished",
+        errorKey: "common.actionFailed",
+      },
+    );
+    if (ok) setOpened(null);
   };
 
   const restore = async (id: number) => {
-    await restoreMutation.mutateAsync({ id });
-    await queryClient.invalidateQueries();
-    setOpened(null);
-    toast.success(t("admin.productList.restored"));
+    const ok = await run(() => restoreMutation.mutateAsync({ id }), {
+      invalidate: [getAdminProductCardsControllerFindAllQueryKey()],
+      successKey: "admin.productList.restored",
+      errorKey: "common.actionFailed",
+    });
+    if (ok) setOpened(null);
   };
 
   const remove = async (id: number) => {
-    await removeMutation.mutateAsync({ id });
-    await queryClient.invalidateQueries();
-    setOpened(null);
-    toast.success(t("admin.productList.removed"));
+    const ok = await run(() => removeMutation.mutateAsync({ id }), {
+      invalidate: [getAdminProductCardsControllerFindAllQueryKey()],
+      successKey: "admin.productList.removed",
+      errorKey: "common.actionFailed",
+    });
+    if (ok) setOpened(null);
   };
 
   /** Один набор действий и для трёх точек, и для правой кнопки мыши. */
@@ -211,14 +221,10 @@ export default function AdminProducts() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="font-heading text-2xl font-bold tracking-tight">
-          {t("admin.products.title")}
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {t("admin.productList.hint")}
-        </p>
-      </div>
+      <AdminPageHeader
+        title={t("admin.products.title")}
+        subtitle={t("admin.productList.hint")}
+      />
 
       <div className="flex flex-wrap items-center gap-3">
         <Button

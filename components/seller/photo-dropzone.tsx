@@ -28,22 +28,31 @@ export function storedPhoto(key: string, url: string, name: string): UploadedPho
 
 /** Resize/compress an image to max 1200px on the long edge via canvas. */
 async function compress(file: File): Promise<UploadedPhoto> {
-  const dataUrl = await new Promise<string>((res) => {
+  const dataUrl = await new Promise<string>((res, rej) => {
     const fr = new FileReader();
     fr.onload = () => res(fr.result as string);
+    fr.onerror = () => rej(new Error(`read failed: ${file.name}`));
     fr.readAsDataURL(file);
   });
-  const img = await new Promise<HTMLImageElement>((res) => {
+  const img = await new Promise<HTMLImageElement>((res, rej) => {
     const i = new Image();
     i.onload = () => res(i);
+    i.onerror = () => rej(new Error(`decode failed: ${file.name}`));
     i.src = dataUrl;
   });
   const scale = Math.min(1, 1200 / Math.max(img.width, img.height));
   const canvas = document.createElement("canvas");
   canvas.width = Math.round(img.width * scale);
   canvas.height = Math.round(img.height * scale);
-  canvas.getContext("2d")?.drawImage(img, 0, 0, canvas.width, canvas.height);
-  const out = canvas.toDataURL("image/jpeg", 0.82);
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("canvas 2d unavailable");
+  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  let out: string;
+  try {
+    out = canvas.toDataURL("image/jpeg", 0.82);
+  } catch {
+    throw new Error(`encode failed: ${file.name}`);
+  }
   return {
     id: crypto.randomUUID(),
     url: out,
@@ -79,11 +88,20 @@ export function PhotoDropzone({
     async (files: FileList | null) => {
       if (!files?.length) return;
       setBusy(true);
-      const room = MAX - photos.length;
-      const picked = Array.from(files).filter((f) => f.type.startsWith("image/")).slice(0, room);
-      const compressed = await Promise.all(picked.map(compress));
-      onChange([...photos, ...compressed]);
-      setBusy(false);
+      try {
+        const room = MAX - photos.length;
+        const picked = Array.from(files)
+          .filter((f) => f.type.startsWith("image/"))
+          .slice(0, room);
+        // Битый файл выбрасываем, а не зависаем навсегда с включённым busy.
+        const results = await Promise.allSettled(picked.map(compress));
+        const compressed = results
+          .filter((r): r is PromiseFulfilledResult<UploadedPhoto> => r.status === "fulfilled")
+          .map((r) => r.value);
+        if (compressed.length) onChange([...photos, ...compressed]);
+      } finally {
+        setBusy(false);
+      }
     },
     [photos, onChange],
   );

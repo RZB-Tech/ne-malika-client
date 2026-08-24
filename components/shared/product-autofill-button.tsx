@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Loader2, Sparkles, Undo2 } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { useT } from "@/components/providers/i18n-provider";
+import { apiErrorMessage } from "@/lib/api/errors";
 import {
   productAutofillControllerFill,
   useProductAutofillControllerPrice,
@@ -145,7 +146,7 @@ export function ProductAutofillButton<T>({
             : undefined,
       });
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : t("ai.autofill.failed"));
+      toast.error(apiErrorMessage(err, t, "ai.autofill.failed"));
     } finally {
       setBusy(false);
     }

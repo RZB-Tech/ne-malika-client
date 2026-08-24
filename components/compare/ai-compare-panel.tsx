@@ -18,6 +18,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useT } from "@/components/providers/i18n-provider";
 import { useCompare } from "@/lib/compare/use-compare";
 import { AI_COMPARE_MIN, useAiCompare } from "@/lib/api/ai-compare";
+import { apiErrorMessage } from "@/lib/api/errors";
 import type {
   AiCompareProductDto,
   AiCompareResultDto,
@@ -111,9 +112,7 @@ function errorText(error: unknown, t: (path: string) => string): string {
   if (axios.isAxiosError(error) && error.response?.status === 429) {
     return t("aiCompare.tooOften");
   }
-  return error instanceof Error && error.message
-    ? error.message
-    : t("aiCompare.failed");
+  return apiErrorMessage(error, t, "aiCompare.failed");
 }
 
 function Loading({ text }: { text: string }) {

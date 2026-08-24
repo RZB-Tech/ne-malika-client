@@ -13,20 +13,23 @@ const ORIGIN = (
 
 const API = `${ORIGIN}/api/v1`;
 
+const fetchOpts = (revalidateSec: number) =>
+  /**
+   * Ноль — ответ у каждого захода свой (перемешанная витрина), и класть его
+   * в кэш незачем: второй раз по тому же адресу никто не придёт, а место
+   * в кэше он занял бы наравне с общими ответами.
+   */
+  revalidateSec > 0
+    ? { next: { revalidate: revalidateSec } }
+    : { cache: "no-store" as const };
+
 async function getJson<T>(
   path: string,
   revalidateSec: number,
 ): Promise<T | null> {
   try {
     const res = await fetch(`${API}${path}`, {
-      /**
-       * Ноль — ответ у каждого захода свой (перемешанная витрина), и класть его
-       * в кэш незачем: второй раз по тому же адресу никто не придёт, а место
-       * в кэше он занял бы наравне с общими ответами.
-       */
-      ...(revalidateSec > 0
-        ? { next: { revalidate: revalidateSec } }
-        : { cache: "no-store" as const }),
+      ...fetchOpts(revalidateSec),
       headers: { accept: "application/json" },
     });
     if (!res.ok) return null;
@@ -36,16 +39,34 @@ async function getJson<T>(
   }
 }
 
+/**
+ * Как getJson, но null только для честной 404. Сетевые сбои и 5xx бросаются:
+ * витринная страница товара/магазина не должна превращать временный сбой API
+ * в постоянный notFound() — для живого URL это вылет из поискового индекса.
+ */
+async function getEntityJson<T>(
+  path: string,
+  revalidateSec: number,
+): Promise<T | null> {
+  const res = await fetch(`${API}${path}`, {
+    ...fetchOpts(revalidateSec),
+    headers: { accept: "application/json" },
+  });
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error(`GET ${path} → ${res.status}`);
+  return (await res.json()) as T;
+}
+
 /** GET /product-cards/:id — публичная карточка товара. */
 export function getPublicProduct(
   id: number,
 ): Promise<PublicProductCard | null> {
-  return getJson<PublicProductCard>(`/product-cards/${id}`, 300);
+  return getEntityJson<PublicProductCard>(`/product-cards/${id}`, 300);
 }
 
 /** GET /shops/:id — публичный магазин. */
 export function getPublicShop(id: number): Promise<PublicShop | null> {
-  return getJson<PublicShop>(`/shops/${id}`, 600);
+  return getEntityJson<PublicShop>(`/shops/${id}`, 600);
 }
 
 /**

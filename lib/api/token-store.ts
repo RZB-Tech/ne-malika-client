@@ -19,7 +19,22 @@ function readStorage() {
   if (typeof window === "undefined") return;
   accessToken = window.localStorage.getItem(TOKEN_KEY);
   const rawUser = window.localStorage.getItem(USER_KEY);
-  currentUser = rawUser ? (JSON.parse(rawUser) as AuthUserDto) : null;
+  if (!rawUser) {
+    currentUser = null;
+    return;
+  }
+  /**
+   * Битая запись (обрыв записи, старая схема) не должна ронять модуль — иначе
+   * белый экран на каждом заходе, пока пользователь сам не чистит localStorage.
+   */
+  try {
+    const parsed = JSON.parse(rawUser) as AuthUserDto;
+    currentUser = typeof parsed?.id === "number" ? parsed : null;
+    if (!currentUser) window.localStorage.removeItem(USER_KEY);
+  } catch {
+    currentUser = null;
+    window.localStorage.removeItem(USER_KEY);
+  }
 }
 
 readStorage();

@@ -26,7 +26,14 @@ export function StoreAvatar({
   /** Чем заменить инициал в плейсхолдере (напр. иконка магазина). */
   fallback?: React.ReactNode;
 }) {
+  /** Сброс флага при смене src: аватар мог «доехать» позже (чаты опрашиваются), —
+   * без этого однажды битый URL навсегда оставлял букву-плейсхолдер. */
   const [failed, setFailed] = useState(false);
+  const [shown, setShown] = useState(src);
+  if (src !== shown) {
+    setShown(src);
+    setFailed(false);
+  }
   const showImage = Boolean(src) && !failed;
 
   return (

@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import { getPublicProduct, getPublicShop } from "@/lib/api/server";
 import { buildTelegramUrl, parseTelegramUsername } from "@/lib/telegram";
-import { messages } from "@/lib/i18n/messages";
+import { loadMessages } from "@/lib/i18n/messages";
 import { defaultLocale, locales, type Locale } from "@/lib/i18n/config";
 
 /**
@@ -38,12 +38,13 @@ export async function GET(
   const locale: Locale = locales.includes(raw as Locale)
     ? (raw as Locale)
     : defaultLocale;
+  const dict = await loadMessages(locale);
 
   return NextResponse.redirect(
     buildTelegramUrl(username, {
       productName: product.name,
       productId: String(product.id),
-      greeting: messages[locale].product.telegramGreeting,
+      greeting: dict.product.telegramGreeting,
     }),
   );
 }

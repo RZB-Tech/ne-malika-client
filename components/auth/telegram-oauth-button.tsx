@@ -10,6 +10,7 @@ import {
 import { TelegramIcon } from "@/components/icons/telegram-icon";
 import { Button } from "@/components/ui/button";
 import { useT } from "@/components/providers/i18n-provider";
+import { apiErrorMessage } from "@/lib/api/errors";
 
 /**
  * Browser Telegram sign-in via the official OAuth popup (oauth.telegram.org),
@@ -67,7 +68,7 @@ function OAuthButton({
     onSuccess: (data) => onAuth(data),
     onError: (err) =>
       onError?.(
-        err instanceof Error ? err.message : t("auth.telegramCancelled"),
+        apiErrorMessage(err, t, "auth.telegramCancelled"),
       ),
   });
 

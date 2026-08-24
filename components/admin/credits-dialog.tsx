@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -15,12 +14,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useAdminMutation } from "@/components/admin/use-admin-mutation";
 import {
+  getAdminCreditsControllerBalanceQueryKey,
+  getAdminCreditsControllerHistoryQueryKey,
   useAdminCreditsControllerBalance,
   useAdminCreditsControllerGrant,
   useAdminCreditsControllerRevoke,
   useAdminCreditsPreviewControllerPreview,
 } from "@/lib/api/generated/endpoints/credits-admin/credits-admin";
+import { getAdminShopsControllerListQueryKey } from "@/lib/api/generated/endpoints/shops-admin/shops-admin";
+import { getAdminUsersControllerListQueryKey } from "@/lib/api/generated/endpoints/users-admin/users-admin";
 import { useT } from "@/components/providers/i18n-provider";
 
 interface Balance {
@@ -44,7 +48,7 @@ export function CreditsDialog({
   initialTab?: "grant" | "revoke";
 }) {
   const { t } = useT();
-  const queryClient = useQueryClient();
+  const run = useAdminMutation();
 
   const [tab, setTab] = useState<"grant" | "revoke">(initialTab);
   const [grantAmount, setGrantAmount] = useState("");
@@ -85,32 +89,42 @@ export function CreditsDialog({
     onClose();
   };
 
+  const affectedKeys = [
+    getAdminCreditsControllerBalanceQueryKey(shopId),
+    getAdminCreditsControllerHistoryQueryKey(shopId),
+    getAdminShopsControllerListQueryKey(),
+    getAdminUsersControllerListQueryKey(),
+  ];
+
   const grant = async () => {
     if (!validGrant || !shop) {
       toast.error(t("admin.credits.badAmount"));
       return;
     }
-    try {
-      const res = (await grantMutation.mutateAsync({
-        shopId: shop.id,
-        data: {
-          amountUsd: parsedGrant,
-          note: grantNote.trim() || undefined,
-        },
-      })) as unknown as { credits: number; balance: number };
-      await queryClient.invalidateQueries();
-      toast.success(
-        t("admin.credits.granted", {
-          credits: res.credits,
-          balance: res.balance,
-        }),
-      );
-      close();
-    } catch (err) {
-      toast.error(
-        err instanceof Error ? err.message : t("admin.credits.grantFailed"),
-      );
-    }
+    let res: { credits: number; balance: number } | undefined;
+    const ok = await run(
+      async () => {
+        res = (await grantMutation.mutateAsync({
+          shopId,
+          data: {
+            amountUsd: parsedGrant,
+            note: grantNote.trim() || undefined,
+          },
+        })) as unknown as { credits: number; balance: number };
+      },
+      {
+        invalidate: affectedKeys,
+        errorKey: "admin.credits.grantFailed",
+      },
+    );
+    if (!ok || !res) return;
+    toast.success(
+      t("admin.credits.granted", {
+        credits: res.credits,
+        balance: res.balance,
+      }),
+    );
+    close();
   };
 
   const revoke = async () => {
@@ -118,27 +132,30 @@ export function CreditsDialog({
       toast.error(t("admin.credits.badRevokeAmount"));
       return;
     }
-    try {
-      const res = (await revokeMutation.mutateAsync({
-        shopId: shop.id,
-        data: {
-          credits: Math.floor(parsedRevoke),
-          note: revokeNote.trim() || undefined,
-        },
-      })) as unknown as { taken: number; balance: number };
-      await queryClient.invalidateQueries();
-      toast.success(
-        t("admin.credits.revoked", {
-          credits: res.taken,
-          balance: res.balance,
-        }),
-      );
-      close();
-    } catch (err) {
-      toast.error(
-        err instanceof Error ? err.message : t("admin.credits.revokeFailed"),
-      );
-    }
+    let res: { taken: number; balance: number } | undefined;
+    const ok = await run(
+      async () => {
+        res = (await revokeMutation.mutateAsync({
+          shopId,
+          data: {
+            credits: Math.floor(parsedRevoke),
+            note: revokeNote.trim() || undefined,
+          },
+        })) as unknown as { taken: number; balance: number };
+      },
+      {
+        invalidate: affectedKeys,
+        errorKey: "admin.credits.revokeFailed",
+      },
+    );
+    if (!ok || !res) return;
+    toast.success(
+      t("admin.credits.revoked", {
+        credits: res.taken,
+        balance: res.balance,
+      }),
+    );
+    close();
   };
 
   const busy = grantMutation.isPending || revokeMutation.isPending;

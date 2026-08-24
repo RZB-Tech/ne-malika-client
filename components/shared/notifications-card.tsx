@@ -1,24 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
 import { Bell, BellOff } from "@/components/icons";
 import { TelegramIcon } from "@/components/icons/telegram-icon";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useT } from "@/components/providers/i18n-provider";
 import { useAuth } from "@/lib/api/auth";
-import {
-  useNotificationChannels,
-  useSetTelegramNotifications,
-} from "@/lib/api/notify";
-import {
-  hasPushSubscription,
-  isPushSupported,
-  permissionState,
-  subscribeToPush,
-  unsubscribeFromPush,
-} from "@/lib/api/push";
+import { useNotificationChannels } from "@/lib/api/notify";
+import { usePushChannel, useTelegramChannel } from "@/lib/api/use-push-channel";
+import { isPushSupported } from "@/lib/api/push";
 import { cn } from "@/lib/utils";
 
 /**
@@ -37,83 +27,28 @@ export function NotificationsCard({ className }: { className?: string }) {
   const { t } = useT();
   const { isAuthenticated } = useAuth();
   const { data } = useNotificationChannels();
-  const setTelegram = useSetTelegramNotifications();
+  const push = usePushChannel();
+  const telegram = useTelegramChannel();
 
   /**
    * Подписку проверяем в самом браузере, а не по ответу сервера: сервер знает
    * только, что подписано хоть одно устройство. Человеку за другим компьютером
    * надо предложить включить, а не отрапортовать, что всё уже работает.
    */
-  const [deviceSubscribed, setDeviceSubscribed] = useState(false);
+  const deviceSubscribed = push.deviceSubscribed === true;
+  const permission = push.permission;
 
-  /**
-   * Разрешение читаем при отрисовке: это живое состояние браузера, которое
-   * человек может поменять в настройках сайта, не трогая нашу вкладку. В
-   * состоянии лежит только ответ на наш собственный запрос.
-   */
-  const [requested, setRequested] = useState<NotificationPermission | null>(
-    null,
-  );
-  const [busy, setBusy] = useState(false);
+  const pushConfig = data?.push;
+  const telegramConfig = data?.telegram;
 
-  const permission = requested ?? permissionState();
-
-  useEffect(() => {
-    void hasPushSubscription().then(setDeviceSubscribed);
-  }, []);
-
-  const push = data?.push;
-  const telegram = data?.telegram;
-
-  const showPush = isPushSupported() && push?.available === true;
-  const showTelegram = telegram?.available === true;
+  const showPush = isPushSupported() && pushConfig?.available === true;
+  const showTelegram = telegramConfig?.available === true;
 
   if (!isAuthenticated || !data || (!showPush && !showTelegram)) return null;
 
-  const enablePush = async () => {
-    if (!push?.publicKey) return;
-    setBusy(true);
-    try {
-      const result = await subscribeToPush(push.publicKey, {
-        title: t("push.confirmTitle"),
-        body: t("push.confirmBody"),
-      });
-      setRequested(result);
-      if (result === "granted") {
-        setDeviceSubscribed(true);
-        toast.success(t("push.enabled"));
-      } else if (result === "denied") {
-        toast.error(t("push.blocked"));
-      }
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : t("push.failed"));
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  const disablePush = async () => {
-    setBusy(true);
-    try {
-      await unsubscribeFromPush();
-      setDeviceSubscribed(false);
-      setRequested(null);
-      toast.success(t("push.disabled"));
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : t("push.failed"));
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  const toggleTelegram = (enabled: boolean) => {
-    setTelegram.mutate(enabled, {
-      onSuccess: () =>
-        toast.success(
-          enabled ? t("notify.telegramOn") : t("notify.telegramOff"),
-        ),
-      onError: () => toast.error(t("push.failed")),
-    });
+  const enablePush = () => {
+    if (!pushConfig?.publicKey) return;
+    void push.enable(pushConfig.publicKey);
   };
 
   return (
@@ -147,8 +82,8 @@ export function NotificationsCard({ className }: { className?: string }) {
               variant="outline"
               size="sm"
               className="gap-2"
-              onClick={disablePush}
-              disabled={busy}
+              onClick={() => void push.disable()}
+              disabled={push.busy}
             >
               <BellOff className="size-4" />
               {t("push.disable")}
@@ -157,7 +92,7 @@ export function NotificationsCard({ className }: { className?: string }) {
             <Button
               size="sm"
               onClick={enablePush}
-              disabled={busy || permission === "denied"}
+              disabled={push.busy || permission === "denied"}
             >
               {t("push.enable")}
             </Button>
@@ -194,8 +129,8 @@ export function NotificationsCard({ className }: { className?: string }) {
             <Button
               variant={data.telegram.enabled ? "outline" : "default"}
               size="sm"
-              onClick={() => toggleTelegram(!data.telegram.enabled)}
-              disabled={setTelegram.isPending}
+              onClick={() => telegram.toggle(!data.telegram.enabled)}
+              disabled={telegram.setTelegram.isPending}
             >
               {data.telegram.enabled ? t("push.disable") : t("push.enable")}
             </Button>

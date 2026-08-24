@@ -16,18 +16,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useT } from "@/components/providers/i18n-provider";
 import { useAuth } from "@/lib/api/auth";
+import { initials } from "@/lib/format";
 import { cn } from "@/lib/utils";
-
-function initials(name: string): string {
-  return (
-    name
-      .trim()
-      .split(/\s+/)
-      .slice(0, 2)
-      .map((w) => w[0]?.toUpperCase() ?? "")
-      .join("") || "?"
-  );
-}
 
 export function UserMenu({ trigger }: { trigger?: ReactNode } = {}) {
   const { t } = useT();

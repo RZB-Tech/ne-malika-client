@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
 import {
   ChevronDown,
   ChevronUp,
@@ -17,6 +15,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
+import { AdminPageHeader } from "@/components/admin/page-header";
+import { useAdminMutation } from "@/components/admin/use-admin-mutation";
 import { BannerFormDialog } from "@/components/admin/banner-form-dialog";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { useT } from "@/components/providers/i18n-provider";
@@ -27,6 +27,7 @@ import {
 } from "@/lib/api/banners";
 import { photoUrl } from "@/lib/api/photo";
 import {
+  getAdminBannersControllerFindAllQueryKey,
   useAdminBannersControllerFindAll,
   useAdminBannersControllerRemove,
   useAdminBannersControllerReorder,
@@ -35,7 +36,7 @@ import {
 
 export default function AdminBanners() {
   const { t } = useT();
-  const queryClient = useQueryClient();
+  const run = useAdminMutation();
 
   /** `undefined` — диалог закрыт, `null` — создание, объект — правка. */
   const [editing, setEditing] = useState<Banner | null | undefined>(undefined);
@@ -50,58 +51,46 @@ export default function AdminBanners() {
 
   const banners = data ?? [];
 
-  const toggleActive = async (banner: Banner, isActive: boolean) => {
-    try {
-      await updateBanner.mutateAsync({ id: banner.id, data: { isActive } });
-      await queryClient.invalidateQueries();
-    } catch (err) {
-      toast.error(
-        err instanceof Error ? err.message : t("admin.banners.saveFailed"),
-      );
-    }
-  };
+  const toggleActive = (banner: Banner, isActive: boolean) =>
+    run(() => updateBanner.mutateAsync({ id: banner.id, data: { isActive } }), {
+      invalidate: [getAdminBannersControllerFindAllQueryKey()],
+      errorKey: "admin.banners.saveFailed",
+    });
 
-  const onRemove = async (id: number) => {
-    await removeBanner.mutateAsync({ id });
-    await queryClient.invalidateQueries();
-    toast.success(t("admin.banners.removed"));
-  };
+  const onRemove = (id: number) =>
+    run(() => removeBanner.mutateAsync({ id }), {
+      invalidate: [getAdminBannersControllerFindAllQueryKey()],
+      successKey: "admin.banners.removed",
+      errorKey: "admin.banners.saveFailed",
+    });
 
   /**
    * Сдвиг на одну позицию. Отправляем весь порядок целиком, а не пару соседей:
    * так список в базе всегда совпадает с тем, что видно на экране, даже если
    * позиции успели разъехаться от правок в соседней вкладке.
    */
-  const move = async (from: number, to: number) => {
-    if (to < 0 || to >= banners.length) return;
+  const move = (from: number, to: number) => {
+    if (to < 0 || to >= banners.length) return Promise.resolve();
     const ids = banners.map((b) => b.id);
     [ids[from], ids[to]] = [ids[to], ids[from]];
-    try {
-      await reorderBanners.mutateAsync({ data: { ids } });
-      await queryClient.invalidateQueries();
-    } catch (err) {
-      toast.error(
-        err instanceof Error ? err.message : t("admin.banners.saveFailed"),
-      );
-    }
+    return run(() => reorderBanners.mutateAsync({ data: { ids } }), {
+      invalidate: [getAdminBannersControllerFindAllQueryKey()],
+      errorKey: "admin.banners.saveFailed",
+    });
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h1 className="font-heading text-2xl font-bold tracking-tight">
-            {t("admin.banners.title")}
-          </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {t("admin.banners.subtitle", { sizes: BANNER_FORMATS_LABEL })}
-          </p>
-        </div>
-        <Button onClick={() => setEditing(null)}>
-          <Plus data-icon="inline-start" />
-          {t("admin.banners.add")}
-        </Button>
-      </div>
+      <AdminPageHeader
+        title={t("admin.banners.title")}
+        subtitle={t("admin.banners.subtitle", { sizes: BANNER_FORMATS_LABEL })}
+        actions={
+          <Button onClick={() => setEditing(null)}>
+            <Plus data-icon="inline-start" />
+            {t("admin.banners.add")}
+          </Button>
+        }
+      />
 
       {isError && (
         <Card className="border-destructive/40 bg-destructive/5 p-4 text-sm">

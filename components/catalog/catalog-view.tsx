@@ -8,8 +8,11 @@ import { PageContainer } from "@/components/layout/page-container";
 import { StatusPanel } from "@/components/shared/status-panel";
 import {
   ProductCard,
-  ProductCardSkeleton,
 } from "@/components/product/product-card";
+import {
+  ProductGrid,
+  ProductGridSkeleton,
+} from "@/components/product/product-grid";
 import { useCatalogFilters } from "./use-catalog-filters";
 import { useT } from "@/components/providers/i18n-provider";
 import { findCategory, useCategories } from "@/lib/api/categories";
@@ -175,11 +178,7 @@ export function CatalogView({
           }
         />
       ) : isLoading ? (
-        <div className="grid grid-cols-2 justify-center gap-3 md:grid-cols-3 lg:grid-cols-[repeat(auto-fill,var(--product-card-w))]">
-          {Array.from({ length: 10 }).map((_, i) => (
-            <ProductCardSkeleton key={i} />
-          ))}
-        </div>
+        <ProductGridSkeleton count={10} />
       ) : results.length === 0 ? (
         <StatusPanel
           icon={<SearchX className="size-5" />}
@@ -188,19 +187,13 @@ export function CatalogView({
         />
       ) : (
         <>
-          <div className="grid grid-cols-2 justify-center gap-3 md:grid-cols-3 lg:grid-cols-[repeat(auto-fill,var(--product-card-w))] [&>*]:[content-visibility:auto] [&>*]:[contain-intrinsic-size:auto_428px]">
+          <ProductGrid>
             {results.map((p) => (
               <ProductCard key={p.id} product={p} />
             ))}
-          </div>
+          </ProductGrid>
 
-          {isFetchingNextPage && (
-            <div className="mt-4 grid grid-cols-2 justify-center gap-3 md:grid-cols-3 lg:grid-cols-[repeat(auto-fill,var(--product-card-w))]">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <ProductCardSkeleton key={i} />
-              ))}
-            </div>
-          )}
+          {isFetchingNextPage && <ProductGridSkeleton count={5} className="mt-4" />}
 
           {hasNextPage && (
             <div className="mt-8 flex justify-center">

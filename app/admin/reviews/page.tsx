@@ -2,15 +2,16 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Check, Sparkles, Trash2, X } from "@/components/icons";
-import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AbolishDialog } from "@/components/admin/abolish-dialog";
+import { AdminPageHeader } from "@/components/admin/page-header";
+import { useAdminMutation } from "@/components/admin/use-admin-mutation";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { RatingStars } from "@/components/shared/rating-stars";
 import { useT } from "@/components/providers/i18n-provider";
@@ -75,7 +76,7 @@ function AiVerdictLine({
 
 export default function AdminReviews() {
   const { t, locale } = useT();
-  const queryClient = useQueryClient();
+  const run = useAdminMutation();
 
   const [status, setStatus] = useState<ReviewStatus>("pending");
   const [page, setPage] = useState(1);
@@ -105,42 +106,40 @@ export default function AdminReviews() {
   const reviews = list.data?.data ?? [];
   const totalPages = list.data?.meta.totalPages ?? 1;
 
-  const refresh = () => queryClient.invalidateQueries({ queryKey: [KEY] });
+  const approve = (id: number) =>
+    run(() => adminReviewsControllerApprove(id), {
+      invalidate: [[KEY]],
+      successKey: "admin.reviews.approved",
+      errorKey: "common.actionFailed",
+    });
 
-  const approve = async (id: number) => {
-    await adminReviewsControllerApprove(id);
-    await refresh();
-    toast.success(t("admin.reviews.approved"));
-  };
+  const reject = (id: number, reason: string) =>
+    run(() => adminReviewsControllerReject(id, { reason }), {
+      invalidate: [[KEY]],
+      successKey: "admin.reviews.rejected",
+      errorKey: "common.actionFailed",
+    });
 
-  const reject = async (id: number, reason: string) => {
-    await adminReviewsControllerReject(id, { reason });
-    await refresh();
-    toast.success(t("admin.reviews.rejected"));
-  };
+  const remove = (id: number) =>
+    run(() => adminReviewsControllerRemove(id), {
+      invalidate: [[KEY]],
+      successKey: "admin.reviews.removed",
+      errorKey: "common.actionFailed",
+    });
 
-  const remove = async (id: number) => {
-    await adminReviewsControllerRemove(id);
-    await refresh();
-    toast.success(t("admin.reviews.removed"));
-  };
-
-  const recheck = async (id: number) => {
-    await adminReviewsControllerRecheck(id);
-    await refresh();
-    toast.success(t("admin.reviews.rechecked"));
-  };
+  const recheck = (id: number) =>
+    run(() => adminReviewsControllerRecheck(id), {
+      invalidate: [[KEY]],
+      successKey: "admin.reviews.rechecked",
+      errorKey: "common.actionFailed",
+    });
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-heading text-2xl font-bold tracking-tight">
-          {t("admin.reviews.title")}
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {t("admin.reviews.subtitle")}
-        </p>
-      </div>
+      <AdminPageHeader
+        title={t("admin.reviews.title")}
+        subtitle={t("admin.reviews.subtitle")}
+      />
 
       <Tabs
         value={status}

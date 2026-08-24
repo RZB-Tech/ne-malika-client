@@ -8,13 +8,15 @@ import {
   useMemo,
   useState,
 } from "react";
-import { messages } from "@/lib/i18n/messages";
+import { getMessages, loadMessages } from "@/lib/i18n/messages";
+import ru from "@/lib/i18n/locales/ru.json";
 import {
   defaultLocale,
   type Locale,
   locales,
   STORAGE_KEY,
 } from "@/lib/i18n/config";
+import { setRequestLocale } from "@/lib/api/mutator";
 
 type Vars = Record<string, string | number>;
 
@@ -53,26 +55,40 @@ function interpolate(str: string, vars?: Vars): string {
 
 export function I18nProvider({ children }: { children: React.ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>(defaultLocale);
+  /** Счётчик догрузок словаря: сигнал перерисоваться, когда чанк узбекского приехал. */
+  const [dictVersion, setDictVersion] = useState(0);
+
+  const apply = useCallback((l: Locale) => {
+    setLocaleState(l);
+    setRequestLocale(l);
+    void loadMessages(l).then(() => setDictVersion((v) => v + 1));
+  }, []);
 
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY) as Locale | null;
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (stored && locales.includes(stored)) setLocaleState(stored);
-  }, []);
+    if (stored && locales.includes(stored)) apply(stored);
+  }, [apply]);
 
   useEffect(() => {
     document.documentElement.lang = locale;
   }, [locale]);
 
-  const setLocale = useCallback((l: Locale) => {
-    setLocaleState(l);
-    localStorage.setItem(STORAGE_KEY, l);
-  }, []);
+  const setLocale = useCallback(
+    (l: Locale) => {
+      localStorage.setItem(STORAGE_KEY, l);
+      apply(l);
+    },
+    [apply],
+  );
 
   const t = useCallback(
     (path: string, vars?: Vars) =>
-      interpolate(resolve(messages[locale], path), vars),
-    [locale],
+      interpolate(resolve(getMessages(locale) ?? ru, path), vars),
+    // dictVersion не читается телом, но t должен пересоздаться после догрузки
+    // словаря — иначе интерфейс так и останется русским до следующего рендера.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [locale, dictVersion],
   );
 
   const value = useMemo(

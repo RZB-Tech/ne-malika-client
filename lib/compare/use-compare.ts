@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useSyncExternalStore } from "react";
+import { useCallback, useMemo, useSyncExternalStore } from "react";
 import {
   addToCompare,
   clearCompare,
@@ -32,12 +32,19 @@ export function useCompare() {
     return addToCompare(product);
   }, []);
 
+  /** Стабильные ссылки: мемоизированные дети не должны перерисовываться впустую. */
+  const ids = useMemo(() => items.map((p) => p.id), [items]);
+  const has = useCallback(
+    (id: number) => items.some((p) => p.id === id),
+    [items],
+  );
+
   return {
     items: items as CompareProduct[],
-    ids: items.map((p) => p.id),
+    ids,
     isFull: items.length >= MAX_COMPARE,
     max: MAX_COMPARE,
-    has: (id: number) => items.some((p) => p.id === id),
+    has,
     toggle,
     remove: removeFromCompare,
     clear: clearCompare,

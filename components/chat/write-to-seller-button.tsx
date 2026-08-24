@@ -17,6 +17,7 @@ import { LoginDialog } from "@/components/auth/login-dialog";
 import { useT } from "@/components/providers/i18n-provider";
 import { useAuth } from "@/lib/api/auth";
 import { useChats, useStartChat } from "@/lib/api/chats";
+import { apiErrorMessage } from "@/lib/api/errors";
 import { ChatThread } from "./chat-thread";
 import { cn } from "@/lib/utils";
 
@@ -127,7 +128,7 @@ function ChatSheetBody({
         onSuccess: () => setText(""),
         onError: (error) =>
           toast.error(
-            error instanceof Error ? error.message : t("chat.sendFailed"),
+            apiErrorMessage(error, t, "chat.sendFailed"),
           ),
       },
     );

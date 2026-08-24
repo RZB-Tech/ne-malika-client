@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useSyncExternalStore } from "react";
+import { useCallback, useSyncExternalStore } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   getFavoritesControllerFindMineQueryKey,
@@ -13,6 +13,7 @@ import {
 import type { FavoriteDto } from "@/lib/api/generated/schemas";
 import { useAuth } from "@/lib/api/auth";
 import type { ProductSnapshot } from "@/lib/product-snapshot";
+import { useRemoteBackedList } from "@/lib/remote-backed-list";
 import {
   addLocalFavorite,
   clearLocalFavorites,
@@ -23,12 +24,6 @@ import {
   subscribeLocalFavorites,
   type FavoriteProduct,
 } from "./local-favorites";
-
-/**
- * Кого уже синхронизировали в этой вкладке. Ключ — id пользователя: после
- * смены аккаунта избранное устройства нужно перенести заново.
- */
-const syncedUsers = new Set<number>();
 
 function fromRemote(dto: FavoriteDto): FavoriteProduct {
   return {
@@ -46,9 +41,9 @@ function fromRemote(dto: FavoriteDto): FavoriteProduct {
 /**
  * Избранное: локальное у анонима, серверное у вошедшего.
  *
- * Устроено как история просмотров — локальная копия пишется всегда, после
- * входа один раз уезжает на бэкенд и дальше служит запасным вариантом, пока
- * запрос летит и если он не долетел.
+ * Устроено как история просмотров — общая механика в `useRemoteBackedList`:
+ * локальная копия пишется всегда, после входа один раз уезжает на бэкенд и
+ * дальше служит запасным вариантом, пока запрос летит и если он не долетел.
  */
 export function useFavorites() {
   const { user, isAuthenticated, isHydrated } = useAuth();
@@ -63,7 +58,9 @@ export function useFavorites() {
   const enabled = isHydrated && isAuthenticated;
 
   const remote = useFavoritesControllerFindMine(
-    { limit: 100 },
+    // Кап совпадает с локальным и бэкендом: меньше — и has() у активных
+    // пользователей врёт, а toggle перезаписывает уже избранное.
+    { limit: MAX_LOCAL_FAVORITES },
     { query: { enabled } },
   );
 
@@ -80,38 +77,40 @@ export function useFavorites() {
     [queryClient],
   );
 
-  useEffect(() => {
-    const userId = user?.id;
-    if (!enabled || userId === undefined || syncedUsers.has(userId)) return;
+  const sync = useCallback(
+    (items: FavoriteProduct[]) =>
+      syncFavorites({
+        data: {
+          items: items.slice(0, MAX_LOCAL_FAVORITES).map((p) => ({
+            product_card_id: p.id,
+            added_at: p.addedAt,
+          })),
+        },
+      }),
+    [syncFavorites],
+  );
 
-    const items = getLocalFavorites();
-    syncedUsers.add(userId);
-    if (items.length === 0) return;
-
-    syncFavorites({
-      data: {
-        items: items.slice(0, MAX_LOCAL_FAVORITES).map((p) => ({
-          product_card_id: p.id,
-          added_at: p.addedAt,
-        })),
-      },
-    })
-      .then(() => invalidate())
-      .catch(() => {
-        syncedUsers.delete(userId);
-      });
-  }, [enabled, user?.id, syncFavorites, invalidate]);
-
-  const items: FavoriteProduct[] = useMemo(() => {
-    if (!enabled) return local;
-    const data = remote.data?.data;
-    return data ? data.map(fromRemote) : local;
-  }, [enabled, local, remote.data]);
+  const list = useRemoteBackedList<FavoriteProduct, FavoriteDto>({
+    listKey: "favorites",
+    user,
+    enabled,
+    local,
+    getLocal: getLocalFavorites,
+    removeLocal: removeLocalFavorite,
+    clearLocal: clearLocalFavorites,
+    remoteData: remote.data?.data,
+    isPending: remote.isPending,
+    fromRemote,
+    sync,
+    invalidate,
+    removeRemote: (id) => removeRemote({ productCardId: id }),
+    clearRemote: () => clearRemote(),
+  });
 
   const has = useCallback(
     (id: number) =>
-      items.some((p) => p.id === id) || local.some((p) => p.id === id),
-    [items, local],
+      list.items.some((p) => p.id === id) || local.some((p) => p.id === id),
+    [list.items, local],
   );
 
   const add = useCallback(
@@ -129,44 +128,29 @@ export function useFavorites() {
     [enabled, addRemote, invalidate],
   );
 
-  const remove = useCallback(
-    async (id: number) => {
-      removeLocalFavorite(id);
-      if (!enabled) return;
-      await removeRemote({ productCardId: id }).catch(() => undefined);
-      await invalidate();
-    },
-    [enabled, removeRemote, invalidate],
-  );
+  const { remove: removeItem } = list;
 
   const toggle = useCallback(
     async (product: ProductSnapshot) => {
       if (has(product.id)) {
-        await remove(product.id);
+        await removeItem(product.id);
         return false;
       }
       return add(product);
     },
-    [has, add, remove],
+    [has, add, removeItem],
   );
 
-  const clear = useCallback(async () => {
-    clearLocalFavorites();
-    if (!enabled) return;
-    await clearRemote().catch(() => undefined);
-    await invalidate();
-  }, [enabled, clearRemote, invalidate]);
-
   return {
-    items,
-    count: items.length,
-    isLoading: enabled && remote.isPending,
+    items: list.items,
+    count: list.items.length,
+    isLoading: list.isLoading,
     /** Избранное уже общее для всех устройств. */
-    isRemote: enabled && Boolean(remote.data),
+    isRemote: list.isRemote,
     has,
     add,
-    remove,
+    remove: list.remove,
     toggle,
-    clear,
+    clear: list.clear,
   };
 }

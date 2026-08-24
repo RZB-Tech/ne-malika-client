@@ -19,7 +19,6 @@ const store = createLocalListStore<CompareProduct>({
 export const getLocalCompare = store.get;
 export const getEmptyCompare = store.getEmpty;
 export const subscribeLocalCompare = store.subscribe;
-export const isInCompare = store.has;
 export const removeFromCompare = store.remove;
 export const clearCompare = store.clear;
 

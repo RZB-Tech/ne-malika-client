@@ -20,7 +20,6 @@ const store = createLocalListStore<FavoriteProduct>({
 export const getLocalFavorites = store.get;
 export const getEmptyFavorites = store.getEmpty;
 export const subscribeLocalFavorites = store.subscribe;
-export const isLocalFavorite = store.has;
 export const removeLocalFavorite = store.remove;
 export const clearLocalFavorites = store.clear;
 

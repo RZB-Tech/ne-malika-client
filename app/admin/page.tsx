@@ -5,6 +5,7 @@ import { Flag, Package, Store } from "@/components/icons";
 import { Card } from "@/components/ui/card";
 import { StatCard } from "@/components/shared/stat-card";
 import { BarList } from "@/components/shared/charts";
+import { AdminPageHeader } from "@/components/admin/page-header";
 import { useT } from "@/components/providers/i18n-provider";
 import { ActivityCharts } from "@/components/admin/activity-charts";
 import { NotificationsCard } from "@/components/shared/notifications-card";
@@ -81,14 +82,10 @@ export default function AdminStats() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="font-heading text-2xl font-bold tracking-tight">
-          {t("admin.stats.title")}
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {t("admin.dashboard.note")}
-        </p>
-      </div>
+      <AdminPageHeader
+        title={t("admin.stats.title")}
+        subtitle={t("admin.dashboard.note")}
+      />
 
       <NotificationsCard />
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useSyncExternalStore } from "react";
+import { useCallback, useSyncExternalStore } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   getProductViewsControllerFindMineQueryKey,
@@ -11,6 +11,7 @@ import {
 } from "@/lib/api/generated/endpoints/me-product-views/me-product-views";
 import type { ProductViewDto } from "@/lib/api/generated/schemas";
 import { useAuth } from "@/lib/api/auth";
+import { useRemoteBackedList } from "@/lib/remote-backed-list";
 import {
   clearLocalHistory,
   getEmptyHistory,
@@ -25,12 +26,6 @@ import {
 export interface HistoryItem extends ViewedProduct {
   viewCount?: number;
 }
-
-/**
- * Кого уже синхронизировали в этой вкладке. Ключ — id пользователя: после
- * смены аккаунта историю устройства нужно перенести заново.
- */
-const syncedUsers = new Set<number>();
 
 function fromRemote(dto: ProductViewDto): HistoryItem {
   return {
@@ -49,9 +44,10 @@ function fromRemote(dto: ProductViewDto): HistoryItem {
 /**
  * История просмотров кабинета: локальная у анонима, серверная у вошедшего.
  *
- * Локальная копия пишется всегда и остаётся после выхода. У авторизованного
- * она один раз уезжает на бэкенд и дальше служит запасным вариантом — пока
- * запрос летит и если он не долетел.
+ * Общая механика с избранным живёт в `useRemoteBackedList`: локальная копия
+ * пишется всегда и остаётся после выхода. У авторизованного она один раз
+ * уезжает на бэкенд и дальше служит запасным вариантом — пока запрос летит
+ * и если он не долетел.
  */
 export function useViewHistory() {
   const { user, isAuthenticated, isHydrated } = useAuth();
@@ -83,59 +79,43 @@ export function useViewHistory() {
     [queryClient],
   );
 
-  useEffect(() => {
-    const userId = user?.id;
-    if (!enabled || userId === undefined || syncedUsers.has(userId)) return;
-
-    const items = getLocalHistory();
-    syncedUsers.add(userId);
-    if (items.length === 0) return;
-
-    syncViews({
-      data: {
-        items: items.map((p) => ({
-          product_card_id: p.id,
-          viewed_at: p.viewedAt,
-        })),
-      },
-    })
-      .then(() => invalidate())
-      .catch(() => {
-        syncedUsers.delete(userId);
-      });
-  }, [enabled, user?.id, syncViews, invalidate]);
-
-  const items: HistoryItem[] = useMemo(() => {
-    if (!enabled) return local;
-    const data = remote.data?.data;
-    return data ? data.map(fromRemote) : local;
-  }, [enabled, local, remote.data]);
-
-  const remove = useCallback(
-    async (id: number) => {
-      removeLocalView(id);
-      if (!enabled) return;
-      await removeRemote({ productCardId: id }).catch(() => undefined);
-      await invalidate();
-    },
-    [enabled, removeRemote, invalidate],
+  const sync = useCallback(
+    (items: ViewedProduct[]) =>
+      syncViews({
+        data: {
+          items: items.map((p) => ({
+            product_card_id: p.id,
+            viewed_at: p.viewedAt,
+          })),
+        },
+      }),
+    [syncViews],
   );
 
-  const clear = useCallback(async () => {
-    clearLocalHistory();
-    if (!enabled) return;
-    await clearRemote().catch(() => undefined);
-    await invalidate();
-  }, [enabled, clearRemote, invalidate]);
+  const list = useRemoteBackedList<HistoryItem, ProductViewDto>({
+    listKey: "viewHistory",
+    user,
+    enabled,
+    local,
+    getLocal: getLocalHistory,
+    removeLocal: removeLocalView,
+    clearLocal: clearLocalHistory,
+    remoteData: remote.data?.data,
+    isPending: remote.isPending,
+    fromRemote,
+    sync,
+    invalidate,
+    removeRemote: (id) => removeRemote({ productCardId: id }),
+    clearRemote: () => clearRemote(),
+  });
 
   return {
-    items,
-    /** Скелет показываем только на первом запросе, а не на фоновых обновлениях. */
-    isLoading: enabled && remote.isPending,
+    items: list.items,
+    isLoading: list.isLoading,
     isSyncing,
     /** История уже общая для всех устройств. */
-    isRemote: enabled && Boolean(remote.data),
-    remove,
-    clear,
+    isRemote: list.isRemote,
+    remove: list.remove,
+    clear: list.clear,
   };
 }

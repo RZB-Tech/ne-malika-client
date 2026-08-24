@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { RatingStars } from "@/components/shared/rating-stars";
 import { useT } from "@/components/providers/i18n-provider";
-import { formatDate } from "@/lib/format";
+import { formatDate, formatRating } from "@/lib/format";
 import {
   sellerReviewsControllerList,
   sellerReviewsControllerSummary,
@@ -67,7 +67,7 @@ export default function SellerReviews() {
         <Card className="grid gap-6 p-5 sm:grid-cols-[auto_minmax(0,1fr)] sm:gap-10">
           <div className="flex flex-col items-center justify-center gap-1">
             <span className="font-heading text-4xl font-bold tabular">
-              {average.toFixed(1).replace(".", ",")}
+              {formatRating(average)}
             </span>
             <RatingStars value={average} size="md" />
             <span className="text-xs text-muted-foreground">

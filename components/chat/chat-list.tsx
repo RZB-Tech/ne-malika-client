@@ -2,6 +2,7 @@
 
 import { MessageSquare } from "@/components/icons";
 import { Skeleton } from "@/components/ui/skeleton";
+import { StatusPanel } from "@/components/shared/status-panel";
 import { useT } from "@/components/providers/i18n-provider";
 import { formatMessageTime } from "@/lib/format";
 import type { ChatDto } from "@/lib/api/generated/schemas";
@@ -41,18 +42,15 @@ export function ChatList({
 
   if (chats.length === 0) {
     return (
-      <div
-        className={cn(
-          "flex flex-col items-center justify-center px-6 py-16 text-center",
-          className,
-        )}
-      >
-        <MessageSquare className="size-10 text-muted-foreground/60" />
-        <p className="mt-4 font-medium">{t("chat.empty")}</p>
-        <p className="mt-1.5 max-w-xs text-sm text-muted-foreground">
-          {side === "seller" ? t("chat.emptySeller") : t("chat.emptyBuyer")}
-        </p>
-      </div>
+      <StatusPanel
+        compact
+        className={cn("border-0 bg-transparent", className)}
+        icon={<MessageSquare className="size-5" />}
+        title={t("chat.empty")}
+        description={
+          side === "seller" ? t("chat.emptySeller") : t("chat.emptyBuyer")
+        }
+      />
     );
   }
 
