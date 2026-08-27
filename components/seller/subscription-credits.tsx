@@ -21,19 +21,6 @@ import type { CreditTxnDto } from "@/lib/api/generated/schemas";
 
 const LIMIT = 10;
 
-/**
- * Журнал кредитов: каждое начисление, списание и сгорание с обоих счетов.
- *
- * Без него обещанная прозрачность сгорания подписочных кредитов не существует:
- * продавец видел бы только уменьшившееся число и не мог бы отличить «списали за
- * генерацию» от «сгорел остаток при выдаче новой нормы». Строка сгорания — это
- * `adjust` с отрицательной суммой и пометкой `subscription_burn` в `meta`,
- * здесь она читается словами.
- *
- * `subscriptionAfter` у старых строк `null` — их писали до появления подписок,
- * и переписывать историю задним числом мы не стали. Пустое место в колонке
- * остатка честнее выдуманного нуля.
- */
 export function SubscriptionCredits() {
   const { t, locale } = useT();
   const [page, setPage] = useState(1);
@@ -131,7 +118,7 @@ export function SubscriptionCredits() {
                     </TableRow>
                   ))}
 
-              {/* Пусто — только когда сервер ответил и вернул ноль строк. */}
+              {}
               {!isLoading && !isError && rows.length === 0 && (
                 <TableRow className="hover:bg-transparent">
                   <TableCell
@@ -159,14 +146,6 @@ export function SubscriptionCredits() {
   );
 }
 
-/**
- * За что операция.
- *
- * Первой строкой — суть: выдача нормы, сгорание, конкретный запрос к ИИ.
- * Второй — уточнения из `meta`: с какого счёта списано, прошло ли нажатие по
- * бесплатной норме, взята ли цена по прайсу. Комментарий из `note` (его пишет
- * администратор при ручной правке) показываем всегда, но не вместо сути.
- */
 function Reason({ txn }: { txn: CreditTxnDto }) {
   const { t } = useT();
   const meta = txn.meta;
@@ -187,7 +166,6 @@ function Reason({ txn }: { txn: CreditTxnDto }) {
     );
   }
   if (meta?.fixed) details.push(t("seller.credits.fixed"));
-  /* Комментарий уже стоит заголовком, если сути из `meta` не было. */
   if (txn.note && headline !== txn.note) details.push(txn.note);
 
   return (

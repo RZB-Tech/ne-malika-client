@@ -10,11 +10,6 @@ import { useT } from "@/components/providers/i18n-provider";
 import { cn } from "@/lib/utils";
 import type { AdminShopRow } from "@/lib/api/types";
 
-/**
- * Выбор магазина с поиском. Обычный <Select> здесь не годится: магазинов
- * сотни, а поле ввода внутри радиксовского списка перехватывается его же
- * типизацией по буквам — поэтому свой выпадающий список.
- */
 export function ShopPicker({
   shops,
   value,
@@ -24,7 +19,6 @@ export function ShopPicker({
   shops: AdminShopRow[];
   value: number | null;
   onChange: (id: number) => void;
-  /** По умолчанию — «подходящих магазинов нет» на языке интерфейса. */
   emptyHint?: string;
 }) {
   const { t } = useT();

@@ -31,39 +31,22 @@ import {
   useAdminShopSubscriptionControllerActivate,
 } from "@/lib/api/generated/endpoints/subscriptions-admin/subscriptions-admin";
 
-/** Границы `ActivateSubscriptionDto.months` — те же, что проверяет сервер. */
 const MIN_MONTHS = 1;
 const MAX_MONTHS = 12;
 
-/** Магазин, которому выдают подписку руками. */
 export interface SubscriptionActivateTarget {
   shopId: number;
   shopName: string;
-  /** ДЕЙСТВУЮЩИЙ тариф: у просроченной подписки здесь `free`. */
   plan: SubscriptionPlan;
   active: boolean;
   until: string | null;
   subscriptionCredits: number;
 }
 
-/**
- * Ручная выдача подписки: тариф, срок в месяцах и комментарий.
- *
- * Отдельным окном, а не пунктом `withConfirm` в меню строки: у операции три
- * поля и последствие, которое нельзя отменить нажатием «назад» — она выдаёт
- * магазину кредиты. Комментарий не для порядка: у платежа, заведённого руками,
- * это единственный след того, почему деньги появились без кассы.
- *
- * Предупреждение под полями — та же развилка Д1, что и на кассе у продавца:
- * при истёкшем сроке норма кредитов ЗАМЕНЯЕТ остаток, при живом — прибавляется.
- * Подписи взяты из `seller.subscription.*` намеренно: правило одно, и второй
- * словарь тех же двух фраз разъехался бы с первым на первой же правке.
- */
 export function SubscriptionActivateDialog({
   target,
   onClose,
 }: {
-  /** `null` — окно закрыто. */
   target: SubscriptionActivateTarget | null;
   onClose: () => void;
 }) {
@@ -71,7 +54,6 @@ export function SubscriptionActivateDialog({
     <Dialog open={target !== null} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-md">
         {target && (
-          /** Ключ сбрасывает поля: следующий магазин открывается с чистой формой. */
           <ActivateBody
             key={target.shopId}
             target={target}
@@ -94,10 +76,6 @@ function ActivateBody({
   const run = useAdminMutation();
   const activate = useAdminShopSubscriptionControllerActivate();
 
-  /**
-   * Продлевают обычно тем же тарифом, поэтому подставляем действующий. У
-   * магазина без подписки его нет — тогда самый младший из платных.
-   */
   const [plan, setPlan] = useState<PaidPlan>(
     isPaidPlan(target.plan) ? target.plan : PAID_PLANS[0],
   );

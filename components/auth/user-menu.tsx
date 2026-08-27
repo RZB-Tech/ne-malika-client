@@ -28,9 +28,6 @@ export function UserMenu({ trigger }: { trigger?: ReactNode } = {}) {
 
   const photo = user.telegramPhoto as string | null;
   const username = user.telegramUsername as string | null;
-  // Покупателю без магазина показывать пустой кабинет незачем: там его ждала
-  // карточка «магазина нет» с кнопкой на эту же форму — лишний клик на пути,
-  // где и так отваливаются.
   const cabinetHref = isAdmin
     ? "/admin"
     : isSeller

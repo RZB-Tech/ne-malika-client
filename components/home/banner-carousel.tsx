@@ -12,32 +12,10 @@ import {
 } from "@/lib/api/banners";
 import { cn } from "@/lib/utils";
 
-/** Пауза между автопереключениями. */
 const AUTOPLAY_MS = 6000;
 
-/**
- * Ширина кадра в долях витрины. Меньше 100% — это и есть «подглядывание»:
- * оставшееся место занимает край соседнего баннера, и по нему сразу видно, что
- * карусель листается. Заодно баннер выходит ниже, ведь высота считается от его
- * ширины.
- *
- * На телефоне доля больше: там и полоса уже, и соседний кадр, отъевший пятую
- * часть экрана, оставил бы от текста акции нечитаемый огрызок.
- */
 const SLIDE_WIDTH = "w-[92%] sm:w-[86%] lg:w-[82%]";
 
-/**
- * Карусель баннеров над каталогом.
- *
- * Листается нативной прокруткой со scroll-snap, а не сдвигом через transform:
- * свайп, инерция и торможение на кадре достаются от браузера, а ширину кадра
- * можно задать обычными адаптивными классами — с ручным пересчётом позиций
- * пришлось бы мерить контейнер и повторять брейкпоинты в JS.
- *
- * Картинка своя на каждый язык — текст акции нарисован прямо на ней. Язык живёт
- * в localStorage и до монтирования неизвестен, поэтому первый кадр всегда
- * русский, а затем меняется вместе с остальным интерфейсом.
- */
 export function BannerCarousel({ banners }: { banners: PublicBanner[] }) {
   const { t, locale } = useT();
   const trackRef = useRef<HTMLDivElement>(null);
@@ -46,8 +24,6 @@ export function BannerCarousel({ banners }: { banners: PublicBanner[] }) {
 
   const count = banners.length;
 
-  /** Прокрутить к кадру. Позицию берём у самого элемента — она уже посчитана
-      браузером с учётом текущей ширины кадра и промежутков. */
   const go = useCallback(
     (next: number) => {
       const track = trackRef.current;
@@ -66,11 +42,6 @@ export function BannerCarousel({ banners }: { banners: PublicBanner[] }) {
     [count],
   );
 
-  /**
-   * Активный кадр — тот, чей центр ближе к центру полосы. Считать по
-   * `scrollLeft / шаг` нельзя: последний кадр упирается в правый край и встаёт
-   * не на своё расчётное место, из-за чего точка подсвечивалась бы не та.
-   */
   useEffect(() => {
     const track = trackRef.current;
     if (!track) return;
@@ -105,11 +76,6 @@ export function BannerCarousel({ banners }: { banners: PublicBanner[] }) {
     };
   }, []);
 
-  /**
-   * Автопрокрутка. Стоит на паузе под курсором, во время свайпа и при
-   * `prefers-reduced-motion`: баннер, уезжающий сам по себе, — ровно то
-   * движение, от которого эта настройка защищает.
-   */
   useEffect(() => {
     if (count < 2 || paused) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -128,7 +94,6 @@ export function BannerCarousel({ banners }: { banners: PublicBanner[] }) {
         className="group relative"
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
-        /* Пока палец на экране, автопрокрутка не должна вырывать кадр. */
         onPointerDown={() => setPaused(true)}
         onPointerUp={() => setPaused(false)}
         onPointerCancel={() => setPaused(false)}
@@ -142,7 +107,6 @@ export function BannerCarousel({ banners }: { banners: PublicBanner[] }) {
               key={banner.id}
               banner={banner}
               src={bannerImageUrl(banner, locale)}
-              /** Первый баннер — LCP первого экрана, грузим его без очереди. */
               eager={i === 0}
             />
           ))}
@@ -161,8 +125,7 @@ export function BannerCarousel({ banners }: { banners: PublicBanner[] }) {
               onClick={() => go(index + 1)}
             />
 
-            {/* Точки под полосой, а не поверх кадра: поверх они попадали бы то
-                на баннер, то на выглядывающего соседа. */}
+            {}
             <div className="mt-3 flex justify-center gap-1.5">
               {banners.map((banner, i) => (
                 <button
@@ -187,10 +150,6 @@ export function BannerCarousel({ banners }: { banners: PublicBanner[] }) {
   );
 }
 
-/**
- * Один кадр. Ширина — доля витрины, высоту задаёт пропорция баннера, поэтому
- * картинка видна целиком без обрезки.
- */
 function BannerSlide({
   banner,
   src,
@@ -249,10 +208,8 @@ function ArrowButton({
       onClick={onClick}
       aria-label={label}
       className={cn(
-        /* Половина высоты полосы, а не всей секции: под полосой лежат точки. */
         "absolute top-[calc(50%-0.75rem)] grid size-9 -translate-y-1/2 place-items-center rounded-full bg-white/85 text-neutral-900 shadow-md transition-opacity hover:bg-white",
         side === "left" ? "left-3" : "right-3",
-        /* На тач-устройствах наведения нет — там стрелки видны всегда. */
         "[@media(hover:hover)]:opacity-0 group-hover:opacity-100 focus-visible:opacity-100",
       )}
     >

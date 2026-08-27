@@ -15,7 +15,6 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useT } from "@/components/providers/i18n-provider";
 
-/** Reason-required confirmation used for admin "упразднить" actions. */
 export function AbolishDialog({
   title,
   description,

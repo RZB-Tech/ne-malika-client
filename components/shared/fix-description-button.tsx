@@ -9,21 +9,12 @@ import { apiErrorMessage } from "@/lib/api/errors";
 import { imageGenControllerRewriteDescription } from "@/lib/api/generated/endpoints/image-gen/image-gen";
 import { uploadPhoto, dataUrlToBlob } from "@/lib/api/upload";
 
-/** Фотография в форме: у выбранной только что ключа ещё нет. */
 export interface DescriptionPhoto {
   id: string;
   url: string;
   key?: string;
 }
 
-/**
- * «Поправить по фото»: модель приводит в порядок текст продавца, сверяясь с
- * фотографией товара.
- *
- * Отменить правку можно соседней кнопкой, а не действием в уведомлении:
- * уведомление живёт четыре секунды, а прочитать новый текст и решить, что
- * прежний был лучше, за это время невозможно.
- */
 export function FixDescriptionButton({
   photo,
   name,
@@ -32,19 +23,16 @@ export function FixDescriptionButton({
   onPhotoStored,
   disabled,
 }: {
-  /** Первое фото товара — по нему и сверяемся. */
   photo?: DescriptionPhoto;
   name?: string;
   text: string;
   onResult: (text: string) => void;
-  /** Фото могло загрузиться прямо сейчас — ключ нужен и форме. */
   onPhotoStored?: (photoId: string, key: string) => void;
   disabled?: boolean;
 }) {
   const { t } = useT();
   const [busy, setBusy] = useState(false);
 
-  /** Что было до правки и что предложила модель. */
   const [revision, setRevision] = useState<{
     before: string;
     after: string;

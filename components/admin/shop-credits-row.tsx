@@ -5,13 +5,6 @@ import { useAdminCreditsControllerBalance } from "@/lib/api/generated/endpoints/
 import { useT } from "@/components/providers/i18n-provider";
 import { DetailRow } from "@/components/admin/detail-drawer";
 
-/**
- * Остаток кредитов магазина в его карточке.
- *
- * Отдельным запросом, а не полем в списке магазинов: баланс меняется на каждой
- * генерации, и тянуть его в таблицу означало бы обновлять весь список ради
- * одной цифры, которую видно только в открытой карточке.
- */
 export function ShopCreditsRow({ shopId }: { shopId: number }) {
   const { t } = useT();
   const { data, isLoading, isError } = useAdminCreditsControllerBalance(

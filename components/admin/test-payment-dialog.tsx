@@ -16,24 +16,11 @@ import { formatNumber, formatTime } from "@/lib/format";
 import { Copy, ExternalLink } from "@/components/icons";
 import type { TestPaymentLinkDto } from "@/lib/api/generated/schemas";
 
-/** Магазин, на котором проверяют кассу. */
 export interface TestPaymentTarget {
   shopId: number;
   shopName: string;
 }
 
-/**
- * Ссылка на тестовую оплату: сумма, срок жизни окна и кнопка «Открыть кассу».
- *
- * Окном, а не тостом с адресом: ссылку нужно открыть руками и, скорее всего,
- * на телефоне — там стоит приложение Click. Тост исчезает через несколько
- * секунд, а вместе с ним и единственный способ попасть в открытое окно; второй
- * раз нажимать кнопку пришлось бы ради того же адреса.
- *
- * Отдельно и заметно сказано, что подписка не выдастся. Это не осторожность:
- * администратор, увидевший «оплата прошла» и не увидевший подписки, первым
- * делом решит, что сломана выдача, — и пойдёт искать несуществующую ошибку.
- */
 export function TestPaymentDialog({
   target,
   link,
@@ -56,11 +43,6 @@ export function TestPaymentDialog({
       toast.success(t("admin.subscriptions.testCopied"));
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      /**
-       * Буфер обмена закрыт (нет разрешения, страница не в защищённом
-       * контексте). Молчать нельзя: администратор решит, что скопировалось,
-       * и вставит в адресную строку то, что лежало там раньше.
-       */
       toast.error(t("admin.subscriptions.testCopyFailed"));
     }
   };

@@ -5,13 +5,6 @@ import { SearchX } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { useT } from "@/components/providers/i18n-provider";
 
-/**
- * Страница для несуществующего товара или магазина.
- *
- * Без неё `notFound()` из карточки товара отдавал стандартный экран Next.js —
- * «404 | This page could not be found.» по-английски, без шапки и без пути
- * назад. Переводы для этого случая в словаре уже лежали и не использовались.
- */
 export default function SiteNotFound() {
   const { t } = useT();
 

@@ -1,14 +1,6 @@
 import { axiosInstance } from "./mutator";
 
-/**
- * Подписка браузера на push.
- *
- * Не хук и не компонент: работа тут исключительно императивная — спросить
- * разрешение, зарегистрировать service worker, отдать подписку серверу. В
- * React это заворачивать нечего.
- */
 
-/** Поддерживает ли браузер push вообще. iOS — только если сайт добавлен на экран. */
 export function isPushSupported(): boolean {
   return (
     typeof window !== "undefined" &&
@@ -22,19 +14,12 @@ export function permissionState(): NotificationPermission | null {
   return isPushSupported() ? Notification.permission : null;
 }
 
-/** Разрешение браузера ещё не означает, что endpoint действительно создан. */
 export async function hasPushSubscription(): Promise<boolean> {
   if (!isPushSupported()) return false;
   const reg = await navigator.serviceWorker.getRegistration("/");
   return Boolean(await reg?.pushManager.getSubscription());
 }
 
-/**
- * VAPID-ключ приходит base64url, а PushManager ждёт байты.
- *
- * Буфер создаётся явно: типы DOM требуют ArrayBuffer, а `new Uint8Array(n)`
- * в свежем TypeScript выводится как ArrayBufferLike и не подходит.
- */
 function urlBase64ToUint8Array(base64: string): Uint8Array<ArrayBuffer> {
   const padding = "=".repeat((4 - (base64.length % 4)) % 4);
   const normalized = (base64 + padding).replace(/-/g, "+").replace(/_/g, "/");
@@ -63,17 +48,6 @@ export async function fetchPushConfig(): Promise<PushConfig> {
   return data;
 }
 
-/**
- * Спрашивает разрешение и подписывает браузер.
- *
- * Разрешение запрашивается только отсюда, то есть из обработчика клика:
- * браузеры давно наказывают за самовольный запрос при загрузке — Chrome
- * показывает такой вопрос свёрнутым, а при частых отказах блокирует навсегда.
- *
- * Возвращает состояние разрешения, чтобы вызывающий показал понятный текст:
- * «denied» после отказа лечится только настройками сайта, и предлагать нажать
- * кнопку ещё раз бессмысленно.
- */
 export async function subscribeToPush(
   publicKey: string,
   confirmation?: { title: string; body: string },
@@ -113,7 +87,6 @@ export async function subscribeToPush(
   return "granted";
 }
 
-/** Отписывает браузер и убирает подписку на сервере. */
 export async function unsubscribeFromPush(): Promise<void> {
   if (!isPushSupported()) return;
 

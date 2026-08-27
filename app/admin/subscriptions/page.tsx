@@ -65,21 +65,10 @@ import type {
   TestPaymentLinkDto,
 } from "@/lib/api/generated/schemas";
 
-/** Горизонт вкладки «Истекают»: неделя — столько занимает разговор о продлении. */
 const EXPIRING_DAYS = 7;
 
 type Tab = "all" | "start" | "pro" | "max" | "expiring" | "free" | "review";
 
-/**
- * Вкладки — это готовые наборы фильтров ручки, а не клиентская фильтрация:
- * список страничный, и отбор «на месте» показывал бы срез двадцати строк
- * вместо среза всей базы.
- *
- * `free` на сервере значит «подписка не действует» — сюда попадают и те, кто не
- * платил никогда, и бывшие подписчики с истёкшим сроком. Отдельной вкладки
- * «истёкшие» поэтому нет: такого фильтра у ручки не существует, а разделить их
- * можно только по `storedPlan`, который виден прямо в строке.
- */
 const TABS: readonly {
   value: Tab;
   labelKey: string;
@@ -127,11 +116,6 @@ export default function AdminSubscriptions() {
   const [q, setQ] = useState("");
   const [activating, setActivating] =
     useState<SubscriptionActivateTarget | null>(null);
-  /**
-   * Проверка кассы: цель и полученная ссылка держатся раздельно. Цель ставится
-   * до запроса — чтобы заголовок окна знал магазин, — а ссылка приходит после,
-   * и окно открывается только когда есть обе.
-   */
   const [testTarget, setTestTarget] = useState<TestPaymentTarget | null>(null);
   const [testLink, setTestLink] = useState<TestPaymentLinkDto | null>(null);
   const [paymentsShop, setPaymentsShop] = useState<{
@@ -145,12 +129,6 @@ export default function AdminSubscriptions() {
     [tab],
   );
 
-  /**
-   * `select` здесь не косметика: в сгенерированном `AdminSubscriptionRowDto`
-   * поле `shopStatus` объявлено как `string` — из `pgEnum` в OpenAPI попал
-   * голый тип. `EntityStatusBadge` ждёт `EntityStatus`, и без сужения строка
-   * таблицы не собралась бы.
-   */
   const { data, isLoading, isError } = useAdminSubscriptionsControllerList(
     { page, limit: 20, q: q.trim() || undefined, ...tabParams },
     {
@@ -175,13 +153,6 @@ export default function AdminSubscriptions() {
     });
   };
 
-  /**
-   * Открыть окно тестовой оплаты и показать ссылку.
-   *
-   * Без `invalidate`: окно живёт на магазине, а в списке подписок его не видно
-   * — обновлять там нечего. Тоста об успехе тоже нет: успех и есть открывшееся
-   * окно со ссылкой, и второе сообщение о нём было бы шумом.
-   */
   const armTest = async (row: AdminSubscriptionRow) => {
     setTestTarget({ shopId: row.shopId, shopName: row.shopName });
     try {
@@ -200,7 +171,6 @@ export default function AdminSubscriptions() {
     setPaymentsShop({ id: row.shopId, name: row.shopName });
   };
 
-  /** Один набор действий и для трёх точек, и для правой кнопки мыши. */
   const actionsFor = (row: AdminSubscriptionRow): RowAction[] => [
     {
       label: t("admin.subscriptions.openShop"),
@@ -299,11 +269,7 @@ export default function AdminSubscriptions() {
         </Card>
       )}
 
-      {/*
-        Общая подсказка про строку, а не `admin.subscriptions.hint`: та обещает
-        «открыть магазин», а нажатие открывает карточку платежей — магазин
-        рядом, отдельным пунктом меню строки.
-      */}
+      {}
       <p className="text-xs text-muted-foreground">
         {t("admin.common.rowHint")}
       </p>
@@ -326,7 +292,7 @@ export default function AdminSubscriptions() {
                   {t("admin.subscriptions.colCredits")}
                 </TableHead>
                 <TableHead>{t("admin.subscriptions.colLastPayment")}</TableHead>
-                {/* Флаги разбора: заголовка нет — их читают по цвету, не по подписи. */}
+                {}
                 <TableHead className="min-w-[150px]" />
                 <TableHead className="w-10" />
               </TableRow>
@@ -338,12 +304,6 @@ export default function AdminSubscriptions() {
                     onClick={() => openPayments(row)}
                     className={cn(
                       "cursor-pointer",
-                      /**
-                       * Строка целиком в красном, а не один значок в углу:
-                       * «деньги списаны, подписка не выдана» — единственное
-                       * состояние в этой таблице, из-за которого сюда заходят
-                       * не глядя на остальное.
-                       */
                       row.needsManualReview && "bg-destructive/5",
                     )}
                   >
@@ -411,12 +371,7 @@ export default function AdminSubscriptions() {
                       )}
                     </TableCell>
 
-                    {/*
-                      `formatPrice`, а не `formatNumber`: второй с десяти тысяч
-                      переходит на сокращённую запись, и 10 450 кредитов стали
-                      бы «10,5 тыс.». В таблице, по которой разбирают деньги,
-                      округление — это потерянная разница.
-                    */}
+                    {}
                     <TableCell className="tabular text-right text-sm">
                       {formatPrice(row.subscriptionCredits, locale)}
                     </TableCell>
@@ -509,18 +464,6 @@ export default function AdminSubscriptions() {
   );
 }
 
-/**
- * Журнал платежей магазина.
- *
- * Флаги в таблице говорят, У КОГО деньги потерялись; разобрать случай можно
- * только здесь: номер счёта провайдера, что он ответил, был ли возврат, сколько
- * кредитов выдано и сколько сгорело. Без этого списка красный значок в строке —
- * сообщение без продолжения.
- *
- * Подписи взяты из `seller.subscription.payments.*`: продавец и администратор
- * смотрят на одну и ту же строку платежа, и два словаря одних и тех же слов
- * разъехались бы на первой правке.
- */
 function PaymentsDrawer({
   shop,
   page,

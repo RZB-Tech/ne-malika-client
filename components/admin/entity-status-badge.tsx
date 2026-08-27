@@ -12,7 +12,6 @@ const STYLE: Record<EntityStatus, string> = {
   pending: "bg-muted text-muted-foreground",
 };
 
-/** Единый бейдж статуса для админки: и у магазинов, и у товаров он один и тот же. */
 export function EntityStatusBadge({
   status,
   className,

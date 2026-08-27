@@ -22,7 +22,6 @@ export function AddressAutocomplete({
   value: string;
   onChange: (value: string) => void;
   kind: SuggestKind;
-  /** For address lookups — biases suggestions to this city. */
   city?: string;
   id?: string;
   placeholder?: string;

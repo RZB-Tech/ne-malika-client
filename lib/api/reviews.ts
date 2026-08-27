@@ -21,17 +21,8 @@ import type {
   ReviewSummary,
 } from "./types";
 
-/**
- * Отзывы витрины.
- *
- * Обёртки поверх сгенерированных вызовов: спека не описывает тела ответов, и
- * без этого слоя каждый компонент приводил бы `unknown` к типу сам.
- */
-
-/** О чём отзыв: о товаре или о магазине целиком. */
 export type ReviewTarget = { productId: number } | { shopId: number };
 
-/** Префикс ключей react-query — по нему же идёт сброс после любой правки. */
 const REVIEWS_KEY = "/api/v1/reviews";
 const PRODUCTS_KEY = "/api/v1/product-cards";
 
@@ -41,10 +32,6 @@ function targetParams(target: ReviewTarget) {
     : { shop_id: target.shopId };
 }
 
-/**
- * Лента отзывов с догрузкой по кнопке. Именно лента, а не страницы: отзывы
- * читают подряд, и переключатель «1 2 3» здесь только мешал бы.
- */
 export function useReviewsFeed(target: ReviewTarget, limit = 10) {
   const base = targetParams(target);
   return useInfiniteQuery({
@@ -74,11 +61,6 @@ export function useReviewSummary(target: ReviewTarget) {
   });
 }
 
-/**
- * Отзыв этого человека об этом товаре или магазине, если он уже есть.
- * Нужен, чтобы предложить исправить прежний, а не писать второй: второй база
- * всё равно не примет.
- */
 export function useMyReview(target: ReviewTarget, enabled: boolean) {
   const params = { ...targetParams(target), limit: 1 };
   return useQuery({
@@ -106,11 +88,6 @@ export function useMyReviews(page: number, limit = 20) {
   });
 }
 
-/**
- * Сброс кэша после правки отзыва. Вместе с отзывами обновляем и товары:
- * оценка попадает в плитку каталога, и без этого звёзды остались бы прежними
- * до истечения кэша.
- */
 function useInvalidateReviews() {
   const queryClient = useQueryClient();
   return async () => {
@@ -126,7 +103,6 @@ export interface ReviewInput {
   text: string;
 }
 
-/** Создаёт отзыв или правит свой прежний — форма в обоих случаях одна. */
 export function useSaveReview(target: ReviewTarget, existingId?: number) {
   const invalidate = useInvalidateReviews();
 

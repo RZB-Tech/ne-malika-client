@@ -9,10 +9,6 @@ import type { ChatDto } from "@/lib/api/generated/schemas";
 import { cn } from "@/lib/utils";
 import { ChatAvatar } from "./chat-avatar";
 
-/**
- * Список переписок. Одинаковый для обеих сторон, меняется только «кто напротив»:
- * покупатель видит магазин, продавец — покупателя.
- */
 export function ChatList({
   chats,
   side,

@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 
-/** Horizontal labelled bars. */
 export function BarList({
   data,
   formatValue,
@@ -34,25 +33,11 @@ export function BarList({
   );
 }
 
-/** Точка временного ряда: сутки и значение за них. */
 export interface TrendPoint {
   date: string;
   value: number;
 }
 
-/**
- * Одна панель малых кратных: заголовок, итог за период и область под линией.
- *
- * Метрики площадки различаются на порядки — просмотров тысячи, новых магазинов
- * единицы. На общей шкале мелкий ряд лёг бы в ноль, а вторая ось для него —
- * приём, который врёт о пересечениях: две шкалы можно сдвинуть так, что линии
- * «встретятся» где угодно. Поэтому каждая метрика живёт в своей панели со своей
- * шкалой, а сравнение идёт по форме кривой, а не по высоте.
- *
- * Цвет один на все панели: серию называет заголовок, и раскрашивать пять
- * панелей в пять тонов значило бы кодировать цветом то, что уже написано
- * словами. Легенда по той же причине не нужна.
- */
 export function TrendPanel({
   label,
   total,
@@ -71,7 +56,6 @@ export function TrendPanel({
   const W = 300;
   const H = 72;
 
-  // Ноль всегда на дне: у площади обрезанная база завышает перепад в разы.
   const max = Math.max(...points.map((p) => p.value), 1);
   const stepX = points.length > 1 ? W / (points.length - 1) : 0;
   const at = (i: number, v: number) => [i * stepX, H - (v / max) * H] as const;
@@ -112,7 +96,7 @@ export function TrendPanel({
           role="img"
           aria-label={`${label}: ${total}`}
         >
-          {/* Растягивание по ширине исказило бы толщину штриха — гасим это. */}
+          {}
           <path d={area} fill="var(--primary)" opacity={0.1} />
           <path
             d={line}
@@ -145,7 +129,7 @@ export function TrendPanel({
           />
         </svg>
 
-        {/* Точка версткой, а не в SVG: растянутый по ширине круг стал бы овалом. */}
+        {}
         {point && (
           <span
             className="pointer-events-none absolute size-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary ring-2 ring-card"

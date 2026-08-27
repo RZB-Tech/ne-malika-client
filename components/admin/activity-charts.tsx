@@ -12,14 +12,6 @@ import type { ActivityPointDto } from "@/lib/api/generated/schemas";
 
 const RANGES = [30, 90, 365] as const;
 
-/**
- * Активность площадки по дням.
- *
- * Пять метрик — пять панелей со своей шкалой. Свести их в один график нельзя:
- * просмотров тысячи, новых магазинов единицы, и на общей оси второй ряд
- * прилипнет к нулю. Вторая ось эту проблему не решает, а маскирует — точка
- * пересечения двух шкал произвольна и читается как событие, которого не было.
- */
 export function ActivityCharts() {
   const { t, locale } = useT();
   const [days, setDays] = useState<number>(30);
@@ -114,11 +106,6 @@ export function ActivityCharts() {
   );
 }
 
-/**
- * Те же числа таблицей. Не украшение: кривая не читается вслух и не даётся
- * тому, кто не различает её на глаз, — значения обязаны существовать текстом.
- * Свёрнуто, чтобы не спорить с графиками за внимание.
- */
 function ActivityTable({ rows }: { rows: ActivityPointDto[] }) {
   const { t, locale } = useT();
   const filled = rows.filter(

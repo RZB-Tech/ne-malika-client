@@ -1,9 +1,5 @@
 import type { SVGProps } from "react";
 
-/**
- * Official Telegram Paper Airplane Icon component.
- * Replaces generic/crooked Lucide paper plane icons with the authentic Telegram paper plane logo.
- */
 export function TelegramIcon({
   className = "size-4",
   ...props

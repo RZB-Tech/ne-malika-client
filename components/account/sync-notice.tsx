@@ -3,11 +3,6 @@
 import { Cloud } from "@/components/icons";
 import { useT } from "@/components/providers/i18n-provider";
 
-/**
- * Плашка «где лежит список»: в браузере или уже в аккаунте. Общая для
- * избранного и истории просмотров — тексты берутся из неймспейса префикса
- * (`favorites.*` / `account.history.*`), набор ключей у обоих одинаковый.
- */
 export function SyncNotice({
   isRemote,
   prefix,

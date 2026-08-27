@@ -37,11 +37,6 @@ import type { Locale } from "@/lib/i18n/config";
 import { initials } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
-/**
- * Сколько разделов выносим во вторую строку. Больше семи не помещается даже на
- * широком экране, а перенос на две строки ломает высоту шапки — остальные
- * разделы открывает кнопка «Каталог».
- */
 const QUICK_CATEGORIES = 6;
 
 const FALLBACK_QUICK_CATEGORIES: Array<{
@@ -105,21 +100,9 @@ const FALLBACK_QUICK_CATEGORIES: Array<{
   },
 ];
 
-/** Общий вид действия в шапке: значок сверху, подпись под ним. */
 const ACTION_CLASS =
   "flex h-13 w-16 shrink-0 flex-col items-center justify-center gap-1 rounded-lg text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/40";
 
-/**
- * Шапка витрины по раскладке крупных маркетплейсов: светлая, в две строки.
- *
- * Первая строка — знак, «Каталог», поиск во всю оставшуюся ширину и действия
- * покупателя. Вторая — быстрые разделы каталога, язык и тема.
- *
- * Фон светлый, а не фирменный синий, как было раньше: на синем поле и строку
- * поиска, и кнопку каталога приходилось осветлять до белого, и они переставали
- * отличаться друг от друга. Синим осталось то, что должно звать нажать, —
- * кнопка каталога и кнопка поиска.
- */
 export function SiteHeader() {
   const { t, locale } = useT();
   const { user, isAuthenticated, isHydrated } = useAuth();
@@ -241,15 +224,7 @@ export function SiteHeader() {
           <FavoritesAction />
           <CompareAction />
 
-          {/**
-           * Язык и тема для телефона. На широком экране они стоят во второй
-           * строке шапки, но её показывают только с `lg` — на телефоне, где
-           * второй строки нет вовсе, переключиться было нечем.
-           *
-           * Только до `md`: с планшета в этот же ряд встают пять действий
-           * покупателя, и ещё две кнопки отобрали бы у строки поиска последнее
-           * место.
-           */}
+          {}
           <div className="flex shrink-0 items-center gap-0.5 md:hidden">
             <LanguageSwitch className="h-9 gap-1 px-1.5" />
             <AnimatedThemeToggler
@@ -336,11 +311,6 @@ export function SiteHeader() {
   );
 }
 
-/**
- * Содержимое действия. Отдельно от обёртки, потому что обёртки разные: ссылка
- * ведёт на страницу, а вход открывает окно — и `LoginDialog` вешает обработчик
- * на своего ребёнка, которым должен быть настоящий элемент, а не компонент.
- */
 function ActionBody({
   icon: Icon,
   label,
@@ -372,10 +342,6 @@ function ActionBody({
   );
 }
 
-/**
- * Переписка с продавцами. В отличие от соседей ведёт не на страницу, а
- * открывает панель справа: отвечают между делом, не отрываясь от каталога.
- */
 function MessagesAction() {
   const { t } = useT();
   const unread = useBuyerUnread();
@@ -398,7 +364,6 @@ function MessagesAction() {
   );
 }
 
-/** Счётчики лежат в localStorage, поэтому у каждого действия свой хук. */
 function FavoritesAction() {
   const { t } = useT();
   const { count } = useFavorites();

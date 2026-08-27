@@ -35,17 +35,6 @@ function resolve(obj: unknown, path: string): string {
   return typeof value === "string" ? value : path;
 }
 
-/**
- * Подстановка значений в строку перевода.
- *
- * Пустое значение оставляет плейсхолдер нетронутым — как и вовсе не переданный
- * ключ. Раньше `String(undefined)` подставлял в текст слово «undefined», и
- * пользователь читал «Подойдёт размер undefined» как настоящее сообщение;
- * `{sizes}` на его месте хотя бы честно выглядит поломкой, а не требованием.
- *
- * Такое случается, когда константу переименовали, а импорт остался старым:
- * типы это ловят, но не поймает устаревший кэш сборки.
- */
 function interpolate(str: string, vars?: Vars): string {
   if (!vars) return str;
   return str.replace(/\{(\w+)\}/g, (_, k) =>
@@ -55,7 +44,6 @@ function interpolate(str: string, vars?: Vars): string {
 
 export function I18nProvider({ children }: { children: React.ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>(defaultLocale);
-  /** Счётчик догрузок словаря: сигнал перерисоваться, когда чанк узбекского приехал. */
   const [dictVersion, setDictVersion] = useState(0);
 
   const apply = useCallback((l: Locale) => {
@@ -85,8 +73,6 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
   const t = useCallback(
     (path: string, vars?: Vars) =>
       interpolate(resolve(getMessages(locale) ?? ru, path), vars),
-    // dictVersion не читается телом, но t должен пересоздаться после догрузки
-    // словаря — иначе интерфейс так и останется русским до следующего рендера.
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [locale, dictVersion],
   );
@@ -105,7 +91,6 @@ export function useI18n() {
   return ctx;
 }
 
-/** Shorthand hook returning just the translate function + locale. */
 export function useT() {
   const { t, locale } = useI18n();
   return { t, locale };

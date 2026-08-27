@@ -26,24 +26,12 @@ import {
   useSellerBannersControllerRemove,
 } from "@/lib/api/generated/endpoints/banners-seller/banners-seller";
 
-/** Что означает статус — рядом с бейджем, который называет его одним словом. */
 const STATUS_TEXT: Record<BannerModerationStatus, string> = {
   pending: "seller.banner.statusPendingText",
   approved: "seller.banner.statusApprovedText",
   rejected: "seller.banner.statusRejectedText",
 };
 
-/**
- * Баннер магазина в карусели на главной — платная возможность тарифа MAX.
- *
- * Пункта меню у остальных нет, но адрес известен и открывается напрямую, поэтому
- * страница сама объясняет, почему форма закрыта, а не показывает пустоту.
- *
- * Тариф берём из `bannerSlots`, а не из названия плана: слоты приходят уже
- * посчитанными по сроку подписки, и у магазина с истёкшим MAX их ноль. Сравнение
- * с `plan === "max"` выдало бы форму тому, кто перестал платить, — и вся правка
- * упёрлась бы в 403 на сохранении.
- */
 export default function SellerBanner() {
   const { t, locale } = useT();
   const queryClient = useQueryClient();
@@ -69,20 +57,12 @@ export default function SellerBanner() {
     );
   }
 
-  /* Без магазина подписывать нечего и вешать баннер некуда — тот же путь, что у дашборда. */
   if (!shop) {
     redirect("/seller/profile");
   }
 
   const banners = bannersQuery.data ?? [];
 
-  /**
-   * Тариф MAX даёт ровно один слот, поэтому вся страница — про один баннер:
-   * список с сервера приходит массивом, но берём из него первый. Появится тариф
-   * с несколькими слотами — здесь встанет список карточек, а тексты придётся
-   * переписать во множественное число: сейчас они все единственного («Баннера
-   * пока нет», «Один слот в карусели»).
-   */
   const banner: Banner | null = banners[0] ?? null;
 
   const slots = subscription?.bannerSlots ?? 0;
@@ -108,30 +88,21 @@ export default function SellerBanner() {
         </p>
       </div>
 
-      {/**
-       * Одна карточка на оба отказа: подписка и баннер отваливаются обычно
-       * вместе и по одной причине, а две одинаковые красные строки подряд
-       * читаются как две разные поломки.
-       */}
+      {}
       {(subscriptionError || bannersQuery.isError) && (
         <Card className="border-destructive/40 bg-destructive/5 p-4 text-sm">
           {t("seller.banner.loadFailed")}
         </Card>
       )}
 
-      {/* Состояние подписки неизвестно — «купите MAX» в этом месте было бы враньём. */}
+      {}
       {locked && !subscriptionError && <LockedCard />}
 
       {bannersQuery.isLoading ? (
         <Skeleton className="h-44 w-full rounded-2xl" />
       ) : (
         <>
-          {/**
-           * Карточку с баннером показываем и на закрытом тарифе. Удаление —
-           * единственное действие, которое сервер оставляет без гейта, и
-           * намеренно: иначе магазин с истёкшим MAX остался бы с картинкой,
-           * которую нельзя ни показать, ни убрать.
-           */}
+          {}
           {banner && (
             <BannerCard
               banner={banner}
@@ -159,7 +130,6 @@ export default function SellerBanner() {
   );
 }
 
-/** Тариф не даёт баннера: объяснение и дорога к тому, который даёт. */
 function LockedCard() {
   const { t } = useT();
   return (
@@ -176,13 +146,6 @@ function LockedCard() {
   );
 }
 
-/**
- * Сохранённый баннер: картинка текущего языка, статус модерации и удаление.
- *
- * Причину отказа показываем только при `rejected`: сервер стирает её вместе со
- * статусом на каждой правке, и уцелевшая строка рядом с ждущим проверки
- * баннером означала бы претензию к картинке, которой уже нет.
- */
 function BannerCard({
   banner,
   locale,
@@ -203,7 +166,6 @@ function BannerCard({
           style={{ aspectRatio: BANNER_ASPECT_CSS }}
           className="w-56 shrink-0 overflow-hidden rounded-lg border border-border bg-muted"
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={src ?? ""}
             alt={banner.title}

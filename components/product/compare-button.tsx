@@ -8,10 +8,6 @@ import { useCompare } from "@/lib/compare/use-compare";
 import type { ProductSnapshot } from "@/lib/product-snapshot";
 import { cn } from "@/lib/utils";
 
-/**
- * Кнопка «к сравнению». Список локальный, поэтому нажатие срабатывает мгновенно
- * и работает без входа.
- */
 export function CompareButton({
   product,
   variant = "icon",

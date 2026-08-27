@@ -13,10 +13,6 @@ import {
 } from "./local-compare";
 import type { ProductSnapshot } from "@/lib/product-snapshot";
 
-/**
- * Список сравнения. Целиком локальный — синхронизировать с бэкендом здесь
- * нечего: выбор живёт минуты, а не между устройствами.
- */
 export function useCompare() {
   const items = useSyncExternalStore(
     subscribeLocalCompare,
@@ -32,7 +28,6 @@ export function useCompare() {
     return addToCompare(product);
   }, []);
 
-  /** Стабильные ссылки: мемоизированные дети не должны перерисовываться впустую. */
   const ids = useMemo(() => items.map((p) => p.id), [items]);
   const has = useCallback(
     (id: number) => items.some((p) => p.id === id),

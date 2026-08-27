@@ -11,11 +11,6 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 
-/**
- * Общий каркас выдвижных карточек админки: шапка, прокручиваемое тело,
- * закреплённый низ с кнопками. Раньше каждая карточка размечала это сама,
- * и они разъезжались по отступам и ширине.
- */
 export function DetailDrawer({
   open,
   onOpenChange,
@@ -71,7 +66,6 @@ export function DetailDrawer({
   );
 }
 
-/** Строка «поле — значение» в теле карточки. */
 export function DetailRow({
   label,
   value,
@@ -89,7 +83,6 @@ export function DetailRow({
   );
 }
 
-/** Блок-предупреждение: причина блокировки, ошибка проверки и подобное. */
 export function DetailNote({
   tone = "muted",
   title,
@@ -116,7 +109,6 @@ export function DetailNote({
   );
 }
 
-/** Заголовок секции внутри карточки. */
 export function DetailSection({
   title,
   children,
@@ -134,11 +126,6 @@ export function DetailSection({
   );
 }
 
-/**
- * Цвета кнопок в подвале карточки: действие узнаётся по цвету, а не по
- * подписи. На наведении все становятся нейтрально-серыми — так видно, что
- * курсор именно на этой кнопке, и красный не «кричит» под рукой.
- */
 export const drawerAction = {
   neutral: "bg-muted/70 text-foreground hover:bg-muted",
   primary: "bg-primary/10 text-primary hover:bg-muted hover:text-foreground",

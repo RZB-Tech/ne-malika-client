@@ -7,7 +7,6 @@ export interface CompareProduct extends ProductSnapshot {
   addedAt: string;
 }
 
-/** Больше четырёх колонок таблица не выдержит даже на широком экране. */
 export const MAX_COMPARE = 4;
 
 const store = createLocalListStore<CompareProduct>({
@@ -22,7 +21,6 @@ export const subscribeLocalCompare = store.subscribe;
 export const removeFromCompare = store.remove;
 export const clearCompare = store.clear;
 
-/** Возвращает false, если товар уже выбран или мест больше нет. */
 export function addToCompare(
   product: ProductSnapshot,
   addedAt = new Date().toISOString(),

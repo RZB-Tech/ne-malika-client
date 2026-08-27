@@ -38,13 +38,6 @@ function fromRemote(dto: FavoriteDto): FavoriteProduct {
   };
 }
 
-/**
- * Избранное: локальное у анонима, серверное у вошедшего.
- *
- * Устроено как история просмотров — общая механика в `useRemoteBackedList`:
- * локальная копия пишется всегда, после входа один раз уезжает на бэкенд и
- * дальше служит запасным вариантом, пока запрос летит и если он не долетел.
- */
 export function useFavorites() {
   const { user, isAuthenticated, isHydrated } = useAuth();
   const queryClient = useQueryClient();
@@ -58,8 +51,6 @@ export function useFavorites() {
   const enabled = isHydrated && isAuthenticated;
 
   const remote = useFavoritesControllerFindMine(
-    // Кап совпадает с локальным и бэкендом: меньше — и has() у активных
-    // пользователей врёт, а toggle перезаписывает уже избранное.
     { limit: MAX_LOCAL_FAVORITES },
     { query: { enabled } },
   );
@@ -145,7 +136,6 @@ export function useFavorites() {
     items: list.items,
     count: list.items.length,
     isLoading: list.isLoading,
-    /** Избранное уже общее для всех устройств. */
     isRemote: list.isRemote,
     has,
     add,

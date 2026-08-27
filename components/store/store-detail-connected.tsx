@@ -35,10 +35,6 @@ export function StoreDetailConnected({ id }: { id: number }) {
     );
   }
 
-  /**
-   * 404 — магазина действительно нет: notFound(). Остальное (сеть, 5xx) —
-   * временный сбой: показываем ошибку с повтором, а не хороним живой URL.
-   */
   if (isError || !data) {
     const status = (error as AxiosError | null)?.response?.status;
     if (status === 404) notFound();

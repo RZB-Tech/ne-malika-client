@@ -26,7 +26,6 @@ export const SITE_KEYWORDS = [
   "kompyuter bozori Malika",
 ];
 
-/** Абсолютный URL из пути (для canonical, OG, sitemap). */
 export function absoluteUrl(path = "/"): string {
   return `${SITE_URL}${path.startsWith("/") ? path : `/${path}`}`;
 }

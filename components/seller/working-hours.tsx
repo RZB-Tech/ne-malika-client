@@ -43,7 +43,6 @@ export function defaultWorkingHours(): WorkingHours {
   }, {} as WorkingHours);
 }
 
-/** Editor state → backend work_schedule (only open days). */
 export function toWorkSchedule(hours: WorkingHours): WorkScheduleEntry[] {
   return DAYS.map((day) => ({
     day: DAY_CODE[day],
@@ -53,7 +52,6 @@ export function toWorkSchedule(hours: WorkingHours): WorkScheduleEntry[] {
   }));
 }
 
-/** Backend work_schedule → editor state. */
 export function fromWorkSchedule(
   entries: WorkScheduleEntry[] | null | undefined,
 ): WorkingHours {

@@ -12,11 +12,6 @@ import type {
 
 export const IS_DEV = process.env.NODE_ENV === "development";
 
-/**
- * Фиктивная роль для входа в кабинет без бэкенда: `NEXT_PUBLIC_DEV_ROLE=admin`
- * в `.env.local`. Переменная опциональна — без неё вход работает как обычно,
- * через Telegram.
- */
 export const DEV_ROLE = IS_DEV
   ? (process.env.NEXT_PUBLIC_DEV_ROLE as "admin" | "seller" | "user" | undefined)
   : undefined;
@@ -248,10 +243,6 @@ export const devProducts: PublicProductCard[] = [
   },
 ];
 
-/**
- * Те же товары для админки плюс заблокированные — иначе фильтр по статусу
- * локально не на чем проверить.
- */
 export const devAdminProducts: AdminProductRow[] = [
   ...devProducts.map((p) => ({
     ...p,
@@ -455,7 +446,6 @@ export const devAiReview: AiReviewRow[] = [
   },
 ];
 
-/** Журнал ИИ: продавец со списанием, администратор — за счёт площадки. */
 export const devAiUsage: AiUsageRow[] = [
   {
     id: 1,
@@ -558,15 +548,10 @@ export const devReports: ReportRow[] = [
   },
 ];
 
-/**
- * true, когда на экране фикстуры, а не ответ API. Нужен, чтобы не показывать
- * поверх тестовых данных красное «не удалось загрузить» — это сбивает с толку.
- */
 export function usingDevData(data: { length: number } | undefined): boolean {
   return IS_DEV && !data?.length;
 }
 
-/** То же для страничного ответа — meta собираем из длины фикстур. */
 export function devFallbackPage<T>(
   data: Paginated<T> | undefined,
   fixtures: T[],

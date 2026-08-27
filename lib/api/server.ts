@@ -14,11 +14,6 @@ const ORIGIN = (
 const API = `${ORIGIN}/api/v1`;
 
 const fetchOpts = (revalidateSec: number) =>
-  /**
-   * Ноль — ответ у каждого захода свой (перемешанная витрина), и класть его
-   * в кэш незачем: второй раз по тому же адресу никто не придёт, а место
-   * в кэше он занял бы наравне с общими ответами.
-   */
   revalidateSec > 0
     ? { next: { revalidate: revalidateSec } }
     : { cache: "no-store" as const };
@@ -39,11 +34,6 @@ async function getJson<T>(
   }
 }
 
-/**
- * Как getJson, но null только для честной 404. Сетевые сбои и 5xx бросаются:
- * витринная страница товара/магазина не должна превращать временный сбой API
- * в постоянный notFound() — для живого URL это вылет из поискового индекса.
- */
 async function getEntityJson<T>(
   path: string,
   revalidateSec: number,
@@ -57,34 +47,16 @@ async function getEntityJson<T>(
   return (await res.json()) as T;
 }
 
-/** GET /product-cards/:id — публичная карточка товара. */
 export function getPublicProduct(
   id: number,
 ): Promise<PublicProductCard | null> {
   return getEntityJson<PublicProductCard>(`/product-cards/${id}`, 300);
 }
 
-/** GET /shops/:id — публичный магазин. */
 export function getPublicShop(id: number): Promise<PublicShop | null> {
   return getEntityJson<PublicShop>(`/shops/${id}`, 600);
 }
 
-/**
- * GET /product-cards?... — страница каталога для серверного рендера витрины.
- * Значения по умолчанию совпадают с первым запросом CatalogView (page 1,
- * limit 24, без фильтров), чтобы initialData подошёл под ключ react-query и
- * гидратация не разошлась.
- *
- * `seed` — зерно перемешивания: с ним ответ уникален для захода, поэтому мимо
- * кэша. Без него — прежний общий ответ на две минуты.
- *
- * `visitor_id` отсюда не уходит и уйти не может: он лежит в localStorage
- * посетителя (`lib/analytics.ts`), а этот запрос делает сервер. Статистику
- * поисковых запросов это не обедняет — здесь всегда первая страница витрины
- * без строки поиска, а всё, что человек ищет руками, уходит уже клиентским
- * запросом, и вот к нему `visitor_id` приложить обязательно: без него сервер
- * не считает поисковый запрос вовсе, и отчёт MAX останется пустым.
- */
 export function getPublicProducts(
   params: {
     page?: number;
@@ -106,25 +78,10 @@ export function getPublicProducts(
   );
 }
 
-/**
- * GET /banners — карусель главной. Рендерится сервером вместе с первым экраном:
- * баннер стоит выше каталога и, догружаясь на клиенте, сдвигал бы витрину вниз
- * уже после того, как её увидели.
- *
- * Именно `PublicBannerDto`, а не `BannerDto`: с появлением баннеров продавцов
- * ручка перестала отдавать поля модерации (`status`, `rejectReason`, `shopId`,
- * `isActive`, `sortOrder`) — это переписка продавца с модератором, и на
- * витрине ей не место. Тип здесь написан руками, генератор этот путь не
- * видит, так что соврать он может молча: за списком полей следить глазами.
- */
 export async function getBanners(): Promise<PublicBannerDto[]> {
   return (await getJson<PublicBannerDto[]>("/banners", 120)) ?? [];
 }
 
-/**
- * Все id товаров для sitemap. Один запрос к специальному эндпоинту: раньше
- * здесь была последовательная пагинация до сотни запросов подряд.
- */
 export async function getAllProductIds(): Promise<
   { id: number; updatedAt: string }[]
 > {

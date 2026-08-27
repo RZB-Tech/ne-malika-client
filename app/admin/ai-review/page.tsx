@@ -34,11 +34,6 @@ export default function AdminAiReview() {
   const run = useAdminMutation();
 
   const [page, setPage] = useState(1);
-  /**
-   * Фото товара во весь экран. Здесь это не украшение: решение «одобрить или
-   * забраковать» принимается именно по картинке, а на миниатюре 64×64 не видно
-   * того, о чём пишет модель.
-   */
   const [zoomed, setZoomed] = useState<{ photos: string[]; name: string } | null>(
     null,
   );

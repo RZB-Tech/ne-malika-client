@@ -25,16 +25,11 @@ import type { OwnReview, PublicReview, ReviewStatus } from "@/lib/api/types";
 
 const STARS = [5, 4, 3, 2, 1];
 
-/**
- * Отзывы о товаре или магазине: оценка, разбивка по звёздам, лента и своя
- * карточка автора. Один компонент на оба случая — различает их только цель.
- */
 export function ReviewsSection({
   target,
   ownerId,
 }: {
   target: ReviewTarget;
-  /** Владелец магазина: себя оценивать нельзя, и кнопки он не видит. */
   ownerId?: number;
 }) {
   const { t } = useT();
@@ -177,7 +172,6 @@ export function ReviewsSection({
   );
 }
 
-/** Гостю кнопка сначала предлагает войти: отзыв привязан к человеку. */
 function WriteButton({
   authenticated,
   onClick,
@@ -197,11 +191,6 @@ function WriteButton({
   return authenticated ? button : <LoginDialog>{button}</LoginDialog>;
 }
 
-/**
- * Свой отзыв. Показывается отдельно от ленты и всегда: пока модератор не
- * посмотрел, в общем списке его нет, и без этой карточки человек решил бы,
- * что отзыв пропал.
- */
 function MyReview({
   review,
   onEdit,

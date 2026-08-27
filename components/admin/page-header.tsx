@@ -2,10 +2,6 @@
 
 import type { ReactNode } from "react";
 
-/**
- * Шапка админской страницы: заголовок + подзаголовок слева, действия справа.
- * Одиннадцать страниц повторяли этот блок вручную.
- */
 export function AdminPageHeader({
   title,
   subtitle,

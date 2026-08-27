@@ -32,39 +32,12 @@ import { downloadAnalyticsCsv } from "@/lib/api/analytics";
 import { useSellerShopAnalyticsControllerSummary } from "@/lib/api/generated/endpoints/shop-analytics-seller/shop-analytics-seller";
 import type { ShopDailyPointDto } from "@/lib/api/generated/schemas";
 
-/**
- * Глубины периода в переключателе.
- *
- * Тридцать суток открыты всем — это `FREE_LIMITS.analyticsDays` на сервере, и
- * ровно столько же показывает карточка отдельного товара. Остальные две глубины
- * упираются в `analyticsDays` действующего тарифа: у всех, кроме MAX, это те же
- * 30, поэтому 90 и 365 приходят заблокированными.
- *
- * 365 — не круглое число ради красоты, а `@Max(365)` у `StatsRangeQueryDto`:
- * запрос на 366 суток сервер отклонит уже не про тариф, а про несуществующий
- * период.
- */
 export const ANALYTICS_RANGES = [30, 90, 365] as const;
 
-/** Глубина, с которой открывается страница. Совпадает с правами без подписки. */
 export const DEFAULT_ANALYTICS_DAYS = 30;
 
-/** Сколько товаров показывать в топе — столько же отдаёт сервер. */
 const TOP_LIMIT = 10;
 
-/**
- * Аналитика магазина: итоги за период, динамика по дням и топ товаров.
- *
- * Состояние периода живёт на странице, а не здесь, хотя переключатель нарисован
- * этим компонентом: ту же глубину читает блок поисковых запросов, и два
- * независимых счётчика суток на одном экране означали бы, что график и список
- * запросов рассказывают про разные недели.
- *
- * Что закрыто тарифом — закрыто здесь же, до запроса: заблокированная вкладка
- * не нажимается, а вместо кнопки выгрузки на не-MAX стоит строка с замком.
- * Отправить запрос и показать 403 было бы честнее по отношению к серверу и
- * бесполезнее по отношению к продавцу.
- */
 export function ShopAnalytics({
   days,
   onDaysChange,
@@ -73,9 +46,7 @@ export function ShopAnalytics({
 }: {
   days: number;
   onDaysChange: (days: number) => void;
-  /** Глубина, разрешённая действующим тарифом: 30 у всех, 365 на MAX. */
   analyticsDays: number;
-  /** Действующий тариф — MAX. От него зависит выгрузка CSV. */
   isMax: boolean;
 }) {
   const { t, locale } = useT();
@@ -88,12 +59,6 @@ export function ShopAnalytics({
 
   const num = (value: number) => formatNumber(value, locale);
 
-  /**
-   * Сутки в подписи. Часовой пояс проставлен явно: `from`/`to`/`date` приходят
-   * как `YYYY-MM-DD`, `new Date` читает такую строку как полночь UTC, и в
-   * браузере с отрицательным смещением дата съехала бы на день назад. Так же
-   * сделано в `components/admin/activity-charts.tsx`.
-   */
   const day = (iso: string) =>
     new Date(`${iso}T00:00:00Z`).toLocaleDateString(locale, {
       day: "numeric",
@@ -106,13 +71,6 @@ export function ShopAnalytics({
 
   const hasLockedRange = ANALYTICS_RANGES.some((r) => r > analyticsDays);
 
-  /**
-   * Ошибку выгрузки переводим сами, а не берём текст сервера через
-   * `apiErrorMessage`. Ответ у этой ручки — файл, `responseType: "blob"`, и
-   * тело отказа приезжает блобом: перехватчик в `lib/api/mutator.ts` не может
-   * достать из него `message` и оставляет в ошибке английское «Request failed
-   * with status code 403». Показывать продавцу такое вместо объяснения нельзя.
-   */
   const exportCsv = async () => {
     setExporting(true);
     try {
@@ -143,7 +101,7 @@ export function ShopAnalytics({
                   >
                     {locked && <Lock className="size-3.5" />}
                     {t(`seller.analytics.range${range}`)}
-                    {/* Замок виден глазами, причина — нет: озвучиваем её. */}
+                    {}
                     {locked && (
                       <span className="sr-only">
                         {t("seller.analytics.rangeLocked")}
@@ -239,13 +197,7 @@ export function ShopAnalytics({
               icon={Phone}
               hint={t("seller.analytics.contactsHint")}
             />
-            {/*
-              Конверсия считается от «дошедших до контакта», а не от суммы
-              раскрытий телефона и переходов в Telegram: один посетитель умеет и
-              то и другое, и сумма способна обогнать число посетителей. Число
-              приходит с сервера уже посчитанным этим же способом — тем самым,
-              которым его считает карточка товара.
-            */}
+            {}
             <StatCard
               label={t("seller.analytics.conversion")}
               value={`${data.conversionPercent}%`}
@@ -256,11 +208,7 @@ export function ShopAnalytics({
           <Card className="p-5">
             <h2 className="font-medium">{t("seller.analytics.chart")}</h2>
 
-            {/*
-              Пять метрик — пять панелей со своей шкалой. На общей оси переходы
-              в Telegram прилипли бы к нулю рядом с просмотрами, а вторая ось
-              рисует пересечение там, где его нет.
-            */}
+            {}
             <div className="mt-6 grid gap-x-8 gap-y-7 sm:grid-cols-2 xl:grid-cols-3">
               <TrendPanel
                 label={t("seller.analytics.views")}

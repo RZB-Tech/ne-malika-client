@@ -3,13 +3,10 @@
 import { createLocalListStore } from "@/lib/storage/local-list-store";
 import { isProductSnapshot, type ProductSnapshot } from "@/lib/product-snapshot";
 
-/** Товар в локальной истории. */
 export interface ViewedProduct extends ProductSnapshot {
-  /** ISO-дата последнего просмотра. */
   viewedAt: string;
 }
 
-/** Потолок совпадает с ArrayMaxSize на бэкенде: всю историю шлём одним запросом. */
 export const MAX_LOCAL_HISTORY = 100;
 
 const store = createLocalListStore<ViewedProduct>({
@@ -24,10 +21,6 @@ export const subscribeLocalHistory = store.subscribe;
 export const removeLocalView = store.remove;
 export const clearLocalHistory = store.clear;
 
-/**
- * Записывает просмотр. Повторный заход поднимает товар наверх, а не добавляет
- * второй такой же — история отвечает на вопрос «что я смотрел», а не «сколько раз».
- */
 export function recordLocalView(
   product: ProductSnapshot,
   viewedAt = new Date().toISOString(),

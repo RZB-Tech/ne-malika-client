@@ -24,24 +24,16 @@ import { AbolishDialog } from "@/components/admin/abolish-dialog";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { useT } from "@/components/providers/i18n-provider";
 
-/**
- * Одно описание действий строки на два способа вызова: три точки справа
- * и правая кнопка мыши по строке. Иначе каждый пункт пришлось бы держать
- * в двух местах и следить, чтобы они не разъехались.
- */
 export interface RowAction {
   label: string;
   icon: AppIcon;
-  /** Переход — пункт становится ссылкой. */
   href?: string;
   onSelect?: () => void;
-  /** Действие с обязательной причиной: пункт открывает диалог ввода. */
   withReason?: {
     title: string;
     description?: string;
     onConfirm: (reason: string) => Promise<void>;
   };
-  /** Необратимое действие: пункт открывает окно подтверждения. */
   withConfirm?: {
     title: string;
     description?: string;

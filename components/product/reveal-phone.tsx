@@ -6,12 +6,6 @@ import { useT } from "@/components/providers/i18n-provider";
 import { trackContact } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
 
-/**
- * Telegram-style "show number": the seller phone is blurred until the buyer
- * clicks it. The click is an intent signal we can later feed into analytics
- * of interested buyers (see the seam in `reveal`). Once revealed the number
- * itself becomes the call action — tapping it hands off to the dialer.
- */
 export function RevealPhone({
   phone,
   productId,

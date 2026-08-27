@@ -10,13 +10,6 @@ import { useCompare } from "@/lib/compare/use-compare";
 import { hueFromId } from "@/lib/api/mappers";
 import { photoUrl } from "@/lib/api/photo";
 
-/**
- * Панель выбранного к сравнению — висит внизу витрины, пока в списке есть
- * товары. Живёт в layout, а не на конкретной странице: набирают сравнение с
- * карточек по всему сайту, и панель должна ехать следом.
- *
- * На самой /compare скрыта: там список и так перед глазами.
- */
 export function CompareBar() {
   const { t } = useT();
   const pathname = usePathname();

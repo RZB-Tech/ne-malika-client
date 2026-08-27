@@ -11,11 +11,6 @@ const LightRays = dynamic(() => import("@/components/magicui/light-rays"), {
   ssr: false,
 });
 
-/**
- * Страница входа продавца. Единственный способ авторизации — Telegram:
- * ни email, ни пароля у бэкенда нет, отдельной регистрации тоже — аккаунт
- * создаётся при первом входе. Поэтому здесь только кнопка и объяснение.
- */
 export function AuthForm() {
   const { t } = useT();
 

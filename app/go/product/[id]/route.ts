@@ -5,17 +5,6 @@ import { buildTelegramUrl, parseTelegramUsername } from "@/lib/telegram";
 import { loadMessages } from "@/lib/i18n/messages";
 import { defaultLocale, locales, type Locale } from "@/lib/i18n/config";
 
-/**
- * «Связаться с продавцом» прямо из карточки в каталоге.
- *
- * Публичная выдача товаров не содержит телеграма магазина — только shopId, так
- * что собрать ссылку на клиенте нечем. Догружать магазин по клику нельзя:
- * `window.open` после await блокируется браузером. Поэтому кнопка — обычная
- * ссылка сюда, а адрес диалога подставляет сервер редиректом.
- *
- * Язык приезжает параметром `l`: приветствие берётся из того же каталога
- * сообщений, что и на клиенте.
- */
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },

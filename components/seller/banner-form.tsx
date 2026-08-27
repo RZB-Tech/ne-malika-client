@@ -28,12 +28,6 @@ import {
   useSellerBannersControllerUpdate,
 } from "@/lib/api/generated/endpoints/banners-seller/banners-seller";
 
-/**
- * Картинка одного языка: либо уже сохранённая (есть `key`), либо только что
- * выбранная (есть `file`). Загрузка в S3 откладывается до нажатия «Сохранить» —
- * иначе брошенная форма оставляла бы в бакете файлы, на которые никто не
- * ссылается.
- */
 interface Slot {
   key?: string;
   file?: File;
@@ -44,21 +38,6 @@ type Slots = Record<Locale, Slot | null>;
 
 const EMPTY_SLOTS: Slots = { ru: null, "uz-Latn": null, "uz-Cyrl": null };
 
-/**
- * Форма баннера магазина: три картинки (по одной на язык интерфейса), название
- * и ссылка.
- *
- * Одна форма на создание и на правку — поля совпадают, а разделять их значило бы
- * держать два экрана, расходящихся на первой же правке.
- *
- * Правку показываем только тем, у кого действующий MAX: гейт стоит на странице,
- * потому что он же решает, показывать ли форму вообще. `PATCH` на сервере тоже
- * закрыт тарифом — форма без гейта вела бы прямо в 403.
- *
- * Родитель обязан передавать `key={banner?.id ?? "new"}`: после удаления баннера
- * форма должна очиститься, а состояние полей живёт внутри и само по смене
- * пропса не сбросится.
- */
 export function BannerForm({ banner }: { banner: Banner | null }) {
   const { t } = useT();
   const queryClient = useQueryClient();
@@ -73,10 +52,6 @@ export function BannerForm({ banner }: { banner: Banner | null }) {
   );
   const [saving, setSaving] = useState(false);
 
-  /**
-   * Blob-ссылки предпросмотра живут, пока их не отозвать: без этого каждая
-   * переоткрытая страница оставляет во вкладке по мегабайту на картинку.
-   */
   const objectUrls = useRef<string[]>([]);
   useEffect(
     () => () => objectUrls.current.forEach((url) => URL.revokeObjectURL(url)),
@@ -96,11 +71,6 @@ export function BannerForm({ banner }: { banner: Banner | null }) {
     setSlots((s) => ({ ...s, [locale]: { file, preview } }));
   };
 
-  /**
-   * Одна картинка на все языки — обычный случай, когда текста на ней нет.
-   * Ставим один и тот же объект слота во все три поля: по нему же загрузка
-   * потом поймёт, что файл один, и отправит его в S3 однажды.
-   */
   const copyToAll = (from: Locale) => {
     setSlots((s) => {
       const source = s[from];
@@ -110,17 +80,6 @@ export function BannerForm({ banner }: { banner: Banner | null }) {
     toast.success(t("seller.banner.copiedToAll"));
   };
 
-  /**
-   * Есть ли что сохранять.
-   *
-   * Не украшение: сохранение одобренного баннера без единой правки сняло бы его
-   * с главной и отправило на повторную проверку — сервер возвращает в `pending`
-   * любой `PATCH`, независимо от того, изменилось ли хоть одно поле. Кнопка,
-   * которая ничего не меняет, но убирает баннер из карусели на несколько часов,
-   * — худшее, что может быть на этой странице.
-   *
-   * У нового баннера сравнивать не с чем: сохранять всегда есть что.
-   */
   const dirty = !banner || changedFrom(banner, title, linkUrl, slots);
 
   const submit = async (e: React.FormEvent) => {
@@ -144,10 +103,6 @@ export function BannerForm({ banner }: { banner: Banner | null }) {
         photoRu: keys.ru,
         photoUzLatn: keys["uz-Latn"],
         photoUzCyrl: keys["uz-Cyrl"],
-        /**
-         * Пустую строку шлём как есть, а не `undefined`: ключа не было бы в
-         * теле запроса вовсе, и очистка поля молча оставляла бы старую ссылку.
-         */
         linkUrl: linkUrl.trim(),
       };
 
@@ -157,12 +112,6 @@ export function BannerForm({ banner }: { banner: Banner | null }) {
         await createMutation.mutateAsync({ data });
       }
 
-      /**
-       * Выбранные файлы становятся сохранёнными ключами: иначе форма считала бы
-       * себя изменённой сразу после удачного сохранения и предлагала отправить
-       * на проверку то же самое второй раз. Предпросмотр оставляем прежний —
-       * blob уже в памяти вкладки, а картинка в S3 та же самая.
-       */
       setSlots((s) => ({
         ru: { key: keys.ru, preview: s.ru?.preview ?? "" },
         "uz-Latn": { key: keys["uz-Latn"], preview: s["uz-Latn"]?.preview ?? "" },
@@ -245,15 +194,6 @@ export function BannerForm({ banner }: { banner: Banner | null }) {
   );
 }
 
-/**
- * Предупреждение о повторной модерации.
- *
- * Для одобренного баннера это про потерю показов: он уходит с главной до
- * решения модератора, и без этой строки продавец, поправивший опечатку в
- * названии, решит, что площадка сломалась. Для ждущего и отклонённого
- * последствие то же самое, но терять нечего — там это просто справка, поэтому
- * и вида она обычного.
- */
 function ModerationWarning({ approved }: { approved: boolean }) {
   const { t } = useT();
   return (
@@ -340,7 +280,6 @@ function SlotPicker({
         accept={BANNER_MIME_TYPES.join(",")}
         onChange={(e) => {
           const file = e.target.files?.[0];
-          /* Сбрасываем значение: иначе повторный выбор того же файла молчит. */
           e.target.value = "";
           if (file) onPick(file);
         }}
@@ -349,7 +288,6 @@ function SlotPicker({
   );
 }
 
-/** Отличается ли то, что в полях, от того, что уже сохранено. */
 function changedFrom(
   banner: Banner,
   title: string,
@@ -359,12 +297,10 @@ function changedFrom(
   return (
     title.trim() !== banner.title ||
     linkUrl.trim() !== (banner.linkUrl ?? "") ||
-    /* Слот без `key` — это выбранный, но ещё не загруженный файл. */
     locales.some((l) => slots[l]?.key !== bannerPhotoKey(banner, l))
   );
 }
 
-/** Уже сохранённые картинки баннера — как заполненные слоты формы. */
 function storedSlots(banner: Banner): Slots {
   const slot = (locale: Locale): Slot => {
     const key = bannerPhotoKey(banner, locale);
@@ -377,15 +313,6 @@ function storedSlots(banner: Banner): Slots {
   };
 }
 
-/**
- * Ключи трёх картинок для тела запроса: сохранённые проходят насквозь, выбранные
- * загружаются в S3.
- *
- * Кэш по объекту слота нужен из-за кнопки «Поставить на все языки»: она ставит
- * один и тот же слот во все три поля, и без кэша один файл уезжал бы на сервер
- * трижды. На мобильном интернете это втрое дольше и втрое дороже ровно за то же
- * самое.
- */
 async function resolveSlotKeys(slots: Slots): Promise<Record<Locale, string>> {
   const started = new Map<Slot, Promise<string>>();
 

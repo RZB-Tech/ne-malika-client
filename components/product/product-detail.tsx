@@ -36,7 +36,6 @@ export function ProductDetail({
 }) {
   const { t, locale } = useT();
   const [active, setActive] = useState(0);
-  /** Индекс фото, открытого во весь экран; null — просмотрщик закрыт. */
   const [zoomed, setZoomed] = useState<number | null>(null);
   const snapshot = productToSnapshot(product);
 
@@ -62,31 +61,12 @@ export function ProductDetail({
     <PageContainer className="py-6">
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
         <div className="min-w-0">
-          {/**
-           * Верх страницы в три колонки, как на крупных маркетплейсах: галерея,
-           * рядом с ней описание с характеристиками, справа карточка с ценой.
-           *
-           * Раскладка включается по ширине окна, а не по брейкпоинту `lg`:
-           * колонке с текстом нужно хотя бы триста пикселей, иначе таблица
-           * характеристик в две колонки станет нечитаемой. Пока места нет,
-           * текст стоит под галереей, как раньше.
-           *
-           * На 1280 галерея ужимается до 480 — так текст помещается рядом уже
-           * там, а не только на самых широких экранах, где справа от фотографии
-           * иначе оставалось бы пустое поле.
-           */}
+          {}
           <div className="grid gap-8 xl:grid-cols-[minmax(0,480px)_minmax(0,1fr)] min-[1440px]:grid-cols-[minmax(0,640px)_minmax(0,1fr)]">
             <div className="min-w-0">
-              {/**
-               * Галерея — вертикальная, как на крупных маркетплейсах: колонка
-               * миниатюр слева, крупное фото справа.
-               *
-               * Ширина ограничена, потому что левая колонка страницы шире, чем
-               * нужно фотографии: без потолка вертикальный кадр вытянулся бы на
-               * тысячу с лишним пикселей и занял бы экран целиком.
-               */}
+              {}
               <div className="grid max-w-[640px] grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-[76px_minmax(0,1fr)]">
-                {/* Много фото — колонка прокручивается, а не растёт бесконечно. */}
+                {}
                 <div className="no-scrollbar order-2 flex min-w-0 gap-3 overflow-x-auto pb-1 sm:order-1 sm:max-h-[45rem] sm:flex-col sm:overflow-x-visible sm:overflow-y-auto sm:pb-0">
                   {gallery.map((g, i) => (
                     <button
@@ -94,11 +74,6 @@ export function ProductDetail({
                       onClick={() => setActive(i)}
                       aria-current={active === i}
                       className={cn(
-                        /**
-                         * Выбранное фото отмечено рамкой, а не яркостью: соседние
-                         * при затемнении читались как выключенные, хотя нажать
-                         * можно любое.
-                         */
                         "aspect-[3/4] w-[72px] shrink-0 overflow-hidden rounded-lg transition-shadow",
                         active === i
                           ? "ring-2 ring-primary"
@@ -118,10 +93,7 @@ export function ProductDetail({
                   ))}
                 </div>
                 <div className="relative order-1 min-w-0 sm:order-2">
-                  {/**
-                   * Крупный просмотр — только когда фото настоящее: на заглушке
-                   * категории увеличивать нечего.
-                   */}
+                  {}
                   <button
                     type="button"
                     onClick={() => photos.length > 0 && setZoomed(active)}
@@ -131,15 +103,7 @@ export function ProductDetail({
                       photos.length > 0 ? "cursor-zoom-in" : "cursor-default",
                     )}
                   >
-                    {/**
-                     * Вертикальный кадр 3:4 — в этой же пропорции генерируются
-                     * фото товаров (960×1280), поэтому у большинства карточек полей
-                     * не будет вовсе.
-                     *
-                     * Показываем фото целиком, а не заполняем кадр: продавцы грузят
-                     * снимки вперемешку, и обрезка съедала бы то подпись на
-                     * рекламной картинке, то часть товара.
-                     */}
+                    {}
                     <ProductImage
                       hue={gallery[active]?.hue ?? product.hue}
                       src={gallery[active]?.src}
@@ -168,7 +132,7 @@ export function ProductDetail({
               />
             </div>
 
-            {/* Средняя колонка: то, что покупатель читает, решаясь на покупку. */}
+            {}
             <div className="min-w-0 space-y-10">
               <section>
                 <h2 className="font-heading text-xl font-bold tracking-tight">
@@ -206,7 +170,7 @@ export function ProductDetail({
             </div>
           </div>
 
-          {/* Отзывы — под всем блоком: им нужна вся ширина, а не колонка. */}
+          {}
           <ReviewsSection
             target={{ productId: Number(product.id) }}
             ownerId={store.ownerId}

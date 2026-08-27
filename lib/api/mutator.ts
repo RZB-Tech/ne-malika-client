@@ -23,18 +23,12 @@ axiosInstance.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   return config;
 });
 
-/**
- * Кэш языка для заголовка Accept-Language: синхронный localStorage-чтение на
- * каждый запрос — лишний ход в главном потоке. Пишет сюда провайдер локали
- * (единый писатель), первый чтение — ленивое, из хранилища.
- */
 let localeCache: string | null = null;
 
 export function setRequestLocale(locale: Locale): void {
   localeCache = locale;
 }
 
-/** Сохранённый язык интерфейса. На сервере (SSR) localStorage нет. */
 function readLocale(): string {
   if (localeCache) return localeCache;
   if (typeof window === "undefined") return defaultLocale;

@@ -23,7 +23,6 @@ import {
   subscribe,
 } from "./token-store";
 
-/** Ответ Telegram Login Widget — подпись проверяет бэкенд, токен бота живёт только там. */
 export type TelegramUser = TelegramWidgetDto;
 
 interface AuthContextValue {
@@ -31,22 +30,10 @@ interface AuthContextValue {
   isAuthenticated: boolean;
   isSeller: boolean;
   isAdmin: boolean;
-  /**
-   * False during SSR and the first client render, true after mount. Auth state
-   * comes from localStorage, which is unavailable on the server — gate any
-   * auth-dependent UI on this to avoid a logged-out → logged-in flash.
-   */
   isHydrated: boolean;
-  /** True while running inside the Telegram client (Mini App). */
   isTelegramMiniApp: boolean;
   loginWithInitData: (initData: string) => Promise<AuthResponseDto>;
-  /** Браузерный вход через официальный Login Widget. */
   loginWithTelegramUser: (user: TelegramUser) => Promise<AuthResponseDto>;
-  /**
-   * Перевыпускает токены по refresh-cookie. Нужен там, где роль изменилась на
-   * бэкенде: она зашита в access-токен, и без этого «продавец» до конца сессии
-   * остаётся покупателем.
-   */
   refreshSession: () => Promise<AuthResponseDto | null>;
   logout: () => Promise<void>;
 }
@@ -90,8 +77,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setAuth(res.accessToken, res.user);
       return res;
     } catch (err) {
-      // Тихий фолбэк оставлен намеренно (гость без refresh-cookie — норма),
-      // но причина должна быть видна в консоли: ротация cookie, 500 и т.д.
       console.error("[auth] session refresh failed:", err);
       return null;
     }
@@ -141,8 +126,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const initData = readMiniAppInitData();
     if (initData) {
       loginWithInitData(initData).catch((err) => {
-        // Пользователь остаётся гостем без всякого сигнала — хотя бы в логах
-        // должно быть видно, что вход в Mini App не прошёл.
         console.error("[auth] Mini App initData login failed:", err);
       });
       return;

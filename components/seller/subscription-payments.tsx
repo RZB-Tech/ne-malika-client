@@ -26,15 +26,6 @@ import type {
 
 const LIMIT = 10;
 
-/**
- * История платежей за подписку: и оплаты через кассу, и ручные активации
- * администратором.
- *
- * Строка живёт дольше денег: Prepare заводит её раньше списания, а отказ на
- * Complete оставляет `cancelled` с возвратом. Поэтому рядом со статусом стоят
- * пометки о возврате и о том, что платёж ждёт разбора человеком — без них
- * продавец видел бы «Отменён» и не понимал, вернулись ли деньги.
- */
 export function SubscriptionPayments() {
   const { t, locale } = useT();
   const [page, setPage] = useState(1);
@@ -155,11 +146,7 @@ export function SubscriptionPayments() {
                         ) : (
                           <span className="text-muted-foreground">—</span>
                         )}
-                        {/*
-                          Сгоревшее показываем рядом с выданным: это две стороны
-                          одной операции, и продавец должен видеть, что остаток
-                          не пропал сам по себе, а был заменён новой нормой.
-                        */}
+                        {}
                         {p.burnedCredits ? (
                           <div className="tabular whitespace-nowrap text-xs text-warning">
                             {t("seller.subscription.payments.burned", {
@@ -171,9 +158,7 @@ export function SubscriptionPayments() {
                     </TableRow>
                   ))}
 
-              {/* «Платежей не было» — только когда список действительно пуст:
-                  на отказе сервера это была бы неправда, и продавец решил бы,
-                  что журнал стёрли. */}
+              {}
               {!isLoading && !isError && rows.length === 0 && (
                 <TableRow className="hover:bg-transparent">
                   <TableCell
@@ -201,14 +186,6 @@ export function SubscriptionPayments() {
   );
 }
 
-/**
- * Статус платежа.
- *
- * `prepared` и `pending` — касса открыта, денег там ещё нет: Prepare ничего не
- * списывает. `failed` — деньги списаны, а выдать подписку не удалось; такую
- * строку разбирает человек, и красная она не за компанию с «отменён», а по
- * существу.
- */
 function PaymentStatusBadge({
   status,
 }: {
@@ -242,7 +219,6 @@ function PaymentStatusBadge({
   );
 }
 
-/** Пометки под статусом: что стало с деньгами и ждёт ли строка разбора. */
 function Notes({ payment }: { payment: SubscriptionPaymentDto }) {
   const { t } = useT();
   const lines: string[] = [];

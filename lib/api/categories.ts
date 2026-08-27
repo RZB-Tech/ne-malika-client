@@ -5,10 +5,6 @@ import { useCategoriesControllerFindAll } from "@/lib/api/generated/endpoints/ca
 import type { CategoryDto } from "@/lib/api/generated/schemas";
 import type { Locale } from "@/lib/i18n/config";
 
-/**
- * Дерево категорий каталога. Меняется вручную и очень редко, поэтому держим его
- * в кэше запросов надолго: оно нужно и форме товара, и фильтрам, и меню.
- */
 export function useCategories() {
   const query = useCategoriesControllerFindAll({
     query: {
@@ -26,7 +22,6 @@ export function useCategories() {
   };
 }
 
-/** Плоский поиск по дереву — форма правки знает только id сохранённой категории. */
 export function findCategory(
   roots: CategoryDto[],
   id: number | null | undefined,
@@ -40,10 +35,6 @@ export function findCategory(
   return undefined;
 }
 
-/**
- * Подпись категории для карточки: «Ноутбуки · Игровые». Один лист без корня
- * читается плохо — «Игровые» встречаются и у мышей, и у мониторов.
- */
 export function useCategoryLabel(
   id: number | null | undefined,
   locale: Locale,

@@ -21,21 +21,14 @@ import type { CategoryDto } from "@/lib/api/generated/schemas";
 import type { Locale } from "@/lib/i18n/config";
 import { cn } from "@/lib/utils";
 
-/** Должно совпадать с duration-200 у панели: раньше времени снимать её нельзя. */
 const EXIT_MS = 200;
 
-/** Ссылка на раздел каталога. Лист адресуем id — его slug уникален лишь внутри раздела. */
 function categoryHref(root: CategoryDto, child?: CategoryDto): string {
   return child
     ? `/?category=${root.slug}&sub=${child.id}`
     : `/?category=${root.slug}`;
 }
 
-/**
- * Меню каталога из шапки. На широком экране — две колонки: разделы слева,
- * подкатегории наведённого раздела справа. На узком — тот же список с
- * проваливанием внутрь раздела: полторы сотни ссылок сразу на телефон не влезают.
- */
 export function CatalogMenu() {
   const { t, locale } = useT();
   const { roots, isLoading, isError, refetch } = useCategories();

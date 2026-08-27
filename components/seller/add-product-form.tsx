@@ -39,7 +39,6 @@ function SectionTitle({
 }: {
   index: number;
   children: React.ReactNode;
-  /** Кнопка справа от заголовка — например, автозаполнение раздела. */
   action?: React.ReactNode;
 }) {
   return (
@@ -53,12 +52,6 @@ function SectionTitle({
   );
 }
 
-/**
- * Характеристики так, как их увидит бэкенд при сохранении: бренд и модель здесь
- * заполняются отдельными полями, а в карточку уходят строками списка. Модели их
- * тоже надо показать в этом виде — иначе она сочтёт бренд неизвестным и
- * перепишет уже заполненное продавцом.
- */
 function brandModelSpecs(
   brand: string,
   model: string,
@@ -71,11 +64,6 @@ function brandModelSpecs(
   );
 }
 
-/**
- * Форма нового товара. Живёт и отдельной страницей, и внутри диалога, поэтому
- * заголовок с переходом после сохранения вынесены в параметры: в диалоге
- * заголовок свой, а уходить со страницы не нужно — достаточно закрыться.
- */
 export function AddProductForm({
   embedded = false,
   onDone,
@@ -101,7 +89,6 @@ export function AddProductForm({
   ]);
   const [photos, setPhotos] = useState<UploadedPhoto[]>([]);
   const [price, setPrice] = useState("");
-  /** Цена не названа — договорная. Само поле при этом гасится. */
   const [negotiable, setNegotiable] = useState(false);
   const [categoryId, setCategoryId] = useState<number | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -151,7 +138,6 @@ export function AddProductForm({
           price: priceNum,
           state,
           categoryId: categoryId ?? undefined,
-          // При создании пустой список не отправляем вовсе — как и раньше.
           characteristics: characteristics.length ? characteristics : undefined,
         },
       });

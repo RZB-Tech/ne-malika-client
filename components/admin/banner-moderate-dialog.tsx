@@ -30,37 +30,17 @@ import {
 } from "@/lib/api/generated/endpoints/banners-admin/banners-admin";
 import type { ModerateBannerDtoStatus } from "@/lib/api/generated/schemas";
 
-/**
- * Та же нижняя граница, что у сервера (`ModerateBannerDto.reason`, minLength 5).
- * Проверяем до отправки, чтобы отказ без причины не возвращался четырёхсотым
- * ответом уже после нажатия.
- */
 const MIN_REASON = 5;
 
-/** Что именно администратор собирается сделать и с каким баннером. */
 export interface BannerModerationTarget {
   banner: AdminBanner;
   decision: ModerateBannerDtoStatus;
 }
 
-/**
- * Решение по баннеру продавца — одно окно на оба исхода.
- *
- * Отдельный диалог, а не `ConfirmDialog` с `AbolishDialog` по соседству, по
- * двум причинам. Первая: решение принимают, глядя на картинку, а текст акции
- * нарисован прямо на ней и на каждом языке свой — значит все три версии обязаны
- * быть перед глазами в момент нажатия, а не строкой выше в списке. Вторая:
- * `AbolishDialog` подписывает кнопку «Упразднить» и ругается текстом про
- * упразднение — для отказа по баннеру это чужие слова.
- *
- * Одобрение здесь тоже проходит через окно: это и есть требуемое подтверждение,
- * вложенных диалогов не нужно.
- */
 export function BannerModerateDialog({
   target,
   onClose,
 }: {
-  /** `null` — окно закрыто. */
   target: BannerModerationTarget | null;
   onClose: () => void;
 }) {
@@ -68,10 +48,6 @@ export function BannerModerateDialog({
     <Dialog open={target !== null} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
         {target && (
-          /**
-           * Ключом сбрасываем набранную причину: она принадлежит конкретной
-           * заявке и переезжать на соседнюю не должна.
-           */
           <ModerateBody
             key={`${target.banner.id}:${target.decision}`}
             banner={target.banner}
@@ -164,11 +140,7 @@ function ModerateBody({
         )}
       </div>
 
-      {/*
-        Все три языка сразу: текст акции нарисован на самой картинке, поэтому
-        одобрить по одной русской версии — значит выпустить в карусель узбекскую
-        с чужой ценой или пустым местом.
-      */}
+      {}
       <div className="grid gap-3 sm:grid-cols-3">
         {locales.map((loc) => {
           const src = bannerImageUrl(banner, loc);
@@ -181,7 +153,6 @@ function ModerateBody({
                 style={{ aspectRatio: BANNER_ASPECT_CSS }}
                 className="overflow-hidden rounded-lg border border-border bg-muted"
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={src ?? ""}
                   alt={`${banner.title} · ${localeShort[loc]}`}

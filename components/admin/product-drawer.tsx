@@ -39,10 +39,8 @@ export function ProductDrawer({
   onEdit: (product: AdminProductRow) => void;
 }) {
   const { t, locale } = useT();
-  /** Фото, открытое во весь экран; null — просмотрщик закрыт. */
   const [zoomed, setZoomed] = useState<number | null>(null);
 
-  /** Все фото карточки: в drawer видна только первая, а смотреть нужно все. */
   const photos = (product?.photos ?? [])
     .map((key) => photoUrl(key))
     .filter((url): url is string => Boolean(url));

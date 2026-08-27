@@ -23,10 +23,6 @@ function readStorage() {
     currentUser = null;
     return;
   }
-  /**
-   * Битая запись (обрыв записи, старая схема) не должна ронять модуль — иначе
-   * белый экран на каждом заходе, пока пользователь сам не чистит localStorage.
-   */
   try {
     const parsed = JSON.parse(rawUser) as AuthUserDto;
     currentUser = typeof parsed?.id === "number" ? parsed : null;
@@ -59,7 +55,6 @@ export function setAuth(token: string | null, user: AuthUserDto | null) {
   emit();
 }
 
-/** Update only the access token (e.g. after a silent refresh). */
 export function setAccessToken(token: string | null) {
   accessToken = token;
   if (typeof window !== "undefined") {

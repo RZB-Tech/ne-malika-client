@@ -48,15 +48,10 @@ import { cleanSpecs } from "@/lib/product-form";
 import type { AdminProductRow, AdminShopRow } from "@/lib/api/types";
 
 export interface ProductFormTarget {
-  /** Товар для правки; при создании — null, и тогда нужен магазин. */
   product: AdminProductRow | null;
   shopId?: number;
 }
 
-/**
- * Создание и правка товара администратором. Одна форма на оба случая:
- * поля совпадают, отличается только адрес запроса и выбор магазина.
- */
 export function ProductFormDialog({
   target,
   shops,
@@ -110,7 +105,6 @@ function FormBody({
   const [price, setPrice] = useState(
     editing?.price ? formatPriceInput(Number(editing.price)) : "",
   );
-  /** Цена не названа — договорная. */
   const [negotiable, setNegotiable] = useState(editing?.price === null);
   const [state, setState] = useState<"new" | "old">(editing?.state ?? "new");
   const [categoryId, setCategoryId] = useState<number | null>(
@@ -200,11 +194,7 @@ function FormBody({
         </div>
       )}
 
-      {/*
-        Администратору кнопка бесплатна — за его запросы платит площадка, — но
-        нужна ему та же: карточки он заводит и правит теми же руками, что и
-        продавец, и заполнять их вручную ему незачем.
-      */}
+      {}
       <ProductAutofillButton
         photos={photos}
         name={name}

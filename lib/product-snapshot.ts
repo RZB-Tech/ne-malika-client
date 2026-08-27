@@ -7,9 +7,7 @@ export interface ProductSnapshot {
   shopId: number;
   shopName: string;
   name: string;
-  /** numeric с бэкенда приходит строкой — храним как есть. null — договорная. */
   price: string | null;
-  /** Ключ файла в S3, не готовый URL: адрес прокси может измениться. */
   photo: string | null;
   state: "new" | "old";
 }
@@ -24,10 +22,6 @@ export function isProductSnapshot(value: unknown): value is ProductSnapshot {
   );
 }
 
-/**
- * Отображаемый товар → снимок. `brand` у карточек с бэкенда — это название
- * магазина (см. mappers.toProduct), поэтому оно и едет в `shopName`.
- */
 export function productToSnapshot(product: Product): ProductSnapshot {
   return {
     id: Number(product.id),
@@ -40,11 +34,6 @@ export function productToSnapshot(product: Product): ProductSnapshot {
   };
 }
 
-/**
- * Снимок → публичная проекция товара, чтобы список рисовался тем же
- * `ProductCard`, что и витрина. Полей, которых в снимке нет, у карточки на
- * витрине всё равно не видно.
- */
 export function snapshotToPublicCard(
   snapshot: ProductSnapshot,
   createdAt: string,

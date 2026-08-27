@@ -6,11 +6,9 @@ export interface StoredItem {
 
 export interface LocalListStore<T extends StoredItem> {
   get: () => T[];
-  /** Стабильная пустая ссылка для серверного снапшота useSyncExternalStore. */
   getEmpty: () => T[];
   subscribe: (listener: () => void) => () => void;
   has: (id: number) => boolean;
-  /** Заменяет список результатом функции и сохраняет его. */
   update: (next: (items: T[]) => T[]) => void;
   remove: (id: number) => void;
   clear: () => void;
@@ -21,7 +19,6 @@ export function createLocalListStore<T extends StoredItem>({
   isValid,
 }: {
   storageKey: string;
-  /** Отсеивает чужие и устаревшие записи под тем же ключом. */
   isValid: (value: unknown) => value is T;
 }): LocalListStore<T> {
   const EMPTY: T[] = [];

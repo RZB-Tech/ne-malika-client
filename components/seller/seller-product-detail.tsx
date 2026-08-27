@@ -64,11 +64,6 @@ import type { AiProductCheck } from "@/lib/api/types";
 
 type Spec = { key: string; value: string };
 
-/**
- * Бренд и модель приходят отдельными полями ответа: в форме нового товара под
- * них есть свои поля. Здесь их нет — карточка правится списком характеристик,
- * куда они и попадают, первыми строками, как их пишет форма создания.
- */
 function withBrandAndModel(result: {
   brand: string | null;
   model: string | null;
@@ -96,7 +91,6 @@ export function SellerProductDetail({ id }: { id: number }) {
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
-  /** Цена не названа — договорная. */
   const [negotiable, setNegotiable] = useState(false);
   const [state, setState] = useState<"new" | "old">("new");
   const [categoryId, setCategoryId] = useState<number | null>(null);
@@ -105,7 +99,6 @@ export function SellerProductDetail({ id }: { id: number }) {
   const [hydratedRowId, setHydratedRowId] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
   const [aiPhoto, setAiPhoto] = useState<UploadedPhoto | null>(null);
-  /** Фото, открытое во весь экран; null — просмотрщик закрыт. */
   const [zoomed, setZoomed] = useState<number | null>(null);
 
   if (row && row.id !== hydratedRowId) {
@@ -451,7 +444,6 @@ const VERDICT_UI = {
   fail: { Icon: XCircle, cls: "text-destructive", key: "seller.detail.fail" },
 } as const;
 
-/** Ключ аспекта с бэкенда → ключ подписи в словаре. */
 const ASPECT_KEYS: Record<string, string> = {
   description: "seller.detail.criteriaDescription",
   dataConsistency: "seller.detail.criteriaConsistency",

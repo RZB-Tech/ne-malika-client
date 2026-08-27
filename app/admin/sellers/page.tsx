@@ -145,7 +145,6 @@ export default function AdminSellers() {
     });
     if (ok) setOpened(null);
   };
-  /** Доступ к закрытым разделам каталога — смартфонам и планшетам. */
   const setRestricted = async (id: number, enabled: boolean) => {
     const ok = await run(
       () => restrictedMutation.mutateAsync({ id, data: { enabled } }),
@@ -168,7 +167,6 @@ export default function AdminSellers() {
     if (ok) setOpened(null);
   };
 
-  /** Один набор действий и для трёх точек, и для правой кнопки мыши. */
   const actionsFor = (shop: AdminShopRow): RowAction[] => [
     {
       label: t("admin.shops.openProfile"),

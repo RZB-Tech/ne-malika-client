@@ -20,21 +20,11 @@ import { ChatThread } from "./chat-thread";
 import { ChatConversationHeader } from "./chat-conversation-header";
 import { cn } from "@/lib/utils";
 
-/**
- * Переписка из шапки: панель выезжает справа, в ней список разговоров, а по
- * нажатию — сам разговор с полем ответа.
- *
- * Панель, а не отдельная страница: покупатель отвечает продавцу между делом —
- * листая каталог или стоя на карточке товара, — и уводить его со страницы ради
- * двух реплик незачем. Полная страница остаётся: на неё ведёт нижняя панель на
- * телефоне и ссылка отсюда.
- */
 export function ChatDrawer({
   className,
   children,
 }: {
   className?: string;
-  /** Кнопка-открывашка. Своя у шапки, своя у нижней панели. */
   children: React.ReactNode;
 }) {
   const { isAuthenticated, isHydrated, isSeller } = useAuth();
@@ -137,7 +127,6 @@ function DrawerBody({
   );
 }
 
-/** Счётчик непрочитанного для кнопки в шапке. */
 export function useBuyerUnread(): number {
   const { isSeller } = useAuth();
   const unread = useChatUnread().data;

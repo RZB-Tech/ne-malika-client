@@ -14,18 +14,6 @@ import {
   unsubscribeFromPush,
 } from "@/lib/api/push";
 
-/**
- * Состояние push-канала этого устройства и его включение/выключение.
- *
- * Общее для полосы в переписке и карточки в настройках: раньше логика жила в
- * обоих компонентах копиями и уже разошлась — на одно и то же действие одна
- * поверхность показывала текст ошибки сервера, другая — общее «не получилось».
- *
- * Разрешение читаем при отрисовке, а не храним: это живое состояние браузера,
- * которое человек может поменять в настройках сайта, не трогая нашу вкладку.
- * В состоянии лежит только ответ на наш собственный запрос — им и вызывается
- * перерисовка после отказа.
- */
 export function usePushChannel() {
   const { t } = useT();
   const [deviceSubscribed, setDeviceSubscribed] = useState<boolean | null>(null);
@@ -83,7 +71,6 @@ export function usePushChannel() {
   return { deviceSubscribed, permission, busy, enable, disable };
 }
 
-/** Включение/выключение Telegram-канала с тостами — общая обёртка мутации. */
 export function useTelegramChannel() {
   const { t } = useT();
   const setTelegram = useSetTelegramNotifications();

@@ -7,12 +7,6 @@ import { useT } from "@/components/providers/i18n-provider";
 import { trackContact } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
 
-/**
- * Связь с продавцом там, где телеграма магазина под рукой нет — в карточке
- * каталога. Адрес диалога собирает редирект `/go/product/[id]`, поэтому это
- * обычная ссылка: никаких запросов по клику и никаких блокировок попапов.
- * На странице товара, где магазин уже загружен, остаётся `TelegramButton`.
- */
 export function ContactSellerButton({
   productId,
   label,

@@ -38,7 +38,6 @@ export default function AdminBanners() {
   const { t } = useT();
   const run = useAdminMutation();
 
-  /** `undefined` — диалог закрыт, `null` — создание, объект — правка. */
   const [editing, setEditing] = useState<Banner | null | undefined>(undefined);
 
   const { data, isLoading, isError } = useAdminBannersControllerFindAll({
@@ -64,11 +63,6 @@ export default function AdminBanners() {
       errorKey: "admin.banners.saveFailed",
     });
 
-  /**
-   * Сдвиг на одну позицию. Отправляем весь порядок целиком, а не пару соседей:
-   * так список в базе всегда совпадает с тем, что видно на экране, даже если
-   * позиции успели разъехаться от правок в соседней вкладке.
-   */
   const move = (from: number, to: number) => {
     if (to < 0 || to >= banners.length) return Promise.resolve();
     const ids = banners.map((b) => b.id);
@@ -141,7 +135,6 @@ export default function AdminBanners() {
                   style={{ aspectRatio: BANNER_ASPECT_CSS }}
                   className="w-44 shrink-0 overflow-hidden rounded-lg border border-border bg-muted"
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={photoUrl(banner.photoRu) ?? ""}
                     alt={banner.title}

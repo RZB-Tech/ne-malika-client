@@ -25,11 +25,6 @@ import {
 import { useAdminShopBannersControllerList } from "@/lib/api/generated/endpoints/banners-admin/banners-admin";
 import type { AdminShopBannersControllerListStatus } from "@/lib/api/generated/schemas";
 
-/**
- * Вкладки очереди. `all` — не состояние, а его отсутствие: с ним фильтр
- * `status` не уходит вовсе, и ручка отдаёт весь архив. Открывается страница на
- * `pending`: очередь на разбор — то, ради чего сюда заходят.
- */
 const TABS = [
   "pending",
   "approved",
@@ -55,12 +50,6 @@ export default function AdminShopBanners() {
     null,
   );
 
-  /**
-   * Перетипизации через `select` здесь нет намеренно: у ручки в OpenAPI есть
-   * схема ответа, и `PaginatedShopBannersDto` уже описывает строку целиком —
-   * приводить её к самой себе значило бы завести каст, который переживёт
-   * следующее изменение контракта и промолчит о нём.
-   */
   const { data, isLoading, isError } = useAdminShopBannersControllerList(
     { page, limit: 20, status: tab === "all" ? undefined : tab },
     { query: { retry: false } },
@@ -180,11 +169,7 @@ function BannerCard({
             )}
           </div>
 
-          {/*
-            Три языка в ряд прямо в списке: решение принимают по картинке, а
-            текст акции на ней и в каждом языке свой. Разворачивать окно ради
-            того, чтобы обнаружить пустую узбекскую версию, — лишний ход.
-          */}
+          {}
           <div className="flex flex-wrap gap-2">
             {locales.map((loc) => (
               <div key={loc} className="space-y-1">
@@ -195,7 +180,6 @@ function BannerCard({
                   style={{ aspectRatio: BANNER_ASPECT_CSS }}
                   className="w-44 overflow-hidden rounded-lg border border-border bg-muted"
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={bannerImageUrl(banner, loc) ?? ""}
                     alt={`${banner.title} · ${localeShort[loc]}`}

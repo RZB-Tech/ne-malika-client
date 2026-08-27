@@ -45,7 +45,6 @@ export function ShopDrawer({
   onRestore: (id: number) => Promise<void>;
   onBlockOwner: (ownerId: number, reason: string) => Promise<void>;
   onUnblockOwner: (ownerId: number) => Promise<void>;
-  /** Доступ к закрытым разделам каталога — смартфонам и планшетам. */
   onSetRestricted: (id: number, enabled: boolean) => Promise<void>;
   onRemove: (id: number) => Promise<void>;
 }) {

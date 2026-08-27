@@ -20,10 +20,6 @@ import { formatDate } from "@/lib/format";
 import { useDeleteReview, useMyReviews } from "@/lib/api/reviews";
 import type { OwnReview } from "@/lib/api/types";
 
-/**
- * Мои отзывы. Главное здесь — не список, а обратная связь: только тут человек
- * видит, что отзыв отклонён и почему, и может его поправить.
- */
 export function MyReviews() {
   const { t, locale } = useT();
   const { isAuthenticated, isHydrated } = useAuth();

@@ -1,36 +1,13 @@
-/**
- * Address / city suggestions, constrained to Tashkent (Uzbekistan).
- *
- * The marketplace is Tashkent-based, so every lookup is biased — and, where the
- * provider supports it, hard-limited — to the city's bounding box. No results
- * are hardcoded: they come live from the geocoder.
- *
- * Provider is pluggable:
- *  - If `NEXT_PUBLIC_YANDEX_SUGGEST_KEY` is set → Yandex Geosuggest API (preferred).
- *  - Otherwise → keyless OpenStreetMap (Photon), so it works out of the box.
- *
- * To use Yandex, add to `.env.local`:
- *   NEXT_PUBLIC_YANDEX_SUGGEST_KEY=your_key
- * (get one at https://developer.tech.yandex.ru/, "JavaScript API и Геосаджест").
- */
 
 export interface PlaceSuggestion {
-  /** Text shown in the dropdown. */
   label: string;
-  /** Value written into the field when picked. */
   value: string;
 }
 
 export type SuggestKind = "city" | "address";
 
-/** Base city for the whole marketplace. */
 export const BASE_CITY = "Ташкент";
 
-/**
- * Tashkent geo bounds.
- *  - `center` / `span` — [lon, lat] window used by Yandex (`ll` + `spn`).
- *  - `bbox` — [minLon, minLat, maxLon, maxLat] used by Photon.
- */
 const TASHKENT = {
   center: [69.2401, 41.2995] as const,
   span: [0.36, 0.26] as const,

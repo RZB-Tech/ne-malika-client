@@ -1,14 +1,3 @@
-/**
- * Разбор описания товара, размеченного markdown.
- *
- * Свой разбор, а не библиотека: поддержать надо ровно три вещи — абзацы,
- * списки и жирный текст, — а любой полноценный парсер тянет за собой заголовки,
- * таблицы, HTML и ссылки. Ссылки и HTML в описании товара нам прямо не нужны:
- * телефоны и переходы «в директ» — то, за что модерация снимает объявление.
- *
- * Разбор возвращает данные, а не строку с HTML: рисует их React, поэтому
- * подставить в описание разметку невозможно в принципе.
- */
 
 export interface MarkdownText {
   text: string;
@@ -19,10 +8,8 @@ export type MarkdownBlock =
   | { kind: "paragraph"; lines: MarkdownText[][] }
   | { kind: "list"; items: MarkdownText[][] };
 
-/** Строка списка: «- пункт», «* пункт» или «1. пункт». */
 const LIST_ITEM = /^\s*(?:[-*•]|\d+[.)])\s+(.*)$/;
 
-/** Заголовки и цитаты моделью запрещены, но продавец может их набрать сам. */
 const LINE_PREFIX = /^\s*(?:#{1,6}|>)\s*/;
 
 export function parseMarkdown(source: string): MarkdownBlock[] {
@@ -49,7 +36,6 @@ export function parseMarkdown(source: string): MarkdownBlock[] {
   return blocks;
 }
 
-/** Убирает разметку, которую мы не рисуем, оставляя её содержимое. */
 function clean(line: string): string {
   return (
     line
@@ -60,11 +46,6 @@ function clean(line: string): string {
   );
 }
 
-/**
- * Жирный текст. `**так**` и `__так__`; одиночная звёздочка не курсив
- * намеренно — в размерах и артикулах («5*5 см») она встречается чаще, чем
- * в разметке.
- */
 function parseInline(line: string): MarkdownText[] {
   const parts: MarkdownText[] = [];
   const pattern = /\*\*(.+?)\*\*|__(.+?)__/g;
@@ -82,10 +63,6 @@ function parseInline(line: string): MarkdownText[] {
   return parts.length > 0 ? parts : [{ text: line, bold: false }];
 }
 
-/**
- * Текст без разметки — для описания страницы в поиске и для schema.org.
- * Краулеру звёздочки и дефисы списка не нужны, а место в сниппете занимают.
- */
 export function markdownToPlainText(source: string): string {
   return parseMarkdown(source)
     .flatMap((block) =>

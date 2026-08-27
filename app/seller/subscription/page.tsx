@@ -11,18 +11,6 @@ import { SubscriptionState } from "@/components/seller/subscription-state";
 import { useT } from "@/components/providers/i18n-provider";
 import { useSellerSubscription } from "@/lib/api/subscription";
 
-/**
- * Подписка магазина: состояние, витрина тарифов, история платежей и журнал
- * кредитов.
- *
- * Страница целиком клиентская. Всё, что на ней есть, — про конкретного
- * владельца и живёт за `@SellerOnly()`; отдавать её сервером значило бы
- * рендерить пустую разметку и тут же перерисовывать её данными.
- *
- * Ни в одну ручку идентификатор магазина не передаётся: у продавца магазин
- * один, и сервер выводит его по владельцу. Отсюда и порядок проверок ниже —
- * без магазина подписывать нечего, и спрашивать сервер не о чем.
- */
 export default function SellerSubscriptionPage() {
   const { t } = useT();
   const { shop, subscription, isLoading, isError } = useSellerSubscription();
@@ -51,7 +39,6 @@ export default function SellerSubscriptionPage() {
           </div>
         </div>
       ) : !shop ? (
-        /* Магазина нет — вести отсюда некуда, кроме формы его создания. */
         <Card className="items-start gap-3 p-6 text-sm">
           <p className="text-muted-foreground">
             {t("seller.subscription.needShop")}

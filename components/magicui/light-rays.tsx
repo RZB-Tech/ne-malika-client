@@ -66,11 +66,6 @@ const getAnchorAndDir = (
   }
 };
 
-/**
- * Light Rays background (Magic UI / ReactBits). Renders a subtle volumetric
- * light-ray effect via WebGL. Degrades gracefully: disabled for reduced motion
- * and paused when scrolled out of view.
- */
 export default function LightRays({
   className,
   raysOrigin = "top-center",

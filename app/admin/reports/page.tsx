@@ -72,11 +72,6 @@ export default function AdminReports() {
       errorKey: "common.actionFailed",
     });
 
-  /**
-   * Убрать разобранную жалобу. Если удалили последнюю на странице — уходим на
-   * предыдущую, иначе список окажется пустым, а листалка будет показывать
-   * несуществующую страницу.
-   */
   const onRemove = async (id: number) => {
     const ok = await run(() => removeReport.mutateAsync({ id }), {
       invalidate: [getAdminReportsControllerFindAllQueryKey()],

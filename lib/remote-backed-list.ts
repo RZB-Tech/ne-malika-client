@@ -2,24 +2,8 @@
 
 import { useCallback, useEffect, useMemo } from "react";
 
-/**
- * Кого уже синхронизировали в этой вкладке. Ключ — `список:id пользователя`:
- * после смены аккаунта локальные данные нужно перенести заново, а у каждого
- * списка свой зачёт — синк избранного мог пройти, а истории упасть.
- * Модульный уровень, а не состояние хука: StrictMode монтирует эффект дважды,
- * и без этого список уезжал бы на бэкенд по два раза.
- */
 const syncedUsers = new Set<string>();
 
-/**
- * Общая механика «локальный список + серверная копия», общая для избранного и
- * истории просмотров: локальная копия пишется всегда, после входа один раз
- * уезжает на бэкенд и дальше служит запасным вариантом, пока запрос летит и
- * если он не долетел.
- *
- * Раньше у каждого хука была своя копия этой логики — правки (кап лимита,
- * семантика ретраев) приходилось вносить дважды, и они расходились.
- */
 export function useRemoteBackedList<TItem extends { id: number }, TDto>({
   listKey,
   user,
@@ -36,7 +20,6 @@ export function useRemoteBackedList<TItem extends { id: number }, TDto>({
   removeRemote,
   clearRemote,
 }: {
-  /** Имя списка: «favorites», «viewHistory» — для учёта синхронизаций. */
   listKey: string;
   user: { id?: number } | null;
   enabled: boolean;
@@ -94,9 +77,7 @@ export function useRemoteBackedList<TItem extends { id: number }, TDto>({
 
   return {
     items,
-    /** Скелет показываем только на первом запросе, а не на фоновых обновлениях. */
     isLoading: enabled && isPending,
-    /** Список уже общий для всех устройств. */
     isRemote: enabled && Boolean(remoteData),
     remove,
     clear,

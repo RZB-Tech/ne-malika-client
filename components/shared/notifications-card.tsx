@@ -11,18 +11,6 @@ import { usePushChannel, useTelegramChannel } from "@/lib/api/use-push-channel";
 import { isPushSupported } from "@/lib/api/push";
 import { cn } from "@/lib/utils";
 
-/**
- * Выбор канала уведомлений: браузер или Telegram.
- *
- * Два канала, а не один, потому что оба дырявые поодиночке. Браузерные
- * уведомления не переживают закрытый ноутбук и не работают на iOS, пока сайт не
- * добавлен на домашний экран; Telegram требует, чтобы человек сам открыл чат с
- * ботом. Вместе они покрывают почти всех, поэтому предлагаем оба и не считаем
- * ни один обязательным.
- *
- * Разрешение браузера спрашиваем только по нажатию: непрошеный вопрос при
- * загрузке Chrome показывает свёрнутым, а после пары отказов запрещает навсегда.
- */
 export function NotificationsCard({ className }: { className?: string }) {
   const { t } = useT();
   const { isAuthenticated } = useAuth();
@@ -30,11 +18,6 @@ export function NotificationsCard({ className }: { className?: string }) {
   const push = usePushChannel();
   const telegram = useTelegramChannel();
 
-  /**
-   * Подписку проверяем в самом браузере, а не по ответу сервера: сервер знает
-   * только, что подписано хоть одно устройство. Человеку за другим компьютером
-   * надо предложить включить, а не отрапортовать, что всё уже работает.
-   */
   const deviceSubscribed = push.deviceSubscribed === true;
   const permission = push.permission;
 

@@ -8,7 +8,6 @@ import type { ChatDto } from "@/lib/api/generated/schemas";
 import { cn } from "@/lib/utils";
 import { ChatAvatar } from "./chat-avatar";
 
-/** One compact header shared by the drawer, sheet and full messages page. */
 export function ChatConversationHeader({
   chat,
   side,

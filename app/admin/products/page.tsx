@@ -63,13 +63,6 @@ import type {
   Paginated,
 } from "@/lib/api/types";
 
-/**
- * Вкладки фильтра. `undefined` — без параметра, то есть все статусы.
- *
- * «Без категории» фильтрует не по статусу, а по пустому category_id: такие
- * товары остаются после удаления раздела каталога и встречаются в любом
- * статусе, поэтому статус здесь не задан намеренно.
- */
 const TABS: {
   value: string;
   labelKey: string;
@@ -178,7 +171,6 @@ export default function AdminProducts() {
     if (ok) setOpened(null);
   };
 
-  /** Один набор действий и для трёх точек, и для правой кнопки мыши. */
   const actionsFor = (p: AdminProductRow): RowAction[] => [
     {
       label: t("admin.productList.edit"),

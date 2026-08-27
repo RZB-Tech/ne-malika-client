@@ -57,11 +57,6 @@ function SelectTrigger({
   )
 }
 
-/**
- * `popper` — список раскрывается под триггером. Радиксовский `item-aligned`
- * кладёт его поверх триггера, подгоняя выбранный пункт под его место (так ведёт
- * себя нативный `<select>` в macOS), и триггер под меню просто исчезает.
- */
 function SelectContent({
   className,
   children,

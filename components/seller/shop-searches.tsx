@@ -10,25 +10,12 @@ import { useT } from "@/components/providers/i18n-provider";
 import { formatNumber } from "@/lib/format";
 import { useSellerShopAnalyticsControllerSearches } from "@/lib/api/generated/endpoints/shop-analytics-seller/shop-analytics-seller";
 
-/** Сколько запросов показывать. Сервер по умолчанию отдаёт столько же. */
 const SEARCH_LIMIT = 20;
 
-/**
- * По каким словам покупатели находили товары магазина. Только на тарифе MAX.
- *
- * Гейт стоит на самом запросе (`enabled: isMax`), а не только на разметке:
- * ручка отвечает 403 всем, кроме MAX, и звать её ради заведомого отказа значило
- * бы писать в журнал сервера ошибку на каждый заход продавца на START.
- *
- * Данные при этом копятся всегда, независимо от тарифа, — об этом прямо сказано
- * в тексте замка: подписавшись, продавец увидит и то, что было до подписки, а
- * не пустой отчёт с сегодняшнего дня.
- */
 export function ShopSearches({
   days,
   isMax,
 }: {
-  /** Та же глубина, что и у сводки: один период на всю страницу. */
   days: number;
   isMax: boolean;
 }) {
@@ -81,7 +68,7 @@ export function ShopSearches({
         </Card>
       ) : (
         <Card className="p-5">
-          {/* Сетка повторяет сетку BarList — иначе подписи разъедутся со столбцами. */}
+          {}
           <div className="grid grid-cols-[7rem_1fr_auto] items-center gap-3 border-b pb-2 text-xs text-muted-foreground">
             <span>{t("seller.analytics.colQuery")}</span>
             <span />

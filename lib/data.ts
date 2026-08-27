@@ -15,7 +15,6 @@ export interface Category {
 export interface Store {
   id: string;
   slug: string;
-  /** id владельца — известен только у магазинов с бэкенда. */
   ownerId?: number;
   name: string;
   logoHue: number;
@@ -24,9 +23,7 @@ export interface Store {
   city: string;
   phone: string;
   telegram: string;
-  /** Уже собранная строка расписания — для витрин, где сырых данных нет. */
   workingHours: string;
-  /** Сырое расписание с бэкенда: подписи дней зависят от языка. */
   workSchedule?: WorkScheduleEntry[];
   rating: number;
   ratingCount: number;
@@ -52,13 +49,11 @@ export interface Product {
   brand: string;
   model: string;
   sku: string;
-  /** null — «цена договорная». */
   price: number | null;
   oldPrice?: number;
   description: string;
   specs: Spec[];
   warrantyMonths: number;
-  /** Средняя оценка по опубликованным отзывам; 0 — отзывов ещё нет. */
   rating?: number;
   ratingCount?: number;
   availability: Availability;
@@ -74,7 +69,6 @@ export interface Product {
   hidden?: boolean;
   imageUrl?: string | null;
   photoUrls?: string[];
-  /** Сырые ключи S3. Личные списки хранят их, а не собранные URL. */
   photoKeys?: string[];
   abolishReason?: string | null;
 }

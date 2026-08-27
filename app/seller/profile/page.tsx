@@ -55,11 +55,6 @@ export default function SellerProfile() {
   const [saving, setSaving] = useState(false);
   const [hydratedShopId, setHydratedShopId] = useState<number | null>(null);
 
-  /**
-   * Ошибки полей, а не тосты. Тост всплывает поверх страницы и исчезает: на
-   * телефоне человек долистывал форму до конца, жал «Сохранить» и не успевал
-   * увидеть, какое из семи полей его не устроило.
-   */
   const [errors, setErrors] = useState<Record<string, string>>({});
   const nameRef = useRef<HTMLInputElement>(null);
   const phoneRef = useRef<HTMLInputElement>(null);
@@ -95,7 +90,6 @@ export default function SellerProfile() {
       ? parseTelegramUsername(telegram)
       : null;
 
-    // Проверяем всё сразу: по одной ошибке за отправку человек ходит по кругу.
     const found: Record<string, string> = {};
     if (name.trim().length < 2) found.name = t("seller.profile.needName");
     if (!shop && !phone.trim()) found.phone = t("seller.profile.needPhone");
@@ -327,7 +321,6 @@ export default function SellerProfile() {
   );
 }
 
-/** Звёздочка обязательного поля. Читается скринридером словом, а не символом. */
 function Required() {
   const { t } = useT();
   return (
@@ -338,10 +331,6 @@ function Required() {
   );
 }
 
-/**
- * Ошибка под полем. Пустое сообщение ничего не рисует, поэтому вызывающий код
- * не обвешивается условиями.
- */
 function FieldError({ id, message }: { id?: string; message?: string }) {
   if (!message) return null;
   return (

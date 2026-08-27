@@ -6,24 +6,12 @@ import { ChevronLeft, ChevronRight, X } from "@/components/icons";
 import { useT } from "@/components/providers/i18n-provider";
 import { cn } from "@/lib/utils";
 
-/**
- * Фото во весь экран.
- *
- * Собран на примитивах radix напрямую, а не на `components/ui/dialog`: тот
- * рисует светлую карточку с полями и своей подложкой, а здесь нужен тёмный фон
- * во весь экран и картинка без рамки. Ловушка фокуса, Esc и блокировка
- * прокрутки при этом остаются — они в примитиве.
- *
- * Открытие управляется индексом: `startIndex` — номер фото, которое нужно
- * показать, `null` — закрыто.
- */
 export function PhotoLightbox({
   photos,
   startIndex,
   onClose,
   alt,
 }: {
-  /** Ссылки на фото в том же порядке, что и на странице. */
   photos: string[];
   startIndex: number | null;
   onClose: () => void;
@@ -35,7 +23,6 @@ export function PhotoLightbox({
   const [index, setIndex] = useState(startIndex ?? 0);
   const [prevStart, setPrevStart] = useState(startIndex);
 
-  /* Открыли на другом фото — показываем именно его, а не то, что было. */
   if (startIndex !== prevStart) {
     setPrevStart(startIndex);
     if (startIndex !== null) setIndex(startIndex);
@@ -47,10 +34,6 @@ export function PhotoLightbox({
     [count],
   );
 
-  /**
-   * Стрелки клавиатуры. Radix сам закрывает по Esc, но листание — наше:
-   * без него на большом экране пришлось бы целиться мышью в углы.
-   */
   useEffect(() => {
     if (!open || count < 2) return;
     const onKey = (e: KeyboardEvent) => {
@@ -77,7 +60,7 @@ export function PhotoLightbox({
             {alt ?? t("common.photo")}
           </DialogPrimitive.Title>
 
-          {/* Клик мимо картинки закрывает — привычное поведение просмотрщика. */}
+          {}
           <button
             type="button"
             aria-label={t("common.close")}
@@ -85,7 +68,6 @@ export function PhotoLightbox({
             className="absolute inset-0 cursor-zoom-out"
           />
 
-          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={src}
             alt={alt ?? ""}

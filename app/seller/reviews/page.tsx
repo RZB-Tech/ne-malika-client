@@ -17,10 +17,6 @@ import type { Paginated, PublicReview, ReviewSummary } from "@/lib/api/types";
 const KEY = "/api/v1/seller/reviews";
 const STARS = [5, 4, 3, 2, 1];
 
-/**
- * Отзывы о магазине глазами продавца — ровно те, что видит покупатель.
- * Непроверенных здесь нет: спорить о том, что может и не выйти в свет, не о чем.
- */
 export default function SellerReviews() {
   const { t, locale } = useT();
 

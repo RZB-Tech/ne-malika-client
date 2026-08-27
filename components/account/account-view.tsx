@@ -10,14 +10,6 @@ import { FavoritesList } from "./favorites-list";
 import { MyReviews } from "./my-reviews";
 import { ViewHistory } from "./view-history";
 
-/**
- * Кабинет покупателя. Живёт внутри витрины (шапка + подвал), а не в
- * DashboardShell: покупателю нужны несколько вкладок, ради них боковое меню
- * продавца было бы лишним.
- *
- * Вход не обязателен — история и избранное копятся и у анонима, поэтому
- * страница открыта всем, а вкладка «Профиль» у гостя предлагает войти.
- */
 const tab = "px-2 text-xs sm:px-3.5 sm:text-sm";
 
 export function AccountView({

@@ -9,13 +9,6 @@ const SIZES = {
   lg: "size-5",
 } as const;
 
-/**
- * Оценка звёздами.
- *
- * Дробная часть показывается частично закрашенной звездой, а не округляется:
- * между 4,4 и 4,6 для покупателя есть разница, а четыре с половиной звезды
- * читаются с одного взгляда — цифру рядом ещё надо прочесть.
- */
 export function RatingStars({
   value,
   size = "sm",
@@ -54,10 +47,6 @@ export function RatingStars({
   );
 }
 
-/**
- * Выбор оценки. Отдельный компонент, а не режим RatingStars: у ввода своя
- * разметка — это пять кнопок с подсказками, доступных с клавиатуры.
- */
 export function RatingInput({
   value,
   onChange,
@@ -67,7 +56,6 @@ export function RatingInput({
   value: number;
   onChange: (value: number) => void;
   disabled?: boolean;
-  /** Подписи «Ужасно»…«Отлично» — по одной на звезду. */
   labels: string[];
 }) {
   return (

@@ -14,7 +14,6 @@ import { formatDate } from "@/lib/format";
 import { snapshotToPublicCard } from "@/lib/product-snapshot";
 import { useViewHistory, type HistoryItem } from "@/lib/history/use-view-history";
 
-/** Снимок истории → карточка витрины: список выглядит как каталог, не как таблица. */
 function toProduct(item: HistoryItem) {
   return mapPublicProductCard(snapshotToPublicCard(item, item.viewedAt));
 }

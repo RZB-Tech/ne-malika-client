@@ -32,7 +32,6 @@ import {
   type AppIcon,
 } from "@/components/icons";
 
-/** Ключи — значения поля icon у корневых категорий (см. таблицу categories). */
 const map: Record<string, AppIcon> = {
   PcCase,
   Laptop,
@@ -71,7 +70,6 @@ export function CategoryIcon({
   className,
   strokeWidth,
 }: {
-  /** Категории из БД могут прийти без иконки — тогда рисуем коробку. */
   name: string | null | undefined;
   className?: string;
   strokeWidth?: number;

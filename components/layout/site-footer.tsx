@@ -13,12 +13,7 @@ export function SiteFooter() {
 
   return (
     <footer className="mt-auto border-t border-border bg-card">
-      {/*
-        Единственное место на витрине, где сказано, что здесь можно продавать.
-        До этого вход в продавцы жил только в выпадашке под аватаром — то есть
-        был виден лишь тому, кто уже вошёл, и не виден тому, кто как раз пришёл
-        торговать.
-      */}
+      {}
       <PageContainer className="flex justify-center border-b border-border py-5">
         <Link
           href="/seller/profile"

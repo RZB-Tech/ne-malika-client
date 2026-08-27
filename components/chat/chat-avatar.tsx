@@ -5,7 +5,6 @@ import type { ChatDto } from "@/lib/api/generated/schemas";
 import { hueFromId } from "@/lib/api/mappers";
 import { photoUrl } from "@/lib/api/photo";
 
-/** Собеседник в чате: покупатель для продавца, магазин для покупателя. */
 export function ChatAvatar({
   chat,
   side,

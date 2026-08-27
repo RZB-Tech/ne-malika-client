@@ -6,7 +6,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useT } from "@/components/providers/i18n-provider";
 import { useSellerProductStatsControllerStats } from "@/lib/api/generated/endpoints/product-stats-seller/product-stats-seller";
 
-/** Глубина периода. Совпадает с подписью «за 30 дней» под первым числом. */
 const DAYS = 30;
 
 export function ProductStatsCard({ productId }: { productId: number }) {
@@ -85,14 +84,6 @@ function Stat({ label, value }: { label: string; value: number }) {
   );
 }
 
-/**
- * Доля посетителей, дошедших до контакта с продавцом. Единственное число здесь,
- * которое отвечает на вопрос «работает ли объявление», а не «сколько заходов».
- *
- * Числитель считается на бэкенде как «уникальные, сделавшие хоть один контакт»,
- * а не как сумма раскрытий телефона и переходов в Telegram: один человек умеет
- * и то и другое, и сумма способна обогнать число посетителей.
- */
 function Conversion({ reached, visits }: { reached: number; visits: number }) {
   const { t } = useT();
   if (visits === 0) return null;
@@ -109,7 +100,6 @@ function Conversion({ reached, visits }: { reached: number; visits: number }) {
   );
 }
 
-/** Полоски по дням: высота относительно самого активного дня периода. */
 function Sparkline({ points }: { points: number[] }) {
   if (points.length < 2) return null;
   const max = Math.max(...points);

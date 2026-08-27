@@ -19,25 +19,13 @@ import { cn } from "@/lib/utils";
 import { useT } from "@/components/providers/i18n-provider";
 import { useCategories } from "@/lib/api/categories";
 
-/** Каталог — единственная страница, где запрос что-то меняет прямо на глазах. */
 const CATALOG_PATH = "/";
 
-/** Пауза перед запросом: примерно столько длится провал между словами. */
 const DEBOUNCE_MS = 300;
 
-/**
- * Вид поля в шапке: рамка фирменного цвета и кнопка поиска внутри неё справа.
- * Фон, тень и подсветку фокуса рисует контейнер, поэтому у самого поля всё это
- * снято — иначе получается рамка в рамке.
- */
 const MARKETPLACE_BOX =
   "h-10 rounded-lg border-2 border-primary bg-card p-[3px] focus-within:ring-3 focus-within:ring-primary/15";
 
-/**
- * Кнопка поиска отделена от края только полем контейнера, и цвет у них один —
- * поэтому справа она выглядит вровень с рамкой, а выбор раздела слева остаётся
- * отдельной плашкой на белом. Ровно так же собрано поле у крупных площадок.
- */
 const MARKETPLACE_SCOPE =
   "h-full max-w-32 shrink-0 rounded-md px-2.5 text-[13px] font-normal";
 const MARKETPLACE_INPUT =
@@ -53,11 +41,6 @@ export function SearchBar({
 }: {
   className?: string;
   size?: "default" | "lg";
-  /**
-   * «marketplace» — вид как у крупных площадок: поле в рамке и кнопка поиска
-   * справа внутри неё. Нужен в шапке витрины, где поиск главный элемент строки
-   * и должен читаться отдельным блоком, а не ещё одним серым полем.
-   */
   appearance?: "default" | "marketplace";
   placeholder?: string;
   autoFocus?: boolean;
@@ -80,12 +63,6 @@ export function SearchBar({
 
   const typed = useRef(false);
 
-  /**
-   * Поле следует за адресом, а не живёт своей жизнью: по ссылке `/?q=canon`
-   * человек должен увидеть запрос в поле, а не пустую строку над найденным.
-   * Приведение состояния во время рендера, а не в эффекте — иначе один кадр
-   * показывал бы прежний текст.
-   */
   const [syncedQuery, setSyncedQuery] = useState(urlQuery);
   if (onCatalog && urlQuery !== syncedQuery) {
     setSyncedQuery(urlQuery);
@@ -260,11 +237,6 @@ export function SearchBar({
   );
 }
 
-/**
- * Заглушка на время серверного рендера. Строка поиска читает адресную строку,
- * а это возможно только в браузере; без заглушки шапка на долю секунды
- * оставалась бы без поля, и содержимое рядом прыгало бы вбок.
- */
 export function SearchBarSkeleton({
   className,
   appearance = "default",

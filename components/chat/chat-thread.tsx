@@ -12,15 +12,8 @@ import type { ChatDto, ChatMessageDto } from "@/lib/api/generated/schemas";
 import { cn } from "@/lib/utils";
 import { ChatConversationHeader } from "./chat-conversation-header";
 
-/** Столько же принимает бэкенд — обрезать текст молча нельзя. */
 const MESSAGE_MAX = 2000;
 
-/**
- * Лента одной переписки и поле ответа.
- *
- * `side` — чьими глазами смотрим: у покупателя справа его собственные реплики,
- * у продавца — свои. Иначе продавец видел бы разговор наизнанку.
- */
 export function ChatThread({
   chat,
   side,
@@ -31,7 +24,6 @@ export function ChatThread({
   chat: ChatDto;
   side: "buyer" | "seller";
   className?: string;
-  /** Возврат к списку. Только там, где список рядом не помещается, — на телефоне. */
   onBack?: () => void;
   hideHeader?: boolean;
 }) {
@@ -124,7 +116,6 @@ export function ChatThread({
   );
 }
 
-/** Своё ли это сообщение. Автоответ ИИ — со стороны магазина, не покупателя. */
 function isOwn(message: ChatMessageDto, side: "buyer" | "seller"): boolean {
   return side === "buyer" ? message.kind === "buyer" : message.kind !== "buyer";
 }

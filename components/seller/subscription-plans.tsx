@@ -20,19 +20,6 @@ import type {
 } from "@/lib/api/generated/schemas";
 import type { PaidPlan } from "@/lib/api/types";
 
-/**
- * Витрина тарифов с кнопкой оплаты.
- *
- * Прайс берём с сервера, а не из констант клиента: цены, размер нормы кредитов
- * и глубина аналитики живут в `subscriptions.constants.ts` бэкенда, и вторая
- * копия этих чисел здесь разъехалась бы с первой же правкой тарифа — причём
- * молча, показывая продавцу цену, по которой с него не спишут.
- *
- * Старший тариф в прайсе вычисляется по `PLAN_ORDER`, а не сравнением с
- * литералом `"max"`: продвижение «выше остальных», выгрузка CSV и поисковые
- * запросы — это признаки вершины лестницы, и если однажды над MAX появится
- * что-то ещё, подписи переедут туда сами.
- */
 export function SubscriptionPlans({
   subscription,
 }: {
@@ -50,23 +37,9 @@ export function SubscriptionPlans({
     () => [...(data ?? [])].sort((a, b) => planRank(a.id) - planRank(b.id)),
     [data],
   );
-  /** Вершина лестницы и ступень под ней — на них висят два значка витрины. */
   const topId = plans.at(-1)?.id;
   const secondId = plans.length >= 3 ? plans.at(-2)?.id : undefined;
 
-  /**
-   * Одно из двух предупреждений о том, что случится с кредитами и сроком.
-   *
-   * Условия взаимоисключающие — подписка либо жива, либо нет, — поэтому блок
-   * один и стоит над рядом кнопок: три одинаковых копии под тремя кнопками
-   * читались бы как шум, а текст у них в любом случае общий (и остаток, и дата
-   * от выбранного тарифа не зависят).
-   *
-   * Срок вышел — новая норма ЗАМЕНИТ остаток: неиспользованные подписочные
-   * сгорят. Срок ещё идёт — период стыкуется, кредиты складываются, не сгорает
-   * ничего. Без этих двух строк продавец узнаёт правило постфактум и приходит
-   * с жалобой.
-   */
   const warning = !subscription.active
     ? subscription.subscriptionCredits > 0
       ? t("seller.subscription.warnBurn", {
@@ -83,24 +56,9 @@ export function SubscriptionPlans({
     setBusy(plan);
     try {
       const link = await checkout.mutateAsync({ data: { plan } });
-      /**
-       * Уходим на кассу Click в этой же вкладке: `window.open` ловится
-       * блокировщиком всплывающих окон, а вернуться Click умеет сам по
-       * `return_url`. Инвалидировать кэш здесь нечего — подписка появится не
-       * раньше колбэка, а возврат с кассы перезагружает приложение целиком.
-       *
-       * `assign()`, а не присваивание в `location.href`: то же действие, но
-       * присваивание в глобальный объект запрещает правило
-       * `react-hooks/immutability` компилятора React. `router.push` не годится
-       * вовсе — касса живёт на чужом домене, и клиентская навигация Next её не
-       * откроет.
-       */
       window.location.assign(link.url);
     } catch (err) {
       toast.error(apiErrorMessage(err, t, "seller.subscription.payFailed"));
-      /* Снимаем занятость только на отказе: при удаче страница уже уходит на
-         кассу, и вернувшаяся в исходный вид кнопка выглядела бы так, будто
-         нажатие не сработало. */
       setBusy(null);
     }
   };
@@ -145,9 +103,6 @@ export function SubscriptionPlans({
             <PlanCard
               key={plan.id}
               plan={plan}
-              /* Текущим считаем только оплаченный и не истёкший: иначе карточка
-                 подсвечивалась бы у того, чей срок вышел, — и кнопка «Продлить»
-                 стояла бы там, где нужно «Оплатить». */
               current={subscription.active && subscription.plan === plan.id}
               renewable={subscription.active}
               top={plan.id === topId}
@@ -282,7 +237,6 @@ function PlanCard({
   );
 }
 
-/** Строка возможностей тарифа. `off` — то, чего в тарифе нет. */
 function FeatureLine({ text, off }: { text: string; off?: boolean }) {
   return (
     <li className={cn("flex gap-2", off && "text-muted-foreground")}>

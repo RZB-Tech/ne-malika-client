@@ -16,12 +16,6 @@ import {
 import { useT } from "@/components/providers/i18n-provider";
 import { apiErrorMessage } from "@/lib/api/errors";
 
-/**
- * Подтверждение необратимого действия. Вместо window.confirm: тот выглядит
- * системным окном браузера, не подчиняется теме и на телефоне выглядит чужеродно.
- *
- * Для действий, где нужна ещё и причина, есть AbolishDialog.
- */
 export function ConfirmDialog({
   title,
   description,
@@ -32,7 +26,6 @@ export function ConfirmDialog({
 }: {
   title: string;
   description?: string;
-  /** По умолчанию — «Подтвердить» на языке интерфейса. */
   confirmLabel?: string;
   destructive?: boolean;
   onConfirm: () => void;
@@ -49,12 +42,6 @@ export function ConfirmDialog({
       await onConfirm();
       setOpen(false);
     } catch (err) {
-      /**
-       * Раньше здесь стоял пустой catch, и отказ сервера выглядел как «кнопка
-       * не работает»: окно оставалось открытым, запись — на месте, причины ни
-       * на экране, ни в консоли. Сообщение сервера мутатор уже положил в
-       * error.message, показать его — единственное, чего не хватало.
-       */
       toast.error(apiErrorMessage(err, t, "common.actionFailed"));
     } finally {
       setBusy(false);

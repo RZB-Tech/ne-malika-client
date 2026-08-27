@@ -7,13 +7,6 @@ import { useFavorites } from "@/lib/favorites/use-favorites";
 import type { ProductSnapshot } from "@/lib/product-snapshot";
 import { cn } from "@/lib/utils";
 
-/**
- * Сердце «в избранное».
- *
- * `icon` — накладка поверх карточки на витрине, `full` — кнопка с подписью на
- * странице товара. Вход не требуется: анониму избранное пишется в браузер и
- * уезжает на бэкенд, когда он войдёт.
- */
 export function FavoriteButton({
   product,
   variant = "icon",

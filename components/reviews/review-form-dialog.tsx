@@ -20,13 +20,6 @@ import type { OwnReview } from "@/lib/api/types";
 
 const TEXT_MAX = 2000;
 
-/**
- * Написать или поправить свой отзыв.
- *
- * Диалог управляемый: открывает его карточка отзывов — там же решается, звать
- * ли сначала вход. Своя кнопка внутри означала бы две точки входа в одно и то
- * же состояние.
- */
 export function ReviewFormDialog({
   open,
   onOpenChange,
@@ -36,7 +29,6 @@ export function ReviewFormDialog({
   open: boolean;
   onOpenChange: (open: boolean) => void;
   target: ReviewTarget;
-  /** Прежний отзыв — тогда форма правит его, а не создаёт второй. */
   existing?: OwnReview | null;
 }) {
   const { t } = useT();

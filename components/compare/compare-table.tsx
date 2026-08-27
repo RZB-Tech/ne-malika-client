@@ -18,11 +18,9 @@ import { useCompare } from "@/lib/compare/use-compare";
 import type { Paginated, PublicProductCard } from "@/lib/api/types";
 import { cn } from "@/lib/utils";
 
-/** Строка таблицы: название параметра и значение у каждого товара. */
 interface Row {
   label: string;
   values: (string | null)[];
-  /** Значения различаются — такие строки и есть смысл сравнения. */
   differs: boolean;
 }
 

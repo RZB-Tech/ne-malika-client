@@ -12,13 +12,6 @@ import { useT } from "@/components/providers/i18n-provider";
 import { AddProductForm } from "./add-product-form";
 import { onOpenAddProduct } from "./add-product-bus";
 
-/**
- * Диалог создания товара. Смонтирован один раз в layout кабинета и слушает
- * событие — так все три кнопки открывают одно окно, а форма не дублируется.
- *
- * Страница /seller/products/new при этом остаётся рабочей: на неё ведут
- * закладки и внешние ссылки, и там та же форма отображается целиком.
- */
 export function AddProductDialog() {
   const { t } = useT();
   const [open, setOpen] = useState(false);

@@ -12,14 +12,6 @@ import { Button } from "@/components/ui/button";
 import { useT } from "@/components/providers/i18n-provider";
 import { apiErrorMessage } from "@/lib/api/errors";
 
-/**
- * Browser Telegram sign-in via the official OAuth popup (oauth.telegram.org),
- * using @telegram-login-ultimate/react. Requires:
- *   - NEXT_PUBLIC_TELEGRAM_BOT_ID (numeric bot id)
- *   - the site domain registered in @BotFather via /setdomain
- * The popup does not work on localhost — Telegram checks the origin domain.
- * Returns null when the bot id is not configured.
- */
 export function TelegramOAuthButton({
   label,
   disabled,

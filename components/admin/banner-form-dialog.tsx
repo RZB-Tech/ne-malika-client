@@ -35,11 +35,6 @@ import {
   useAdminBannersControllerUpdate,
 } from "@/lib/api/generated/endpoints/banners-admin/banners-admin";
 
-/**
- * Картинка одного языка: либо уже сохранённая (есть `key`), либо только что
- * выбранная (есть `file`). Загрузка в S3 откладывается до сохранения формы —
- * иначе закрытый без сохранения диалог оставлял бы в бакете мусор.
- */
 interface Slot {
   key?: string;
   file?: File;
@@ -50,12 +45,10 @@ type Slots = Record<Locale, Slot | null>;
 
 const EMPTY_SLOTS: Slots = { ru: null, "uz-Latn": null, "uz-Cyrl": null };
 
-/** Создание и правка баннера. Одна форма на оба случая: поля совпадают. */
 export function BannerFormDialog({
   target,
   onOpenChange,
 }: {
-  /** Баннер для правки, `null` — создание нового, `undefined` — диалог закрыт. */
   target: Banner | null | undefined;
   onOpenChange: (open: boolean) => void;
 }) {
@@ -95,10 +88,6 @@ function FormBody({
   );
   const [saving, setSaving] = useState(false);
 
-  /**
-   * Blob-ссылки предпросмотра живут, пока их не отозвать: без этого каждая
-   * переоткрытая форма оставляет в памяти вкладки по мегабайту на картинку.
-   */
   const objectUrls = useRef<string[]>([]);
   useEffect(
     () => () => objectUrls.current.forEach((url) => URL.revokeObjectURL(url)),
@@ -118,7 +107,6 @@ function FormBody({
     setSlots((s) => ({ ...s, [locale]: { file, preview } }));
   };
 
-  /** Одна картинка на все языки — обычный случай, когда текста на ней нет. */
   const copyToAll = (from: Locale) => {
     setSlots((s) => {
       const source = s[from];
@@ -153,10 +141,6 @@ function FormBody({
         photoRu,
         photoUzLatn,
         photoUzCyrl,
-        /**
-         * Пустую строку шлём как есть, а не `undefined`: ключа не было бы в
-         * теле запроса вовсе, и очистка поля молча оставляла бы старую ссылку.
-         */
         linkUrl: linkUrl.trim(),
         isActive,
       };
@@ -324,7 +308,6 @@ function SlotPicker({
         accept={BANNER_MIME_TYPES.join(",")}
         onChange={(e) => {
           const file = e.target.files?.[0];
-          /* Сбрасываем значение: иначе повторный выбор того же файла молчит. */
           e.target.value = "";
           if (file) onPick(file);
         }}
@@ -333,7 +316,6 @@ function SlotPicker({
   );
 }
 
-/** Уже сохранённые картинки баннера — как заполненные слоты формы. */
 function storedSlots(banner: Banner): Slots {
   const slot = (locale: Locale): Slot => {
     const key = bannerPhotoKey(banner, locale);
@@ -342,7 +324,6 @@ function storedSlots(banner: Banner): Slots {
   return { ru: slot("ru"), "uz-Latn": slot("uz-Latn"), "uz-Cyrl": slot("uz-Cyrl") };
 }
 
-/** Сохранённая картинка проходит насквозь, выбранная — загружается в S3. */
 function resolveKey(slot: Slot): Promise<string> {
   return slot.key ? Promise.resolve(slot.key) : uploadPhoto(slot.file!);
 }

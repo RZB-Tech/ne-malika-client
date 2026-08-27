@@ -3,14 +3,6 @@
 import { useCallback, useMemo } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-/**
- * Что сужает выдачу каталога.
- *
- * Панель фильтров с ценой и сортировкой убрана вместе с кнопкой «Фильтры»:
- * остались только текстовый запрос из шапки и раздел, который выбирают в
- * меню каталога. Оба живут в URL — ссылку на выдачу можно переслать, а
- * «назад» возвращает прежний список.
- */
 export function useCatalogFilters() {
   const router = useRouter();
   const pathname = usePathname();

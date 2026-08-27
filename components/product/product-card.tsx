@@ -15,17 +15,8 @@ import { productToSnapshot } from "@/lib/product-snapshot";
 import { type Product } from "@/lib/data";
 import { Badge } from "@/components/ui/badge";
 
-/** Через сколько показывать следующее фото, пока курсор на карточке. */
 const PHOTO_INTERVAL_MS = 1000;
 
-/**
- * Перелистывать ли фотографии самостоятельно.
- *
- * Только там, где есть настоящее наведение: на телефоне `onMouseEnter`
- * срабатывает по касанию, и карточка начинала бы мигать под пальцем. И только
- * если человек не просил систему убрать анимацию — движущаяся сама по себе
- * картинка ровно то, от чего эта настройка защищает.
- */
 function canAutoplay(): boolean {
   return (
     window.matchMedia("(hover: hover)").matches &&
@@ -33,20 +24,6 @@ function canAutoplay(): boolean {
   );
 }
 
-/**
- * Карточка каталога по раскладке маркетплейса: высокая картинка 3:4, а под ней
- * сначала цена и только потом название.
- *
- * Коробки вокруг карточки нет намеренно. Фотографии товаров — инфографика со
- * своим фоном; рамка вокруг неё даёт двойной контур, а на плитке из пяти
- * колонок ещё и съедает ширину. Границу задаёт сама картинка, скруглённая по
- * углам, — так же это устроено у Wildberries и Ozon.
- */
-/**
- * Мемоизация не украшение: в гриде до сотни с лишним плиток, и без неё клик
- * по сердцу (или смена локали) перерисовывал каждую целиком. Снапшоты товара
- * стабильны между изменениями данных, поэтому memo реально отсекает каскад.
- */
 export const ProductCard = memo(function ProductCard({ product }: { product: Product }) {
   const { t, locale } = useT();
   const snapshot = productToSnapshot(product);
@@ -77,15 +54,6 @@ export const ProductCard = memo(function ProductCard({ product }: { product: Pro
 
   return (
     <div
-      /**
-       * Высота задана жёстко (`--product-card-h`), а не сложена из содержимого:
-       * иначе карточка с рейтингом и двухстрочным названием оказывалась выше
-       * соседки без них, и ряд шёл ступенькой. Остаток высоты забирает
-       * картинка — она единственная, чей размер можно менять безнаказанно.
-       *
-       * Только с `sm`: на телефоне в ряду две колонки, карточка узкая, и
-       * фиксированная высота растянула бы её в столб.
-       */
       className="group relative isolate flex flex-col rounded-2xl bg-card p-2 sm:h-[var(--product-card-h)]"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={leave}
@@ -115,7 +83,7 @@ export const ProductCard = memo(function ProductCard({ product }: { product: Pro
           )}
         </div>
 
-        {/* Текст не тянется: свободную высоту в карточке отдаём картинке. */}
+        {}
         <div className="flex flex-col gap-1 pt-2.5">
           <div className="flex flex-wrap items-baseline gap-x-2">
             <span className="tabular text-base font-bold text-foreground">
@@ -171,11 +139,6 @@ export const ProductCard = memo(function ProductCard({ product }: { product: Pro
   );
 });
 
-/**
- * Заглушка ровно той же высоты, что и карточка: одна картинка вместо всей
- * карточки заставляла ленту подпрыгивать в момент загрузки — плитка была
- * заметно ниже того, что вставало на её место.
- */
 export function ProductCardSkeleton() {
   return (
     <div className="flex flex-col rounded-2xl bg-card p-2 sm:h-[var(--product-card-h)]">

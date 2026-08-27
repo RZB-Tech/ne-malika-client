@@ -22,7 +22,6 @@ import {
   type ViewedProduct,
 } from "./local-history";
 
-/** Просмотренный товар в кабинете. `viewCount` есть только у серверных записей. */
 export interface HistoryItem extends ViewedProduct {
   viewCount?: number;
 }
@@ -41,14 +40,6 @@ function fromRemote(dto: ProductViewDto): HistoryItem {
   };
 }
 
-/**
- * История просмотров кабинета: локальная у анонима, серверная у вошедшего.
- *
- * Общая механика с избранным живёт в `useRemoteBackedList`: локальная копия
- * пишется всегда и остаётся после выхода. У авторизованного она один раз
- * уезжает на бэкенд и дальше служит запасным вариантом — пока запрос летит
- * и если он не долетел.
- */
 export function useViewHistory() {
   const { user, isAuthenticated, isHydrated } = useAuth();
   const queryClient = useQueryClient();
@@ -113,7 +104,6 @@ export function useViewHistory() {
     items: list.items,
     isLoading: list.isLoading,
     isSyncing,
-    /** История уже общая для всех устройств. */
     isRemote: list.isRemote,
     remove: list.remove,
     clear: list.clear,

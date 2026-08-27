@@ -110,38 +110,20 @@ import {
   Wrench01Icon,
 } from "@hugeicons/core-free-icons";
 
-/**
- * Единственный источник значков в проекте.
- *
- * Внутри — Hugeicons; наружу — привычные имена, поэтому в компонентах меняется
- * только строка импорта, а разметка остаётся прежней: `<Search className="size-4" />`.
- *
- * Зачем прослойка: набор значков — вещь сменная. Здесь она меняется в одном
- * файле, а не в семидесяти. Смена стиля на платный «solid rounded» — это ровно
- * одна правка импорта ниже: имена значков в пакетах Hugeicons совпадают, отличается
- * только пакет (`@hugeicons-pro/core-solid-rounded` вместо `@hugeicons/core-free-icons`).
- * Бесплатный набор идёт только в обводке — заливки в нём нет.
- */
 
 export type AppIconProps = Omit<
   React.ComponentProps<typeof HugeiconsIcon>,
   "icon"
 >;
 
-/** Тип значка для мест, где его передают как значение: меню, вкладки, панели. */
 export type AppIcon = (props: AppIconProps) => React.ReactElement;
 
-/**
- * Значок фиксированного размера 24 — как у Lucide. Реальный размер задают
- * классы `size-*` со стороны вызова: у svg они перебивают атрибуты.
- */
 function make(icon: IconSvgElement, displayName: string): AppIcon {
   const Icon = (props: AppIconProps) => <HugeiconsIcon icon={icon} {...props} />;
   Icon.displayName = displayName;
   return Icon;
 }
 
-/** Пометка у автоответа: покупатель должен видеть, что писал не человек. */
 export const Bot = make(AiBrain01Icon, "Bot");
 
 export const Armchair = make(ArmchairIcon, "Armchair");
@@ -158,7 +140,6 @@ export const Box = make(Package01Icon, "Box");
 export const CalendarDays = make(Calendar03Icon, "CalendarDays");
 export const Check = make(Tick02Icon, "Check");
 export const CheckIcon = Check;
-/** Две галочки — «прочитано», как в мессенджерах. */
 export const CheckDouble = make(TickDouble02Icon, "CheckDouble");
 export const CheckCircle2 = make(CheckmarkCircle02Icon, "CheckCircle2");
 export const CircleCheckIcon = CheckCircle2;
@@ -193,7 +174,6 @@ export const Headphones = make(HeadphonesIcon, "Headphones");
 export const Heart = make(FavouriteIcon, "Heart");
 export const History = make(HistoryIcon, "History");
 export const Home = make(Home01Icon, "Home");
-/** Раздел баннеров главной: картинка как самостоятельная единица контента. */
 export const ImageIcon = make(Image01Icon, "ImageIcon");
 export const ImagePlus = make(ImageAdd01Icon, "ImagePlus");
 export const Info = make(InformationCircleIcon, "Info");
@@ -246,7 +226,6 @@ export const Store = make(Store01Icon, "Store");
 export const Sun = make(Sun03Icon, "Sun");
 export const Tablet = make(Tablet01Icon, "Tablet");
 export const Tag = make(Tag01Icon, "Tag");
-/** Плитка раздела «Услуги»: ремонт и обслуживание, а не продажа вещи. */
 export const Tools = make(ToolsIcon, "Tools");
 export const Trash2 = make(Delete02Icon, "Trash2");
 export const TriangleAlert = make(Alert02Icon, "TriangleAlert");

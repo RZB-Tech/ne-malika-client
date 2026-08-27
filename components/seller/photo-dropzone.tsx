@@ -10,23 +10,18 @@ export interface UploadedPhoto {
   id: string;
   url: string;
   name: string;
-  /** S3-ключ уже сохранённого фото. У выбранных сейчас файлов его нет. */
   key?: string;
-  /** Размеры знает только свежесжатый файл — у сохранённых фото их нет. */
   originalKb?: number;
   compressedKb?: number;
 }
 
-/** Потолок фотографий у товара. Столько же требует бэкенд (photos maxItems). */
 export const MAX_PHOTOS = 10;
 const MAX = MAX_PHOTOS;
 
-/** Оборачивает сохранённый S3-ключ в элемент дропзоны (для формы редактирования). */
 export function storedPhoto(key: string, url: string, name: string): UploadedPhoto {
   return { id: key, key, url, name };
 }
 
-/** Resize/compress an image to max 1200px on the long edge via canvas. */
 async function compress(file: File): Promise<UploadedPhoto> {
   const dataUrl = await new Promise<string>((res, rej) => {
     const fr = new FileReader();
@@ -69,18 +64,11 @@ export function PhotoDropzone({
 }: {
   photos: UploadedPhoto[];
   onChange: (p: UploadedPhoto[]) => void;
-  /**
-   * Задан — плитка становится кликабельной и открывает перерисовку через ИИ.
-   * Передают все три формы товара: админская и обе продавца. У фото без `key`
-   * (только что выбранного и ещё не загруженного) диалог сам предложит
-   * сохранить его перед генерацией.
-   */
   onPhotoClick?: (photo: UploadedPhoto) => void;
 }) {
   const { t } = useT();
   const [drag, setDrag] = useState(false);
   const [busy, setBusy] = useState(false);
-  /** Фото, открытое во весь экран; null — просмотрщик закрыт. */
   const [zoomed, setZoomed] = useState<number | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -93,7 +81,6 @@ export function PhotoDropzone({
         const picked = Array.from(files)
           .filter((f) => f.type.startsWith("image/"))
           .slice(0, room);
-        // Битый файл выбрасываем, а не зависаем навсегда с включённым busy.
         const results = await Promise.allSettled(picked.map(compress));
         const compressed = results
           .filter((r): r is PromiseFulfilledResult<UploadedPhoto> => r.status === "fulfilled")
@@ -161,7 +148,6 @@ export function PhotoDropzone({
           <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
             {photos.map((p, i) => (
               <div key={p.id} className="group relative aspect-square overflow-hidden rounded-lg border border-border bg-muted">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={p.url}
                   alt={p.name}
@@ -184,11 +170,7 @@ export function PhotoDropzone({
                   </div>
                 )}
                 <div className="absolute right-1.5 top-1.5 flex items-center gap-1">
-                  {/**
-                   * Отдельная кнопка, а не клик по плитке: клик уже занят
-                   * перерисовкой через ИИ, а рассмотреть фото перед отправкой
-                   * нужно и там, где её нет.
-                   */}
+                  {}
                   <button
                     type="button"
                     onClick={() => setZoomed(i)}

@@ -35,10 +35,6 @@ import type {
 const TABS: ReviewStatus[] = ["pending", "approved", "rejected"];
 const KEY = "/api/v1/admin/reviews";
 
-/**
- * Что решил ИИ. Отдельной строкой, а не бейджем у статуса: модератору важен не
- * столько сам вердикт, сколько объяснение — ради него он сюда и пришёл.
- */
 function AiVerdictLine({
   verdict,
   note,

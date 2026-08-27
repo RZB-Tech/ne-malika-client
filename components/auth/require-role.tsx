@@ -11,25 +11,16 @@ import { useT } from "@/components/providers/i18n-provider";
 import { useAuth } from "@/lib/api/auth";
 import type { UserRole } from "@/lib/api/types";
 
-/**
- * Закрывает раздел от чужих. Проверка только клиентская: сессия лежит в
- * localStorage, серверу она недоступна, поэтому middleware тут бессилен.
- *
- * Это защита интерфейса, а не данных. Настоящий барьер — guard'ы NestJS на
- * каждом эндпоинте: даже открыв разметку кабинета, чужих товаров не увидишь.
- */
 export function RequireRole({
   role,
   children,
 }: {
-  /** Одна роль или список: в кабинет продавца пускаем и покупателя — создать магазин. */
   role: UserRole | UserRole[];
   children: React.ReactNode;
 }) {
   const { user, isAuthenticated, isHydrated, refreshSession } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
-  /** Одна попытка перевыпустить токен, прежде чем выставлять за дверь. */
   const refreshTried = useRef(false);
   const [refreshDone, setRefreshDone] = useState(false);
 
@@ -37,9 +28,6 @@ export function RequireRole({
   const allowed = Boolean(user && roles.includes(user.role as UserRole));
 
   useEffect(() => {
-    // Невошедшего не выгоняем: ему показывается приглашение войти. Молчаливый
-    // редирект на главную выглядел как поломка — человек, открывший ссылку на
-    // кабинет, оказывался на витрине без единого слова о том, что произошло.
     if (!isHydrated || !isAuthenticated) return;
     if (allowed) return;
 
@@ -65,11 +53,6 @@ export function RequireRole({
   return <>{children}</>;
 }
 
-/**
- * Приглашение войти вместо пустого экрана. После входа возвращает ровно туда,
- * куда человек шёл: иначе продавец, открывший ссылку на форму магазина,
- * оказывался бы в кабинете и искал её заново.
- */
 function LoginWall({ next }: { next: string }) {
   const { t } = useT();
 

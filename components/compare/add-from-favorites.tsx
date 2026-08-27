@@ -9,16 +9,6 @@ import { useFavorites } from "@/lib/favorites/use-favorites";
 import { hueFromId } from "@/lib/api/mappers";
 import { photoUrl } from "@/lib/api/photo";
 
-/**
- * Быстрый набор сравнения из избранного.
- *
- * Второй источник товаров помимо выдачи поиска: там сравнение набирают кнопкой
- * прямо на плитке, а сюда приходят уже с готовым списком отложенного — и
- * возвращаться в каталог за каждой карточкой ради одной кнопки незачем.
- *
- * Показывается, только пока есть что добавить: пустая полоса под таблицей
- * выглядела бы поломкой.
- */
 export function AddFromFavorites() {
   const { t } = useT();
   const { items: favorites, isLoading } = useFavorites();

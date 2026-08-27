@@ -4,11 +4,9 @@ import { createLocalListStore } from "@/lib/storage/local-list-store";
 import { isProductSnapshot, type ProductSnapshot } from "@/lib/product-snapshot";
 
 export interface FavoriteProduct extends ProductSnapshot {
-  /** ISO-дата добавления в избранное. */
   addedAt: string;
 }
 
-/** Совпадает с ArrayMaxSize на бэкенде: всё избранное уезжает одним запросом. */
 export const MAX_LOCAL_FAVORITES = 200;
 
 const store = createLocalListStore<FavoriteProduct>({
@@ -23,7 +21,6 @@ export const subscribeLocalFavorites = store.subscribe;
 export const removeLocalFavorite = store.remove;
 export const clearLocalFavorites = store.clear;
 
-/** Возвращает false, если товар уже в избранном или список переполнен. */
 export function addLocalFavorite(
   product: ProductSnapshot,
   addedAt = new Date().toISOString(),

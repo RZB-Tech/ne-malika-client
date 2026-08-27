@@ -1,13 +1,6 @@
 import { parseMarkdown, type MarkdownText } from "@/lib/markdown";
 import { cn } from "@/lib/utils";
 
-/**
- * Описание товара с простой разметкой: абзацы, списки и жирный текст.
- *
- * Рисуется React-элементами, а не через dangerouslySetInnerHTML: описание
- * пишут продавцы и правит модель, и единственный способ гарантировать, что
- * оттуда не приедет разметка, — вообще не собирать HTML из строки.
- */
 export function Markdown({
   text,
   className,

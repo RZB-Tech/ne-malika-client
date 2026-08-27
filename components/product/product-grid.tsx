@@ -4,12 +4,6 @@ import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { ProductCardSkeleton } from "./product-card";
 
-/**
- * Единая сетка карточек товара: 2 колонки на телефоне, 3 на планшете, дальше
- * авто-заполнение по ширине контейнера. Раньше этот класс копировался в девяти
- * местах, и оптимизационные content-visibility классы доехали только в один
- * из копий — остальные рендерили плитки за пределами вьюпента целиком.
- */
 export function ProductGrid({
   children,
   className,
@@ -30,7 +24,6 @@ export function ProductGrid({
   );
 }
 
-/** Скелет сетки на время загрузки — той же высоты, что настоящие карточки. */
 export function ProductGridSkeleton({
   count = 10,
   className,

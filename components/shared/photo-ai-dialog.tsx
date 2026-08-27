@@ -40,12 +40,6 @@ import { cn } from "@/lib/utils";
 type Format = "portrait" | "square";
 type Tier = "1K" | "2K" | "3K" | "4K";
 
-/**
- * Значения — в пикселях: тиры вроде «1K» модель не принимает, отвечает
- * «Expected WIDTHxHEIGHT». Вертикальные 3:4 — формат карточки на маркетплейсах,
- * заголовок и выноски помещаются только в него. В обеих колонках 4K упирается в
- * потолок модели по числу пикселей, больше не бывает.
- */
 const SIZES: Record<Format, Record<Tier, GenerateImagesDtoSize>> = {
   portrait: {
     "1K": "960x1280",
@@ -89,23 +83,11 @@ interface Generated {
   url: string;
 }
 
-/** Ранее нарисованное по этому же фото, как его отдаёт сервер. */
 interface StoredImage extends Generated {
   prompt: string;
   createdAt: string;
 }
 
-/**
- * Перерисовка фотографии товара. Исходник уходит модели как основа, поэтому на
- * выходе тот же товар — иначе карточка обещала бы одно, а приезжало другое.
- *
- * По умолчанию рисуется карточка-инфографика, как на Wildberries и Ozon: товар
- * на оформленном фоне, заголовок и выноски. Режим «фото на белом» оставлен для
- * случаев, когда нужна обычная студийная съёмка.
- *
- * Выбранные варианты возвращаются наружу: первый встаёт на место исходного фото,
- * остальные добавляются в конец галереи.
- */
 export function PhotoAiDialog({
   photo,
   onClose,
@@ -115,10 +97,6 @@ export function PhotoAiDialog({
   photo: UploadedPhoto | null;
   onClose: () => void;
   onApply: (replacement: UploadedPhoto[]) => void;
-  /**
-   * Фото загрузили в хранилище прямо из диалога — форма должна запомнить ключ,
-   * иначе при отправке файл уедет в S3 второй раз.
-   */
   onPhotoStored?: (photoId: string, key: string) => void;
 }) {
   const { t } = useT();
@@ -142,20 +120,6 @@ export function PhotoAiDialog({
 
   const open = photo !== null;
 
-  /**
-   * Последнее непустое фото. Radix держит содержимое смонтированным, пока идёт
-   * анимация закрытия, а `photo` к этому моменту уже null — и разметка, которая
-   * читала бы его напрямую, роняла страницу целиком.
-   *
-   * Само по себе закрытие безобидно: без ключа рисуется ветка «фото ещё не
-   * сохранено». Ломалось после кнопки «Сохранить фото»: `savedKey` переживает
-   * закрытие, поэтому `photoKey` оставался непустым, и разметка шла в ветку,
-   * которая ждёт фотографию.
-   *
-   * Смена фотографии здесь же сбрасывает всё, что относилось к предыдущей.
-   * Сравниваем по id, а не по ссылке: объект пересобирается, когда форма
-   * дописывает в него ключ хранилища, и сравнение ссылок гоняло бы рендер.
-   */
   const [shownPhoto, setShownPhoto] = useState(photo);
   if (photo && photo.id !== shownPhoto?.id) {
     setShownPhoto(photo);
@@ -169,16 +133,6 @@ export function PhotoAiDialog({
   const photoKey = shownPhoto?.key ?? savedKey ?? undefined;
   const size = SIZES[format][tier];
 
-  /**
-   * Разрешение и остаток считает сервер, и своей проверки поверх здесь нет
-   * намеренно: остаток кредитов складывается из двух карманов — купленного и
-   * подписочного, — и любая вторая формула на клиенте выключила бы кнопки
-   * подписчику, у которого куплено ноль, а по тарифу оплачено шесть тысяч.
-   * `allowed` приходит из той же точки, что и сам резерв.
-   *
-   * `credits: null` — администратор: лимита у него нет, за его запросы платит
-   * площадка.
-   */
   const quotaQuery = useImageGenControllerBalance({
     query: { enabled: open, retry: false },
   });
@@ -193,7 +147,6 @@ export function PhotoAiDialog({
   );
   const history = historyQuery.data as unknown as StoredImage[] | undefined;
 
-  /** Свежие варианты впереди, за ними прошлые. Ключи не повторяются. */
   const gallery = useMemo(() => {
     const seen = new Set<string>();
     const out: Generated[] = [];
@@ -210,7 +163,6 @@ export function PhotoAiDialog({
     onClose();
   };
 
-  /** Инфографика вертикальная, студийное фото — квадратное: так их и снимают. */
   const changeStyle = (next: GenerateImagesDtoStyle) => {
     setStyle(next);
     setFormat(next === "photo" ? "square" : "portrait");
@@ -272,11 +224,6 @@ export function PhotoAiDialog({
     close();
   };
 
-  /**
-   * Кладёт ещё не сохранённое фото в хранилище. Нужно в форме создания товара:
-   * там ключи появляются только при отправке, и до этого генерация была
-   * недоступна вовсе.
-   */
   const storePhoto = async () => {
     if (!photo || photo.key || savedKey) return;
     setSavingPhoto(true);
@@ -346,7 +293,6 @@ export function PhotoAiDialog({
         ) : (
           <div className="space-y-4">
             <div className="flex gap-4">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={shownPhoto.url}
                 alt={t("admin.photoAi.sourceAlt")}
@@ -387,7 +333,6 @@ export function PhotoAiDialog({
               <Label>{t("admin.photoAi.reference")}</Label>
               {reference ? (
                 <div className="flex items-center gap-3">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={reference.url}
                     alt={t("admin.photoAi.referenceAlt")}
@@ -549,13 +494,6 @@ export function PhotoAiDialog({
               </Button>
 
               {quota?.allowed === false ? (
-                /**
-                 * Отказ бывает двух видов, и путать их нельзя: у продавца с
-                 * нулевым остатком «обратитесь к администратору» звучит как
-                 * поломка, хотя достаточно пополнить баланс или оформить
-                 * подписку. Остаток числом сервер отдаёт только магазину —
-                 * значит, это он и есть.
-                 */
                 <span className="text-sm text-destructive">
                   {t(
                     left === null
@@ -601,7 +539,6 @@ export function PhotoAiDialog({
                           : "ring-1 ring-foreground/10 hover:ring-foreground/25",
                       )}
                     >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={r.url}
                         alt={t("admin.photoAi.variantAlt")}
@@ -632,12 +569,6 @@ export function PhotoAiDialog({
   );
 }
 
-/**
- * Ожидание генерации. Обычная «пульсирующая» заглушка на минуте ожидания
- * читается как зависшая страница, поэтому здесь блик бежит по плитке, плитки
- * оживают по очереди, а счётчик показывает, что процесс идёт и сколько уже
- * длится — это единственное, что admin реально может отслеживать.
- */
 function GeneratingGrid({
   count,
   format,

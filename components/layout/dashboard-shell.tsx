@@ -31,26 +31,16 @@ export interface NavItem {
   label: string;
   icon: AppIcon;
   exact?: boolean;
-  /** Если задан — пункт открывает окно вместо перехода по href. */
   onSelect?: () => void;
-  /** Непрочитанное рядом с подписью. Ноль не показываем. */
   badge?: number;
 }
 
-/** Плашка владельца раздела. В свёрнутом меню от неё остаётся только аватар. */
 export interface ShellBrand {
   avatar: React.ReactNode;
   title: string;
   subtitle: string;
 }
 
-/**
- * Оболочка кабинетов продавца и администратора: боковое меню + верхняя панель.
- *
- * Панель и меню намеренно без разделительных линий и на одном фоне (`bg-sidebar`)
- * — вместе они читаются как единая Г-образная рамка вокруг контента, а не как
- * два состыкованных блока.
- */
 export function DashboardShell({
   items,
   sectionLabel,

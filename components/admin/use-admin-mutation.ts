@@ -6,15 +6,6 @@ import { toast } from "sonner";
 import { useT } from "@/components/providers/i18n-provider";
 import { apiErrorMessage } from "@/lib/api/errors";
 
-/**
- * Обёртка мутаций админских страниц: успех — точечная инвалидация затронутых
- * запросов и тост, ошибка — тост с текстом сервера.
- *
- * До неё почти каждая страница вызывала `invalidateQueries()` без фильтра —
- * любая мутация перезапрашивала весь кэш приложения, включая витринные
- * запросы покупателя. И почти нигде не было catch: ошибка мутации уходила в
- * тихий unhandled rejection, без тоста и без следа в консоли.
- */
 export function useAdminMutation() {
   const { t } = useT();
   const queryClient = useQueryClient();
@@ -23,7 +14,6 @@ export function useAdminMutation() {
     async (
       action: () => Promise<unknown>,
       opts: {
-        /** Базовые ключи затронутых запросов (фабрики orval). Пусто — нечего инвалидировать. */
         invalidate?: readonly (readonly unknown[])[];
         successKey?: string;
         errorKey: string;

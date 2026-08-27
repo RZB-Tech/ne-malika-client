@@ -33,11 +33,6 @@ interface Balance {
   available: number;
 }
 
-/**
- * Единый диалог управления кредитами магазина: выдача и отбор на двух вкладках.
- * Объединяет бывшие GrantCreditsDialog и RevokeCreditsDialog в одно место,
- * чтобы в контекстном меню была одна кнопка «Кредиты» вместо двух.
- */
 export function CreditsDialog({
   shop,
   onClose,
@@ -191,7 +186,7 @@ export function CreditsDialog({
             </TabsTrigger>
           </TabsList>
 
-          {/* ── Выдача ── */}
+          {}
           <TabsContent value="grant" className="space-y-4 pt-2">
             <div className="space-y-1.5">
               <Label htmlFor="grant-amount">
@@ -242,7 +237,7 @@ export function CreditsDialog({
             </DialogFooter>
           </TabsContent>
 
-          {/* ── Отбор ── */}
+          {}
           <TabsContent value="revoke" className="space-y-4 pt-2">
             <div className="space-y-1.5">
               <Label htmlFor="revoke-amount">

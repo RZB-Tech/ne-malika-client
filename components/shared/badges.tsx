@@ -61,22 +61,6 @@ export function ModerationBadge({
   );
 }
 
-/**
- * Статус модерации баннера продавца.
- *
- * Отдельный компонент, а не расширение `ModerationBadge` выше. Тот типизирован
- * `draft | moderation | published | rejected` (`lib/data.ts`) и заканчивается
- * фолбэком `cfg[status] ?? cfg.moderation`: `pending` и `approved` в его
- * словаре отсутствуют оба, и оба отрисовались бы одинаково — жёлтым «На
- * модерации». Одобренный баннер выглядел бы неодобренным, и продавец пошёл бы
- * спрашивать, почему его не пускают.
- *
- * Подписи берём из `admin.shopBanners.status.*` — единственной тройки под эти
- * три слова. Соседние `admin.status.*` (`active/hidden/abolished/pending`) и
- * `moderation.*` (про товар) описывают другие состояния, а завести вторую
- * тройку в `seller.*` значило бы дать продавцу и модератору расходящиеся
- * названия одного и того же.
- */
 export function BannerStatusBadge({
   status,
   className,
@@ -107,7 +91,6 @@ export function BannerStatusBadge({
   );
 }
 
-/** Роль пользователя: в админке и в профиле покупателя. */
 export function RoleBadge({
   role,
   className,

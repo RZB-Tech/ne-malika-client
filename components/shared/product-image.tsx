@@ -5,11 +5,6 @@ import { cn } from "@/lib/utils";
 import { CategoryIcon } from "./category-icon";
 import { getCategory } from "@/lib/data";
 
-/**
- * Product artwork. When a real photo URL is available (`src`) we render it and
- * fall back to a deterministic, brand-tinted category tile if it fails to load
- * or is absent — so local dev without a live S3 bucket still looks intentional.
- */
 export function ProductImage({
   hue,
   categorySlug,
@@ -25,14 +20,6 @@ export function ProductImage({
   alt?: string;
   className?: string;
   iconClassName?: string;
-  /**
-   * "cover" (default) crops to fill — good for thumbnails/tiles.
-   * "contain" shows the whole photo without cropping (letterboxed on a
-   * neutral backdrop) — use for the main product view.
-   * "natural" lets the photo set the height: no crop, no letterbox. The
-   * caller must not impose an aspect ratio. Falls back to a 4:3 tile when
-   * there is no photo, since a flow image is what gave the box its height.
-   */
   fit?: "cover" | "contain" | "natural";
 }) {
   const [failed, setFailed] = useState(false);
@@ -84,7 +71,6 @@ export function ProductImage({
           {fit === "contain" && (
             <div className="absolute inset-0 z-[5] bg-muted" />
           )}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={src!}
             alt={alt ?? ""}

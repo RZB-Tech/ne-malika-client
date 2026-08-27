@@ -4,10 +4,6 @@ import { ChevronLeft, ChevronRight } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { useT } from "@/components/providers/i18n-provider";
 
-/**
- * Переключение страниц списка. Ничего не рисует, пока страница одна —
- * чтобы на коротких списках не висел мёртвый элемент управления.
- */
 export function Pagination({
   page,
   totalPages,
@@ -16,7 +12,6 @@ export function Pagination({
 }: {
   page: number;
   totalPages: number;
-  /** Общее число записей — показываем рядом, чтобы был масштаб. */
   total?: number;
   onChange: (page: number) => void;
 }) {

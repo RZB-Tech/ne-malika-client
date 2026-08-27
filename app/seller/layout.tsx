@@ -32,20 +32,8 @@ export default function SellerLayout({ children }: { children: React.ReactNode }
 
 function SellerLayoutInner({ children }: { children: React.ReactNode }) {
   const { t } = useT();
-  /* Магазин и подписка одним хуком: за магазином он ходит тем же запросом. */
   const { shop, subscription } = useSellerSubscription();
 
-  /**
-   * Разделы, которым нужен магазин, — внутри ветки `shop`: без магазина
-   * подписывать нечего, считать нечего и баннер вешать некуда.
-   *
-   * «Баннер» показываем только при `bannerSlots > 0`, то есть на действующем
-   * MAX. Слоты приходят посчитанными по сроку подписки: у истёкшей их ноль,
-   * даже если в магазине по-прежнему записан купленный когда-то MAX. Пункт без
-   * этой проверки вёл бы продавца прямиком в 403.
-   *
-   * `exact` не нужен ни одному из трёх: подпутей у них нет.
-   */
   const items: NavItem[] = [
     { href: "/seller", label: t("seller.nav.dashboard"), icon: LayoutDashboard, exact: true },
     ...(shop
