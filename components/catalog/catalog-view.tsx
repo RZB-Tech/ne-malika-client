@@ -20,6 +20,7 @@ import { productCardsControllerFindAll } from "@/lib/api/generated/endpoints/pro
 import type { ProductCardsControllerFindAllParams } from "@/lib/api/generated/schemas";
 import { mapPublicProductCard } from "@/lib/api/mappers";
 import { randomCatalogSeed } from "@/lib/catalog-seed";
+import { visitorId } from "@/lib/analytics";
 import type { Paginated, PublicProductCard } from "@/lib/api/types";
 
 const PAGE_SIZE = 24;
@@ -77,9 +78,24 @@ export function CatalogView({
 
   const listQuery = useInfiniteQuery({
     queryKey: ["/api/v1/product-cards", "infinite", params] as const,
+    /**
+     * `visitor_id` подставляется здесь, а не в `params`, и в ключ кэша не
+     * попадает намеренно. На состав выдачи он не влияет — это подпись
+     * посетителя для дедупликации счётчика поисковых запросов, — а в ключе он
+     * завёл бы каждому человеку личную копию одной и той же страницы и,
+     * главное, разошёлся бы между серверным рендером (localStorage там нет,
+     * будет `null`) и первым рендером в браузере: `initialData` перестал бы
+     * подходить под ключ, и витрина перезапрашивалась бы сразу после гидратации.
+     *
+     * Отправляем при любом запросе каталога, а не только когда заполнен `q`.
+     * Сегодня сервер считает лишь поиск (`recordSearchHit` выходит, если нет
+     * `q` или это не первая страница), но повторять это правило на клиенте
+     * значило бы: расширят учёт на сервере — и отчёт снова молча останется
+     * пустым. Ровно этой тишины здесь и избегаем.
+     */
     queryFn: ({ pageParam, signal }) =>
       productCardsControllerFindAll(
-        { ...params, page: pageParam },
+        { ...params, page: pageParam, visitor_id: visitorId() ?? undefined },
         undefined,
         signal,
       ) as unknown as Promise<Paginated<PublicProductCard>>,

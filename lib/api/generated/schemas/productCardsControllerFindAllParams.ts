@@ -54,4 +54,8 @@ sort?: ProductCardsControllerFindAllSort;
  * Зерно для sort=random; одно зерно — один и тот же порядок
  */
 seed?: string;
+/**
+ * Анонимный id браузера (uuid из localStorage). Нужен только счётчику поисковых запросов, на выдачу не влияет; негодное значение игнорируется.
+ */
+visitor_id?: string;
 };

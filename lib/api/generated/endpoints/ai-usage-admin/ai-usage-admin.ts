@@ -141,7 +141,7 @@ export function useAdminAiUsageControllerList<TData = Awaited<ReturnType<typeof 
 
 
 /**
- * @summary Итоги за всё время: число запросов, расход у OpenRouter и снятые кредиты
+ * @summary Итоги за всё время: число запросов, расход у OpenRouter по платным, подписочным и площадочным операциям и снятые кредиты
  */
 export const adminAiUsageControllerTotals = (
 
@@ -212,7 +212,7 @@ export function useAdminAiUsageControllerTotals<TData = Awaited<ReturnType<typeo
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
- * @summary Итоги за всё время: число запросов, расход у OpenRouter и снятые кредиты
+ * @summary Итоги за всё время: число запросов, расход у OpenRouter по платным, подписочным и площадочным операциям и снятые кредиты
  */
 
 export function useAdminAiUsageControllerTotals<TData = Awaited<ReturnType<typeof adminAiUsageControllerTotals>>, TError = ErrorType<unknown>>(

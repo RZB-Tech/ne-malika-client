@@ -54,7 +54,7 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
 };
 
 /**
- * @summary Цена автозаполнения и остаток кредитов магазина
+ * @summary Цена следующего автозаполнения: бесплатно по норме или безлимиту тарифа либо по прайсу, плюс остаток кредитов магазина
  */
 export const productAutofillControllerPrice = (
 
@@ -125,7 +125,7 @@ export function useProductAutofillControllerPrice<TData = Awaited<ReturnType<typ
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
- * @summary Цена автозаполнения и остаток кредитов магазина
+ * @summary Цена следующего автозаполнения: бесплатно по норме или безлимиту тарифа либо по прайсу, плюс остаток кредитов магазина
  */
 
 export function useProductAutofillControllerPrice<TData = Awaited<ReturnType<typeof productAutofillControllerPrice>>, TError = ErrorType<unknown>>(

@@ -1,6 +1,6 @@
 import "server-only";
 
-import type { BannerDto } from "./generated/schemas";
+import type { PublicBannerDto } from "./generated/schemas";
 import type { PublicProductCard, PublicShop, Paginated } from "./types";
 
 const ORIGIN = (
@@ -77,6 +77,13 @@ export function getPublicShop(id: number): Promise<PublicShop | null> {
  *
  * `seed` — зерно перемешивания: с ним ответ уникален для захода, поэтому мимо
  * кэша. Без него — прежний общий ответ на две минуты.
+ *
+ * `visitor_id` отсюда не уходит и уйти не может: он лежит в localStorage
+ * посетителя (`lib/analytics.ts`), а этот запрос делает сервер. Статистику
+ * поисковых запросов это не обедняет — здесь всегда первая страница витрины
+ * без строки поиска, а всё, что человек ищет руками, уходит уже клиентским
+ * запросом, и вот к нему `visitor_id` приложить обязательно: без него сервер
+ * не считает поисковый запрос вовсе, и отчёт MAX останется пустым.
  */
 export function getPublicProducts(
   params: {
@@ -103,9 +110,15 @@ export function getPublicProducts(
  * GET /banners — карусель главной. Рендерится сервером вместе с первым экраном:
  * баннер стоит выше каталога и, догружаясь на клиенте, сдвигал бы витрину вниз
  * уже после того, как её увидели.
+ *
+ * Именно `PublicBannerDto`, а не `BannerDto`: с появлением баннеров продавцов
+ * ручка перестала отдавать поля модерации (`status`, `rejectReason`, `shopId`,
+ * `isActive`, `sortOrder`) — это переписка продавца с модератором, и на
+ * витрине ей не место. Тип здесь написан руками, генератор этот путь не
+ * видит, так что соврать он может молча: за списком полей следить глазами.
  */
-export async function getBanners(): Promise<BannerDto[]> {
-  return (await getJson<BannerDto[]>("/banners", 120)) ?? [];
+export async function getBanners(): Promise<PublicBannerDto[]> {
+  return (await getJson<PublicBannerDto[]>("/banners", 120)) ?? [];
 }
 
 /**

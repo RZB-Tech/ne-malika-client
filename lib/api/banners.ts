@@ -1,16 +1,54 @@
 import type { Locale } from "@/lib/i18n/config";
-import type { BannerDto } from "./generated/schemas";
+import type {
+  AdminBannerDto,
+  BannerDto,
+  PublicBannerDto,
+} from "./generated/schemas";
 import { photoUrl } from "./photo";
 
+export type { BannerModerationStatus } from "./types";
+
+/**
+ * Баннер, каким его видит владелец: с полями модерации и слотом.
+ *
+ * `shopId = null` — баннер площадки: его заводит администратор, модерации он не
+ * проходит и стоит в карусели первым. Непустой `shopId` — купленный слот
+ * продавца на тарифе MAX, он же единственный, у кого `status` бывает не
+ * `approved`.
+ *
+ * Это же тело возвращают и админские ручки баннеров площадки, и продавцовы
+ * `GET/POST/PATCH /seller/banners`.
+ */
 export type Banner = BannerDto;
+
+/** Очередь модерации `GET /admin/shop-banners`: то же плюс имя магазина. */
+export type AdminBanner = AdminBannerDto;
+
+/**
+ * Баннер витрины `GET /banners`.
+ *
+ * Полей модерации здесь нет и быть не должно: карусель на главной открыта всем,
+ * а `status`, `rejectReason` и `shopId` — переписка продавца с модератором.
+ * Раньше ручка отдавала целый `BannerDto`, поэтому у публичного пути (SSR
+ * `getBanners` → `BannerCarousel`) тип обязан быть именно этим — иначе он врёт
+ * про ответ, а компилятор молчит: лишние поля читать никто не заставляет.
+ */
+export type PublicBanner = PublicBannerDto;
 
 /**
  * Допустимые размеры картинки баннера. Те же числа продублированы в
  * `src/modules/banners/banners.constants.ts` на бэкенде — там они попадают в
- * описание Swagger. Меняя здесь, поменяйте и там.
+ * описание Swagger. Меняя здесь, поменяйте и там: пара помечена комментарием
+ * с обеих сторон.
  *
  * Первый в списке — основной: по нему карусель считает высоту слота. Остальные
  * тоже принимаются, но встают в тот же слот с полями по краям.
+ *
+ * С появлением баннеров продавцов эта проверка стала единственной: сервер
+ * разрешение не смотрит и смотреть не будет — библиотеки, разбирающей
+ * картинки, в его зависимостях нет, а `sharp` ради этого он тянуть не станет.
+ * Кривой файл ловится глазами модератора, но до модератора его лучше не
+ * доводить.
  */
 export const BANNER_FORMATS = [
   { width: 1942, height: 809 },
@@ -62,22 +100,31 @@ export const BANNER_MIME_TYPES = [
 /** Тот же потолок, что у бэкенда (MAX_FILE_SIZE_BYTES). */
 export const BANNER_MAX_BYTES = 10 * 1024 * 1024;
 
-/** Поле с ключом фото под каждый язык интерфейса. */
-const PHOTO_FIELD: Record<Locale, keyof Pick<
-  BannerDto,
+/**
+ * Три ключа картинок — всё, что нужно этим двум функциям.
+ *
+ * Именно `Pick`, а не `Banner`: те же вызовы идут и с витрины, где приходит
+ * `PublicBanner` без полей модерации. Требовать целый `BannerDto` там, где
+ * читаются три поля, значит запретить публичному пути честный тип ответа.
+ */
+export type BannerPhotos = Pick<
+  PublicBannerDto,
   "photoRu" | "photoUzLatn" | "photoUzCyrl"
->> = {
+>;
+
+/** Поле с ключом фото под каждый язык интерфейса. */
+const PHOTO_FIELD: Record<Locale, keyof BannerPhotos> = {
   ru: "photoRu",
   "uz-Latn": "photoUzLatn",
   "uz-Cyrl": "photoUzCyrl",
 };
 
-export function bannerPhotoKey(banner: BannerDto, locale: Locale): string {
+export function bannerPhotoKey(banner: BannerPhotos, locale: Locale): string {
   return banner[PHOTO_FIELD[locale]] ?? banner.photoRu;
 }
 
 export function bannerImageUrl(
-  banner: BannerDto,
+  banner: BannerPhotos,
   locale: Locale,
 ): string | null {
   return photoUrl(bannerPhotoKey(banner, locale));

@@ -31,4 +31,8 @@ userId?: number;
  * Вид операции
  */
 operation?: AdminAiUsageControllerListOperation;
+/**
+ * true — только бесплатные по подписке, false — только те, за которые списаны кредиты. Запросы администратора не бесплатные: у них нет магазина, ищите их по shopId
+ */
+free?: boolean;
 };

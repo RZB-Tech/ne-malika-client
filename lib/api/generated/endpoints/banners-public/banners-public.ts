@@ -21,7 +21,7 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
-  BannerDto
+  PublicBannerDto
 } from '../../schemas';
 
 import { customInstance } from '../../../mutator';
@@ -48,6 +48,7 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
 };
 
 /**
+ * Карусель площадки вперемешку с оплаченными баннерами магазинов: первое место за площадкой, дальше баннеры продавцов в ротации.
  * @summary Баннеры главной страницы в порядке показа
  */
 export const bannersControllerFindAll = (
@@ -56,7 +57,7 @@ export const bannersControllerFindAll = (
 ) => {
 
 
-      return customInstance<BannerDto[]>(
+      return customInstance<PublicBannerDto[]>(
       {url: `/api/v1/banners`, method: 'GET', signal
     },
       options);

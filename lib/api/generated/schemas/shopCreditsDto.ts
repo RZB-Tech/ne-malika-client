@@ -7,10 +7,10 @@
  */
 
 export interface ShopCreditsDto {
-  /** Начислено всего, за вычетом потраченного */
+  /** Купленные и подаренные кредиты. Не сгорают */
   balance: number;
   /** Занято выполняющимися сейчас запросами */
   reserved: number;
-  /** Доступно к трате: balance − reserved */
+  /** Доступно к трате */
   available: number;
 }

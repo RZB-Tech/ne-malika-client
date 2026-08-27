@@ -25,8 +25,12 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  AdminBannerDto,
+  AdminShopBannersControllerListParams,
   BannerDto,
   CreateBannerDto,
+  ModerateBannerDto,
+  PaginatedShopBannersDto,
   ReorderBannersDto,
   UpdateBannerDto
 } from '../../schemas';
@@ -400,4 +404,163 @@ export const useAdminBannersControllerRemove = <TError = ErrorType<void>,
         TContext
       > => {
       return useMutation(getAdminBannersControllerRemoveMutationOptions(options), queryClient);
+    }
+    /**
+ * @summary Баннеры продавцов: очередь модерации и архив
+ */
+export const adminShopBannersControllerList = (
+    params?: AdminShopBannersControllerListParams,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<PaginatedShopBannersDto>(
+      {url: `/api/v1/admin/shop-banners`, method: 'GET',
+        params, signal
+    },
+      options);
+    }
+
+
+
+
+export const getAdminShopBannersControllerListQueryKey = (params?: AdminShopBannersControllerListParams,) => {
+    return [
+    `/api/v1/admin/shop-banners`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getAdminShopBannersControllerListQueryOptions = <TData = Awaited<ReturnType<typeof adminShopBannersControllerList>>, TError = ErrorType<unknown>>(params?: AdminShopBannersControllerListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminShopBannersControllerList>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getAdminShopBannersControllerListQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof adminShopBannersControllerList>>> = ({ signal }) => adminShopBannersControllerList(params, requestOptions, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof adminShopBannersControllerList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type AdminShopBannersControllerListQueryResult = NonNullable<Awaited<ReturnType<typeof adminShopBannersControllerList>>>
+export type AdminShopBannersControllerListQueryError = ErrorType<unknown>
+
+
+export function useAdminShopBannersControllerList<TData = Awaited<ReturnType<typeof adminShopBannersControllerList>>, TError = ErrorType<unknown>>(
+ params: undefined |  AdminShopBannersControllerListParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminShopBannersControllerList>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof adminShopBannersControllerList>>,
+          TError,
+          Awaited<ReturnType<typeof adminShopBannersControllerList>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAdminShopBannersControllerList<TData = Awaited<ReturnType<typeof adminShopBannersControllerList>>, TError = ErrorType<unknown>>(
+ params?: AdminShopBannersControllerListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminShopBannersControllerList>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof adminShopBannersControllerList>>,
+          TError,
+          Awaited<ReturnType<typeof adminShopBannersControllerList>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAdminShopBannersControllerList<TData = Awaited<ReturnType<typeof adminShopBannersControllerList>>, TError = ErrorType<unknown>>(
+ params?: AdminShopBannersControllerListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminShopBannersControllerList>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Баннеры продавцов: очередь модерации и архив
+ */
+
+export function useAdminShopBannersControllerList<TData = Awaited<ReturnType<typeof adminShopBannersControllerList>>, TError = ErrorType<unknown>>(
+ params?: AdminShopBannersControllerListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminShopBannersControllerList>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getAdminShopBannersControllerListQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+/**
+ * При отказе причина обязательна — её читает продавец. О решении владелец магазина узнаёт в Telegram и push-уведомлением.
+ * @summary Одобрить или отклонить баннер продавца
+ */
+export const adminShopBannersControllerModerate = (
+    id: number,
+    moderateBannerDto: BodyType<ModerateBannerDto>,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<AdminBannerDto>(
+      {url: `/api/v1/admin/shop-banners/${id}/moderate`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: moderateBannerDto, signal
+    },
+      options);
+    }
+
+
+
+
+export const getAdminShopBannersControllerModerateMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminShopBannersControllerModerate>>, TError,{id: number;data: BodyType<ModerateBannerDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof adminShopBannersControllerModerate>>, TError,{id: number;data: BodyType<ModerateBannerDto>}, TContext> => {
+
+const mutationKey = ['adminShopBannersControllerModerate'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminShopBannersControllerModerate>>, {id: number;data: BodyType<ModerateBannerDto>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  adminShopBannersControllerModerate(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AdminShopBannersControllerModerateMutationResult = NonNullable<Awaited<ReturnType<typeof adminShopBannersControllerModerate>>>
+    export type AdminShopBannersControllerModerateMutationBody = BodyType<ModerateBannerDto>
+    export type AdminShopBannersControllerModerateMutationError = ErrorType<void>
+
+    /**
+ * @summary Одобрить или отклонить баннер продавца
+ */
+export const useAdminShopBannersControllerModerate = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminShopBannersControllerModerate>>, TError,{id: number;data: BodyType<ModerateBannerDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof adminShopBannersControllerModerate>>,
+        TError,
+        {id: number;data: BodyType<ModerateBannerDto>},
+        TContext
+      > => {
+      return useMutation(getAdminShopBannersControllerModerateMutationOptions(options), queryClient);
     }

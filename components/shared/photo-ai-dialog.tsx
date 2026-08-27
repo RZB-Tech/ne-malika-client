@@ -169,6 +169,16 @@ export function PhotoAiDialog({
   const photoKey = shownPhoto?.key ?? savedKey ?? undefined;
   const size = SIZES[format][tier];
 
+  /**
+   * Разрешение и остаток считает сервер, и своей проверки поверх здесь нет
+   * намеренно: остаток кредитов складывается из двух карманов — купленного и
+   * подписочного, — и любая вторая формула на клиенте выключила бы кнопки
+   * подписчику, у которого куплено ноль, а по тарифу оплачено шесть тысяч.
+   * `allowed` приходит из той же точки, что и сам резерв.
+   *
+   * `credits: null` — администратор: лимита у него нет, за его запросы платит
+   * площадка.
+   */
   const quotaQuery = useImageGenControllerBalance({
     query: { enabled: open, retry: false },
   });
@@ -539,8 +549,19 @@ export function PhotoAiDialog({
               </Button>
 
               {quota?.allowed === false ? (
+                /**
+                 * Отказ бывает двух видов, и путать их нельзя: у продавца с
+                 * нулевым остатком «обратитесь к администратору» звучит как
+                 * поломка, хотя достаточно пополнить баланс или оформить
+                 * подписку. Остаток числом сервер отдаёт только магазину —
+                 * значит, это он и есть.
+                 */
                 <span className="text-sm text-destructive">
-                  {t("admin.photoAi.noAccess")}
+                  {t(
+                    left === null
+                      ? "admin.photoAi.noAccess"
+                      : "admin.photoAi.noCredits",
+                  )}
                 </span>
               ) : left !== null ? (
                 <span

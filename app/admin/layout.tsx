@@ -13,6 +13,7 @@ import {
   Star,
   Store,
   Users,
+  Wallet,
 } from "@/components/icons";
 import { RequireRole } from "@/components/auth/require-role";
 import {
@@ -43,6 +44,10 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
     { href: "/admin/users", label: t("admin.nav.users"), icon: Users },
     { href: "/admin/products", label: t("admin.nav.products"), icon: Package },
     { href: "/admin/banners", label: t("admin.nav.banners"), icon: ImageIcon },
+    /* Очередь модерации стоит рядом с баннерами площадки: таблица одна и та же,
+       разделены они тем, кто баннер завёл. Подписки — следом, это про деньги. */
+    { href: "/admin/shop-banners", label: t("admin.nav.shopBanners"), icon: ShieldCheck },
+    { href: "/admin/subscriptions", label: t("admin.nav.subscriptions"), icon: Wallet },
     { href: "/admin/ai-review", label: t("admin.nav.aiReview"), icon: Sparkles },
     { href: "/admin/ai-usage", label: t("admin.nav.aiUsage"), icon: Coins },
     { href: "/admin/broadcast", label: t("admin.nav.broadcast"), icon: Send },

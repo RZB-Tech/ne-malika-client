@@ -8,7 +8,7 @@ import { useT } from "@/components/providers/i18n-provider";
 import {
   BANNER_ASPECT_CSS,
   bannerImageUrl,
-  type Banner,
+  type PublicBanner,
 } from "@/lib/api/banners";
 import { cn } from "@/lib/utils";
 
@@ -38,7 +38,7 @@ const SLIDE_WIDTH = "w-[92%] sm:w-[86%] lg:w-[82%]";
  * в localStorage и до монтирования неизвестен, поэтому первый кадр всегда
  * русский, а затем меняется вместе с остальным интерфейсом.
  */
-export function BannerCarousel({ banners }: { banners: Banner[] }) {
+export function BannerCarousel({ banners }: { banners: PublicBanner[] }) {
   const { t, locale } = useT();
   const trackRef = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(0);
@@ -196,7 +196,7 @@ function BannerSlide({
   src,
   eager,
 }: {
-  banner: Banner;
+  banner: PublicBanner;
   src: string | null;
   eager: boolean;
 }) {

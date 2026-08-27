@@ -7,6 +7,48 @@ export type AiVerdict = "pass" | "warn" | "fail";
 /** `pending` — отзыв написан, но до проверки его не видно и в оценке он не участвует. */
 export type ReviewStatus = "pending" | "approved" | "rejected";
 
+/**
+ * Тариф подписки магазина.
+ *
+ * `free` не продаётся: это состояние «подписки нет» — и у магазина, который
+ * никогда не платил, и у того, чей срок вышел. Сервер отдаёт в полях `plan`
+ * именно ДЕЙСТВУЮЩИЙ тариф, посчитанный по сроку; колонка `shops.subscription_plan`
+ * после истечения намеренно хранит купленный когда-то `max`, и читать её
+ * вместо `plan` нельзя — на этом стоят все гейты (автозаполнение, баннер,
+ * аналитика).
+ */
+export type SubscriptionPlan = "free" | "start" | "pro" | "max";
+
+/** Тарифы, которые можно купить: то, что уходит на кассу. */
+export type PaidPlan = Exclude<SubscriptionPlan, "free">;
+
+/**
+ * Модерация баннера продавца.
+ *
+ * Имя не `ModerationStatus`: оно занято в `lib/data.ts` другим набором
+ * (`draft|moderation|published|rejected`) — тот про товар, и значения не
+ * пересекаются. Отсюда же отдельный `BannerStatusBadge` в
+ * `components/shared/badges.tsx`.
+ */
+export type BannerModerationStatus = "pending" | "approved" | "rejected";
+
+/**
+ * Состояние платежа за подписку.
+ *
+ * `prepared` — касса открыта, подтверждения от провайдера ещё не было: денег
+ * там нет, Prepare ничего не списывает. `failed` — списание прошло, а выдать
+ * подписку не удалось; такие строки ждут разбора человеком.
+ */
+export type SubscriptionPaymentStatus =
+  | "pending"
+  | "prepared"
+  | "paid"
+  | "cancelled"
+  | "failed";
+
+/** `manual` — подписку выдал администратор руками, денег через кассу не было. */
+export type PaymentProvider = "click" | "payme" | "manual";
+
 export interface PaginationMeta {
   page: number;
   limit: number;
@@ -144,6 +186,75 @@ export interface AdminShopRow {
   ownerBlockReason: string | null;
 }
 
+/** GET /admin/subscriptions — строка таблицы подписок в админке. */
+export interface AdminSubscriptionRow {
+  shopId: number;
+  shopName: string;
+  /** Статус самого магазина: упразднённый попадает в список наравне с живым. */
+  shopStatus: EntityStatus;
+  ownerId: number;
+  ownerName: string;
+  ownerUsername: string | null;
+  /** ДЕЙСТВУЮЩИЙ тариф: у просроченной подписки здесь `free`. */
+  plan: SubscriptionPlan;
+  /**
+   * Тариф, записанный в магазине. После истечения остаётся прежним — по нему
+   * видно, чем магазин пользовался, пока платил. Для гейтов не годится.
+   */
+  storedPlan: SubscriptionPlan;
+  active: boolean;
+  /** До какого момента оплачено. null — не платили ни разу. */
+  until: string | null;
+  /** Полных суток до истечения, вверх. null — платежей не было. */
+  daysLeft: number | null;
+  subscriptionCredits: number;
+  lastPaidAt: string | null;
+  /**
+   * Платёж застрял в `prepared` дольше суток: касса открыта, подтверждение не
+   * пришло. Денег там нет — это брошенная касса, а не потерянная оплата.
+   */
+  stuckPrepared: boolean;
+  /** Деньги списаны, а довести выдачу до конца автоматика не смогла. */
+  needsManualReview: boolean;
+}
+
+/**
+ * Платёж за подписку: GET /seller/subscription/payments и
+ * GET /admin/shops/:id/subscription/payments отдают одну и ту же строку.
+ */
+export interface SubscriptionPaymentRow {
+  id: number;
+  provider: PaymentProvider;
+  /** Снимок тарифа на момент оплаты: тариф магазина с тех пор мог поменяться. */
+  plan: SubscriptionPlan;
+  /** Сумма в сумах. */
+  amount: number;
+  status: SubscriptionPaymentStatus;
+  /** Номер счёта — его же видит плательщик в чеке провайдера. */
+  merchantBillingId: number;
+  activatedFrom: string | null;
+  activatedUntil: string | null;
+  /** Сколько подписочных кредитов выдал платёж. */
+  grantedCredits: number | null;
+  /** Сколько неиспользованных подписочных кредитов сгорело при выдаче. */
+  burnedCredits: number | null;
+  paidAt: string | null;
+  cancelledAt: string | null;
+  createdAt: string;
+  /** Комментарий к ручной активации или отмене. */
+  note: string | null;
+  /** Что сообщил провайдер, отменяя платёж. */
+  errorNote: string | null;
+  /** Деньги возвращены плательщику. */
+  reversed: boolean;
+  /**
+   * Возврат инициировал сам провайдер уже после выдачи подписки. Период при
+   * этом не отзывается автоматически — строку разбирает администратор.
+   */
+  refundedByProvider: boolean;
+  needsManualReview: boolean;
+}
+
 /** GET /admin/ai-usage — журнал обращений к ИИ: кто, какой магазин, во что обошлось. */
 export interface AiUsageRow {
   id: number;
@@ -152,8 +263,20 @@ export interface AiUsageRow {
   images: number;
   /** Фактическая стоимость у OpenRouter. null — он её не вернул. */
   usd: number | null;
-  /** Снято с магазина. Ноль у администратора: за него платит площадка. */
+  /**
+   * Снято с магазина. Ноль в двух разных случаях, и различает их поле `free`:
+   * у администратора платит площадка, у подписчика — месячная норма тарифа.
+   */
   credits: number;
+  /**
+   * Запрос прошёл по подписке: месячная норма автозаполнений либо безлимит
+   * PRO/MAX. Кредитов не списано, но расход у OpenRouter настоящий — он уже
+   * оплачен абонплатой. Фильтр списка: `free=true|false`.
+   *
+   * Необязательное: поле появилось вместе с подписками, а строки фикстур
+   * (`lib/api/dev-fixtures.ts`) собраны до него. Сервер шлёт его всегда.
+   */
+  free?: boolean;
   estimated: boolean;
   createdAt: string;
   userId: number | null;
@@ -164,14 +287,34 @@ export interface AiUsageRow {
   shopName: string | null;
 }
 
-/** GET /admin/ai-usage/totals — сводка за всё время. */
+/**
+ * GET /admin/ai-usage/totals — сводка за всё время.
+ *
+ * Расход у OpenRouter разложен на три кармана, и складывать их обратно ради
+ * «сколько всего потрачено» имеет право только тот, кому нужен именно расход.
+ * Кому нужна маржа — не имеет: с `credits` сравнима одна лишь `usd`.
+ *
+ * До подписок карман был один, поэтому смысл поля `usd` сменился молча —
+ * теперь это не весь расход, а только платная его часть.
+ */
 export interface AiUsageTotals {
   requests: number;
   images: number;
-  /** Сколько площадка потратила у OpenRouter. */
+  /**
+   * Платные операции: есть магазин и с него списаны кредиты. Ровно эта сумма
+   * сравнима с `credits`, и только их разница — заработок на ИИ.
+   */
   usd: number;
-  /** Сколько снято с магазинов. Разница с usd — заработок на ИИ. */
+  /** Сколько снято с магазинов. */
   credits: number;
+  /** Запросов, прошедших по подписке (норма либо безлимит). */
+  freeRequests: number;
+  /** Их себестоимость. Покрыта абонплатой, с `credits` несравнима. */
+  freeUsd: number;
+  /** Запросов администратора (`shopId = null`): проверки, разбор жалоб. */
+  platformRequests: number;
+  /** Их себестоимость. Выручки у них нет и не предполагалось. */
+  platformUsd: number;
 }
 
 export interface AiCheckDetail {

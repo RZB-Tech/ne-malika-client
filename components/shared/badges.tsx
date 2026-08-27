@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useT } from "@/components/providers/i18n-provider";
 import type { Availability, ModerationStatus } from "@/lib/data";
-import type { UserRole } from "@/lib/api/types";
+import type { BannerModerationStatus, UserRole } from "@/lib/api/types";
 import { CheckCircle2, Clock, Package, XCircle } from "@/components/icons";
 
 export function AvailabilityBadge({
@@ -57,6 +57,52 @@ export function ModerationBadge({
     <Badge variant="outline" className={cn("gap-1 border-transparent font-medium", cls, className)}>
       <Icon className="size-3" />
       {t(`moderation.${status in cfg ? status : "moderation"}`)}
+    </Badge>
+  );
+}
+
+/**
+ * Статус модерации баннера продавца.
+ *
+ * Отдельный компонент, а не расширение `ModerationBadge` выше. Тот типизирован
+ * `draft | moderation | published | rejected` (`lib/data.ts`) и заканчивается
+ * фолбэком `cfg[status] ?? cfg.moderation`: `pending` и `approved` в его
+ * словаре отсутствуют оба, и оба отрисовались бы одинаково — жёлтым «На
+ * модерации». Одобренный баннер выглядел бы неодобренным, и продавец пошёл бы
+ * спрашивать, почему его не пускают.
+ *
+ * Подписи берём из `admin.shopBanners.status.*` — единственной тройки под эти
+ * три слова. Соседние `admin.status.*` (`active/hidden/abolished/pending`) и
+ * `moderation.*` (про товар) описывают другие состояния, а завести вторую
+ * тройку в `seller.*` значило бы дать продавцу и модератору расходящиеся
+ * названия одного и того же.
+ */
+export function BannerStatusBadge({
+  status,
+  className,
+}: {
+  status: BannerModerationStatus;
+  className?: string;
+}) {
+  const { t } = useT();
+  const cfg: Record<
+    BannerModerationStatus,
+    { cls: string; Icon: typeof Clock }
+  > = {
+    pending: { cls: "bg-warning/15 text-warning", Icon: Clock },
+    approved: { cls: "bg-success/12 text-success", Icon: CheckCircle2 },
+    rejected: { cls: "bg-destructive/12 text-destructive", Icon: XCircle },
+  };
+  const known = status in cfg ? status : "pending";
+  const { cls, Icon } = cfg[known];
+
+  return (
+    <Badge
+      variant="outline"
+      className={cn("gap-1 border-transparent font-medium", cls, className)}
+    >
+      <Icon className="size-3" />
+      {t(`admin.shopBanners.status.${known}`)}
     </Badge>
   );
 }

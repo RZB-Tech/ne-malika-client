@@ -883,6 +883,87 @@
         ]
       }
     },
+    "/api/v1/seller/credits": {
+      "get": {
+        "operationId": "SellerCreditsController_balance",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SellerCreditsDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "У продавца нет активного магазина"
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Мои кредиты: купленные и подписочные",
+        "tags": [
+          "credits-seller"
+        ]
+      }
+    },
+    "/api/v1/seller/credits/history": {
+      "get": {
+        "operationId": "SellerCreditsController_history",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Номер страницы",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Размер страницы",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedCreditsHistoryDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "История начислений, списаний и сгораний",
+        "tags": [
+          "credits-seller"
+        ]
+      }
+    },
     "/api/v1/admin/settings": {
       "get": {
         "operationId": "AdminSettingsController_get",
@@ -1103,6 +1184,24 @@
             "description": "Зерно для sort=random; одно зерно — один и тот же порядок",
             "schema": {
               "example": "k3f9d1a7",
+              "type": "string"
+            }
+          },
+          {
+            "name": "visitor_id",
+            "required": false,
+            "in": "query",
+            "description": "Анонимный id браузера (uuid из localStorage). Нужен только счётчику поисковых запросов, на выдачу не влияет; негодное значение игнорируется.",
+            "schema": {
+              "example": "9f1c3a54-7b2e-4c11-9a0d-2f5e8b6c1d33",
+              "type": "string"
+            }
+          },
+          {
+            "name": "user-agent",
+            "required": true,
+            "in": "header",
+            "schema": {
               "type": "string"
             }
           }
@@ -2092,7 +2191,7 @@
             "access-token": []
           }
         ],
-        "summary": "Цена автозаполнения и остаток кредитов магазина",
+        "summary": "Цена следующего автозаполнения: бесплатно по норме или безлимиту тарифа либо по прайсу, плюс остаток кредитов магазина",
         "tags": [
           "product-autofill"
         ]
@@ -2194,6 +2293,16 @@
                 "autofill"
               ]
             }
+          },
+          {
+            "name": "free",
+            "required": false,
+            "in": "query",
+            "description": "true — только бесплатные по подписке, false — только те, за которые списаны кредиты. Запросы администратора не бесплатные: у них нет магазина, ищите их по shopId",
+            "schema": {
+              "example": true,
+              "type": "boolean"
+            }
           }
         ],
         "responses": {
@@ -2226,7 +2335,7 @@
             "access-token": []
           }
         ],
-        "summary": "Итоги за всё время: число запросов, расход у OpenRouter и снятые кредиты",
+        "summary": "Итоги за всё время: число запросов, расход у OpenRouter по платным, подписочным и площадочным операциям и снятые кредиты",
         "tags": [
           "ai-usage-admin"
         ]
@@ -2526,6 +2635,160 @@
         "summary": "Просмотры и контакты по своей карточке",
         "tags": [
           "product-stats-seller"
+        ]
+      }
+    },
+    "/api/v1/seller/analytics": {
+      "get": {
+        "description": "Ряд по дням сплошной — сутки без событий приходят нулями. Глубина ограничена тарифом: 30 дней всем, 365 на MAX.",
+        "operationId": "SellerShopAnalyticsController_summary",
+        "parameters": [
+          {
+            "name": "days",
+            "required": false,
+            "in": "query",
+            "description": "Глубина периода в днях, считая сегодняшний",
+            "schema": {
+              "default": 30,
+              "example": 30,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShopAnalyticsDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Период больше 30 дней доступен на тарифе MAX"
+          },
+          "404": {
+            "description": "У продавца нет активного магазина"
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Сводка по магазину: график, итоги, топ товаров",
+        "tags": [
+          "shop-analytics-seller"
+        ]
+      }
+    },
+    "/api/v1/seller/analytics/searches": {
+      "get": {
+        "description": "Только на тарифе MAX. Запросы нормализованы: нижний регистр, схлопнутые пробелы.",
+        "operationId": "SellerShopAnalyticsController_searches",
+        "parameters": [
+          {
+            "name": "days",
+            "required": false,
+            "in": "query",
+            "description": "Глубина периода в днях, считая сегодняшний",
+            "schema": {
+              "default": 30,
+              "example": 30,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Сколько запросов вернуть",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "example": 20,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SearchHitDto"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Статистика поисковых запросов доступна на тарифе MAX"
+          },
+          "404": {
+            "description": "У продавца нет активного магазина"
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "По каким запросам находили товары магазина",
+        "tags": [
+          "shop-analytics-seller"
+        ]
+      }
+    },
+    "/api/v1/seller/analytics/export.csv": {
+      "get": {
+        "description": "Только на тарифе MAX. Разделитель — точка с запятой, кодировка UTF-8 с BOM: файл открывается двойным щелчком в Excel с русской локалью.",
+        "operationId": "SellerShopAnalyticsController_export",
+        "parameters": [
+          {
+            "name": "days",
+            "required": false,
+            "in": "query",
+            "description": "Глубина периода в днях, считая сегодняшний",
+            "schema": {
+              "default": 30,
+              "example": 30,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Выгрузка CSV доступна на тарифе MAX"
+          },
+          "404": {
+            "description": "У продавца нет активного магазина"
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Выгрузка аналитики магазина в CSV",
+        "tags": [
+          "shop-analytics-seller"
         ]
       }
     },
@@ -3875,6 +4138,7 @@
     },
     "/api/v1/banners": {
       "get": {
+        "description": "Карусель площадки вперемешку с оплаченными баннерами магазинов: первое место за площадкой, дальше баннеры продавцов в ротации.",
         "operationId": "BannersController_findAll",
         "parameters": [],
         "responses": {
@@ -3885,7 +4149,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/BannerDto"
+                    "$ref": "#/components/schemas/PublicBannerDto"
                   }
                 }
               }
@@ -4081,6 +4345,696 @@
           "banners-admin"
         ]
       }
+    },
+    "/api/v1/seller/banners": {
+      "get": {
+        "operationId": "SellerBannersController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BannerDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Магазин не найден"
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Баннеры своего магазина, включая ждущие модерации и отклонённые",
+        "tags": [
+          "banners-seller"
+        ]
+      },
+      "post": {
+        "description": "Баннер создаётся со статусом pending и попадёт в карусель только после одобрения администратором.",
+        "operationId": "SellerBannersController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateShopBannerDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BannerDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Одна из картинок не загружена"
+          },
+          "403": {
+            "description": "Тариф магазина не даёт баннер"
+          },
+          "409": {
+            "description": "Все слоты баннеров заняты"
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Загрузить баннер на модерацию",
+        "tags": [
+          "banners-seller"
+        ]
+      }
+    },
+    "/api/v1/seller/banners/{id}": {
+      "patch": {
+        "description": "Любая правка возвращает баннер на модерацию: одобрена была картинка, а не строка в таблице.",
+        "operationId": "SellerBannersController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateShopBannerDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BannerDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Одна из картинок не загружена"
+          },
+          "403": {
+            "description": "Тариф магазина не даёт баннер"
+          },
+          "404": {
+            "description": "Баннер не найден"
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Изменить свой баннер",
+        "tags": [
+          "banners-seller"
+        ]
+      },
+      "delete": {
+        "operationId": "SellerBannersController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "Баннер не найден"
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Удалить свой баннер",
+        "tags": [
+          "banners-seller"
+        ]
+      }
+    },
+    "/api/v1/admin/shop-banners": {
+      "get": {
+        "operationId": "AdminShopBannersController_list",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Номер страницы",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Размер страницы",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "Фильтр по состоянию модерации",
+            "schema": {
+              "example": "pending",
+              "type": "string",
+              "enum": [
+                "pending",
+                "approved",
+                "rejected"
+              ]
+            }
+          },
+          {
+            "name": "shop_id",
+            "required": false,
+            "in": "query",
+            "description": "Только баннеры магазина",
+            "schema": {
+              "example": 12,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedShopBannersDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Баннеры продавцов: очередь модерации и архив",
+        "tags": [
+          "banners-admin"
+        ]
+      }
+    },
+    "/api/v1/admin/shop-banners/{id}/moderate": {
+      "patch": {
+        "description": "При отказе причина обязательна — её читает продавец. О решении владелец магазина узнаёт в Telegram и push-уведомлением.",
+        "operationId": "AdminShopBannersController_moderate",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModerateBannerDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminBannerDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Отказ без причины"
+          },
+          "404": {
+            "description": "Баннер не найден"
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Одобрить или отклонить баннер продавца",
+        "tags": [
+          "banners-admin"
+        ]
+      }
+    },
+    "/api/v1/subscriptions/plans": {
+      "get": {
+        "operationId": "SubscriptionsController_plans",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SubscriptionPlanDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Тарифы подписки магазина и их цены",
+        "tags": [
+          "subscriptions-public"
+        ]
+      }
+    },
+    "/api/v1/seller/subscription": {
+      "get": {
+        "operationId": "SellerSubscriptionsController_state",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SellerSubscriptionDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "У продавца нет активного магазина"
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Моя подписка: тариф, срок, кредиты и лимиты",
+        "tags": [
+          "subscriptions-seller"
+        ]
+      }
+    },
+    "/api/v1/seller/subscription/checkout": {
+      "post": {
+        "operationId": "SellerSubscriptionsController_checkout",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCheckoutDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentLinkDto"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Приём оплаты не настроен — подписку выдаёт администратор"
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Получить ссылку на оплату тарифа",
+        "tags": [
+          "subscriptions-seller"
+        ]
+      }
+    },
+    "/api/v1/seller/subscription/payments": {
+      "get": {
+        "operationId": "SellerSubscriptionsController_payments",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Номер страницы",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Размер страницы",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedSubscriptionPaymentsDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "История платежей за подписку",
+        "tags": [
+          "subscriptions-seller"
+        ]
+      }
+    },
+    "/api/v1/admin/subscriptions": {
+      "get": {
+        "operationId": "AdminSubscriptionsController_list",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Номер страницы",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Размер страницы",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "plan",
+            "required": false,
+            "in": "query",
+            "description": "ДЕЙСТВУЮЩИЙ тариф, а не записанный в магазине: `max` вернёт только тех, у кого он ещё оплачен, а `free` — всех остальных, включая просроченных бывших подписчиков",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "free",
+                "start",
+                "pro",
+                "max"
+              ]
+            }
+          },
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "description": "Поиск по названию магазина, контакту или владельцу",
+            "schema": {
+              "example": "техно",
+              "type": "string"
+            }
+          },
+          {
+            "name": "expiring_days",
+            "required": false,
+            "in": "query",
+            "description": "Показать только тех, у кого подписка ещё жива и истекает в ближайшие N суток. `0` — истекает сегодня",
+            "schema": {
+              "minimum": 0,
+              "maximum": 90,
+              "example": 7,
+              "type": "number"
+            }
+          },
+          {
+            "name": "needs_review",
+            "required": false,
+            "in": "query",
+            "description": "Только магазины с платежами, помеченными «требует разбора»: деньги списаны, а автоматика не довела дело до конца (Д3)",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedAdminSubscriptionsDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Подписки магазинов: тариф, срок и флаги ручного разбора",
+        "tags": [
+          "subscriptions-admin"
+        ]
+      }
+    },
+    "/api/v1/admin/shops/{shopId}/subscription/payments": {
+      "get": {
+        "operationId": "AdminShopSubscriptionController_payments",
+        "parameters": [
+          {
+            "name": "shopId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Номер страницы",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Размер страницы",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedSubscriptionPaymentsDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Платежи магазина за подписку",
+        "tags": [
+          "subscriptions-admin"
+        ]
+      }
+    },
+    "/api/v1/admin/shops/{shopId}/subscription/activate": {
+      "post": {
+        "operationId": "AdminShopSubscriptionController_activate",
+        "parameters": [
+          {
+            "name": "shopId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ActivateSubscriptionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SellerSubscriptionDto"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Магазин упразднён либо подписка уже выдана только что"
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Выдать подписку вручную",
+        "tags": [
+          "subscriptions-admin"
+        ]
+      }
+    },
+    "/api/v1/admin/shops/{shopId}/subscription/cancel": {
+      "post": {
+        "operationId": "AdminShopSubscriptionController_cancel",
+        "parameters": [
+          {
+            "name": "shopId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReasonDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SellerSubscriptionDto"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "У магазина нет действующей подписки"
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Оборвать оплаченный период досрочно",
+        "tags": [
+          "subscriptions-admin"
+        ]
+      }
     }
   },
   "info": {
@@ -4133,6 +5087,38 @@
     {
       "name": "reports",
       "description": "Жалобы покупателей и их просмотр администратором"
+    },
+    {
+      "name": "subscriptions-public",
+      "description": "Тарифы подписки магазина и их цены"
+    },
+    {
+      "name": "subscriptions-seller",
+      "description": "Подписка продавца: состояние, оплата, история платежей"
+    },
+    {
+      "name": "subscriptions-admin",
+      "description": "Подписки магазинов: список, ручная выдача и отмена (администратор)"
+    },
+    {
+      "name": "credits-seller",
+      "description": "Кредиты магазина на ИИ и их журнал (продавец)"
+    },
+    {
+      "name": "banners-public",
+      "description": "Карусель баннеров на главной (покупатель)"
+    },
+    {
+      "name": "banners-seller",
+      "description": "Баннер магазина в карусели главной (тариф MAX)"
+    },
+    {
+      "name": "banners-admin",
+      "description": "Баннеры площадки и модерация баннеров магазинов (администратор)"
+    },
+    {
+      "name": "shop-analytics-seller",
+      "description": "Аналитика магазина: сводка, поисковые запросы, выгрузка CSV (продавец)"
     }
   ],
   "servers": [],
@@ -4458,7 +5444,7 @@
         "properties": {
           "balance": {
             "type": "number",
-            "description": "Начислено всего, за вычетом потраченного"
+            "description": "Купленные и подаренные кредиты. Не сгорают"
           },
           "reserved": {
             "type": "number",
@@ -4466,7 +5452,7 @@
           },
           "available": {
             "type": "number",
-            "description": "Доступно к трате: balance − reserved"
+            "description": "Доступно к трате"
           }
         },
         "required": [
@@ -4566,6 +5552,199 @@
         "required": [
           "credits",
           "markup"
+        ]
+      },
+      "SellerCreditsDto": {
+        "type": "object",
+        "properties": {
+          "balance": {
+            "type": "number",
+            "description": "Купленные и подаренные кредиты. Не сгорают"
+          },
+          "reserved": {
+            "type": "number",
+            "description": "Занято выполняющимися сейчас запросами"
+          },
+          "available": {
+            "type": "number",
+            "description": "Доступно к трате"
+          },
+          "subscription": {
+            "type": "number",
+            "description": "Кредиты подписки как они лежат в магазине — включая запертые истёкшим тарифом: оплатив снова, продавец получит норму заново"
+          },
+          "usable": {
+            "type": "number",
+            "description": "Из них доступны к трате сейчас. Ноль, если подписка истекла: кредиты не сгорели, но и потратить их нельзя"
+          }
+        },
+        "required": [
+          "balance",
+          "reserved",
+          "available",
+          "subscription",
+          "usable"
+        ]
+      },
+      "CreditTxnMetaDto": {
+        "type": "object",
+        "properties": {
+          "operation": {
+            "type": "string",
+            "enum": [
+              "prompt",
+              "description",
+              "image",
+              "autofill"
+            ],
+            "description": "За что списано"
+          },
+          "images": {
+            "type": "number",
+            "description": "Сколько картинок нарисовано"
+          },
+          "promo": {
+            "type": "string",
+            "enum": [
+              "welcome",
+              "welcome_topup",
+              "subscription",
+              "subscription_burn"
+            ],
+            "description": "Метка выдачи: подарок, выдача нормы подписки или сгорание остатка"
+          },
+          "plan": {
+            "type": "string",
+            "enum": [
+              "start",
+              "pro",
+              "max"
+            ],
+            "description": "Тариф, по которому выдано или сожжено"
+          },
+          "fromSubscription": {
+            "type": "number",
+            "description": "Сколько из списания ушло с подписочного счёта"
+          },
+          "free": {
+            "type": "string",
+            "enum": [
+              "quota",
+              "unlimited"
+            ],
+            "description": "Автозаполнение прошло по месячной норме либо по безлимиту"
+          },
+          "fixed": {
+            "type": "boolean",
+            "description": "Списано по объявленному прайсу, а не по стоимости запроса"
+          },
+          "paymentId": {
+            "type": "number",
+            "description": "Платёж, породивший выдачу"
+          }
+        }
+      },
+      "CreditTxnDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "grant",
+              "spend",
+              "refund",
+              "adjust"
+            ],
+            "description": "grant — начисление, spend — списание за запрос, adjust — правка человеком либо сгорание подписочного остатка"
+          },
+          "amount": {
+            "type": "number",
+            "description": "Со знаком: выдача положительна, списание — нет"
+          },
+          "balanceAfter": {
+            "type": "number",
+            "description": "Купленный остаток после операции"
+          },
+          "subscriptionAfter": {
+            "type": "number",
+            "nullable": true,
+            "description": "Подписочный остаток после операции. null у строк, написанных до появления подписок — историю задним числом не переписываем"
+          },
+          "note": {
+            "type": "string",
+            "nullable": true
+          },
+          "meta": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CreditTxnMetaDto"
+              }
+            ]
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "amount",
+          "balanceAfter",
+          "subscriptionAfter",
+          "note",
+          "meta",
+          "createdAt"
+        ]
+      },
+      "PaginationMetaDto": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "number",
+            "example": 1
+          },
+          "limit": {
+            "type": "number",
+            "example": 20
+          },
+          "total": {
+            "type": "number",
+            "example": 42
+          },
+          "totalPages": {
+            "type": "number",
+            "example": 3
+          }
+        },
+        "required": [
+          "page",
+          "limit",
+          "total",
+          "totalPages"
+        ]
+      },
+      "PaginatedCreditsHistoryDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreditTxnDto"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PaginationMetaDto"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
         ]
       },
       "AppSettingsDto": {
@@ -5117,21 +6296,73 @@
           "price": {
             "type": "number",
             "example": 10,
-            "description": "Цена одного автозаполнения в кредитах"
+            "description": "Цена одного автозаполнения в кредитах — сколько оно стоит без подписки"
+          },
+          "effectivePrice": {
+            "type": "number",
+            "example": 0,
+            "description": "Сколько спишут за следующее нажатие: 0 в бесплатных ветках, price — в платной. Это и есть число для подписи под кнопкой"
+          },
+          "free": {
+            "type": "boolean",
+            "example": true,
+            "description": "Следующее нажатие бесплатно — по месячной норме либо по безлимиту"
+          },
+          "unlimited": {
+            "type": "boolean",
+            "example": false,
+            "description": "Тариф даёт автозаполнение без счётчика (PRO, MAX): показывать «без ограничений», а не остаток"
+          },
+          "freeLeft": {
+            "type": "number",
+            "nullable": true,
+            "example": 3,
+            "description": "Остаток бесплатных попыток в этом месяце. null — счётчика нет: безлимитный тариф, отсутствие подписки или администратор"
+          },
+          "freeLimit": {
+            "type": "number",
+            "example": 5,
+            "description": "Размер месячной нормы у тарифа, который её даёт (START). Это не остаток: у безлимитных тарифов и без подписки своего числа тут нет, а ноль превратил бы приглашение подписаться в «0 из 0»"
+          },
+          "resetsAt": {
+            "type": "string",
+            "nullable": true,
+            "format": "date",
+            "example": "2026-09-01",
+            "description": "Когда обновится норма, YYYY-MM-DD по ташкентскому календарю. Датой, а не моментом времени: норма сбрасывается в ташкентскую полночь, и ISO-момент показал бы «31 августа» всякому браузеру западнее Ташкента. null — обновлять нечего"
+          },
+          "plan": {
+            "type": "string",
+            "enum": [
+              "free",
+              "start",
+              "pro",
+              "max"
+            ],
+            "example": "start",
+            "description": "Действующий тариф. Считается по сроку подписки, а не по колонке магазина: после истечения в ней намеренно остаётся купленный тариф"
           },
           "allowed": {
             "type": "boolean",
-            "description": "Хватает ли кредитов. У администратора всегда true"
+            "example": true,
+            "description": "Пройдёт ли следующее нажатие: бесплатно, по безлимиту или хватает кредитов. У администратора всегда true"
           },
           "balance": {
             "type": "number",
             "nullable": true,
             "example": 300,
-            "description": "Доступный остаток. null — без ограничения (администратор)"
+            "description": "Доступный остаток кредитов — оба кармана минус занятое. null — без ограничения (администратор)"
           }
         },
         "required": [
           "price",
+          "effectivePrice",
+          "free",
+          "unlimited",
+          "freeLeft",
+          "freeLimit",
+          "resetsAt",
+          "plan",
           "allowed",
           "balance"
         ]
@@ -5231,13 +6462,24 @@
           "credits": {
             "type": "number",
             "example": 10,
-            "description": "Списано с магазина. 0 у администратора — за него платит площадка"
+            "description": "Списано с магазина. 0 у администратора — за него платит площадка, и 0 же у бесплатного автозаполнения: отличать по free"
           },
           "balance": {
             "type": "number",
             "nullable": true,
             "example": 290,
-            "description": "Остаток после списания — чтобы форма обновила счётчик без второго запроса. null у администратора: у него лимита нет"
+            "description": "Остаток после списания — чтобы форма обновила счётчик без второго запроса. null только у администратора: у него лимита нет. У бесплатного автозаполнения здесь число — просто не уменьшившееся"
+          },
+          "free": {
+            "type": "boolean",
+            "example": true,
+            "description": "Автозаполнение не стоило магазину кредитов: месячная норма START либо безлимит PRO/MAX. У администратора false — магазина, которому что-то досталось бесплатно, у него нет, за него платит площадка"
+          },
+          "freeLeft": {
+            "type": "number",
+            "nullable": true,
+            "example": 3,
+            "description": "Сколько бесплатных попыток осталось в этом месяце после этой. null — считать нечего: безлимит, платная ветка или администратор"
           }
         },
         "required": [
@@ -5248,7 +6490,9 @@
           "categoryId",
           "state",
           "credits",
-          "balance"
+          "balance",
+          "free",
+          "freeLeft"
         ]
       },
       "AiCompareRowDto": {
@@ -5455,33 +6699,6 @@
           "viewCount"
         ]
       },
-      "PaginationMetaDto": {
-        "type": "object",
-        "properties": {
-          "page": {
-            "type": "number",
-            "example": 1
-          },
-          "limit": {
-            "type": "number",
-            "example": 20
-          },
-          "total": {
-            "type": "number",
-            "example": 42
-          },
-          "totalPages": {
-            "type": "number",
-            "example": 3
-          }
-        },
-        "required": [
-          "page",
-          "limit",
-          "total",
-          "totalPages"
-        ]
-      },
       "PaginatedProductViewsDto": {
         "type": "object",
         "properties": {
@@ -5643,6 +6860,207 @@
           "telegramClicks",
           "contactVisitors",
           "daily"
+        ]
+      },
+      "ShopDailyPointDto": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "description": "Сутки, YYYY-MM-DD",
+            "example": "2026-08-18"
+          },
+          "views": {
+            "type": "number",
+            "description": "Просмотров карточек за эти сутки",
+            "example": 312
+          },
+          "visitors": {
+            "type": "number",
+            "description": "Посетителей за эти сутки — сумма уникальных по товарам",
+            "example": 204
+          },
+          "phoneClicks": {
+            "type": "number",
+            "description": "Раскрытий телефона за эти сутки",
+            "example": 18
+          },
+          "telegramClicks": {
+            "type": "number",
+            "description": "Переходов в Telegram за эти сутки",
+            "example": 26
+          },
+          "contactVisitors": {
+            "type": "number",
+            "description": "Посетителей, дошедших до контакта — без двойного счёта",
+            "example": 33
+          }
+        },
+        "required": [
+          "date",
+          "views",
+          "visitors",
+          "phoneClicks",
+          "telegramClicks",
+          "contactVisitors"
+        ]
+      },
+      "TopProductDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "Идентификатор товара",
+            "example": 4821
+          },
+          "name": {
+            "type": "string",
+            "description": "Название товара",
+            "example": "Ноутбук ASUS X515"
+          },
+          "views": {
+            "type": "number",
+            "description": "Просмотры за период",
+            "example": 512
+          },
+          "visits": {
+            "type": "number",
+            "description": "Посещения за период — сумма уникальных по дням",
+            "example": 340
+          },
+          "contacts": {
+            "type": "number",
+            "description": "Контакты: раскрытия телефона плюс переходы в Telegram",
+            "example": 47
+          },
+          "contactVisitors": {
+            "type": "number",
+            "description": "Посетителей, дошедших до контакта — без двойного счёта",
+            "example": 38
+          },
+          "conversionPercent": {
+            "type": "number",
+            "description": "Доля дошедших до контакта, целых процентов от 0 до 100",
+            "example": 11
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "views",
+          "visits",
+          "contacts",
+          "contactVisitors",
+          "conversionPercent"
+        ]
+      },
+      "ShopAnalyticsDto": {
+        "type": "object",
+        "properties": {
+          "shopId": {
+            "type": "number",
+            "description": "Идентификатор магазина",
+            "example": 42
+          },
+          "shopName": {
+            "type": "string",
+            "description": "Название магазина",
+            "example": "Малика Электроникс"
+          },
+          "from": {
+            "type": "string",
+            "description": "Первые сутки периода, YYYY-MM-DD",
+            "example": "2026-07-20"
+          },
+          "to": {
+            "type": "string",
+            "description": "Последние сутки периода, YYYY-MM-DD",
+            "example": "2026-08-18"
+          },
+          "views": {
+            "type": "number",
+            "description": "Просмотры за период",
+            "example": 9312
+          },
+          "visits": {
+            "type": "number",
+            "description": "Посещений за период — сумма уникальных по дням и товарам",
+            "example": 6104
+          },
+          "phoneClicks": {
+            "type": "number",
+            "description": "Раскрытий телефона за период",
+            "example": 402
+          },
+          "telegramClicks": {
+            "type": "number",
+            "description": "Переходов в Telegram за период",
+            "example": 611
+          },
+          "contacts": {
+            "type": "number",
+            "description": "Контакты: раскрытия телефона плюс переходы в Telegram",
+            "example": 1013
+          },
+          "contactVisitors": {
+            "type": "number",
+            "description": "Посетителей, дошедших до контакта — без двойного счёта",
+            "example": 780
+          },
+          "conversionPercent": {
+            "type": "number",
+            "description": "Доля дошедших до контакта, целых процентов от 0 до 100",
+            "example": 12
+          },
+          "daily": {
+            "description": "Ряд по дням от старого к новому, без пропусков",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ShopDailyPointDto"
+            }
+          },
+          "topProducts": {
+            "description": "Самые просматриваемые товары периода",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TopProductDto"
+            }
+          }
+        },
+        "required": [
+          "shopId",
+          "shopName",
+          "from",
+          "to",
+          "views",
+          "visits",
+          "phoneClicks",
+          "telegramClicks",
+          "contacts",
+          "contactVisitors",
+          "conversionPercent",
+          "daily",
+          "topProducts"
+        ]
+      },
+      "SearchHitDto": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Нормализованный запрос: нижний регистр, одиночные пробелы",
+            "example": "ноутбук asus",
+            "maxLength": 100
+          },
+          "shows": {
+            "type": "number",
+            "description": "Сколько раз по этому запросу в выдаче оказался товар магазина за период",
+            "example": 37
+          }
+        },
+        "required": [
+          "query",
+          "shows"
         ]
       },
       "ActivityPointDto": {
@@ -6338,6 +7756,44 @@
           "text"
         ]
       },
+      "PublicBannerDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "example": 1
+          },
+          "title": {
+            "type": "string",
+            "example": "Школьный базар — выгода до 50%"
+          },
+          "photoRu": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "photoUzLatn": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "photoUzCyrl": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "linkUrl": {
+            "type": "string",
+            "nullable": true,
+            "example": "/product/12"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "photoRu",
+          "photoUzLatn",
+          "photoUzCyrl",
+          "linkUrl"
+        ]
+      },
       "BannerDto": {
         "type": "object",
         "properties": {
@@ -6374,6 +7830,30 @@
             "type": "number",
             "example": 0
           },
+          "shopId": {
+            "type": "number",
+            "nullable": true,
+            "example": 12
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "approved",
+              "rejected"
+            ],
+            "example": "pending"
+          },
+          "rejectReason": {
+            "type": "string",
+            "nullable": true,
+            "example": "Текст акции обрезан по правому краю"
+          },
+          "moderatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
           "createdAt": {
             "type": "string",
             "format": "date-time"
@@ -6391,7 +7871,11 @@
           "photoUzCyrl",
           "linkUrl",
           "isActive",
-          "sortOrder"
+          "sortOrder",
+          "shopId",
+          "status",
+          "rejectReason",
+          "moderatedAt"
         ]
       },
       "CreateBannerDto": {
@@ -6507,6 +7991,714 @@
             "description": "Порядок в карусели: меньше — раньше"
           }
         }
+      },
+      "CreateShopBannerDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 200,
+            "example": "Школьный базар — выгода до 50%",
+            "description": "Название для админки; оно же alt изображения"
+          },
+          "photoRu": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Ключ загруженного файла (POST /seller/uploads). Допустимое разрешение — 1942×809 / 1240×400 или кратно больше с тем же соотношением сторон. Русская."
+          },
+          "photoUzLatn": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Ключ загруженного файла (POST /seller/uploads). Допустимое разрешение — 1942×809 / 1240×400 или кратно больше с тем же соотношением сторон. Узбекская латиница."
+          },
+          "photoUzCyrl": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Ключ загруженного файла (POST /seller/uploads). Допустимое разрешение — 1942×809 / 1240×400 или кратно больше с тем же соотношением сторон. Узбекская кириллица."
+          },
+          "linkUrl": {
+            "type": "string",
+            "maxLength": 500,
+            "example": "/product/12",
+            "description": "Куда ведёт клик: абсолютный https-адрес или путь от корня сайта. Пусто — баннер показывается, но не кликается"
+          }
+        },
+        "required": [
+          "title",
+          "photoRu",
+          "photoUzLatn",
+          "photoUzCyrl"
+        ]
+      },
+      "UpdateShopBannerDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 200,
+            "example": "Школьный базар — выгода до 50%",
+            "description": "Название для админки; оно же alt изображения"
+          },
+          "photoRu": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Ключ загруженного файла (POST /seller/uploads). Допустимое разрешение — 1942×809 / 1240×400 или кратно больше с тем же соотношением сторон. Русская."
+          },
+          "photoUzLatn": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Ключ загруженного файла (POST /seller/uploads). Допустимое разрешение — 1942×809 / 1240×400 или кратно больше с тем же соотношением сторон. Узбекская латиница."
+          },
+          "photoUzCyrl": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Ключ загруженного файла (POST /seller/uploads). Допустимое разрешение — 1942×809 / 1240×400 или кратно больше с тем же соотношением сторон. Узбекская кириллица."
+          },
+          "linkUrl": {
+            "type": "string",
+            "maxLength": 500,
+            "example": "/product/12",
+            "description": "Куда ведёт клик: абсолютный https-адрес или путь от корня сайта. Пусто — баннер показывается, но не кликается"
+          }
+        }
+      },
+      "AdminBannerDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "example": 1
+          },
+          "title": {
+            "type": "string",
+            "example": "Школьный базар — выгода до 50%"
+          },
+          "photoRu": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "photoUzLatn": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "photoUzCyrl": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "linkUrl": {
+            "type": "string",
+            "nullable": true,
+            "example": "/product/12"
+          },
+          "isActive": {
+            "type": "boolean",
+            "example": true
+          },
+          "sortOrder": {
+            "type": "number",
+            "example": 0
+          },
+          "shopId": {
+            "type": "number",
+            "nullable": true,
+            "example": 12
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "approved",
+              "rejected"
+            ],
+            "example": "pending"
+          },
+          "rejectReason": {
+            "type": "string",
+            "nullable": true,
+            "example": "Текст акции обрезан по правому краю"
+          },
+          "moderatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "shopName": {
+            "type": "string",
+            "example": "ТехноМаркет"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "photoRu",
+          "photoUzLatn",
+          "photoUzCyrl",
+          "linkUrl",
+          "isActive",
+          "sortOrder",
+          "shopId",
+          "status",
+          "rejectReason",
+          "moderatedAt",
+          "shopName"
+        ]
+      },
+      "PaginatedShopBannersDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminBannerDto"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PaginationMetaDto"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "ModerateBannerDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "approved",
+              "rejected"
+            ],
+            "example": "approved",
+            "description": "Решение: approved — баннер уходит в карусель, rejected — возвращается продавцу с причиной"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 1000,
+            "example": "Текст акции обрезан по правому краю",
+            "description": "Причина отказа — её читает продавец. Обязательна при status = rejected"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "SubscriptionPlanDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "enum": [
+              "start",
+              "pro",
+              "max"
+            ],
+            "description": "Идентификатор тарифа. `free` не продаётся и в прайс не входит"
+          },
+          "priceUzs": {
+            "type": "number",
+            "description": "Цена в сумах",
+            "example": 65000
+          },
+          "months": {
+            "type": "number",
+            "description": "Срок в календарных месяцах",
+            "example": 1
+          },
+          "credits": {
+            "type": "number",
+            "description": "Сколько кредитов на ИИ выдаётся при каждой оплате",
+            "example": 3000
+          },
+          "freeAutofills": {
+            "type": "number",
+            "nullable": true,
+            "description": "Бесплатных автозаполнений карточки в календарный месяц. `null` — без ограничения",
+            "example": 5
+          },
+          "promoted": {
+            "type": "boolean",
+            "description": "Поднимает ли тариф товары магазина в общей выдаче"
+          },
+          "bannerSlots": {
+            "type": "number",
+            "description": "Сколько баннеров можно держать одновременно"
+          },
+          "analyticsDays": {
+            "type": "number",
+            "description": "Глубина аналитики в днях",
+            "example": 30
+          }
+        },
+        "required": [
+          "id",
+          "priceUzs",
+          "months",
+          "credits",
+          "freeAutofills",
+          "promoted",
+          "bannerSlots",
+          "analyticsDays"
+        ]
+      },
+      "SubscriptionAutofillDto": {
+        "type": "object",
+        "properties": {
+          "free": {
+            "type": "boolean",
+            "description": "Следующее нажатие бесплатно — по норме либо по безлимиту"
+          },
+          "unlimited": {
+            "type": "boolean",
+            "description": "Тариф даёт автозаполнение без счётчика"
+          },
+          "left": {
+            "type": "number",
+            "nullable": true,
+            "description": "Остаток бесплатных попыток в этом месяце. `null` — счётчика нет: либо безлимит, либо тариф бесплатных попыток не даёт вовсе"
+          },
+          "limit": {
+            "type": "number",
+            "description": "Размер месячной нормы у тарифа, который её даёт (START). Показывается и тем, у кого её нет: это часть описания тарифа"
+          },
+          "resetsAt": {
+            "type": "string",
+            "description": "Когда норма обновится — первое число следующего месяца",
+            "example": "2026-09-01"
+          }
+        },
+        "required": [
+          "free",
+          "unlimited",
+          "left",
+          "limit",
+          "resetsAt"
+        ]
+      },
+      "SellerSubscriptionDto": {
+        "type": "object",
+        "properties": {
+          "plan": {
+            "type": "string",
+            "enum": [
+              "free",
+              "start",
+              "pro",
+              "max"
+            ],
+            "description": "ДЕЙСТВУЮЩИЙ тариф. У просроченной подписки здесь `free`, даже если в магазине по-прежнему записан оплаченный когда-то `max`"
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Подписка оплачена и срок ещё не вышел"
+          },
+          "until": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "До какого момента оплачено. `null` — не платили ни разу"
+          },
+          "daysLeft": {
+            "type": "number",
+            "nullable": true,
+            "description": "Полных суток до истечения, вверх. `null` у магазина без подписки"
+          },
+          "subscriptionCredits": {
+            "type": "number",
+            "description": "Кредиты, выданные подпиской, как они лежат в магазине — включая запертые истёкшим тарифом: они не сгорели, но потратить их нельзя"
+          },
+          "creditsBalance": {
+            "type": "number",
+            "description": "Купленные и подаренные кредиты. Не сгорают"
+          },
+          "creditsReserved": {
+            "type": "number",
+            "description": "Занято выполняющимися сейчас запросами"
+          },
+          "available": {
+            "type": "number",
+            "description": "Сколько магазин может потратить прямо сейчас: купленные плюс доступные подписочные минус резерв"
+          },
+          "autofill": {
+            "$ref": "#/components/schemas/SubscriptionAutofillDto"
+          },
+          "bannerSlots": {
+            "type": "number",
+            "description": "Сколько баннеров разрешено тарифом"
+          },
+          "analyticsDays": {
+            "type": "number",
+            "description": "Глубина аналитики в днях"
+          },
+          "promoted": {
+            "type": "boolean",
+            "description": "Товары магазина поднимаются в общей выдаче"
+          }
+        },
+        "required": [
+          "plan",
+          "active",
+          "until",
+          "daysLeft",
+          "subscriptionCredits",
+          "creditsBalance",
+          "creditsReserved",
+          "available",
+          "autofill",
+          "bannerSlots",
+          "analyticsDays",
+          "promoted"
+        ]
+      },
+      "CreateCheckoutDto": {
+        "type": "object",
+        "properties": {
+          "plan": {
+            "type": "string",
+            "enum": [
+              "start",
+              "pro",
+              "max"
+            ],
+            "description": "Тариф, за который платим",
+            "example": "pro"
+          }
+        },
+        "required": [
+          "plan"
+        ]
+      },
+      "PaymentLinkDto": {
+        "type": "object",
+        "properties": {
+          "provider": {
+            "type": "string",
+            "enum": [
+              "click",
+              "payme",
+              "manual"
+            ],
+            "example": "click"
+          },
+          "plan": {
+            "type": "string",
+            "enum": [
+              "start",
+              "pro",
+              "max"
+            ]
+          },
+          "amountUzs": {
+            "type": "number",
+            "description": "Сумма к оплате в сумах"
+          },
+          "url": {
+            "type": "string",
+            "description": "Адрес кассы провайдера — открывается в новой вкладке",
+            "example": "https://my.click.uz/services/pay?service_id=..."
+          }
+        },
+        "required": [
+          "provider",
+          "plan",
+          "amountUzs",
+          "url"
+        ]
+      },
+      "SubscriptionPaymentDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "provider": {
+            "type": "string",
+            "enum": [
+              "click",
+              "payme",
+              "manual"
+            ]
+          },
+          "plan": {
+            "type": "string",
+            "enum": [
+              "free",
+              "start",
+              "pro",
+              "max"
+            ],
+            "description": "Тариф, за который заплатили. Снимок на момент оплаты: тариф магазина с тех пор мог поменяться"
+          },
+          "amount": {
+            "type": "number",
+            "description": "Сумма платежа в сумах"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "prepared",
+              "paid",
+              "cancelled",
+              "failed"
+            ]
+          },
+          "merchantBillingId": {
+            "type": "number",
+            "description": "Номер счёта — его же видит плательщик в чеке провайдера"
+          },
+          "activatedFrom": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "Начало оплаченного периода"
+          },
+          "activatedUntil": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "Конец оплаченного периода"
+          },
+          "grantedCredits": {
+            "type": "number",
+            "nullable": true,
+            "description": "Сколько подписочных кредитов выдал платёж"
+          },
+          "burnedCredits": {
+            "type": "number",
+            "nullable": true,
+            "description": "Сколько неиспользованных подписочных кредитов сгорело при выдаче"
+          },
+          "paidAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "cancelledAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "note": {
+            "type": "string",
+            "nullable": true,
+            "description": "Комментарий к ручной активации или отмене"
+          },
+          "errorNote": {
+            "type": "string",
+            "nullable": true,
+            "description": "Что сообщил провайдер, отменяя платёж"
+          },
+          "reversed": {
+            "type": "boolean",
+            "description": "Деньги возвращены плательщику"
+          },
+          "refundedByProvider": {
+            "type": "boolean",
+            "description": "Возврат инициировал сам провайдер уже после выдачи подписки. Период при этом не отзывается автоматически"
+          },
+          "needsManualReview": {
+            "type": "boolean",
+            "description": "Платёж ждёт разбора человеком: автоматика не справилась"
+          }
+        },
+        "required": [
+          "id",
+          "provider",
+          "plan",
+          "amount",
+          "status",
+          "merchantBillingId",
+          "activatedFrom",
+          "activatedUntil",
+          "grantedCredits",
+          "burnedCredits",
+          "paidAt",
+          "cancelledAt",
+          "createdAt",
+          "note",
+          "errorNote",
+          "reversed",
+          "refundedByProvider",
+          "needsManualReview"
+        ]
+      },
+      "PaginatedSubscriptionPaymentsDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SubscriptionPaymentDto"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PaginationMetaDto"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "AdminSubscriptionRowDto": {
+        "type": "object",
+        "properties": {
+          "shopId": {
+            "type": "number"
+          },
+          "shopName": {
+            "type": "string"
+          },
+          "shopStatus": {
+            "type": "string",
+            "description": "Статус самого магазина: активен или упразднён"
+          },
+          "ownerId": {
+            "type": "number"
+          },
+          "ownerName": {
+            "type": "string"
+          },
+          "ownerUsername": {
+            "type": "string",
+            "nullable": true
+          },
+          "plan": {
+            "type": "string",
+            "enum": [
+              "free",
+              "start",
+              "pro",
+              "max"
+            ],
+            "description": "ДЕЙСТВУЮЩИЙ тариф: у просроченной подписки здесь `free`"
+          },
+          "storedPlan": {
+            "type": "string",
+            "enum": [
+              "free",
+              "start",
+              "pro",
+              "max"
+            ],
+            "description": "Тариф, записанный в магазине. У просроченной подписки остаётся прежним — так видно, чем магазин пользовался"
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Подписка оплачена и срок ещё не вышел"
+          },
+          "until": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "daysLeft": {
+            "type": "number",
+            "nullable": true
+          },
+          "subscriptionCredits": {
+            "type": "number",
+            "description": "Подписочные кредиты магазина"
+          },
+          "lastPaidAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "Когда прошла последняя успешная оплата"
+          },
+          "stuckPrepared": {
+            "type": "boolean",
+            "description": "Есть платёж, застрявший в `prepared` дольше суток: касса открыта, подтверждение не пришло. Денег там нет — Prepare ничего не списывает"
+          },
+          "needsManualReview": {
+            "type": "boolean",
+            "description": "Есть платёж с отметкой «требует разбора»: деньги списаны, а довести дело до конца автоматика не смогла"
+          }
+        },
+        "required": [
+          "shopId",
+          "shopName",
+          "shopStatus",
+          "ownerId",
+          "ownerName",
+          "ownerUsername",
+          "plan",
+          "storedPlan",
+          "active",
+          "until",
+          "daysLeft",
+          "subscriptionCredits",
+          "lastPaidAt",
+          "stuckPrepared",
+          "needsManualReview"
+        ]
+      },
+      "PaginatedAdminSubscriptionsDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminSubscriptionRowDto"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PaginationMetaDto"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "ActivateSubscriptionDto": {
+        "type": "object",
+        "properties": {
+          "plan": {
+            "type": "string",
+            "enum": [
+              "start",
+              "pro",
+              "max"
+            ],
+            "description": "Тариф, который выдаём",
+            "example": "max"
+          },
+          "months": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 12,
+            "default": 1,
+            "description": "Сколько месяцев выдать одной операцией. Кредиты начисляются в том же кратном размере: норма тарифа, умноженная на число месяцев",
+            "example": 3
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "Зачем выдали: номер платёжного поручения, номер обращения, договорённость. Виден в журнале платежей магазина",
+            "example": "Оплата по счёту №142 от 12.08"
+          }
+        },
+        "required": [
+          "plan"
+        ]
       }
     }
   }
