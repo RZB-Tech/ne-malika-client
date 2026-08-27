@@ -10,12 +10,11 @@ const DAYS = 30;
 
 export function ProductStatsCard({ productId }: { productId: number }) {
   const { t } = useT();
-  const { data, isLoading, isError, error } =
-    useSellerProductStatsControllerStats(
-      productId,
-      { days: DAYS },
-      { query: { retry: false } },
-    );
+  const { data, isLoading, isError, error } = useSellerProductStatsControllerStats(
+    productId,
+    { days: DAYS },
+    { query: { retry: false } },
+  );
 
   if (isLoading) return <Skeleton className="h-28 w-full rounded-2xl" />;
   if (isError || !data) {
@@ -32,9 +31,7 @@ export function ProductStatsCard({ productId }: { productId: number }) {
     return (
       <Card className="p-6">
         <Title />
-        <p className="mt-3 text-sm text-muted-foreground">
-          {t("seller.stats.empty")}
-        </p>
+        <p className="mt-3 text-sm text-muted-foreground">{t("seller.stats.empty")}</p>
       </Card>
     );
   }
@@ -51,14 +48,8 @@ export function ProductStatsCard({ productId }: { productId: number }) {
       </div>
 
       <div className="mt-6 flex flex-wrap items-end gap-x-10 gap-y-4 border-t pt-5">
-        <Stat
-          label={t("seller.stats.phoneShows")}
-          value={data.phoneClicks}
-        />
-        <Stat
-          label={t("seller.stats.telegramClicks")}
-          value={data.telegramClicks}
-        />
+        <Stat label={t("seller.stats.phoneShows")} value={data.phoneClicks} />
+        <Stat label={t("seller.stats.telegramClicks")} value={data.telegramClicks} />
         <Conversion reached={data.contactVisitors} visits={data.visits} />
       </div>
     </Card>
@@ -90,12 +81,8 @@ function Conversion({ reached, visits }: { reached: number; visits: number }) {
 
   return (
     <div>
-      <div className="tabular text-2xl font-semibold">
-        {Math.round((reached / visits) * 100)}%
-      </div>
-      <div className="text-xs text-muted-foreground">
-        {t("seller.stats.reachedContact")}
-      </div>
+      <div className="tabular text-2xl font-semibold">{Math.round((reached / visits) * 100)}%</div>
+      <div className="text-xs text-muted-foreground">{t("seller.stats.reachedContact")}</div>
     </div>
   );
 }

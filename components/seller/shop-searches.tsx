@@ -12,13 +12,7 @@ import { useSellerShopAnalyticsControllerSearches } from "@/lib/api/generated/en
 
 const SEARCH_LIMIT = 20;
 
-export function ShopSearches({
-  days,
-  isMax,
-}: {
-  days: number;
-  isMax: boolean;
-}) {
+export function ShopSearches({ days, isMax }: { days: number; isMax: boolean }) {
   const { t, locale } = useT();
 
   const { data, isLoading, isError } = useSellerShopAnalyticsControllerSearches(
@@ -72,9 +66,7 @@ export function ShopSearches({
           <div className="grid grid-cols-[7rem_1fr_auto] items-center gap-3 border-b pb-2 text-xs text-muted-foreground">
             <span>{t("seller.analytics.colQuery")}</span>
             <span />
-            <span className="text-right">
-              {t("seller.analytics.colShows")}
-            </span>
+            <span className="text-right">{t("seller.analytics.colShows")}</span>
           </div>
           <div className="mt-4">
             <BarList data={rows} formatValue={(v) => formatNumber(v, locale)} />

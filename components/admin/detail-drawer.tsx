@@ -33,16 +33,10 @@ export function DetailDrawer({
       <DrawerContent className="data-[vaul-drawer-direction=right]:sm:max-w-md">
         <div className="flex h-full min-h-0 flex-col">
           <DrawerHeader className="gap-2 px-5 pt-5 pb-4">
-            {badges && (
-              <div className="flex flex-wrap items-center gap-1.5">{badges}</div>
-            )}
-            <DrawerTitle className="text-left text-lg leading-snug">
-              {title}
-            </DrawerTitle>
+            {badges && <div className="flex flex-wrap items-center gap-1.5">{badges}</div>}
+            <DrawerTitle className="text-left text-lg leading-snug">{title}</DrawerTitle>
             {description && (
-              <DrawerDescription className="text-left">
-                {description}
-              </DrawerDescription>
+              <DrawerDescription className="text-left">{description}</DrawerDescription>
             )}
           </DrawerHeader>
 
@@ -55,9 +49,7 @@ export function DetailDrawer({
           {footer && (
             <>
               <Separator />
-              <DrawerFooter className="grid grid-cols-2 gap-2 px-5 py-4">
-                {footer}
-              </DrawerFooter>
+              <DrawerFooter className="grid grid-cols-2 gap-2 px-5 py-4">{footer}</DrawerFooter>
             </>
           )}
         </div>
@@ -102,25 +94,15 @@ export function DetailNote({
       )}
     >
       {title && <div className="font-medium">{title}</div>}
-      <div className={cn("text-muted-foreground", title && "mt-1")}>
-        {children}
-      </div>
+      <div className={cn("text-muted-foreground", title && "mt-1")}>{children}</div>
     </div>
   );
 }
 
-export function DetailSection({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
+export function DetailSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="flex flex-col gap-2">
-      <h3 className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-        {title}
-      </h3>
+      <h3 className="text-xs font-medium tracking-wide text-muted-foreground uppercase">{title}</h3>
       {children}
     </section>
   );
@@ -130,7 +112,6 @@ export const drawerAction = {
   neutral: "bg-muted/70 text-foreground hover:bg-muted",
   primary: "bg-primary/10 text-primary hover:bg-muted hover:text-foreground",
   warning: "bg-warning/12 text-warning hover:bg-muted hover:text-foreground",
-  danger:
-    "bg-destructive/10 text-destructive hover:bg-muted hover:text-foreground",
+  danger: "bg-destructive/10 text-destructive hover:bg-muted hover:text-foreground",
   success: "bg-success/12 text-success hover:bg-muted hover:text-foreground",
 } as const;

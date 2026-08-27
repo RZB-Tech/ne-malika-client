@@ -53,9 +53,7 @@ export function useChatStream(): void {
         attempt = 0;
         lastFrameAt = Date.now();
 
-        const reader = response.body
-          .pipeThrough(new TextDecoderStream())
-          .getReader();
+        const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
         let buffer = "";
 
         for (;;) {
@@ -68,9 +66,7 @@ export function useChatStream(): void {
           buffer = frames.pop() ?? "";
 
           for (const frame of frames) {
-            const line = frame
-              .split("\n")
-              .find((part) => part.startsWith("data:"));
+            const line = frame.split("\n").find((part) => part.startsWith("data:"));
             if (!line) continue;
 
             const payload = safeParse(line.slice(5).trim());

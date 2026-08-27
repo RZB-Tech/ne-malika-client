@@ -29,10 +29,7 @@ export function PhotoLightbox({
   }
 
   const count = photos.length;
-  const go = useCallback(
-    (next: number) => setIndex(((next % count) + count) % count),
-    [count],
-  );
+  const go = useCallback((next: number) => setIndex(((next % count) + count) % count), [count]);
 
   useEffect(() => {
     if (!open || count < 2) return;
@@ -87,16 +84,8 @@ export function PhotoLightbox({
 
           {count > 1 && (
             <>
-              <NavButton
-                side="left"
-                label={t("common.prevPhoto")}
-                onClick={() => go(index - 1)}
-              />
-              <NavButton
-                side="right"
-                label={t("common.nextPhoto")}
-                onClick={() => go(index + 1)}
-              />
+              <NavButton side="left" label={t("common.prevPhoto")} onClick={() => go(index - 1)} />
+              <NavButton side="right" label={t("common.nextPhoto")} onClick={() => go(index + 1)} />
               <div className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-white/10 px-3 py-1 text-xs text-white tabular backdrop-blur-sm">
                 {index + 1} / {count}
               </div>

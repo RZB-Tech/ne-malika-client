@@ -1,0 +1,11 @@
+node_modules
+.next
+.next-*
+out
+build
+coverage
+graphify-out
+pnpm-lock.yaml
+next-env.d.ts
+*.tsbuildinfo
+.vercel

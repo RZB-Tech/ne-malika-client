@@ -50,9 +50,7 @@ export function CompareTable() {
     const base: Row[] = [
       {
         label: t("compare.rowPrice"),
-        values: items.map(
-          (i) => priceText(i.price, locale, t),
-        ),
+        values: items.map((i) => priceText(i.price, locale, t)),
         differs: new Set(items.map((i) => i.price)).size > 1,
       },
       {
@@ -78,8 +76,7 @@ export function CompareTable() {
 
     const specs: Row[] = keys.map((key) => {
       const values = cards.map(
-        (card) =>
-          card?.characteristics?.find((c) => c.key === key)?.value ?? null,
+        (card) => card?.characteristics?.find((c) => c.key === key)?.value ?? null,
       );
       return {
         label: key,
@@ -112,12 +109,7 @@ export function CompareTable() {
         <span className="text-sm text-muted-foreground">
           {t("compare.count", { count: items.length })}
         </span>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="gap-1.5 text-muted-foreground"
-          onClick={clear}
-        >
+        <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground" onClick={clear}>
           <Trash2 className="size-4" />
           {t("compare.clear")}
         </Button>
@@ -157,10 +149,7 @@ export function CompareTable() {
                       </span>
                     </Link>
 
-                    <ContactSellerButton
-                      productId={String(item.id)}
-                      className="mt-2 w-full"
-                    />
+                    <ContactSellerButton productId={String(item.id)} className="mt-2 w-full" />
                   </div>
                 </th>
               ))}
@@ -206,7 +195,6 @@ export function CompareTable() {
                 ))}
               </tr>
             )}
-
           </tbody>
         </table>
       </div>

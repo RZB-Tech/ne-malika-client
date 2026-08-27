@@ -30,11 +30,7 @@ import { EntityStatusBadge } from "@/components/admin/entity-status-badge";
 import { Pagination } from "@/components/shared/pagination";
 import { ShopDrawer } from "@/components/admin/shop-drawer";
 import { CreditsDialog } from "@/components/admin/credits-dialog";
-import {
-  RowActionsMenu,
-  RowContextMenu,
-  type RowAction,
-} from "@/components/admin/row-actions";
+import { RowActionsMenu, RowContextMenu, type RowAction } from "@/components/admin/row-actions";
 import { useT } from "@/components/providers/i18n-provider";
 import { formatDate } from "@/lib/format";
 import {
@@ -52,11 +48,7 @@ import {
 } from "@/lib/api/generated/endpoints/users-admin/users-admin";
 import { hueFromId } from "@/lib/api/mappers";
 import { photoUrl } from "@/lib/api/photo";
-import {
-  devFallbackPage,
-  devShops,
-  usingDevData,
-} from "@/lib/api/dev-fixtures";
+import { devFallbackPage, devShops, usingDevData } from "@/lib/api/dev-fixtures";
 import type { AdminShopRow, Paginated } from "@/lib/api/types";
 
 export default function AdminSellers() {
@@ -102,14 +94,11 @@ export default function AdminSellers() {
   const isDevData = usingDevData(data?.data);
 
   const abolish = async (id: number, reason: string) => {
-    const ok = await run(
-      () => abolishMutation.mutateAsync({ id, data: { reason } }),
-      {
-        invalidate: [getAdminShopsControllerListQueryKey()],
-        successKey: "admin.shops.abolished",
-        errorKey: "common.actionFailed",
-      },
-    );
+    const ok = await run(() => abolishMutation.mutateAsync({ id, data: { reason } }), {
+      invalidate: [getAdminShopsControllerListQueryKey()],
+      successKey: "admin.shops.abolished",
+      errorKey: "common.actionFailed",
+    });
     if (ok) setOpened(null);
   };
   const restore = async (id: number) => {
@@ -121,41 +110,27 @@ export default function AdminSellers() {
     if (ok) setOpened(null);
   };
   const blockOwner = async (ownerId: number, reason: string) => {
-    const ok = await run(
-      () => blockMutation.mutateAsync({ id: ownerId, data: { reason } }),
-      {
-        invalidate: [
-          getAdminShopsControllerListQueryKey(),
-          getAdminUsersControllerListQueryKey(),
-        ],
-        successKey: "admin.shops.ownerBlocked",
-        errorKey: "common.actionFailed",
-      },
-    );
+    const ok = await run(() => blockMutation.mutateAsync({ id: ownerId, data: { reason } }), {
+      invalidate: [getAdminShopsControllerListQueryKey(), getAdminUsersControllerListQueryKey()],
+      successKey: "admin.shops.ownerBlocked",
+      errorKey: "common.actionFailed",
+    });
     if (ok) setOpened(null);
   };
   const unblockOwner = async (ownerId: number) => {
     const ok = await run(() => unblockMutation.mutateAsync({ id: ownerId }), {
-      invalidate: [
-        getAdminShopsControllerListQueryKey(),
-        getAdminUsersControllerListQueryKey(),
-      ],
+      invalidate: [getAdminShopsControllerListQueryKey(), getAdminUsersControllerListQueryKey()],
       successKey: "admin.shops.ownerUnblocked",
       errorKey: "common.actionFailed",
     });
     if (ok) setOpened(null);
   };
   const setRestricted = async (id: number, enabled: boolean) => {
-    const ok = await run(
-      () => restrictedMutation.mutateAsync({ id, data: { enabled } }),
-      {
-        invalidate: [getAdminShopsControllerListQueryKey()],
-        successKey: enabled
-          ? "admin.shops.restrictedGranted"
-          : "admin.shops.restrictedRevoked",
-        errorKey: "admin.shops.restrictedFailed",
-      },
-    );
+    const ok = await run(() => restrictedMutation.mutateAsync({ id, data: { enabled } }), {
+      invalidate: [getAdminShopsControllerListQueryKey()],
+      successKey: enabled ? "admin.shops.restrictedGranted" : "admin.shops.restrictedRevoked",
+      errorKey: "admin.shops.restrictedFailed",
+    });
     if (ok) setOpened(null);
   };
   const remove = async (id: number) => {
@@ -239,10 +214,7 @@ export default function AdminSellers() {
 
   return (
     <div className="flex flex-col gap-6">
-      <AdminPageHeader
-        title={t("admin.sellers.title")}
-        subtitle={t("admin.common.rowHint")}
-      />
+      <AdminPageHeader title={t("admin.sellers.title")} subtitle={t("admin.common.rowHint")} />
 
       <div className="relative max-w-sm">
         <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -274,13 +246,9 @@ export default function AdminSellers() {
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-transparent">
-                <TableHead className="min-w-[220px]">
-                  {t("admin.sellers.colStore")}
-                </TableHead>
+                <TableHead className="min-w-[220px]">{t("admin.sellers.colStore")}</TableHead>
                 <TableHead>{t("admin.shops.colOwner")}</TableHead>
-                <TableHead className="text-right">
-                  {t("admin.sellers.colProducts")}
-                </TableHead>
+                <TableHead className="text-right">{t("admin.sellers.colProducts")}</TableHead>
                 <TableHead>{t("admin.sellers.colStatus")}</TableHead>
                 <TableHead>{t("admin.sellers.colJoined")}</TableHead>
                 <TableHead className="w-10" />
@@ -289,10 +257,7 @@ export default function AdminSellers() {
             <TableBody>
               {rows.map((s) => (
                 <RowContextMenu key={s.id} actions={actionsFor(s)}>
-                  <TableRow
-                    onClick={() => setOpened(s)}
-                    className="cursor-pointer"
-                  >
+                  <TableRow onClick={() => setOpened(s)} className="cursor-pointer">
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <StoreAvatar
@@ -323,13 +288,9 @@ export default function AdminSellers() {
                           </Badge>
                         )}
                       </div>
-                      <div className="text-xs text-muted-foreground">
-                        {s.contact}
-                      </div>
+                      <div className="text-xs text-muted-foreground">{s.contact}</div>
                     </TableCell>
-                    <TableCell className="tabular text-right text-sm">
-                      {s.productCount}
-                    </TableCell>
+                    <TableCell className="tabular text-right text-sm">{s.productCount}</TableCell>
                     <TableCell>
                       <EntityStatusBadge status={s.status} />
                     </TableCell>

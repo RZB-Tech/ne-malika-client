@@ -4961,6 +4961,46 @@
         ]
       }
     },
+    "/api/v1/admin/subscriptions/report": {
+      "get": {
+        "description": "Выручка, оплаты и разбивки по тарифам, провайдерам и магазинам. В выручку идут только оплаченные счёта — без тестовых прогонов и без тех, по которым провайдер вернул деньги; сколько таких отброшено, видно в excludedTest и excludedRefunded. Ряд по дням сплошной: сутки без оплат приходят нулями.",
+        "operationId": "AdminSubscriptionsController_report",
+        "parameters": [
+          {
+            "name": "days",
+            "required": false,
+            "in": "query",
+            "description": "Глубина периода в днях, считая сегодняшний",
+            "schema": {
+              "default": 30,
+              "example": 30,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionReportDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Отчёт по продажам подписок",
+        "tags": [
+          "subscriptions-admin"
+        ]
+      }
+    },
     "/api/v1/admin/shops/{shopId}/subscription/payments": {
       "get": {
         "operationId": "AdminShopSubscriptionController_payments",
@@ -8859,6 +8899,295 @@
         "required": [
           "data",
           "meta"
+        ]
+      },
+      "SubscriptionSalesPointDto": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "description": "Сутки, YYYY-MM-DD",
+            "example": "2026-08-18"
+          },
+          "revenue": {
+            "type": "number",
+            "description": "Выручка за сутки в сумах",
+            "example": 1470000
+          },
+          "payments": {
+            "type": "number",
+            "description": "Оплат за сутки",
+            "example": 7
+          },
+          "start": {
+            "type": "number",
+            "description": "Выручка по тарифу start",
+            "example": 210000
+          },
+          "pro": {
+            "type": "number",
+            "description": "Выручка по тарифу pro",
+            "example": 660000
+          },
+          "max": {
+            "type": "number",
+            "description": "Выручка по тарифу max",
+            "example": 600000
+          }
+        },
+        "required": [
+          "date",
+          "revenue",
+          "payments",
+          "start",
+          "pro",
+          "max"
+        ]
+      },
+      "SubscriptionPlanSliceDto": {
+        "type": "object",
+        "properties": {
+          "plan": {
+            "type": "string",
+            "enum": [
+              "start",
+              "pro",
+              "max"
+            ]
+          },
+          "payments": {
+            "type": "number",
+            "description": "Оплат за период",
+            "example": 12
+          },
+          "revenue": {
+            "type": "number",
+            "description": "Выручка за период в сумах",
+            "example": 2520000
+          }
+        },
+        "required": [
+          "plan",
+          "payments",
+          "revenue"
+        ]
+      },
+      "SubscriptionProviderSliceDto": {
+        "type": "object",
+        "properties": {
+          "provider": {
+            "type": "string",
+            "enum": [
+              "click",
+              "payme",
+              "manual"
+            ]
+          },
+          "payments": {
+            "type": "number",
+            "description": "Оплат за период",
+            "example": 12
+          },
+          "revenue": {
+            "type": "number",
+            "description": "Выручка за период в сумах",
+            "example": 2520000
+          }
+        },
+        "required": [
+          "provider",
+          "payments",
+          "revenue"
+        ]
+      },
+      "SubscriptionStatusSliceDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "prepared",
+              "paid",
+              "cancelled",
+              "failed"
+            ]
+          },
+          "payments": {
+            "type": "number",
+            "description": "Счетов в этом состоянии за период",
+            "example": 4
+          }
+        },
+        "required": [
+          "status",
+          "payments"
+        ]
+      },
+      "SubscriptionTopShopDto": {
+        "type": "object",
+        "properties": {
+          "shopId": {
+            "type": "number",
+            "example": 41
+          },
+          "name": {
+            "type": "string",
+            "example": "Компьютерный мир"
+          },
+          "payments": {
+            "type": "number",
+            "description": "Оплат за период",
+            "example": 3
+          },
+          "revenue": {
+            "type": "number",
+            "description": "Выручка за период в сумах",
+            "example": 900000
+          }
+        },
+        "required": [
+          "shopId",
+          "name",
+          "payments",
+          "revenue"
+        ]
+      },
+      "SubscriptionActivePlanDto": {
+        "type": "object",
+        "properties": {
+          "plan": {
+            "type": "string",
+            "enum": [
+              "start",
+              "pro",
+              "max"
+            ]
+          },
+          "shops": {
+            "type": "number",
+            "description": "Магазинов с действующей подпиской",
+            "example": 18
+          }
+        },
+        "required": [
+          "plan",
+          "shops"
+        ]
+      },
+      "SubscriptionReportDto": {
+        "type": "object",
+        "properties": {
+          "daily": {
+            "description": "Ряд по дням от старого к новому, без пропусков",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SubscriptionSalesPointDto"
+            }
+          },
+          "byPlan": {
+            "description": "Выручка по тарифам в порядке самих тарифов: start, pro, max",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SubscriptionPlanSliceDto"
+            }
+          },
+          "byProvider": {
+            "description": "Разбивка по платёжным провайдерам",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SubscriptionProviderSliceDto"
+            }
+          },
+          "byStatus": {
+            "description": "Чем закончились выставленные за период счёта. Считаются все, включая неоплаченные — по ним и виден процент доходимости",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SubscriptionStatusSliceDto"
+            }
+          },
+          "topShops": {
+            "description": "Магазины с наибольшей выручкой за период, до 8 штук",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SubscriptionTopShopDto"
+            }
+          },
+          "activeByPlan": {
+            "description": "Срез на сейчас: сколько магазинов сидит на каждом тарифе",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SubscriptionActivePlanDto"
+            }
+          },
+          "revenue": {
+            "type": "number",
+            "description": "Выручка за период в сумах",
+            "example": 5040000
+          },
+          "payments": {
+            "type": "number",
+            "description": "Оплат за период",
+            "example": 24
+          },
+          "avgCheck": {
+            "type": "number",
+            "description": "Средний чек в сумах, округлён до целого",
+            "example": 210000
+          },
+          "payingShops": {
+            "type": "number",
+            "description": "Сколько магазинов заплатило",
+            "example": 19
+          },
+          "newRevenue": {
+            "type": "number",
+            "description": "Выручка с магазинов, заплативших за подписку впервые",
+            "example": 1680000
+          },
+          "renewalRevenue": {
+            "type": "number",
+            "description": "Выручка с продлений — у магазина уже была оплата раньше",
+            "example": 3360000
+          },
+          "activeShops": {
+            "type": "number",
+            "description": "Магазинов с действующей подпиской на сейчас",
+            "example": 31
+          },
+          "conversion": {
+            "type": "number",
+            "description": "Доходимость до оплаты в процентах: оплаченные счёта к выставленным",
+            "example": 68
+          },
+          "excludedTest": {
+            "type": "number",
+            "description": "Тестовых оплат за период — в выручку не попали",
+            "example": 2
+          },
+          "excludedRefunded": {
+            "type": "number",
+            "description": "Оплат, по которым провайдер вернул деньги — в выручку не попали",
+            "example": 1
+          }
+        },
+        "required": [
+          "daily",
+          "byPlan",
+          "byProvider",
+          "byStatus",
+          "topShops",
+          "activeByPlan",
+          "revenue",
+          "payments",
+          "avgCheck",
+          "payingShops",
+          "newRevenue",
+          "renewalRevenue",
+          "activeShops",
+          "conversion",
+          "excludedTest",
+          "excludedRefunded"
         ]
       },
       "ActivateSubscriptionDto": {

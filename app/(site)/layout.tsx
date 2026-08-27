@@ -3,11 +3,7 @@ import { SiteFooter } from "@/components/layout/site-footer";
 import { CompareBar } from "@/components/compare/compare-bar";
 import { BottomNav } from "@/components/layout/bottom-nav";
 
-export default function SiteLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function SiteLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
       <SiteHeader />

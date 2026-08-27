@@ -30,7 +30,6 @@ const jetbrains = JetBrains_Mono({
 
 const THEME_INIT = `(function(){try{var d=localStorage.getItem('theme')==='dark';var e=document.documentElement;if(d)e.classList.add('dark');e.style.colorScheme=d?'dark':'light';}catch(e){}})();`;
 
-
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
@@ -59,12 +58,7 @@ export default function RootLayout({
         <script src="https://telegram.org/js/telegram-web-app.js" async />
       </head>
       <body suppressHydrationWarning className="flex min-h-full flex-col">
-        <NextTopLoader
-          color="var(--primary)"
-          height={2}
-          shadow={false}
-          showSpinner={false}
-        />
+        <NextTopLoader color="var(--primary)" height={2} shadow={false} showSpinner={false} />
         <QueryProvider>
           <AuthProvider>
             <I18nProvider>

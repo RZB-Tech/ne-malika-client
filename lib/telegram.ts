@@ -1,4 +1,3 @@
-
 import { absoluteUrl } from "./seo";
 
 const USERNAME_RE = /^[a-zA-Z0-9_]{5,32}$/;

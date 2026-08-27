@@ -55,14 +55,12 @@ self.addEventListener("notificationclick", (event) => {
   const target = new URL(event.notification.data?.url || "/", self.location.origin).href;
 
   event.waitUntil(
-    self.clients
-      .matchAll({ type: "window", includeUncontrolled: true })
-      .then((clients) => {
-        // Уже открытую вкладку переиспользуем, а не плодим новые.
-        for (const client of clients) {
-          if (client.url === target && "focus" in client) return client.focus();
-        }
-        return self.clients.openWindow(target);
-      }),
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clients) => {
+      // Уже открытую вкладку переиспользуем, а не плодим новые.
+      for (const client of clients) {
+        if (client.url === target && "focus" in client) return client.focus();
+      }
+      return self.clients.openWindow(target);
+    }),
   );
 });

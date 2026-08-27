@@ -35,10 +35,7 @@ export function findCategory(
   return undefined;
 }
 
-export function useCategoryLabel(
-  id: number | null | undefined,
-  locale: Locale,
-): string {
+export function useCategoryLabel(id: number | null | undefined, locale: Locale): string {
   const { roots } = useCategories();
   return useMemo(() => {
     const found = findCategory(roots, id);

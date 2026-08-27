@@ -1,9 +1,5 @@
-
 import { sellerFilesControllerCreateUploadUrl } from "./generated/endpoints/files/files";
-import type {
-  CreateUploadUrlDtoContentType,
-  UploadUrlResponseDto,
-} from "./generated/schemas";
+import type { CreateUploadUrlDtoContentType, UploadUrlResponseDto } from "./generated/schemas";
 
 function toContentType(type: string): CreateUploadUrlDtoContentType {
   if (type === "image/png") return "image/png";
@@ -37,10 +33,6 @@ export async function uploadPhoto(blob: Blob): Promise<string> {
   return presigned.key;
 }
 
-export function resolvePhotoKeys(
-  photos: { url: string; key?: string }[],
-): Promise<string[]> {
-  return Promise.all(
-    photos.map((p) => p.key ?? uploadPhoto(dataUrlToBlob(p.url))),
-  );
+export function resolvePhotoKeys(photos: { url: string; key?: string }[]): Promise<string[]> {
+  return Promise.all(photos.map((p) => p.key ?? uploadPhoto(dataUrlToBlob(p.url))));
 }

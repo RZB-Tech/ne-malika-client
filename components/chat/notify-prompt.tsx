@@ -35,11 +35,9 @@ export function NotifyPrompt({ className }: { className?: string }) {
     data.push.publicKey !== null &&
     permission !== "denied";
 
-  const canTelegram =
-    data?.telegram.available === true && data.telegram.enabled === false;
+  const canTelegram = data?.telegram.available === true && data.telegram.enabled === false;
 
-  const alreadyOn =
-    push.deviceSubscribed === true || data?.telegram.enabled === true;
+  const alreadyOn = push.deviceSubscribed === true || data?.telegram.enabled === true;
 
   const hidden =
     !isHydrated ||
@@ -63,18 +61,11 @@ export function NotifyPrompt({ className }: { className?: string }) {
   };
 
   return (
-    <div
-      className={cn(
-        "flex items-start gap-3 rounded-xl bg-primary/5 px-3 py-2.5",
-        className,
-      )}
-    >
+    <div className={cn("flex items-start gap-3 rounded-xl bg-primary/5 px-3 py-2.5", className)}>
       <Bell className="mt-0.5 size-4 shrink-0 text-primary" />
 
       <div className="min-w-0 flex-1">
-        <p className="text-xs text-muted-foreground sm:text-sm">
-          {t("chat.pushPrompt")}
-        </p>
+        <p className="text-xs text-muted-foreground sm:text-sm">{t("chat.pushPrompt")}</p>
 
         <div className="mt-2 flex flex-wrap gap-2">
           {canPush && (
@@ -98,11 +89,7 @@ export function NotifyPrompt({ className }: { className?: string }) {
             ) : (
               data.telegram.url && (
                 <Button asChild variant="outline" size="sm" className="gap-2">
-                  <a
-                    href={data.telegram.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <a href={data.telegram.url} target="_blank" rel="noopener noreferrer">
                     <TelegramIcon className="size-4" />
                     {t("notify.telegram")}
                   </a>

@@ -15,7 +15,5 @@ export default async function AccountPage({
 }) {
   const { tab } = await searchParams;
 
-  return (
-    <AccountView defaultTab={tab && TABS.includes(tab) ? tab : "history"} />
-  );
+  return <AccountView defaultTab={tab && TABS.includes(tab) ? tab : "history"} />;
 }

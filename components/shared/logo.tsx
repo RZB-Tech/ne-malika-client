@@ -96,13 +96,7 @@ export function LogoMark({ className }: { className?: string }) {
   );
 }
 
-export function Logo({
-  className,
-  showText = true,
-}: {
-  className?: string;
-  showText?: boolean;
-}) {
+export function Logo({ className, showText = true }: { className?: string; showText?: boolean }) {
   return (
     <Link
       href="/"

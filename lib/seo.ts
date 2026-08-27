@@ -1,7 +1,7 @@
-
-export const SITE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://nemalika.uz"
-).replace(/\/+$/, "");
+export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://nemalika.uz").replace(
+  /\/+$/,
+  "",
+);
 
 export const SITE_NAME = "neMalika";
 

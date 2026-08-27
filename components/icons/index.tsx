@@ -110,11 +110,7 @@ import {
   Wrench01Icon,
 } from "@hugeicons/core-free-icons";
 
-
-export type AppIconProps = Omit<
-  React.ComponentProps<typeof HugeiconsIcon>,
-  "icon"
->;
+export type AppIconProps = Omit<React.ComponentProps<typeof HugeiconsIcon>, "icon">;
 
 export type AppIcon = (props: AppIconProps) => React.ReactElement;
 
@@ -166,10 +162,7 @@ export const Flag = make(Flag02Icon, "Flag");
 export const Gamepad2 = make(GamepadIcon, "Gamepad2");
 export const Handshake = make(HandshakeIcon, "Handshake");
 export const HardDrive = make(HardDriveIcon, "HardDrive");
-export const HardDriveDownload = make(
-  HardDriveDownloadIcon,
-  "HardDriveDownload",
-);
+export const HardDriveDownload = make(HardDriveDownloadIcon, "HardDriveDownload");
 export const Headphones = make(HeadphonesIcon, "Headphones");
 export const Heart = make(FavouriteIcon, "Heart");
 export const History = make(HistoryIcon, "History");

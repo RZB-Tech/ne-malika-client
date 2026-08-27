@@ -23,11 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  PhotoDropzone,
-  storedPhoto,
-  type UploadedPhoto,
-} from "@/components/seller/photo-dropzone";
+import { PhotoDropzone, storedPhoto, type UploadedPhoto } from "@/components/seller/photo-dropzone";
 import { ShopPicker } from "@/components/admin/shop-picker";
 import {
   getAdminProductCardsControllerFindAllQueryKey,
@@ -92,24 +88,17 @@ function FormBody({
   const createMutation = useAdminProductCardsControllerCreate();
   const updateMutation = useAdminProductCardsControllerUpdate();
 
-  const activeShops = useMemo(
-    () => shops.filter((s) => s.status === "active"),
-    [shops],
-  );
+  const activeShops = useMemo(() => shops.filter((s) => s.status === "active"), [shops]);
 
   const { t } = useT();
   const [shopId, setShopId] = useState<number | null>(
     editing?.shopId ?? target.shopId ?? activeShops[0]?.id ?? null,
   );
   const [name, setName] = useState(editing?.name ?? "");
-  const [price, setPrice] = useState(
-    editing?.price ? formatPriceInput(Number(editing.price)) : "",
-  );
+  const [price, setPrice] = useState(editing?.price ? formatPriceInput(Number(editing.price)) : "");
   const [negotiable, setNegotiable] = useState(editing?.price === null);
   const [state, setState] = useState<"new" | "old">(editing?.state ?? "new");
-  const [categoryId, setCategoryId] = useState<number | null>(
-    editing?.categoryId ?? null,
-  );
+  const [categoryId, setCategoryId] = useState<number | null>(editing?.categoryId ?? null);
   const [description, setDescription] = useState(editing?.description ?? "");
   const [specs, setSpecs] = useState(editing?.characteristics ?? []);
   const [photos, setPhotos] = useState<UploadedPhoto[]>(
@@ -169,9 +158,7 @@ function FormBody({
   return (
     <form onSubmit={submit} className="flex flex-col gap-5">
       <DialogHeader>
-        <DialogTitle>
-          {t(editing ? "admin.form.editTitle" : "admin.form.newTitle")}
-        </DialogTitle>
+        <DialogTitle>{t(editing ? "admin.form.editTitle" : "admin.form.newTitle")}</DialogTitle>
         <DialogDescription>
           {t(editing ? "admin.form.editHint" : "admin.form.newHint")}
         </DialogDescription>
@@ -187,9 +174,7 @@ function FormBody({
             emptyHint={t("admin.form.noActiveShops")}
           />
           {activeShops.length === 0 && (
-            <p className="text-xs text-destructive">
-              {t("admin.form.allShopsAbolished")}
-            </p>
+            <p className="text-xs text-destructive">{t("admin.form.allShopsAbolished")}</p>
           )}
         </div>
       )}
@@ -218,19 +203,13 @@ function FormBody({
           setState(before.state);
         }}
         onPhotoStored={(photoId, key) =>
-          setPhotos((prev) =>
-            prev.map((p) => (p.id === photoId ? { ...p, key } : p)),
-          )
+          setPhotos((prev) => prev.map((p) => (p.id === photoId ? { ...p, key } : p)))
         }
       />
 
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="pname">{t("admin.form.name")}</Label>
-        <Input
-          id="pname"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
+        <Input id="pname" value={name} onChange={(e) => setName(e.target.value)} />
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
@@ -245,19 +224,13 @@ function FormBody({
             disabled={negotiable}
           />
           <label className="flex cursor-pointer items-center gap-2 pt-1 text-sm text-muted-foreground">
-            <Checkbox
-              checked={negotiable}
-              onCheckedChange={(v) => setNegotiable(v === true)}
-            />
+            <Checkbox checked={negotiable} onCheckedChange={(v) => setNegotiable(v === true)} />
             {t("seller.add.negotiable")}
           </label>
         </div>
         <div className="flex flex-col gap-1.5">
           <Label>{t("product.state")}</Label>
-          <Select
-            value={state}
-            onValueChange={(v) => setState(v as "new" | "old")}
-          >
+          <Select value={state} onValueChange={(v) => setState(v as "new" | "old")}>
             <SelectTrigger className="w-full">
               <SelectValue />
             </SelectTrigger>
@@ -283,9 +256,7 @@ function FormBody({
             text={description}
             onResult={setDescription}
             onPhotoStored={(photoId, key) =>
-              setPhotos((prev) =>
-                prev.map((p) => (p.id === photoId ? { ...p, key } : p)),
-              )
+              setPhotos((prev) => prev.map((p) => (p.id === photoId ? { ...p, key } : p)))
             }
           />
         </div>
@@ -295,9 +266,7 @@ function FormBody({
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         />
-        <p className="text-xs text-muted-foreground">
-          {t("ai.description.markdownHint")}
-        </p>
+        <p className="text-xs text-muted-foreground">{t("ai.description.markdownHint")}</p>
       </div>
 
       <div className="flex flex-col gap-2">
@@ -308,11 +277,7 @@ function FormBody({
               placeholder={t("admin.form.specName")}
               value={s.key}
               onChange={(e) =>
-                setSpecs((arr) =>
-                  arr.map((x, j) =>
-                    j === i ? { ...x, key: e.target.value } : x,
-                  ),
-                )
+                setSpecs((arr) => arr.map((x, j) => (j === i ? { ...x, key: e.target.value } : x)))
               }
             />
             <Input
@@ -320,9 +285,7 @@ function FormBody({
               value={s.value}
               onChange={(e) =>
                 setSpecs((arr) =>
-                  arr.map((x, j) =>
-                    j === i ? { ...x, value: e.target.value } : x,
-                  ),
+                  arr.map((x, j) => (j === i ? { ...x, value: e.target.value } : x)),
                 )
               }
             />
@@ -349,33 +312,21 @@ function FormBody({
 
       <div className="flex flex-col gap-2">
         <Label>{t("admin.form.photos")}</Label>
-        <PhotoDropzone
-          photos={photos}
-          onChange={setPhotos}
-          onPhotoClick={setAiPhoto}
-        />
-        <p className="mt-2 text-xs text-muted-foreground">
-          {t("admin.form.photoHint")}
-        </p>
+        <PhotoDropzone photos={photos} onChange={setPhotos} onPhotoClick={setAiPhoto} />
+        <p className="mt-2 text-xs text-muted-foreground">{t("admin.form.photoHint")}</p>
 
         <PhotoAiDialog
           photo={aiPhoto}
           onClose={() => setAiPhoto(null)}
           onApply={(generated) => {
-            const { photos: next, dropped } = applyGenerated(
-              photos,
-              aiPhoto?.id,
-              generated,
-            );
+            const { photos: next, dropped } = applyGenerated(photos, aiPhoto?.id, generated);
             setPhotos(next);
             if (dropped > 0) {
               toast.error(t("admin.photoAi.tooManyPhotos", { count: dropped }));
             }
           }}
           onPhotoStored={(photoId, key) =>
-            setPhotos((prev) =>
-              prev.map((p) => (p.id === photoId ? { ...p, key } : p)),
-            )
+            setPhotos((prev) => prev.map((p) => (p.id === photoId ? { ...p, key } : p)))
           }
         />
       </div>

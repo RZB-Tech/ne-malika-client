@@ -20,11 +20,7 @@ import { useAdminMutation } from "@/components/admin/use-admin-mutation";
 import { BannerFormDialog } from "@/components/admin/banner-form-dialog";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { useT } from "@/components/providers/i18n-provider";
-import {
-  BANNER_ASPECT_CSS,
-  BANNER_FORMATS_LABEL,
-  type Banner,
-} from "@/lib/api/banners";
+import { BANNER_ASPECT_CSS, BANNER_FORMATS_LABEL, type Banner } from "@/lib/api/banners";
 import { photoUrl } from "@/lib/api/photo";
 import {
   getAdminBannersControllerFindAllQueryKey,
@@ -147,9 +143,7 @@ export default function AdminBanners() {
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="truncate font-medium">{banner.title}</p>
                     {!banner.isActive && (
-                      <Badge variant="secondary">
-                        {t("admin.banners.hidden")}
-                      </Badge>
+                      <Badge variant="secondary">{t("admin.banners.hidden")}</Badge>
                     )}
                   </div>
                   {banner.linkUrl ? (
@@ -206,10 +200,7 @@ export default function AdminBanners() {
         </div>
       )}
 
-      <BannerFormDialog
-        target={editing}
-        onOpenChange={(open) => !open && setEditing(undefined)}
-      />
+      <BannerFormDialog target={editing} onOpenChange={(open) => !open && setEditing(undefined)} />
     </div>
   );
 }

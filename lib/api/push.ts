@@ -1,6 +1,5 @@
 import { axiosInstance } from "./mutator";
 
-
 export function isPushSupported(): boolean {
   return (
     typeof window !== "undefined" &&

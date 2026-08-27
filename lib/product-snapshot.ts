@@ -1,4 +1,3 @@
-
 import type { PublicProductCard } from "@/lib/api/types";
 import type { Product } from "@/lib/data";
 
@@ -15,10 +14,7 @@ export interface ProductSnapshot {
 export function isProductSnapshot(value: unknown): value is ProductSnapshot {
   const v = value as Partial<ProductSnapshot> | null;
   return (
-    typeof v === "object" &&
-    v !== null &&
-    typeof v.id === "number" &&
-    typeof v.name === "string"
+    typeof v === "object" && v !== null && typeof v.id === "number" && typeof v.name === "string"
   );
 }
 

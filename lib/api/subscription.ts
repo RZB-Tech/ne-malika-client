@@ -13,13 +13,8 @@ export function planRank(plan: SubscriptionPlan): number {
   return index < 0 ? 0 : index;
 }
 
-export function planLabel(
-  plan: SubscriptionPlan,
-  t: (path: string) => string,
-): string {
-  const known = (PLAN_ORDER as readonly string[]).includes(plan)
-    ? plan
-    : "free";
+export function planLabel(plan: SubscriptionPlan, t: (path: string) => string): string {
+  const known = (PLAN_ORDER as readonly string[]).includes(plan) ? plan : "free";
   return t(`seller.plans.${known}.title`);
 }
 

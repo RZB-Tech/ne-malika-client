@@ -101,6 +101,13 @@
   --chart-4: oklch(0.73 0.16 68);
   --chart-5: oklch(0.62 0.2 20);
 
+  /* Тарифы — порядковая шкала одного тона: чем дороже, тем темнее. Разными
+     цветами их красить нельзя, порядок тарифов должен читаться цветом.
+     Светлый конец держит 2.31:1 к белой подложке карточки. */
+  --plan-start: oklch(0.74 0.11 262);
+  --plan-pro: oklch(0.62 0.17 262);
+  --plan-max: oklch(0.48 0.21 262);
+
   --sidebar: oklch(0.965 0.004 260);
   --sidebar-foreground: oklch(0.18 0.01 260);
   --sidebar-primary: oklch(0.54 0.215 262);
@@ -151,6 +158,12 @@
   --chart-4: oklch(0.78 0.15 72);
   --chart-5: oklch(0.7 0.19 20);
 
+  /* На тёмной подложке шкала разворачивается: дороже — светлее. Тёмный конец
+     держит 3.30:1 к --card. */
+  --plan-start: oklch(0.52 0.13 262);
+  --plan-pro: oklch(0.65 0.17 262);
+  --plan-max: oklch(0.8 0.13 262);
+
   --sidebar: oklch(0.145 0.012 264);
   --sidebar-foreground: oklch(0.95 0.006 260);
   --sidebar-primary: oklch(0.66 0.18 262);
@@ -169,7 +182,8 @@
     @apply bg-background text-foreground;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11", "ss01";
   }
-  button:not(:disabled), [role="button"]:not(:disabled) {
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
     cursor: pointer;
   }
   html {
@@ -237,15 +251,24 @@
     scrollbar-width: thin;
     scrollbar-color: color-mix(in oklch, var(--foreground) 20%, transparent) transparent;
   }
-  .no-scrollbar::-webkit-scrollbar { display: none; }
-  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 
   /* Блик, пробегающий по заглушке, пока картинка рисуется. Плейсхолдер,
      который просто меняет яркость, читается как «зависло»; движение вдоль
      плитки показывает, что процесс идёт. */
   @keyframes shimmer-sweep {
-    from { transform: translateX(-100%); }
-    to   { transform: translateX(100%); }
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: translateX(100%);
+    }
   }
   .shimmer {
     position: relative;
@@ -270,8 +293,16 @@
   /* subtle grid texture used behind sections */
   .bg-grid {
     background-image:
-      linear-gradient(to right, color-mix(in oklch, var(--foreground) 6%, transparent) 1px, transparent 1px),
-      linear-gradient(to bottom, color-mix(in oklch, var(--foreground) 6%, transparent) 1px, transparent 1px);
+      linear-gradient(
+        to right,
+        color-mix(in oklch, var(--foreground) 6%, transparent) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        to bottom,
+        color-mix(in oklch, var(--foreground) 6%, transparent) 1px,
+        transparent 1px
+      );
     background-size: 44px 44px;
   }
 
@@ -289,7 +320,8 @@
   }
 }
 
-::view-transition-old(root), ::view-transition-new(root) {
-    animation: none;
-    mix-blend-mode: normal;
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
 }

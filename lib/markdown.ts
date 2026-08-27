@@ -1,12 +1,10 @@
-
 export interface MarkdownText {
   text: string;
   bold: boolean;
 }
 
 export type MarkdownBlock =
-  | { kind: "paragraph"; lines: MarkdownText[][] }
-  | { kind: "list"; items: MarkdownText[][] };
+  { kind: "paragraph"; lines: MarkdownText[][] } | { kind: "list"; items: MarkdownText[][] };
 
 const LIST_ITEM = /^\s*(?:[-*•]|\d+[.)])\s+(.*)$/;
 
@@ -20,9 +18,7 @@ export function parseMarkdown(source: string): MarkdownBlock[] {
     if (lines.length === 0) continue;
 
     if (lines.some((line) => LIST_ITEM.test(line))) {
-      const items = lines.map((line) =>
-        parseInline(clean(LIST_ITEM.exec(line)?.[1] ?? line)),
-      );
+      const items = lines.map((line) => parseInline(clean(LIST_ITEM.exec(line)?.[1] ?? line)));
       blocks.push({ kind: "list", items });
       continue;
     }
@@ -37,13 +33,11 @@ export function parseMarkdown(source: string): MarkdownBlock[] {
 }
 
 function clean(line: string): string {
-  return (
-    line
-      .replace(LINE_PREFIX, "")
-      .replace(/!?\[([^\]]*)\]\([^)]*\)/g, "$1")
-      .replace(/`+/g, "")
-      .trim()
-  );
+  return line
+    .replace(LINE_PREFIX, "")
+    .replace(/!?\[([^\]]*)\]\([^)]*\)/g, "$1")
+    .replace(/`+/g, "")
+    .trim();
 }
 
 function parseInline(line: string): MarkdownText[] {
@@ -65,11 +59,7 @@ function parseInline(line: string): MarkdownText[] {
 
 export function markdownToPlainText(source: string): string {
   return parseMarkdown(source)
-    .flatMap((block) =>
-      block.kind === "list"
-        ? block.items.map(join)
-        : block.lines.map(join),
-    )
+    .flatMap((block) => (block.kind === "list" ? block.items.map(join) : block.lines.map(join)))
     .join(" ")
     .replace(/\s+/g, " ")
     .trim();

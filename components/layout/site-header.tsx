@@ -176,11 +176,7 @@ export function SiteHeader() {
                 className={cn(ACTION_CLASS, "hidden text-foreground md:flex")}
                 title={t("nav.login")}
               >
-                <ActionBody
-                  icon={UserRound}
-                  label={t("nav.login")}
-                  attention
-                />
+                <ActionBody icon={UserRound} label={t("nav.login")} attention />
               </Button>
             </LoginDialog>
           ) : (
@@ -194,27 +190,16 @@ export function SiteHeader() {
                   title={accountLabel}
                 >
                   <Avatar size="sm">
-                    {photo && user ? (
-                      <AvatarImage src={photo} alt={user.fullname} />
-                    ) : null}
-                    <AvatarFallback>
-                      {user ? initials(user.fullname) : "?"}
-                    </AvatarFallback>
+                    {photo && user ? <AvatarImage src={photo} alt={user.fullname} /> : null}
+                    <AvatarFallback>{user ? initials(user.fullname) : "?"}</AvatarFallback>
                   </Avatar>
-                  <span className="max-w-16 truncate text-[11px] leading-none">
-                    {accountLabel}
-                  </span>
+                  <span className="max-w-16 truncate text-[11px] leading-none">{accountLabel}</span>
                 </Button>
               }
             />
           )}
 
-          <Button
-            asChild
-            variant="ghost"
-            size="lg"
-            className={cn(ACTION_CLASS, "hidden md:flex")}
-          >
+          <Button asChild variant="ghost" size="lg" className={cn(ACTION_CLASS, "hidden md:flex")}>
             <Link href="/account?tab=history" title={t("nav.orders")}>
               <ActionBody icon={Package} label={t("nav.orders")} />
             </Link>
@@ -239,9 +224,7 @@ export function SiteHeader() {
         aria-hidden={isCompact}
         className={cn(
           "hidden overflow-hidden transition-[height,opacity] duration-300 ease-in-out motion-reduce:transition-none lg:block",
-          isCompact
-            ? "h-0 pointer-events-none opacity-0"
-            : "h-10 opacity-100",
+          isCompact ? "h-0 pointer-events-none opacity-0" : "h-10 opacity-100",
         )}
       >
         <div className="mx-auto flex h-10 w-full max-w-site items-center px-5 sm:px-8">
@@ -287,9 +270,7 @@ export function SiteHeader() {
         aria-hidden={isCompact}
         className={cn(
           "relative mx-auto hidden w-full max-w-site overflow-hidden rounded-b-3xl bg-primary transition-[height,opacity] duration-300 ease-in-out motion-reduce:transition-none md:block",
-          isCompact
-            ? "h-0 pointer-events-none opacity-0"
-            : "h-18 opacity-100",
+          isCompact ? "h-0 pointer-events-none opacity-0" : "h-18 opacity-100",
         )}
       >
         <Image
@@ -354,11 +335,7 @@ function MessagesAction() {
         title={t("nav.messages")}
         className={cn(ACTION_CLASS, "hidden md:flex")}
       >
-        <ActionBody
-          icon={MessageSquare}
-          label={t("nav.messages")}
-          count={unread}
-        />
+        <ActionBody icon={MessageSquare} label={t("nav.messages")} count={unread} />
       </Button>
     </ChatDrawer>
   );
@@ -369,21 +346,9 @@ function FavoritesAction() {
   const { count } = useFavorites();
 
   return (
-    <Button
-      asChild
-      variant="ghost"
-      size="lg"
-      className={cn(ACTION_CLASS, "hidden md:flex")}
-    >
-      <Link
-        href="/account?tab=favorites"
-        title={t("account.tabs.favorites")}
-      >
-        <ActionBody
-          icon={Heart}
-          label={t("account.tabs.favorites")}
-          count={count}
-        />
+    <Button asChild variant="ghost" size="lg" className={cn(ACTION_CLASS, "hidden md:flex")}>
+      <Link href="/account?tab=favorites" title={t("account.tabs.favorites")}>
+        <ActionBody icon={Heart} label={t("account.tabs.favorites")} count={count} />
       </Link>
     </Button>
   );
@@ -394,18 +359,9 @@ function CompareAction() {
   const { items } = useCompare();
 
   return (
-    <Button
-      asChild
-      variant="ghost"
-      size="lg"
-      className={cn(ACTION_CLASS, "hidden md:flex")}
-    >
+    <Button asChild variant="ghost" size="lg" className={cn(ACTION_CLASS, "hidden md:flex")}>
       <Link href="/compare" title={t("nav.compare")}>
-        <ActionBody
-          icon={Scale}
-          label={t("nav.compare")}
-          count={items.length}
-        />
+        <ActionBody icon={Scale} label={t("nav.compare")} count={items.length} />
       </Link>
     </Button>
   );

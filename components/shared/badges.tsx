@@ -16,12 +16,9 @@ export function AvailabilityBadge({
 }) {
   const { t } = useT();
   const styles: Record<Availability, string> = {
-    in_stock:
-      "border-transparent bg-success/12 text-success dark:bg-success/15",
-    out_of_stock:
-      "border-transparent bg-muted text-muted-foreground",
-    on_order:
-      "border-transparent bg-warning/15 text-warning dark:bg-warning/15",
+    in_stock: "border-transparent bg-success/12 text-success dark:bg-success/15",
+    out_of_stock: "border-transparent bg-muted text-muted-foreground",
+    on_order: "border-transparent bg-warning/15 text-warning dark:bg-warning/15",
   };
   return (
     <Badge variant="outline" className={cn("gap-1 font-medium", styles[status], className)}>
@@ -69,10 +66,7 @@ export function BannerStatusBadge({
   className?: string;
 }) {
   const { t } = useT();
-  const cfg: Record<
-    BannerModerationStatus,
-    { cls: string; Icon: typeof Clock }
-  > = {
+  const cfg: Record<BannerModerationStatus, { cls: string; Icon: typeof Clock }> = {
     pending: { cls: "bg-warning/15 text-warning", Icon: Clock },
     approved: { cls: "bg-success/12 text-success", Icon: CheckCircle2 },
     rejected: { cls: "bg-destructive/12 text-destructive", Icon: XCircle },
@@ -81,23 +75,14 @@ export function BannerStatusBadge({
   const { cls, Icon } = cfg[known];
 
   return (
-    <Badge
-      variant="outline"
-      className={cn("gap-1 border-transparent font-medium", cls, className)}
-    >
+    <Badge variant="outline" className={cn("gap-1 border-transparent font-medium", cls, className)}>
       <Icon className="size-3" />
       {t(`admin.shopBanners.status.${known}`)}
     </Badge>
   );
 }
 
-export function RoleBadge({
-  role,
-  className,
-}: {
-  role: UserRole;
-  className?: string;
-}) {
+export function RoleBadge({ role, className }: { role: UserRole; className?: string }) {
   const { t } = useT();
   const cfg: Record<UserRole, string> = {
     user: "bg-muted text-muted-foreground",
@@ -108,22 +93,13 @@ export function RoleBadge({
   const label = t(`roles.${role in cfg ? role : "user"}`);
 
   return (
-    <Badge
-      variant="outline"
-      className={cn("border-transparent font-medium", cls, className)}
-    >
+    <Badge variant="outline" className={cn("border-transparent font-medium", cls, className)}>
       {label}
     </Badge>
   );
 }
 
-export function DiscountBadge({
-  percent,
-  className,
-}: {
-  percent: number;
-  className?: string;
-}) {
+export function DiscountBadge({ percent, className }: { percent: number; className?: string }) {
   return (
     <Badge
       className={cn(

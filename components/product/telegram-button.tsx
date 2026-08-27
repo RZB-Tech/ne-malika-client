@@ -34,13 +34,7 @@ export function TelegramButton({
   });
 
   return (
-    <Button
-      asChild
-      size={size}
-      variant={variant}
-      className={cn("gap-2", className)}
-      {...rest}
-    >
+    <Button asChild size={size} variant={variant} className={cn("gap-2", className)} {...rest}>
       <a
         href={url}
         target="_blank"

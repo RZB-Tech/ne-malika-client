@@ -23,9 +23,7 @@ export function AddFromFavorites() {
         <Heart className="size-4 text-primary" />
         {t("compare.fromFavorites")}
       </h2>
-      <p className="mt-1 text-xs text-muted-foreground">
-        {t("compare.sourcesHint")}
-      </p>
+      <p className="mt-1 text-xs text-muted-foreground">{t("compare.sourcesHint")}</p>
 
       <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
         {candidates.map((item) => (
@@ -48,9 +46,7 @@ export function AddFromFavorites() {
               className="size-9 shrink-0 rounded-md"
               iconClassName="size-4"
             />
-            <span className="line-clamp-2 min-w-0 flex-1 text-xs">
-              {item.name}
-            </span>
+            <span className="line-clamp-2 min-w-0 flex-1 text-xs">{item.name}</span>
             <Plus className="size-4 shrink-0 text-muted-foreground" />
           </button>
         ))}

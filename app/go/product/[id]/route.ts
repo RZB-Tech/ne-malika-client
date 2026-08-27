@@ -5,10 +5,7 @@ import { buildTelegramUrl, parseTelegramUsername } from "@/lib/telegram";
 import { loadMessages } from "@/lib/i18n/messages";
 import { defaultLocale, locales, type Locale } from "@/lib/i18n/config";
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const productId = Number(id);
   const fallback = new URL(`/product/${id}`, req.url);
@@ -24,9 +21,7 @@ export async function GET(
   if (!username) return NextResponse.redirect(fallback);
 
   const raw = req.nextUrl.searchParams.get("l");
-  const locale: Locale = locales.includes(raw as Locale)
-    ? (raw as Locale)
-    : defaultLocale;
+  const locale: Locale = locales.includes(raw as Locale) ? (raw as Locale) : defaultLocale;
   const dict = await loadMessages(locale);
 
   return NextResponse.redirect(

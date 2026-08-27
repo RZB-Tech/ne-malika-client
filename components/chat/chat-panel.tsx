@@ -30,12 +30,7 @@ export function ChatPanel({
   };
 
   return (
-    <div
-      className={cn(
-        "flex overflow-hidden rounded-2xl border border-border bg-card",
-        className,
-      )}
-    >
+    <div className={cn("flex overflow-hidden rounded-2xl border border-border bg-card", className)}>
       <div
         className={cn(
           "w-full shrink-0 overflow-y-auto md:w-80 md:border-r md:border-border",

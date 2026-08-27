@@ -42,11 +42,7 @@ export function useFavorites() {
   const { user, isAuthenticated, isHydrated } = useAuth();
   const queryClient = useQueryClient();
 
-  const local = useSyncExternalStore(
-    subscribeLocalFavorites,
-    getLocalFavorites,
-    getEmptyFavorites,
-  );
+  const local = useSyncExternalStore(subscribeLocalFavorites, getLocalFavorites, getEmptyFavorites);
 
   const enabled = isHydrated && isAuthenticated;
 
@@ -99,8 +95,7 @@ export function useFavorites() {
   });
 
   const has = useCallback(
-    (id: number) =>
-      list.items.some((p) => p.id === id) || local.some((p) => p.id === id),
+    (id: number) => list.items.some((p) => p.id === id) || local.some((p) => p.id === id),
     [list.items, local],
   );
 
@@ -109,9 +104,7 @@ export function useFavorites() {
       const added = addLocalFavorite(product);
       if (!added) return false;
       if (enabled) {
-        await addRemote({ data: { product_card_id: product.id } }).catch(
-          () => undefined,
-        );
+        await addRemote({ data: { product_card_id: product.id } }).catch(() => undefined);
         await invalidate();
       }
       return true;

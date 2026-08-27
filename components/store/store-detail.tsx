@@ -29,13 +29,7 @@ import { formatWorkSchedule } from "@/lib/api/mappers";
 import { formatDate, formatRating } from "@/lib/format";
 import { type Product, type Store } from "@/lib/data";
 
-export function StoreDetail({
-  store,
-  products = [],
-}: {
-  store: Store;
-  products?: Product[];
-}) {
+export function StoreDetail({ store, products = [] }: { store: Store; products?: Product[] }) {
   const { t, locale } = useT();
   const all = products;
   const [q, setQ] = useState("");
@@ -43,9 +37,7 @@ export function StoreDetail({
   const list = useMemo(() => {
     if (!q.trim()) return all;
     const s = q.toLowerCase();
-    return all.filter((p) =>
-      `${p.name} ${p.brand} ${p.model}`.toLowerCase().includes(s),
-    );
+    return all.filter((p) => `${p.name} ${p.brand} ${p.model}`.toLowerCase().includes(s));
   }, [all, q]);
 
   const contacts = [
@@ -67,7 +59,9 @@ export function StoreDetail({
   return (
     <PageContainer className="py-6">
       <nav className="mb-5 flex items-center gap-1 text-sm text-muted-foreground">
-        <Link href="/" className="hover:text-foreground">{t("brand.name")}</Link>
+        <Link href="/" className="hover:text-foreground">
+          {t("brand.name")}
+        </Link>
         <ChevronRight className="size-3.5" />
         <span className="text-foreground/70">{store.name}</span>
       </nav>
@@ -91,18 +85,10 @@ export function StoreDetail({
               <div className="flex items-center gap-2">
                 <h1 className="font-heading text-2xl font-bold tracking-tight">{store.name}</h1>
                 {store.rating > 0 && (
-                  <Badge
-                    variant="secondary"
-                    className="gap-1"
-                    aria-label={t("store.rating")}
-                  >
+                  <Badge variant="secondary" className="gap-1" aria-label={t("store.rating")}>
                     <Star className="size-3 fill-warning text-warning" />
-                    <span className="tabular">
-                      {formatRating(store.rating)}
-                    </span>
-                    <span className="text-muted-foreground tabular">
-                      · {store.ratingCount}
-                    </span>
+                    <span className="tabular">{formatRating(store.rating)}</span>
+                    <span className="text-muted-foreground tabular">· {store.ratingCount}</span>
                   </Badge>
                 )}
               </div>
@@ -112,11 +98,7 @@ export function StoreDetail({
             </div>
             <div className="flex gap-2">
               {store.telegram && (
-                <TelegramButton
-                  username={store.telegram}
-                  label={t("store.write")}
-                  size="default"
-                />
+                <TelegramButton username={store.telegram} label={t("store.write")} size="default" />
               )}
               {store.phone && (
                 <Button asChild variant="outline" size="default" className="gap-2">
@@ -171,10 +153,7 @@ export function StoreDetail({
         )}
       </div>
 
-      <ReviewsSection
-        target={{ shopId: Number(store.id) }}
-        ownerId={store.ownerId}
-      />
+      <ReviewsSection target={{ shopId: Number(store.id) }} ownerId={store.ownerId} />
     </PageContainer>
   );
 }

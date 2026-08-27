@@ -42,9 +42,7 @@ export function NotificationsCard({ className }: { className?: string }) {
         </span>
         <div className="min-w-0">
           <p className="font-medium">{t("notify.title")}</p>
-          <p className="mt-0.5 text-sm text-muted-foreground">
-            {t("notify.text")}
-          </p>
+          <p className="mt-0.5 text-sm text-muted-foreground">{t("notify.text")}</p>
         </div>
       </div>
 
@@ -52,11 +50,7 @@ export function NotificationsCard({ className }: { className?: string }) {
         <ChannelRow
           icon={<Bell className="size-4" />}
           title={t("notify.browser")}
-          hint={
-            permission === "denied"
-              ? t("push.blockedHint")
-              : t("notify.browserHint")
-          }
+          hint={permission === "denied" ? t("push.blockedHint") : t("notify.browserHint")}
           active={deviceSubscribed}
           activeLabel={t("notify.on")}
         >
@@ -72,11 +66,7 @@ export function NotificationsCard({ className }: { className?: string }) {
               {t("push.disable")}
             </Button>
           ) : (
-            <Button
-              size="sm"
-              onClick={enablePush}
-              disabled={push.busy || permission === "denied"}
-            >
+            <Button size="sm" onClick={enablePush} disabled={push.busy || permission === "denied"}>
               {t("push.enable")}
             </Button>
           )}
@@ -87,21 +77,13 @@ export function NotificationsCard({ className }: { className?: string }) {
         <ChannelRow
           icon={<TelegramIcon className="size-4" />}
           title={t("notify.telegram")}
-          hint={
-            data.telegram.linked
-              ? t("notify.telegramHint")
-              : t("notify.telegramOpenHint")
-          }
+          hint={data.telegram.linked ? t("notify.telegramHint") : t("notify.telegramOpenHint")}
           active={data.telegram.enabled}
           activeLabel={t("notify.on")}
         >
           {!data.telegram.linked && data.telegram.url && (
             <Button asChild size="sm" className="gap-2">
-              <a
-                href={data.telegram.url}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <a href={data.telegram.url} target="_blank" rel="noopener noreferrer">
                 <TelegramIcon className="size-4" />
                 {t("notify.telegramOpen")}
               </a>

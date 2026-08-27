@@ -14,9 +14,7 @@ export default function SiteNotFound() {
       <h1 className="mt-5 font-heading text-2xl font-bold tracking-tight">
         {t("product.notFound")}
       </h1>
-      <p className="mt-2 text-sm text-muted-foreground">
-        {t("product.notFoundText")}
-      </p>
+      <p className="mt-2 text-sm text-muted-foreground">{t("product.notFoundText")}</p>
       <Button asChild className="mt-6">
         <Link href="/">{t("product.toCatalog")}</Link>
       </Button>

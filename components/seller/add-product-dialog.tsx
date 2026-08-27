@@ -26,13 +26,7 @@ export function AddProductDialog() {
           <DialogDescription>{t("seller.add.subtitle")}</DialogDescription>
         </DialogHeader>
 
-        {open && (
-          <AddProductForm
-            key={String(open)}
-            embedded
-            onDone={() => setOpen(false)}
-          />
-        )}
+        {open && <AddProductForm key={String(open)} embedded onDone={() => setOpen(false)} />}
       </DialogContent>
     </Dialog>
   );

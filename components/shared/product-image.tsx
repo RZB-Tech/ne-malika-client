@@ -68,9 +68,7 @@ export function ProductImage({
         />
       ) : showImage ? (
         <>
-          {fit === "contain" && (
-            <div className="absolute inset-0 z-[5] bg-muted" />
-          )}
+          {fit === "contain" && <div className="absolute inset-0 z-[5] bg-muted" />}
           <img
             src={src!}
             alt={alt ?? ""}

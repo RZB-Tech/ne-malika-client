@@ -39,9 +39,8 @@ export function LoginDialog({
   };
 
   const loginMiniApp = async () => {
-    const wa = (
-      window as unknown as { Telegram?: { WebApp?: { initData?: string } } }
-    ).Telegram?.WebApp;
+    const wa = (window as unknown as { Telegram?: { WebApp?: { initData?: string } } }).Telegram
+      ?.WebApp;
     const initData = wa?.initData;
     if (!initData) {
       toast.error(t("auth.telegramDataFailed"));

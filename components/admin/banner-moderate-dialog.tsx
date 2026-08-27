@@ -19,11 +19,7 @@ import { useAdminMutation } from "@/components/admin/use-admin-mutation";
 import { useT } from "@/components/providers/i18n-provider";
 import { formatDate } from "@/lib/format";
 import { localeShort, locales } from "@/lib/i18n/config";
-import {
-  BANNER_ASPECT_CSS,
-  bannerImageUrl,
-  type AdminBanner,
-} from "@/lib/api/banners";
+import { BANNER_ASPECT_CSS, bannerImageUrl, type AdminBanner } from "@/lib/api/banners";
 import {
   getAdminShopBannersControllerListQueryKey,
   useAdminShopBannersControllerModerate,
@@ -88,15 +84,11 @@ function ModerateBody({
       () =>
         moderate.mutateAsync({
           id: banner.id,
-          data: rejecting
-            ? { status: "rejected", reason: trimmed }
-            : { status: "approved" },
+          data: rejecting ? { status: "rejected", reason: trimmed } : { status: "approved" },
         }),
       {
         invalidate: [getAdminShopBannersControllerListQueryKey()],
-        successKey: rejecting
-          ? "admin.shopBanners.rejected"
-          : "admin.shopBanners.approved",
+        successKey: rejecting ? "admin.shopBanners.rejected" : "admin.shopBanners.approved",
         errorKey: "admin.shopBanners.actionFailed",
       },
     );
@@ -107,11 +99,7 @@ function ModerateBody({
     <>
       <DialogHeader>
         <DialogTitle>
-          {t(
-            rejecting
-              ? "admin.shopBanners.rejectTitle"
-              : "admin.shopBanners.approveTitle",
-          )}
+          {t(rejecting ? "admin.shopBanners.rejectTitle" : "admin.shopBanners.approveTitle")}
         </DialogTitle>
         <DialogDescription>
           {rejecting
@@ -123,10 +111,7 @@ function ModerateBody({
       <div className="flex flex-wrap items-center gap-2 text-sm">
         <BannerStatusBadge status={banner.status} />
         {banner.shopId !== null ? (
-          <Link
-            href={`/store/${banner.shopId}`}
-            className="font-medium hover:underline"
-          >
+          <Link href={`/store/${banner.shopId}`} className="font-medium hover:underline">
             {banner.shopName}
           </Link>
         ) : (
@@ -134,8 +119,7 @@ function ModerateBody({
         )}
         {banner.createdAt && (
           <span className="tabular text-xs text-muted-foreground">
-            {t("admin.shopBanners.colCreated")}:{" "}
-            {formatDate(banner.createdAt, locale)}
+            {t("admin.shopBanners.colCreated")}: {formatDate(banner.createdAt, locale)}
           </span>
         )}
       </div>
@@ -146,9 +130,7 @@ function ModerateBody({
           const src = bannerImageUrl(banner, loc);
           return (
             <div key={loc} className="space-y-1.5">
-              <p className="text-xs font-medium text-muted-foreground">
-                {localeShort[loc]}
-              </p>
+              <p className="text-xs font-medium text-muted-foreground">{localeShort[loc]}</p>
               <div
                 style={{ aspectRatio: BANNER_ASPECT_CSS }}
                 className="overflow-hidden rounded-lg border border-border bg-muted"
@@ -178,9 +160,7 @@ function ModerateBody({
             {t("admin.shopBanners.link", { url: banner.linkUrl })}
           </a>
         ) : (
-          <p className="text-xs text-muted-foreground">
-            {t("admin.shopBanners.noLink")}
-          </p>
+          <p className="text-xs text-muted-foreground">{t("admin.shopBanners.noLink")}</p>
         )}
         {banner.rejectReason && (
           <p className="text-xs text-destructive">
@@ -209,27 +189,17 @@ function ModerateBody({
       )}
 
       <DialogFooter>
-        <Button
-          variant="outline"
-          onClick={onDone}
-          disabled={moderate.isPending}
-        >
+        <Button variant="outline" onClick={onDone} disabled={moderate.isPending}>
           {t("common.cancel")}
         </Button>
         <Button
           variant={rejecting ? "destructive" : "default"}
           onClick={submit}
-          disabled={
-            moderate.isPending || (rejecting && trimmed.length < MIN_REASON)
-          }
+          disabled={moderate.isPending || (rejecting && trimmed.length < MIN_REASON)}
         >
           {moderate.isPending
             ? t("common.running")
-            : t(
-                rejecting
-                  ? "admin.shopBanners.reject"
-                  : "admin.shopBanners.approve",
-              )}
+            : t(rejecting ? "admin.shopBanners.reject" : "admin.shopBanners.approve")}
         </Button>
       </DialogFooter>
     </>

@@ -61,8 +61,7 @@ export function ProductAutofillButton<T>({
   const priceLine = !quota
     ? null
     : quota.unlimited && quota.balance === null
-      ?
-        null
+      ? null
       : quota.unlimited
         ? t("ai.autofill.unlimited")
         : quota.free
@@ -72,9 +71,7 @@ export function ProductAutofillButton<T>({
             })
           : t("ai.autofill.price", { price: quota.effectivePrice });
 
-  const quotaSpent = Boolean(
-    quota && !quota.free && !quota.unlimited && quota.freeLeft === 0,
-  );
+  const quotaSpent = Boolean(quota && !quota.free && !quota.unlimited && quota.freeLeft === 0);
 
   const blocked = quota?.allowed === false;
 
@@ -138,8 +135,7 @@ export function ProductAutofillButton<T>({
         name: name.trim(),
         description: context.description?.trim() || undefined,
         characteristics: context.characteristics?.filter(
-          (characteristic) =>
-            characteristic.key.trim() && characteristic.value.trim(),
+          (characteristic) => characteristic.key.trim() && characteristic.value.trim(),
         ),
         categoryId: context.categoryId ?? undefined,
         state: context.state,
@@ -149,10 +145,7 @@ export function ProductAutofillButton<T>({
       setBefore(captured);
       const fresh = await priceQuery.refetch();
       toast.success(t("ai.autofill.done"), {
-        description: filledNote(
-          result,
-          fresh.data?.freeLimit ?? quota?.freeLimit,
-        ),
+        description: filledNote(result, fresh.data?.freeLimit ?? quota?.freeLimit),
       });
     } catch (err) {
       toast.error(apiErrorMessage(err, t, "ai.autofill.failed"));
@@ -179,11 +172,7 @@ export function ProductAutofillButton<T>({
         disabled={busy || disabled || blocked}
         title={t("ai.autofill.hint")}
       >
-        {busy ? (
-          <Loader2 className="size-3.5 animate-spin" />
-        ) : (
-          <Sparkles className="size-3.5" />
-        )}
+        {busy ? <Loader2 className="size-3.5 animate-spin" /> : <Sparkles className="size-3.5" />}
         {busy ? t("ai.autofill.working") : t("ai.autofill.action")}
       </Button>
 
@@ -205,20 +194,14 @@ export function ProductAutofillButton<T>({
         {[
           priceLine,
           t("ai.autofill.needs"),
-          quota?.balance != null &&
-            t("ai.autofill.balance", { balance: quota.balance }),
+          quota?.balance != null && t("ai.autofill.balance", { balance: quota.balance }),
         ]
           .filter(Boolean)
           .join(" · ")}
       </p>
 
       {note && (
-        <p
-          className={cn(
-            "w-full text-xs",
-            blocked ? "text-destructive" : "text-muted-foreground",
-          )}
-        >
+        <p className={cn("w-full text-xs", blocked ? "text-destructive" : "text-muted-foreground")}>
           {note}
         </p>
       )}

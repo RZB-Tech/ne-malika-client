@@ -61,12 +61,8 @@ function LoginWall({ next }: { next: string }) {
       <Card className="mx-auto flex max-w-md flex-col items-center gap-4 py-14 text-center">
         <LogIn className="size-10 text-muted-foreground/50" />
         <div>
-          <h2 className="font-heading text-lg font-semibold">
-            {t("auth.needLoginTitle")}
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {t("auth.needLoginText")}
-          </p>
+          <h2 className="font-heading text-lg font-semibold">{t("auth.needLoginTitle")}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">{t("auth.needLoginText")}</p>
         </div>
         <LoginDialog redirectTo={next}>
           <Button className="gap-2">

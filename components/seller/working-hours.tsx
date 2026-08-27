@@ -28,9 +28,10 @@ const DAY_CODE: Record<Day, WorkScheduleEntry["day"]> = {
   saturday: "Sa",
   sunday: "Su",
 };
-const CODE_DAY = Object.fromEntries(
-  Object.entries(DAY_CODE).map(([k, v]) => [v, k]),
-) as Record<WorkScheduleEntry["day"], Day>;
+const CODE_DAY = Object.fromEntries(Object.entries(DAY_CODE).map(([k, v]) => [v, k])) as Record<
+  WorkScheduleEntry["day"],
+  Day
+>;
 
 export function defaultWorkingHours(): WorkingHours {
   return DAYS.reduce((acc, day) => {
@@ -52,9 +53,7 @@ export function toWorkSchedule(hours: WorkingHours): WorkScheduleEntry[] {
   }));
 }
 
-export function fromWorkSchedule(
-  entries: WorkScheduleEntry[] | null | undefined,
-): WorkingHours {
+export function fromWorkSchedule(entries: WorkScheduleEntry[] | null | undefined): WorkingHours {
   const base = defaultWorkingHours();
   for (const e of entries ?? []) {
     const day = CODE_DAY[e.day];
@@ -81,14 +80,10 @@ export function WorkingHoursEditor({
         const d = value[day];
         return (
           <div key={day} className="flex flex-wrap items-center gap-3 px-3 py-2.5">
-            <span className="w-28 shrink-0 text-sm font-medium">
-              {t(`weekdays.${day}`)}
-            </span>
+            <span className="w-28 shrink-0 text-sm font-medium">{t(`weekdays.${day}`)}</span>
 
             {d.closed ? (
-              <span className="text-sm text-muted-foreground">
-                {t("seller.profile.dayOff")}
-              </span>
+              <span className="text-sm text-muted-foreground">{t("seller.profile.dayOff")}</span>
             ) : (
               <div className="flex items-center gap-2">
                 <Input

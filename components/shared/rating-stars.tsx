@@ -21,10 +21,7 @@ export function RatingStars({
   const icon = SIZES[size];
 
   return (
-    <span
-      className={cn("inline-flex items-center gap-0.5", className)}
-      aria-hidden
-    >
+    <span className={cn("inline-flex items-center gap-0.5", className)} aria-hidden>
       {[1, 2, 3, 4, 5].map((position) => {
         const fill = Math.min(1, Math.max(0, value - position + 1));
         return (
@@ -35,9 +32,7 @@ export function RatingStars({
                 className="absolute inset-0 overflow-hidden"
                 style={{ width: `${fill * 100}%` }}
               >
-                <Star
-                  className={cn(icon, "fill-amber-400 text-amber-400")}
-                />
+                <Star className={cn(icon, "fill-amber-400 text-amber-400")} />
               </span>
             )}
           </span>
@@ -74,9 +69,7 @@ export function RatingInput({
           <Star
             className={cn(
               "size-7 transition-colors",
-              position <= value
-                ? "fill-amber-400 text-amber-400"
-                : "text-muted-foreground/40",
+              position <= value ? "fill-amber-400 text-amber-400" : "text-muted-foreground/40",
             )}
           />
         </button>

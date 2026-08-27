@@ -419,8 +419,7 @@ export const devAiReview: AiReviewRow[] = [
     checkId: 9001,
     productCardId: 202,
     verdict: "fail",
-    summary:
-      "В описании контакты стороннего продавца и нет сведений о самом товаре.",
+    summary: "В описании контакты стороннего продавца и нет сведений о самом товаре.",
     error: null,
     checkedAt: "2026-07-08T18:35:00.000Z",
     name: "Ноутбук игровой ТОП ЦЕНА ЗВОНИТЕ",
@@ -552,10 +551,7 @@ export function usingDevData(data: { length: number } | undefined): boolean {
   return IS_DEV && !data?.length;
 }
 
-export function devFallbackPage<T>(
-  data: Paginated<T> | undefined,
-  fixtures: T[],
-): Paginated<T> {
+export function devFallbackPage<T>(data: Paginated<T> | undefined, fixtures: T[]): Paginated<T> {
   if (data && data.data.length > 0) return data;
   if (!IS_DEV) {
     return data ?? { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 1 } };

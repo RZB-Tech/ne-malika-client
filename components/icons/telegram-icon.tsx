@@ -1,9 +1,6 @@
 import type { SVGProps } from "react";
 
-export function TelegramIcon({
-  className = "size-4",
-  ...props
-}: SVGProps<SVGSVGElement>) {
+export function TelegramIcon({ className = "size-4", ...props }: SVGProps<SVGSVGElement>) {
   return (
     <svg
       viewBox="0 0 24 24"

@@ -54,9 +54,7 @@ export default function SellerDashboard() {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="font-heading text-2xl font-bold tracking-tight">{shop.name}</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {t("seller.nav.dashboard")}
-          </p>
+          <p className="mt-1 text-sm text-muted-foreground">{t("seller.nav.dashboard")}</p>
         </div>
         {shop.status === "active" && (
           <Button className="gap-2" onClick={openAddProduct}>
@@ -70,9 +68,7 @@ export default function SellerDashboard() {
 
       {shop.status !== "active" && (
         <Card className="border-destructive/40 bg-destructive/5 p-4 text-sm">
-          <p className="font-medium text-destructive">
-            {t("seller.shop.abolished")}
-          </p>
+          <p className="font-medium text-destructive">{t("seller.shop.abolished")}</p>
           {shop.abolishReason && (
             <p className="mt-1 text-muted-foreground">
               {t("common.reasonLine", { reason: shop.abolishReason })}
@@ -83,21 +79,15 @@ export default function SellerDashboard() {
 
       <div className="grid gap-4 sm:grid-cols-3">
         <StatCard label={t("seller.nav.products")} value={String(total)} icon={Package} />
-        <StatCard
-          label={t("seller.shop.published")}
-          value={String(active)}
-          icon={Tag}
-        />
-        <StatCard
-          label={t("seller.shop.newOnes")}
-          value={String(newCount)}
-          icon={Store}
-        />
+        <StatCard label={t("seller.shop.published")} value={String(active)} icon={Tag} />
+        <StatCard label={t("seller.shop.newOnes")} value={String(newCount)} icon={Store} />
       </div>
 
       <div>
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="font-heading text-lg font-bold tracking-tight">{t("seller.nav.products")}</h2>
+          <h2 className="font-heading text-lg font-bold tracking-tight">
+            {t("seller.nav.products")}
+          </h2>
           <Button asChild variant="ghost" size="sm">
             <Link href="/seller/products">{t("seller.shop.allProducts")}</Link>
           </Button>

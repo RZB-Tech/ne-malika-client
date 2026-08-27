@@ -61,29 +61,19 @@ interface BroadcastRow {
 export default function AdminBroadcast() {
   const { t, locale } = useT();
   const run = useAdminMutation();
-  const [audience, setAudience] =
-    useState<CreateBroadcastDtoAudience>("sellers");
+  const [audience, setAudience] = useState<CreateBroadcastDtoAudience>("sellers");
   const [text, setText] = useState("");
 
-  const countQuery = useAdminBroadcastsControllerCount(
-    { audience },
-    { query: { retry: false } },
-  );
-  const historyQuery = useAdminBroadcastsControllerList(
-    { limit: 20 },
-    { query: { retry: false } },
-  );
+  const countQuery = useAdminBroadcastsControllerCount({ audience }, { query: { retry: false } });
+  const historyQuery = useAdminBroadcastsControllerList({ limit: 20 }, { query: { retry: false } });
   const sendMutation = useAdminBroadcastsControllerSend();
 
-  const audienceCount = countQuery.data as unknown as
-    | { count?: number; push?: number }
-    | undefined;
+  const audienceCount = countQuery.data as unknown as { count?: number; push?: number } | undefined;
   const count = audienceCount?.count ?? 0;
   const pushCount = audienceCount?.push ?? 0;
   const countFailed = countQuery.isError;
   const noRecipients = countQuery.isSuccess && count === 0;
-  const history =
-    ((historyQuery.data as unknown as { data?: BroadcastRow[] })?.data ?? []);
+  const history = (historyQuery.data as unknown as { data?: BroadcastRow[] })?.data ?? [];
 
   const send = async () => {
     const value = text.trim();
@@ -107,9 +97,7 @@ export default function AdminBroadcast() {
       },
     );
     if (!ok || !res) return;
-    toast.success(
-      t("admin.broadcast.started", { recipients: res.recipients }),
-    );
+    toast.success(t("admin.broadcast.started", { recipients: res.recipients }));
     setText("");
   };
 
@@ -128,9 +116,7 @@ export default function AdminBroadcast() {
             <Label>{t("admin.broadcast.audience")}</Label>
             <Select
               value={audience}
-              onValueChange={(v) =>
-                setAudience(v as CreateBroadcastDtoAudience)
-              }
+              onValueChange={(v) => setAudience(v as CreateBroadcastDtoAudience)}
             >
               <SelectTrigger className="w-full">
                 <SelectValue />
@@ -189,9 +175,7 @@ export default function AdminBroadcast() {
             onChange={(e) => setText(e.target.value)}
             placeholder={t("admin.broadcast.textPlaceholder")}
           />
-          <p className="text-xs text-muted-foreground">
-            {t("admin.broadcast.textHint")}
-          </p>
+          <p className="text-xs text-muted-foreground">{t("admin.broadcast.textHint")}</p>
         </div>
 
         <ConfirmDialog
@@ -203,16 +187,10 @@ export default function AdminBroadcast() {
           <Button
             type="button"
             className="gap-2 self-start"
-            disabled={
-              sendMutation.isPending || (noRecipients && pushCount === 0)
-            }
+            disabled={sendMutation.isPending || (noRecipients && pushCount === 0)}
           >
             <Send className="size-4" />
-            {t(
-              sendMutation.isPending
-                ? "admin.broadcast.sending"
-                : "admin.broadcast.send",
-            )}
+            {t(sendMutation.isPending ? "admin.broadcast.sending" : "admin.broadcast.send")}
           </Button>
         </ConfirmDialog>
       </Card>
@@ -235,54 +213,43 @@ export default function AdminBroadcast() {
             </div>
           ) : (
             <Table className="min-w-[760px] table-fixed">
-                <TableHeader>
-                  <TableRow className="hover:bg-transparent">
-                    <TableHead className="w-44">
-                      {t("admin.broadcast.colDate")}
-                    </TableHead>
-                    <TableHead className="w-32">
-                      {t("admin.broadcast.colAudience")}
-                    </TableHead>
-                    <TableHead>
-                      {t("admin.broadcast.colText")}
-                    </TableHead>
-                    <TableHead className="w-28 text-right">
-                      {t("admin.broadcast.colResult")}
-                    </TableHead>
-                    <TableHead className="w-28">
-                      {t("admin.broadcast.colAuthor")}
-                    </TableHead>
+              <TableHeader>
+                <TableRow className="hover:bg-transparent">
+                  <TableHead className="w-44">{t("admin.broadcast.colDate")}</TableHead>
+                  <TableHead className="w-32">{t("admin.broadcast.colAudience")}</TableHead>
+                  <TableHead>{t("admin.broadcast.colText")}</TableHead>
+                  <TableHead className="w-28 text-right">
+                    {t("admin.broadcast.colResult")}
+                  </TableHead>
+                  <TableHead className="w-28">{t("admin.broadcast.colAuthor")}</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {history.map((row) => (
+                  <TableRow key={row.id}>
+                    <TableCell className="tabular whitespace-nowrap text-sm text-muted-foreground">
+                      {formatDate(row.createdAt, locale)}
+                    </TableCell>
+                    <TableCell className="text-sm">
+                      {t(
+                        AUDIENCES.find((a) => a.value === row.audience)?.labelKey ??
+                          "admin.broadcast.audienceAll",
+                      )}
+                    </TableCell>
+                    <TableCell className="whitespace-normal text-sm">
+                      <span className="line-clamp-2 break-words" title={row.text}>
+                        {row.text}
+                      </span>
+                    </TableCell>
+                    <TableCell className="tabular whitespace-nowrap text-right text-sm">
+                      {row.delivered} / {row.recipients}
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      {row.authorName ?? "—"}
+                    </TableCell>
                   </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {history.map((row) => (
-                    <TableRow key={row.id}>
-                      <TableCell className="tabular whitespace-nowrap text-sm text-muted-foreground">
-                        {formatDate(row.createdAt, locale)}
-                      </TableCell>
-                      <TableCell className="text-sm">
-                        {t(
-                          AUDIENCES.find((a) => a.value === row.audience)
-                            ?.labelKey ?? "admin.broadcast.audienceAll",
-                        )}
-                      </TableCell>
-                      <TableCell className="whitespace-normal text-sm">
-                        <span
-                          className="line-clamp-2 break-words"
-                          title={row.text}
-                        >
-                          {row.text}
-                        </span>
-                      </TableCell>
-                      <TableCell className="tabular whitespace-nowrap text-right text-sm">
-                        {row.delivered} / {row.recipients}
-                      </TableCell>
-                      <TableCell className="text-sm text-muted-foreground">
-                        {row.authorName ?? "—"}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
+                ))}
+              </TableBody>
             </Table>
           )}
         </Card>

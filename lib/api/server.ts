@@ -14,14 +14,9 @@ const ORIGIN = (
 const API = `${ORIGIN}/api/v1`;
 
 const fetchOpts = (revalidateSec: number) =>
-  revalidateSec > 0
-    ? { next: { revalidate: revalidateSec } }
-    : { cache: "no-store" as const };
+  revalidateSec > 0 ? { next: { revalidate: revalidateSec } } : { cache: "no-store" as const };
 
-async function getJson<T>(
-  path: string,
-  revalidateSec: number,
-): Promise<T | null> {
+async function getJson<T>(path: string, revalidateSec: number): Promise<T | null> {
   try {
     const res = await fetch(`${API}${path}`, {
       ...fetchOpts(revalidateSec),
@@ -34,10 +29,7 @@ async function getJson<T>(
   }
 }
 
-async function getEntityJson<T>(
-  path: string,
-  revalidateSec: number,
-): Promise<T | null> {
+async function getEntityJson<T>(path: string, revalidateSec: number): Promise<T | null> {
   const res = await fetch(`${API}${path}`, {
     ...fetchOpts(revalidateSec),
     headers: { accept: "application/json" },
@@ -47,9 +39,7 @@ async function getEntityJson<T>(
   return (await res.json()) as T;
 }
 
-export function getPublicProduct(
-  id: number,
-): Promise<PublicProductCard | null> {
+export function getPublicProduct(id: number): Promise<PublicProductCard | null> {
   return getEntityJson<PublicProductCard>(`/product-cards/${id}`, 300);
 }
 
@@ -72,23 +62,13 @@ export function getPublicProducts(
     sort,
     ...(seed ? { seed } : {}),
   }).toString();
-  return getJson<Paginated<PublicProductCard>>(
-    `/product-cards?${qs}`,
-    seed ? 0 : 120,
-  );
+  return getJson<Paginated<PublicProductCard>>(`/product-cards?${qs}`, seed ? 0 : 120);
 }
 
 export async function getBanners(): Promise<PublicBannerDto[]> {
   return (await getJson<PublicBannerDto[]>("/banners", 120)) ?? [];
 }
 
-export async function getAllProductIds(): Promise<
-  { id: number; updatedAt: string }[]
-> {
-  return (
-    (await getJson<{ id: number; updatedAt: string }[]>(
-      "/product-cards/sitemap",
-      3600,
-    )) ?? []
-  );
+export async function getAllProductIds(): Promise<{ id: number; updatedAt: string }[]> {
+  return (await getJson<{ id: number; updatedAt: string }[]>("/product-cards/sitemap", 3600)) ?? [];
 }

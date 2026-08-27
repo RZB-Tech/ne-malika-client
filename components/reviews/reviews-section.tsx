@@ -25,13 +25,7 @@ import type { OwnReview, PublicReview, ReviewStatus } from "@/lib/api/types";
 
 const STARS = [5, 4, 3, 2, 1];
 
-export function ReviewsSection({
-  target,
-  ownerId,
-}: {
-  target: ReviewTarget;
-  ownerId?: number;
-}) {
+export function ReviewsSection({ target, ownerId }: { target: ReviewTarget; ownerId?: number }) {
   const { t } = useT();
   const { isAuthenticated, isHydrated, user } = useAuth();
 
@@ -82,13 +76,9 @@ export function ReviewsSection({
       ) : count > 0 ? (
         <div className="mt-4 grid gap-6 rounded-2xl bg-muted/40 p-5 sm:grid-cols-[auto_minmax(0,1fr)] sm:gap-10">
           <div className="flex flex-col items-center justify-center gap-1">
-            <span className="font-heading text-4xl font-bold tabular">
-              {formatRating(average)}
-            </span>
+            <span className="font-heading text-4xl font-bold tabular">{formatRating(average)}</span>
             <RatingStars value={average} size="md" />
-            <span className="text-xs text-muted-foreground">
-              {t("reviews.count", { count })}
-            </span>
+            <span className="text-xs text-muted-foreground">{t("reviews.count", { count })}</span>
           </div>
 
           <div className="flex flex-col justify-center gap-1.5">
@@ -116,9 +106,7 @@ export function ReviewsSection({
           </div>
         </div>
       ) : (
-        <p className="mt-3 text-sm text-muted-foreground">
-          {t("reviews.empty")}
-        </p>
+        <p className="mt-3 text-sm text-muted-foreground">{t("reviews.empty")}</p>
       )}
 
       {mine.data && (
@@ -154,9 +142,7 @@ export function ReviewsSection({
             onClick={() => feed.fetchNextPage()}
             disabled={feed.isFetchingNextPage}
           >
-            {feed.isFetchingNextPage && (
-              <Loader2 className="size-4 animate-spin" />
-            )}
+            {feed.isFetchingNextPage && <Loader2 className="size-4 animate-spin" />}
             {t("reviews.more")}
           </Button>
         </div>
@@ -217,9 +203,7 @@ function MyReview({
       <div className="mt-2">
         <RatingStars value={review.rating} />
       </div>
-      {review.text && (
-        <p className="mt-2 text-sm whitespace-pre-line">{review.text}</p>
-      )}
+      {review.text && <p className="mt-2 text-sm whitespace-pre-line">{review.text}</p>}
 
       {review.status === "rejected" && review.moderationNote && (
         <p className="mt-2 rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">
@@ -273,9 +257,7 @@ function ReviewItem({ review }: { review: PublicReview }) {
       )}
 
       {review.text && (
-        <p className="mt-2 text-sm leading-relaxed whitespace-pre-line">
-          {review.text}
-        </p>
+        <p className="mt-2 text-sm leading-relaxed whitespace-pre-line">{review.text}</p>
       )}
     </div>
   );

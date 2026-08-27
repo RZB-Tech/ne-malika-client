@@ -106,9 +106,7 @@ export function PhotoAiDialog({
   const [format, setFormat] = useState<Format>("portrait");
   const [tier, setTier] = useState<Tier>("1K");
   const [quality, setQuality] = useState<GenerateImagesDtoQuality>("medium");
-  const [reference, setReference] = useState<{ key: string; url: string } | null>(
-    null,
-  );
+  const [reference, setReference] = useState<{ key: string; url: string } | null>(null);
   const [uploading, setUploading] = useState(false);
   const [savingPhoto, setSavingPhoto] = useState(false);
   const [savedKey, setSavedKey] = useState<string | null>(null);
@@ -137,8 +135,7 @@ export function PhotoAiDialog({
     query: { enabled: open, retry: false },
   });
   const quota = quotaQuery.data as unknown as
-    | { allowed: boolean; credits: number | null }
-    | undefined;
+    { allowed: boolean; credits: number | null } | undefined;
   const left = quota?.credits ?? null;
 
   const historyQuery = useImageGenControllerHistory(
@@ -176,9 +173,7 @@ export function PhotoAiDialog({
       })) as unknown as { prompt: string };
       setPrompt(res.prompt);
     } catch (err) {
-      toast.error(
-        apiErrorMessage(err, t, "admin.photoAi.promptFailed"),
-      );
+      toast.error(apiErrorMessage(err, t, "admin.photoAi.promptFailed"));
     }
   };
 
@@ -204,9 +199,7 @@ export function PhotoAiDialog({
       setPicked(new Set());
       await Promise.all([quotaQuery.refetch(), historyQuery.refetch()]);
     } catch (err) {
-      toast.error(
-        apiErrorMessage(err, t, "admin.photoAi.generateFailed"),
-      );
+      toast.error(apiErrorMessage(err, t, "admin.photoAi.generateFailed"));
     }
   };
 
@@ -216,11 +209,7 @@ export function PhotoAiDialog({
       toast.error(t("admin.photoAi.pickAtLeastOne"));
       return;
     }
-    onApply(
-      chosen.map((r) =>
-        storedPhoto(r.key, r.url, t("admin.photoAi.generatedCaption")),
-      ),
-    );
+    onApply(chosen.map((r) => storedPhoto(r.key, r.url, t("admin.photoAi.generatedCaption"))));
     close();
   };
 
@@ -232,9 +221,7 @@ export function PhotoAiDialog({
       setSavedKey(key);
       onPhotoStored?.(photo.id, key);
     } catch (err) {
-      toast.error(
-        apiErrorMessage(err, t, "admin.photoAi.savePhotoFailed"),
-      );
+      toast.error(apiErrorMessage(err, t, "admin.photoAi.savePhotoFailed"));
     } finally {
       setSavingPhoto(false);
     }
@@ -247,9 +234,7 @@ export function PhotoAiDialog({
       const key = await uploadPhoto(file);
       setReference({ key, url: URL.createObjectURL(file) });
     } catch (err) {
-      toast.error(
-        apiErrorMessage(err, t, "admin.photoAi.referenceFailed"),
-      );
+      toast.error(apiErrorMessage(err, t, "admin.photoAi.referenceFailed"));
     } finally {
       setUploading(false);
     }
@@ -273,21 +258,10 @@ export function PhotoAiDialog({
 
         {!shownPhoto || !photoKey ? (
           <div className="space-y-3">
-            <p className="text-sm text-muted-foreground">
-              {t("admin.photoAi.unsaved")}
-            </p>
-            <Button
-              type="button"
-              className="gap-2"
-              onClick={storePhoto}
-              disabled={savingPhoto}
-            >
+            <p className="text-sm text-muted-foreground">{t("admin.photoAi.unsaved")}</p>
+            <Button type="button" className="gap-2" onClick={storePhoto} disabled={savingPhoto}>
               <ImagePlus className="size-4" />
-              {t(
-                savingPhoto
-                  ? "admin.photoAi.savingPhoto"
-                  : "admin.photoAi.savePhoto",
-              )}
+              {t(savingPhoto ? "admin.photoAi.savingPhoto" : "admin.photoAi.savePhoto")}
             </Button>
           </div>
         ) : (
@@ -307,9 +281,7 @@ export function PhotoAiDialog({
                     size="sm"
                     className="h-7 gap-1.5 text-xs"
                     onClick={describe}
-                    disabled={
-                      describeMutation.isPending || quota?.allowed === false
-                    }
+                    disabled={describeMutation.isPending || quota?.allowed === false}
                   >
                     <Sparkles className="size-3.5" />
                     {t(
@@ -362,11 +334,7 @@ export function PhotoAiDialog({
                   )}
                 >
                   <ImagePlus className="size-4" />
-                  {t(
-                    uploading
-                      ? "common.uploading"
-                      : "admin.photoAi.referenceAdd",
-                  )}
+                  {t(uploading ? "common.uploading" : "admin.photoAi.referenceAdd")}
                   <input
                     type="file"
                     accept="image/*"
@@ -401,10 +369,7 @@ export function PhotoAiDialog({
               </div>
               <div className="space-y-1.5">
                 <Label>{t("admin.photoAi.formatLabel")}</Label>
-                <Select
-                  value={format}
-                  onValueChange={(v) => setFormat(v as Format)}
-                >
+                <Select value={format} onValueChange={(v) => setFormat(v as Format)}>
                   <SelectTrigger className="w-full">
                     <SelectValue />
                   </SelectTrigger>
@@ -422,10 +387,7 @@ export function PhotoAiDialog({
             <div className="grid gap-3 sm:grid-cols-3">
               <div className="space-y-1.5">
                 <Label>{t("admin.photoAi.countLabel")}</Label>
-                <Select
-                  value={String(count)}
-                  onValueChange={(v) => setCount(Number(v))}
-                >
+                <Select value={String(count)} onValueChange={(v) => setCount(Number(v))}>
                   <SelectTrigger className="w-full">
                     <SelectValue />
                   </SelectTrigger>
@@ -495,11 +457,7 @@ export function PhotoAiDialog({
 
               {quota?.allowed === false ? (
                 <span className="text-sm text-destructive">
-                  {t(
-                    left === null
-                      ? "admin.photoAi.noAccess"
-                      : "admin.photoAi.noCredits",
-                  )}
+                  {t(left === null ? "admin.photoAi.noAccess" : "admin.photoAi.noCredits")}
                 </span>
               ) : left !== null ? (
                 <span
@@ -517,15 +475,11 @@ export function PhotoAiDialog({
               ) : null}
             </div>
 
-            {generateMutation.isPending && (
-              <GeneratingGrid count={count} format={format} />
-            )}
+            {generateMutation.isPending && <GeneratingGrid count={count} format={format} />}
 
             {gallery.length > 0 && (
               <div className="space-y-2">
-                <p className="text-sm text-muted-foreground">
-                  {t("admin.photoAi.pickHint")}
-                </p>
+                <p className="text-sm text-muted-foreground">{t("admin.photoAi.pickHint")}</p>
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                   {gallery.map((r) => (
                     <button
@@ -552,12 +506,7 @@ export function PhotoAiDialog({
                     </button>
                   ))}
                 </div>
-                <Button
-                  type="button"
-                  onClick={apply}
-                  className="mt-2"
-                  disabled={picked.size === 0}
-                >
+                <Button type="button" onClick={apply} className="mt-2" disabled={picked.size === 0}>
                   {t("admin.photoAi.apply", { count: picked.size })}
                 </Button>
               </div>
@@ -569,13 +518,7 @@ export function PhotoAiDialog({
   );
 }
 
-function GeneratingGrid({
-  count,
-  format,
-}: {
-  count: number;
-  format: Format;
-}) {
+function GeneratingGrid({ count, format }: { count: number; format: Format }) {
   const { t } = useT();
   const [seconds, setSeconds] = useState(0);
 

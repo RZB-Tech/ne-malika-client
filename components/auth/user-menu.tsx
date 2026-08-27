@@ -28,11 +28,7 @@ export function UserMenu({ trigger }: { trigger?: ReactNode } = {}) {
 
   const photo = user.telegramPhoto as string | null;
   const username = user.telegramUsername as string | null;
-  const cabinetHref = isAdmin
-    ? "/admin"
-    : isSeller
-      ? "/seller"
-      : "/seller/profile";
+  const cabinetHref = isAdmin ? "/admin" : isSeller ? "/seller" : "/seller/profile";
   const cabinetLabel = isAdmin
     ? t("nav.admin")
     : isSeller
@@ -68,9 +64,7 @@ export function UserMenu({ trigger }: { trigger?: ReactNode } = {}) {
         <DropdownMenuLabel className="flex flex-col gap-0.5">
           <span className="truncate font-medium">{user.fullname}</span>
           {username ? (
-            <span className="truncate text-xs font-normal text-muted-foreground">
-              @{username}
-            </span>
+            <span className="truncate text-xs font-normal text-muted-foreground">@{username}</span>
           ) : null}
         </DropdownMenuLabel>
         <DropdownMenuSeparator />

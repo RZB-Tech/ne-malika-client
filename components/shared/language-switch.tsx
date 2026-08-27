@@ -20,10 +20,7 @@ export function LanguageSwitch({ className }: { className?: string } = {}) {
         <Button
           variant="ghost"
           size="sm"
-          className={cn(
-            "gap-1.5 px-2 text-muted-foreground hover:text-foreground",
-            className,
-          )}
+          className={cn("gap-1.5 px-2 text-muted-foreground hover:text-foreground", className)}
         >
           <Flag locale={locale} />
           <span className="text-xs font-semibold">{localeShort[locale]}</span>
@@ -34,10 +31,7 @@ export function LanguageSwitch({ className }: { className?: string } = {}) {
           <DropdownMenuItem
             key={l}
             onClick={() => setLocale(l)}
-            className={cn(
-              "gap-2",
-              l === locale && "font-medium text-primary",
-            )}
+            className={cn("gap-2", l === locale && "font-medium text-primary")}
           >
             <Flag locale={l} className="size-5" />
             {localeNames[l]}

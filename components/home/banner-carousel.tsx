@@ -5,11 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "@/components/icons";
 import { PageContainer } from "@/components/layout/page-container";
 import { useT } from "@/components/providers/i18n-provider";
-import {
-  BANNER_ASPECT_CSS,
-  bannerImageUrl,
-  type PublicBanner,
-} from "@/lib/api/banners";
+import { BANNER_ASPECT_CSS, bannerImageUrl, type PublicBanner } from "@/lib/api/banners";
 import { cn } from "@/lib/utils";
 
 const AUTOPLAY_MS = 6000;
@@ -34,9 +30,7 @@ export function BannerCarousel({ banners }: { banners: PublicBanner[] }) {
 
       track.scrollTo({
         left: target.offsetLeft,
-        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
-          ? "auto"
-          : "smooth",
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
       });
     },
     [count],
@@ -56,9 +50,7 @@ export function BannerCarousel({ banners }: { banners: PublicBanner[] }) {
 
         Array.from(track.children).forEach((child, i) => {
           if (!(child instanceof HTMLElement)) return;
-          const distance = Math.abs(
-            child.offsetLeft + child.offsetWidth / 2 - center,
-          );
+          const distance = Math.abs(child.offsetLeft + child.offsetWidth / 2 - center);
           if (distance < best) {
             best = distance;
             nearest = i;
@@ -114,11 +106,7 @@ export function BannerCarousel({ banners }: { banners: PublicBanner[] }) {
 
         {count > 1 && (
           <>
-            <ArrowButton
-              side="left"
-              label={t("home.banners.prev")}
-              onClick={() => go(index - 1)}
-            />
+            <ArrowButton side="left" label={t("home.banners.prev")} onClick={() => go(index - 1)} />
             <ArrowButton
               side="right"
               label={t("home.banners.next")}
@@ -175,10 +163,7 @@ function BannerSlide({
 
   return (
     <div
-      className={cn(
-        "shrink-0 snap-start overflow-hidden rounded-2xl bg-muted",
-        SLIDE_WIDTH,
-      )}
+      className={cn("shrink-0 snap-start overflow-hidden rounded-2xl bg-muted", SLIDE_WIDTH)}
       style={{ aspectRatio: BANNER_ASPECT_CSS }}
     >
       {banner.linkUrl ? (

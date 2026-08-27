@@ -6,13 +6,8 @@ import { Loader2, RefreshCw, SearchX, TriangleAlert, X } from "@/components/icon
 import { Button } from "@/components/ui/button";
 import { PageContainer } from "@/components/layout/page-container";
 import { StatusPanel } from "@/components/shared/status-panel";
-import {
-  ProductCard,
-} from "@/components/product/product-card";
-import {
-  ProductGrid,
-  ProductGridSkeleton,
-} from "@/components/product/product-grid";
+import { ProductCard } from "@/components/product/product-card";
+import { ProductGrid, ProductGridSkeleton } from "@/components/product/product-grid";
 import { useCatalogFilters } from "./use-catalog-filters";
 import { useT } from "@/components/providers/i18n-provider";
 import { findCategory, useCategories } from "@/lib/api/categories";
@@ -47,14 +42,8 @@ export function CatalogView({
     () => ({
       limit: PAGE_SIZE,
       q: q || undefined,
-      ...(subCategoryId
-        ? { category_id: subCategoryId }
-        : category
-          ? { category }
-          : {}),
-      ...(q
-        ? { sort: 'newest' as const }
-        : { sort: 'random' as const, seed }),
+      ...(subCategoryId ? { category_id: subCategoryId } : category ? { category } : {}),
+      ...(q ? { sort: "newest" as const } : { sort: "random" as const, seed }),
     }),
     [q, category, subCategoryId, seed],
   );
@@ -76,24 +65,14 @@ export function CatalogView({
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
     initialData:
-      isInitialParams && initialData
-        ? { pages: [initialData], pageParams: [1] }
-        : undefined,
+      isInitialParams && initialData ? { pages: [initialData], pageParams: [1] } : undefined,
   });
 
-  const {
-    data,
-    isLoading,
-    isError,
-    hasNextPage,
-    isFetchingNextPage,
-    fetchNextPage,
-    refetch,
-  } = listQuery;
+  const { data, isLoading, isError, hasNextPage, isFetchingNextPage, fetchNextPage, refetch } =
+    listQuery;
 
   const results = useMemo(
-    () =>
-      (data?.pages ?? []).flatMap((p) => p.data.map(mapPublicProductCard)),
+    () => (data?.pages ?? []).flatMap((p) => p.data.map(mapPublicProductCard)),
     [data],
   );
 

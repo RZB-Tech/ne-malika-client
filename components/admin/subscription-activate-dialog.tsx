@@ -53,13 +53,7 @@ export function SubscriptionActivateDialog({
   return (
     <Dialog open={target !== null} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-md">
-        {target && (
-          <ActivateBody
-            key={target.shopId}
-            target={target}
-            onDone={onClose}
-          />
-        )}
+        {target && <ActivateBody key={target.shopId} target={target} onDone={onClose} />}
       </DialogContent>
     </Dialog>
   );
@@ -76,17 +70,13 @@ function ActivateBody({
   const run = useAdminMutation();
   const activate = useAdminShopSubscriptionControllerActivate();
 
-  const [plan, setPlan] = useState<PaidPlan>(
-    isPaidPlan(target.plan) ? target.plan : PAID_PLANS[0],
-  );
+  const [plan, setPlan] = useState<PaidPlan>(isPaidPlan(target.plan) ? target.plan : PAID_PLANS[0]);
   const [months, setMonths] = useState("1");
   const [note, setNote] = useState("");
 
   const parsedMonths = Number(months);
   const validMonths =
-    Number.isInteger(parsedMonths) &&
-    parsedMonths >= MIN_MONTHS &&
-    parsedMonths <= MAX_MONTHS;
+    Number.isInteger(parsedMonths) && parsedMonths >= MIN_MONTHS && parsedMonths <= MAX_MONTHS;
 
   const submit = async () => {
     if (!validMonths) {
@@ -142,9 +132,7 @@ function ActivateBody({
       </div>
 
       <div className="space-y-1.5">
-        <Label htmlFor="activate-months">
-          {t("admin.subscriptions.activateMonths")}
-        </Label>
+        <Label htmlFor="activate-months">{t("admin.subscriptions.activateMonths")}</Label>
         <Input
           id="activate-months"
           inputMode="numeric"
@@ -159,9 +147,7 @@ function ActivateBody({
       </div>
 
       <div className="space-y-1.5">
-        <Label htmlFor="activate-note">
-          {t("admin.subscriptions.activateNote")}
-        </Label>
+        <Label htmlFor="activate-note">{t("admin.subscriptions.activateNote")}</Label>
         <Input
           id="activate-note"
           value={note}
@@ -186,9 +172,7 @@ function ActivateBody({
           {t("common.cancel")}
         </Button>
         <Button onClick={submit} disabled={activate.isPending || !validMonths}>
-          {activate.isPending
-            ? t("common.running")
-            : t("admin.subscriptions.activate")}
+          {activate.isPending ? t("common.running") : t("admin.subscriptions.activate")}
         </Button>
       </DialogFooter>
     </>

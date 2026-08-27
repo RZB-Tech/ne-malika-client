@@ -6,8 +6,7 @@ import axios, {
 import { clearAuth, getAccessToken, setAccessToken } from "./token-store";
 import { defaultLocale, locales, STORAGE_KEY, type Locale } from "@/lib/i18n/config";
 
-export const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
 
 export const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
@@ -63,8 +62,7 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
     const original = error.config as
-      | (InternalAxiosRequestConfig & { _retried?: boolean })
-      | undefined;
+      (InternalAxiosRequestConfig & { _retried?: boolean }) | undefined;
 
     const status = error.response?.status;
     const url = original?.url ?? "";
@@ -82,12 +80,8 @@ axiosInstance.interceptors.response.use(
       }
     }
 
-    const body = error.response?.data as
-      | { message?: string | string[] }
-      | undefined;
-    const serverMessage = Array.isArray(body?.message)
-      ? body.message.join('; ')
-      : body?.message;
+    const body = error.response?.data as { message?: string | string[] } | undefined;
+    const serverMessage = Array.isArray(body?.message) ? body.message.join("; ") : body?.message;
     if (serverMessage) error.message = serverMessage;
 
     return Promise.reject(error);

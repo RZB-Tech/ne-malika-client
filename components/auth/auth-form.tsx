@@ -24,9 +24,7 @@ export function AuthForm() {
           <h1 className="font-heading text-2xl font-bold tracking-tight">
             {t("auth.registerTitle")}
           </h1>
-          <p className="mt-1.5 text-sm text-muted-foreground">
-            {t("auth.registerSubtitle")}
-          </p>
+          <p className="mt-1.5 text-sm text-muted-foreground">{t("auth.registerSubtitle")}</p>
 
           <LoginDialog>
             <Button size="lg" className="mt-7 h-12 w-full gap-2 text-base">
@@ -35,12 +33,8 @@ export function AuthForm() {
             </Button>
           </LoginDialog>
 
-          <p className="mt-4 text-center text-xs text-muted-foreground">
-            {t("auth.autoAccount")}
-          </p>
-          <p className="mt-2 text-center text-xs text-muted-foreground">
-            {t("auth.agree")}
-          </p>
+          <p className="mt-4 text-center text-xs text-muted-foreground">{t("auth.autoAccount")}</p>
+          <p className="mt-2 text-center text-xs text-muted-foreground">{t("auth.agree")}</p>
         </div>
       </div>
 

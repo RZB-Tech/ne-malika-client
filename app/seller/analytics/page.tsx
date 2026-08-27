@@ -5,10 +5,7 @@ import { redirect } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useT } from "@/components/providers/i18n-provider";
-import {
-  DEFAULT_ANALYTICS_DAYS,
-  ShopAnalytics,
-} from "@/components/seller/shop-analytics";
+import { DEFAULT_ANALYTICS_DAYS, ShopAnalytics } from "@/components/seller/shop-analytics";
 import { ShopSearches } from "@/components/seller/shop-searches";
 import { useSellerSubscription } from "@/lib/api/subscription";
 
@@ -16,9 +13,7 @@ export default function SellerAnalyticsPage() {
   const { t } = useT();
   const { shop, subscription, isLoading, isError } = useSellerSubscription();
 
-  const [requestedDays, setRequestedDays] = useState<number>(
-    DEFAULT_ANALYTICS_DAYS,
-  );
+  const [requestedDays, setRequestedDays] = useState<number>(DEFAULT_ANALYTICS_DAYS);
 
   if (isLoading) {
     return (
@@ -49,9 +44,7 @@ export default function SellerAnalyticsPage() {
         <h1 className="font-heading text-2xl font-bold tracking-tight">
           {t("seller.analytics.title")}
         </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {t("seller.analytics.subtitle")}
-        </p>
+        <p className="mt-1 text-sm text-muted-foreground">{t("seller.analytics.subtitle")}</p>
       </div>
 
       {}

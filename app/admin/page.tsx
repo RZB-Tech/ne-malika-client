@@ -14,18 +14,8 @@ import { useAdminShopsControllerList } from "@/lib/api/generated/endpoints/shops
 import { useProductCardsControllerFindAll } from "@/lib/api/generated/endpoints/product-cards-public/product-cards-public";
 import { useAdminReportsControllerFindAll } from "@/lib/api/generated/endpoints/reports/reports";
 import { hueFromId } from "@/lib/api/mappers";
-import {
-  devFallbackPage,
-  devProducts,
-  devReports,
-  devShops,
-} from "@/lib/api/dev-fixtures";
-import type {
-  AdminShopRow,
-  Paginated,
-  PublicProductCard,
-  ReportRow,
-} from "@/lib/api/types";
+import { devFallbackPage, devProducts, devReports, devShops } from "@/lib/api/dev-fixtures";
+import type { AdminShopRow, Paginated, PublicProductCard, ReportRow } from "@/lib/api/types";
 
 export default function AdminStats() {
   const { t, locale } = useT();
@@ -58,12 +48,8 @@ export default function AdminStats() {
     },
   );
 
-  const shops = useMemo(
-    () => devFallbackPage(shopsQuery.data, devShops).data,
-    [shopsQuery.data],
-  );
-  const productsTotal = devFallbackPage(productsQuery.data, devProducts).meta
-    .total;
+  const shops = useMemo(() => devFallbackPage(shopsQuery.data, devShops).data, [shopsQuery.data]);
+  const productsTotal = devFallbackPage(productsQuery.data, devProducts).meta.total;
   const reportsTotal = devFallbackPage(reportsQuery.data, devReports).meta.total;
   const activeShops = shops.filter((s) => s.status === "active").length;
 
@@ -82,10 +68,7 @@ export default function AdminStats() {
 
   return (
     <div className="space-y-8">
-      <AdminPageHeader
-        title={t("admin.stats.title")}
-        subtitle={t("admin.dashboard.note")}
-      />
+      <AdminPageHeader title={t("admin.stats.title")} subtitle={t("admin.dashboard.note")} />
 
       <NotificationsCard />
 
@@ -117,9 +100,7 @@ export default function AdminStats() {
       <Card className="p-5">
         <h2 className="mb-5 font-medium">{t("admin.dashboard.topShops")}</h2>
         {topShops.length === 0 ? (
-          <p className="text-sm text-muted-foreground">
-            {t("admin.dashboard.noData")}
-          </p>
+          <p className="text-sm text-muted-foreground">{t("admin.dashboard.noData")}</p>
         ) : (
           <BarList data={topShops} formatValue={(v) => String(v)} />
         )}

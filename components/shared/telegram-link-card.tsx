@@ -9,11 +9,7 @@ import { useAuth } from "@/lib/api/auth";
 
 const BOT_USERNAME = process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME;
 
-export function TelegramLinkCard({
-  variant = "admin",
-}: {
-  variant?: "admin" | "seller";
-}) {
+export function TelegramLinkCard({ variant = "admin" }: { variant?: "admin" | "seller" }) {
   const { t } = useT();
   const { user } = useAuth();
 
@@ -28,11 +24,7 @@ export function TelegramLinkCard({
       <div className="min-w-0 flex-1">
         <p className="font-medium">{t("admin.telegramLink.title")}</p>
         <p className="mt-0.5 text-sm text-muted-foreground">
-          {t(
-            variant === "seller"
-              ? "admin.telegramLink.textSeller"
-              : "admin.telegramLink.text",
-          )}
+          {t(variant === "seller" ? "admin.telegramLink.textSeller" : "admin.telegramLink.text")}
         </p>
       </div>
 
@@ -48,9 +40,7 @@ export function TelegramLinkCard({
           </a>
         </Button>
       ) : (
-        <p className="shrink-0 text-xs text-destructive">
-          {t("admin.telegramLink.notConfigured")}
-        </p>
+        <p className="shrink-0 text-xs text-destructive">{t("admin.telegramLink.notConfigured")}</p>
       )}
     </Card>
   );

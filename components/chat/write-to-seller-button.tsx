@@ -60,10 +60,7 @@ export function WriteToSellerButton({
     <>
       {button}
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent
-          side="right"
-          className="flex w-full flex-col gap-0 p-0 sm:max-w-md"
-        >
+        <SheetContent side="right" className="flex w-full flex-col gap-0 p-0 sm:max-w-md">
           <ChatSheetBody productId={productId} shopId={shopId} />
         </SheetContent>
       </Sheet>
@@ -71,13 +68,7 @@ export function WriteToSellerButton({
   );
 }
 
-function ChatSheetBody({
-  productId,
-  shopId,
-}: {
-  productId?: number;
-  shopId?: number;
-}) {
+function ChatSheetBody({ productId, shopId }: { productId?: number; shopId?: number }) {
   const { t } = useT();
   const { data, isPending } = useChats("buyer");
   const start = useStartChat();
@@ -110,10 +101,7 @@ function ChatSheetBody({
       { productCardId: productId, shopId, text: value },
       {
         onSuccess: () => setText(""),
-        onError: (error) =>
-          toast.error(
-            apiErrorMessage(error, t, "chat.sendFailed"),
-          ),
+        onError: (error) => toast.error(apiErrorMessage(error, t, "chat.sendFailed")),
       },
     );
   };

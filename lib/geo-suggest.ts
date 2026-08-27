@@ -1,4 +1,3 @@
-
 export interface PlaceSuggestion {
   label: string;
   value: string;
@@ -25,9 +24,7 @@ export async function suggestPlaces(
   const city = opts.city || BASE_CITY;
   const text = opts.kind === "address" ? `${city}, ${q}` : q;
   try {
-    return YANDEX_KEY
-      ? await suggestYandex(text, opts)
-      : await suggestPhoton(text, opts);
+    return YANDEX_KEY ? await suggestYandex(text, opts) : await suggestPhoton(text, opts);
   } catch {
     return [];
   }
@@ -91,9 +88,7 @@ async function suggestPhoton(
   });
   if (!res.ok) return [];
   const data = (await res.json()) as { features?: { properties: PhotonProps }[] };
-  return dedupe(
-    (data.features ?? []).map((f) => photonSuggestion(f.properties, opts.kind)),
-  );
+  return dedupe((data.features ?? []).map((f) => photonSuggestion(f.properties, opts.kind)));
 }
 
 function photonSuggestion(p: PhotonProps, kind: SuggestKind): PlaceSuggestion {

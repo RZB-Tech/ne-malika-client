@@ -1,14 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import {
-  Ban,
-  ExternalLink,
-  Lock,
-  RotateCcw,
-  Trash2,
-  UserX,
-} from "@/components/icons";
+import { Ban, ExternalLink, Lock, RotateCcw, Trash2, UserX } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { StoreAvatar } from "@/components/shared/store-avatar";
@@ -120,10 +113,7 @@ export function ShopDrawer({
                 description={t("admin.shops.blockOwnerText")}
                 onConfirm={(reason) => onBlockOwner(shop.ownerId, reason)}
               >
-                <Button
-                  variant="ghost"
-                  className={`col-span-2 ${drawerAction.danger}`}
-                >
+                <Button variant="ghost" className={`col-span-2 ${drawerAction.danger}`}>
                   <UserX className="size-4" /> {t("admin.shops.blockOwnerShort")}
                 </Button>
               </AbolishDialog>
@@ -132,16 +122,9 @@ export function ShopDrawer({
             <Button
               variant="ghost"
               className={`col-span-2 ${
-                shop.restrictedCategoriesEnabled
-                  ? drawerAction.warning
-                  : drawerAction.primary
+                shop.restrictedCategoriesEnabled ? drawerAction.warning : drawerAction.primary
               }`}
-              onClick={() =>
-                void onSetRestricted(
-                  shop.id,
-                  !shop.restrictedCategoriesEnabled,
-                )
-              }
+              onClick={() => void onSetRestricted(shop.id, !shop.restrictedCategoriesEnabled)}
             >
               <Lock className="size-4" />{" "}
               {t(
@@ -161,10 +144,7 @@ export function ShopDrawer({
               destructive
               onConfirm={() => onRemove(shop.id)}
             >
-              <Button
-                variant="ghost"
-                className={`col-span-2 ${drawerAction.danger}`}
-              >
+              <Button variant="ghost" className={`col-span-2 ${drawerAction.danger}`}>
                 <Trash2 className="size-4" /> {t("admin.shops.remove")}
               </Button>
             </ConfirmDialog>
@@ -195,14 +175,8 @@ export function ShopDrawer({
 
           <DetailSection title={t("admin.shops.contacts")}>
             <DetailRow label={t("admin.shops.phone")} value={shop.contact} />
-            <DetailRow
-              label={t("admin.shops.address")}
-              value={shop.address ?? "—"}
-            />
-            <DetailRow
-              label={t("admin.common.productCount")}
-              value={shop.productCount}
-            />
+            <DetailRow label={t("admin.shops.address")} value={shop.address ?? "—"} />
+            <DetailRow label={t("admin.common.productCount")} value={shop.productCount} />
             <DetailRow
               label={t("admin.shops.restrictedTitle")}
               value={t(

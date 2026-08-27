@@ -62,11 +62,7 @@ export function FavoritesList() {
       <ProductGrid>
         {items.map((item) => (
           <div key={item.id}>
-            <ProductCard
-              product={mapPublicProductCard(
-                snapshotToPublicCard(item, item.addedAt),
-              )}
-            />
+            <ProductCard product={mapPublicProductCard(snapshotToPublicCard(item, item.addedAt))} />
             <div className="mt-1.5 flex items-center justify-between gap-2 px-1">
               <span className="truncate text-xs text-muted-foreground">
                 {t("favorites.addedAt", {

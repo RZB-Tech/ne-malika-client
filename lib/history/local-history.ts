@@ -21,10 +21,7 @@ export const subscribeLocalHistory = store.subscribe;
 export const removeLocalView = store.remove;
 export const clearLocalHistory = store.clear;
 
-export function recordLocalView(
-  product: ProductSnapshot,
-  viewedAt = new Date().toISOString(),
-) {
+export function recordLocalView(product: ProductSnapshot, viewedAt = new Date().toISOString()) {
   store.update((items) =>
     [{ ...product, viewedAt }, ...items.filter((p) => p.id !== product.id)].slice(
       0,

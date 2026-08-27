@@ -37,9 +37,7 @@ export function ActivityCharts() {
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h2 className="font-medium">{t("admin.activity.title")}</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {t("admin.activity.subtitle")}
-          </p>
+          <p className="mt-1 text-sm text-muted-foreground">{t("admin.activity.subtitle")}</p>
         </div>
 
         <Tabs value={String(days)} onValueChange={(v) => setDays(Number(v))}>
@@ -56,9 +54,7 @@ export function ActivityCharts() {
       {isLoading ? (
         <Skeleton className="mt-6 h-32 w-full rounded-xl" />
       ) : isError || !data ? (
-        <p className="mt-6 text-sm text-muted-foreground">
-          {t("admin.activity.error")}
-        </p>
+        <p className="mt-6 text-sm text-muted-foreground">{t("admin.activity.error")}</p>
       ) : (
         <>
           <div className="mt-6 grid gap-x-8 gap-y-7 sm:grid-cols-2 xl:grid-cols-3">
@@ -108,16 +104,10 @@ export function ActivityCharts() {
 
 function ActivityTable({ rows }: { rows: ActivityPointDto[] }) {
   const { t, locale } = useT();
-  const filled = rows.filter(
-    (r) => r.products || r.shops || r.users || r.views || r.contacts,
-  );
+  const filled = rows.filter((r) => r.products || r.shops || r.users || r.views || r.contacts);
 
   if (filled.length === 0) {
-    return (
-      <p className="mt-6 text-sm text-muted-foreground">
-        {t("admin.activity.empty")}
-      </p>
-    );
+    return <p className="mt-6 text-sm text-muted-foreground">{t("admin.activity.empty")}</p>;
   }
 
   return (
@@ -129,24 +119,12 @@ function ActivityTable({ rows }: { rows: ActivityPointDto[] }) {
         <table className="w-full text-sm">
           <thead>
             <tr className="text-left text-xs text-muted-foreground">
-              <th className="py-1 pr-4 font-normal">
-                {t("admin.activity.range")}
-              </th>
-              <th className="py-1 pr-4 font-normal">
-                {t("admin.activity.products")}
-              </th>
-              <th className="py-1 pr-4 font-normal">
-                {t("admin.activity.shops")}
-              </th>
-              <th className="py-1 pr-4 font-normal">
-                {t("admin.activity.users")}
-              </th>
-              <th className="py-1 pr-4 font-normal">
-                {t("admin.activity.views")}
-              </th>
-              <th className="py-1 font-normal">
-                {t("admin.activity.contacts")}
-              </th>
+              <th className="py-1 pr-4 font-normal">{t("admin.activity.range")}</th>
+              <th className="py-1 pr-4 font-normal">{t("admin.activity.products")}</th>
+              <th className="py-1 pr-4 font-normal">{t("admin.activity.shops")}</th>
+              <th className="py-1 pr-4 font-normal">{t("admin.activity.users")}</th>
+              <th className="py-1 pr-4 font-normal">{t("admin.activity.views")}</th>
+              <th className="py-1 font-normal">{t("admin.activity.contacts")}</th>
             </tr>
           </thead>
           <tbody className="tabular">
@@ -158,7 +136,7 @@ function ActivityTable({ rows }: { rows: ActivityPointDto[] }) {
                 <td className="py-1 pr-4">{formatNumber(r.users, locale)}</td>
                 <td className="py-1 pr-4">{formatNumber(r.views, locale)}</td>
                 <td className="py-1">{formatNumber(r.contacts, locale)}</td>
-            </tr>
+              </tr>
             ))}
           </tbody>
         </table>

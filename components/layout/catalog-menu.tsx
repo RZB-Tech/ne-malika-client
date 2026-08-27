@@ -24,9 +24,7 @@ import { cn } from "@/lib/utils";
 const EXIT_MS = 200;
 
 function categoryHref(root: CategoryDto, child?: CategoryDto): string {
-  return child
-    ? `/?category=${root.slug}&sub=${child.id}`
-    : `/?category=${root.slug}`;
+  return child ? `/?category=${root.slug}&sub=${child.id}` : `/?category=${root.slug}`;
 }
 
 export function CatalogMenu() {
@@ -38,13 +36,10 @@ export function CatalogMenu() {
   const [activeId, setActiveId] = useState<number | null>(null);
   const [drilled, setDrilled] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const unmountTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
-    undefined,
-  );
+  const unmountTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const active = roots.find((r) => r.id === activeId) ?? roots[0];
-  const activeHasGroups =
-    active?.children.some((child) => child.children.length > 0) ?? false;
+  const activeHasGroups = active?.children.some((child) => child.children.length > 0) ?? false;
 
   const openMenu = useCallback(() => {
     clearTimeout(unmountTimer.current);
@@ -102,10 +97,7 @@ export function CatalogMenu() {
         aria-expanded={open}
         aria-haspopup="true"
       >
-        <span
-          data-icon="inline-start"
-          className="relative grid size-5 place-items-center"
-        >
+        <span data-icon="inline-start" className="relative grid size-5 place-items-center">
           <LayoutGrid
             className={cn(
               "absolute transition-all duration-200",
@@ -140,8 +132,7 @@ export function CatalogMenu() {
             <div
               className={cn(
                 "mx-auto max-h-[min(70vh,40rem)] max-w-site overflow-y-auto px-4 py-4 sm:px-8 lg:py-5",
-                roots.length > 0 &&
-                  "lg:h-full lg:max-h-none lg:overflow-hidden",
+                roots.length > 0 && "lg:h-full lg:max-h-none lg:overflow-hidden",
               )}
             >
               {isError ? (
@@ -153,11 +144,7 @@ export function CatalogMenu() {
                   description={t("catalog.categoriesLoadError")}
                   action={
                     <div className="flex flex-wrap justify-center gap-2">
-                      <Button
-                        type="button"
-                        size="sm"
-                        onClick={() => void refetch()}
-                      >
+                      <Button type="button" size="sm" onClick={() => void refetch()}>
                         <RefreshCw data-icon="inline-start" />
                         {t("common.retry")}
                       </Button>
@@ -198,9 +185,7 @@ export function CatalogMenu() {
                                 name={root.icon}
                                 className="size-5 text-muted-foreground"
                               />
-                              <span className="flex-1">
-                                {root.name[locale]}
-                              </span>
+                              <span className="flex-1">{root.name[locale]}</span>
                               <ChevronRight className="size-4 text-muted-foreground" />
                             </button>
                           </li>
@@ -219,9 +204,7 @@ export function CatalogMenu() {
                       >
                         <Link href="/" onClick={close}>
                           <LayoutGrid data-icon="inline-start" />
-                          <span className="flex-1 text-left">
-                            {t("catalog.allSections")}
-                          </span>
+                          <span className="flex-1 text-left">{t("catalog.allSections")}</span>
                           <ChevronRight data-icon="inline-end" />
                         </Link>
                       </Button>
@@ -246,9 +229,7 @@ export function CatalogMenu() {
                                   name={root.icon}
                                   className="size-4 text-muted-foreground"
                                 />
-                                <span className="min-w-0 flex-1 truncate">
-                                  {root.name[locale]}
-                                </span>
+                                <span className="min-w-0 flex-1 truncate">{root.name[locale]}</span>
                                 <ChevronRight className="size-4 opacity-35" />
                               </Link>
                             </li>
@@ -271,10 +252,7 @@ export function CatalogMenu() {
                           {activeHasGroups ? (
                             <div className="mt-7 columns-2 gap-12 xl:columns-3">
                               {active.children.map((child) => (
-                                <section
-                                  key={child.id}
-                                  className="mb-8 break-inside-avoid"
-                                >
+                                <section key={child.id} className="mb-8 break-inside-avoid">
                                   <Link
                                     href={categoryHref(active, child)}
                                     onClick={close}

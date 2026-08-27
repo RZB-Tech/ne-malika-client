@@ -1,15 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import {
-  Ban,
-  ExternalLink,
-  Pencil,
-  Plus,
-  RotateCcw,
-  Search,
-  Trash2,
-} from "@/components/icons";
+import { Ban, ExternalLink, Pencil, Plus, RotateCcw, Search, Trash2 } from "@/components/icons";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -28,16 +20,9 @@ import { AdminPageHeader } from "@/components/admin/page-header";
 import { useAdminMutation } from "@/components/admin/use-admin-mutation";
 import { Pagination } from "@/components/shared/pagination";
 import { EntityStatusBadge } from "@/components/admin/entity-status-badge";
-import {
-  RowActionsMenu,
-  RowContextMenu,
-  type RowAction,
-} from "@/components/admin/row-actions";
+import { RowActionsMenu, RowContextMenu, type RowAction } from "@/components/admin/row-actions";
 import { ProductDrawer } from "@/components/admin/product-drawer";
-import {
-  ProductFormDialog,
-  type ProductFormTarget,
-} from "@/components/admin/product-form-dialog";
+import { ProductFormDialog, type ProductFormTarget } from "@/components/admin/product-form-dialog";
 import { useT } from "@/components/providers/i18n-provider";
 import { priceText } from "@/lib/format";
 import {
@@ -50,18 +35,8 @@ import {
 import { hueFromId } from "@/lib/api/mappers";
 import { photoUrl } from "@/lib/api/photo";
 import { useAdminShopsControllerList } from "@/lib/api/generated/endpoints/shops-admin/shops-admin";
-import {
-  devAdminProducts,
-  devFallbackPage,
-  devShops,
-  usingDevData,
-} from "@/lib/api/dev-fixtures";
-import type {
-  AdminProductRow,
-  AdminShopRow,
-  EntityStatus,
-  Paginated,
-} from "@/lib/api/types";
+import { devAdminProducts, devFallbackPage, devShops, usingDevData } from "@/lib/api/dev-fixtures";
+import type { AdminProductRow, AdminShopRow, EntityStatus, Paginated } from "@/lib/api/types";
 
 const TABS: {
   value: string;
@@ -142,14 +117,11 @@ export default function AdminProducts() {
   const isDevData = usingDevData(data?.data);
 
   const abolish = async (id: number, reason: string) => {
-    const ok = await run(
-      () => abolishMutation.mutateAsync({ id, data: { reason } }),
-      {
-        invalidate: [getAdminProductCardsControllerFindAllQueryKey()],
-        successKey: "admin.productList.abolished",
-        errorKey: "common.actionFailed",
-      },
-    );
+    const ok = await run(() => abolishMutation.mutateAsync({ id, data: { reason } }), {
+      invalidate: [getAdminProductCardsControllerFindAllQueryKey()],
+      successKey: "admin.productList.abolished",
+      errorKey: "common.actionFailed",
+    });
     if (ok) setOpened(null);
   };
 
@@ -213,16 +185,10 @@ export default function AdminProducts() {
 
   return (
     <div className="flex flex-col gap-6">
-      <AdminPageHeader
-        title={t("admin.products.title")}
-        subtitle={t("admin.productList.hint")}
-      />
+      <AdminPageHeader title={t("admin.products.title")} subtitle={t("admin.productList.hint")} />
 
       <div className="flex flex-wrap items-center gap-3">
-        <Button
-          className="order-last sm:order-none"
-          onClick={() => setForm({ product: null })}
-        >
+        <Button className="order-last sm:order-none" onClick={() => setForm({ product: null })}>
           <Plus className="size-4" /> {t("admin.productList.newProduct")}
         </Button>
 
@@ -273,14 +239,10 @@ export default function AdminProducts() {
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-transparent">
-                <TableHead className="min-w-[260px]">
-                  {t("admin.products.colProduct")}
-                </TableHead>
+                <TableHead className="min-w-[260px]">{t("admin.products.colProduct")}</TableHead>
                 <TableHead>{t("admin.products.colStore")}</TableHead>
                 <TableHead>{t("admin.productList.colStatus")}</TableHead>
-                <TableHead className="text-right">
-                  {t("admin.products.colPrice")}
-                </TableHead>
+                <TableHead className="text-right">{t("admin.products.colPrice")}</TableHead>
                 <TableHead className="w-10" />
               </TableRow>
             </TableHeader>
@@ -288,40 +250,38 @@ export default function AdminProducts() {
               {rows.map((p) => (
                 <RowContextMenu key={p.id} actions={actionsFor(p)}>
                   <TableRow onClick={() => setOpened(p)} className="cursor-pointer">
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      <ProductImage
-                        hue={hueFromId(p.id)}
-                        categorySlug=""
-                        src={photoUrl(p.photos?.[0])}
-                        alt={p.name}
-                        className="size-10 shrink-0 rounded-lg"
-                        iconClassName="size-4"
-                      />
-                      <div className="min-w-0">
-                        <div className="line-clamp-1 text-sm font-medium">
-                          {p.name}
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <ProductImage
+                          hue={hueFromId(p.id)}
+                          categorySlug=""
+                          src={photoUrl(p.photos?.[0])}
+                          alt={p.name}
+                          className="size-10 shrink-0 rounded-lg"
+                          iconClassName="size-4"
+                        />
+                        <div className="min-w-0">
+                          <div className="line-clamp-1 text-sm font-medium">{p.name}</div>
+                          {p.abolishReason && (
+                            <div className="line-clamp-1 text-xs text-destructive">
+                              {p.abolishReason}
+                            </div>
+                          )}
                         </div>
-                        {p.abolishReason && (
-                          <div className="line-clamp-1 text-xs text-destructive">
-                            {p.abolishReason}
-                          </div>
-                        )}
                       </div>
-                    </div>
-                  </TableCell>
-                  <TableCell className="whitespace-nowrap text-sm text-muted-foreground">
-                    {p.shopName}
-                  </TableCell>
-                  <TableCell>
-                    <EntityStatusBadge status={p.status} />
-                  </TableCell>
-                  <TableCell className="tabular whitespace-nowrap text-right text-sm font-medium">
-                    {priceText(p.price, locale, t)}
-                  </TableCell>
-                  <TableCell onClick={(e) => e.stopPropagation()}>
-                    <RowActionsMenu actions={actionsFor(p)} />
-                  </TableCell>
+                    </TableCell>
+                    <TableCell className="whitespace-nowrap text-sm text-muted-foreground">
+                      {p.shopName}
+                    </TableCell>
+                    <TableCell>
+                      <EntityStatusBadge status={p.status} />
+                    </TableCell>
+                    <TableCell className="tabular whitespace-nowrap text-right text-sm font-medium">
+                      {priceText(p.price, locale, t)}
+                    </TableCell>
+                    <TableCell onClick={(e) => e.stopPropagation()}>
+                      <RowActionsMenu actions={actionsFor(p)} />
+                    </TableCell>
                   </TableRow>
                 </RowContextMenu>
               ))}

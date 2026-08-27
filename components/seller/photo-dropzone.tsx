@@ -119,7 +119,9 @@ export function PhotoDropzone({
         onClick={() => inputRef.current?.click()}
         className={cn(
           "flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed px-6 py-10 text-center transition-colors",
-          drag ? "border-primary bg-primary/5" : "border-border hover:border-primary/40 hover:bg-muted/40",
+          drag
+            ? "border-primary bg-primary/5"
+            : "border-border hover:border-primary/40 hover:bg-muted/40",
           photos.length >= MAX && "pointer-events-none opacity-50",
         )}
       >
@@ -147,15 +149,15 @@ export function PhotoDropzone({
           </div>
           <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
             {photos.map((p, i) => (
-              <div key={p.id} className="group relative aspect-square overflow-hidden rounded-lg border border-border bg-muted">
+              <div
+                key={p.id}
+                className="group relative aspect-square overflow-hidden rounded-lg border border-border bg-muted"
+              >
                 <img
                   src={p.url}
                   alt={p.name}
                   onClick={onPhotoClick ? () => onPhotoClick(p) : undefined}
-                  className={cn(
-                    "size-full object-cover",
-                    onPhotoClick && "cursor-pointer",
-                  )}
+                  className={cn("size-full object-cover", onPhotoClick && "cursor-pointer")}
                   onError={(e) => e.currentTarget.classList.add("opacity-0")}
                 />
                 {i === 0 && (

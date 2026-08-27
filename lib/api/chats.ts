@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   chatsControllerList,
   chatsControllerMessages,
@@ -32,8 +28,7 @@ export function useChats(role: ChatRole, enabled = true) {
 
   return useQuery<PaginatedChatsDto>({
     queryKey: [CHATS_KEY, "list", role] as const,
-    queryFn: ({ signal }) =>
-      chatsControllerList({ role, limit: 50 }, undefined, signal),
+    queryFn: ({ signal }) => chatsControllerList({ role, limit: 50 }, undefined, signal),
     enabled: enabled && isHydrated && isAuthenticated,
     refetchInterval: UNREAD_POLL_MS,
   });
@@ -42,8 +37,7 @@ export function useChats(role: ChatRole, enabled = true) {
 export function useChatMessages(chatId: number | null) {
   return useQuery<PaginatedChatMessagesDto>({
     queryKey: [CHATS_KEY, "messages", chatId] as const,
-    queryFn: ({ signal }) =>
-      chatsControllerMessages(chatId!, { limit: 100 }, undefined, signal),
+    queryFn: ({ signal }) => chatsControllerMessages(chatId!, { limit: 100 }, undefined, signal),
     enabled: chatId !== null,
     refetchInterval: THREAD_POLL_MS,
   });
@@ -70,12 +64,10 @@ export function useSendMessage(chatId: number | null, side: ChatRole) {
   const messagesKey = [CHATS_KEY, "messages", chatId] as const;
 
   return useMutation({
-    mutationFn: (text: string) =>
-      chatsControllerSend(chatId!, { text: text.trim() }),
+    mutationFn: (text: string) => chatsControllerSend(chatId!, { text: text.trim() }),
 
     onMutate: (text: string) => {
-      const previous =
-        queryClient.getQueryData<PaginatedChatMessagesDto>(messagesKey);
+      const previous = queryClient.getQueryData<PaginatedChatMessagesDto>(messagesKey);
 
       const pendingId = -Date.now();
       const pending: ChatMessageDto = {
@@ -102,9 +94,7 @@ export function useSendMessage(chatId: number | null, side: ChatRole) {
         (old) =>
           old && {
             ...old,
-            data: old.data.map((row) =>
-              row.id === context?.pendingId ? message : row,
-            ),
+            data: old.data.map((row) => (row.id === context?.pendingId ? message : row)),
           },
       );
     },
@@ -126,11 +116,8 @@ export function useStartChat() {
   const invalidate = useInvalidateChats();
 
   return useMutation({
-    mutationFn: (input: {
-      productCardId?: number;
-      shopId?: number;
-      text: string;
-    }) => chatsControllerStart({ ...input, text: input.text.trim() }),
+    mutationFn: (input: { productCardId?: number; shopId?: number; text: string }) =>
+      chatsControllerStart({ ...input, text: input.text.trim() }),
     onSuccess: invalidate,
   });
 }

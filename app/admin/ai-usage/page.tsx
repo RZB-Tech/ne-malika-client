@@ -20,11 +20,7 @@ import {
   useAdminAiUsageControllerList,
   useAdminAiUsageControllerTotals,
 } from "@/lib/api/generated/endpoints/ai-usage-admin/ai-usage-admin";
-import {
-  devAiUsage,
-  devFallbackPage,
-  usingDevData,
-} from "@/lib/api/dev-fixtures";
+import { devAiUsage, devFallbackPage, usingDevData } from "@/lib/api/dev-fixtures";
 import type { AiUsageRow, AiUsageTotals, Paginated } from "@/lib/api/types";
 
 const OPERATIONS = ["prompt", "description", "image", "autofill"] as const;
@@ -78,10 +74,7 @@ export default function AdminAiUsage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <AdminPageHeader
-        title={t("admin.aiUsage.title")}
-        subtitle={t("admin.aiUsage.subtitle")}
-      />
+      <AdminPageHeader title={t("admin.aiUsage.title")} subtitle={t("admin.aiUsage.subtitle")} />
 
       {}
       <div className="grid gap-3 sm:grid-cols-4">
@@ -128,9 +121,7 @@ export default function AdminAiUsage() {
         />
       </div>
 
-      <p className="text-xs text-muted-foreground">
-        {t("admin.aiUsage.spentHint")}
-      </p>
+      <p className="text-xs text-muted-foreground">{t("admin.aiUsage.spentHint")}</p>
 
       <div className="flex flex-col gap-2">
         <div className="flex flex-wrap gap-2">
@@ -177,9 +168,7 @@ export default function AdminAiUsage() {
                 setPage(1);
               }}
             >
-              {p === "free"
-                ? t("admin.aiUsage.filterFree")
-                : t("admin.aiUsage.filterPaid")}
+              {p === "free" ? t("admin.aiUsage.filterFree") : t("admin.aiUsage.filterPaid")}
             </FilterChip>
           ))}
         </div>
@@ -202,17 +191,11 @@ export default function AdminAiUsage() {
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-transparent">
-                <TableHead className="min-w-[200px]">
-                  {t("admin.aiUsage.colUser")}
-                </TableHead>
+                <TableHead className="min-w-[200px]">{t("admin.aiUsage.colUser")}</TableHead>
                 <TableHead>{t("admin.aiUsage.colShop")}</TableHead>
                 <TableHead>{t("admin.aiUsage.colOperation")}</TableHead>
-                <TableHead className="text-right">
-                  {t("admin.aiUsage.colCost")}
-                </TableHead>
-                <TableHead className="text-right">
-                  {t("admin.aiUsage.colCredits")}
-                </TableHead>
+                <TableHead className="text-right">{t("admin.aiUsage.colCost")}</TableHead>
+                <TableHead className="text-right">{t("admin.aiUsage.colCredits")}</TableHead>
                 <TableHead>{t("admin.aiUsage.colWhen")}</TableHead>
               </TableRow>
             </TableHeader>
@@ -232,9 +215,7 @@ export default function AdminAiUsage() {
                           {r.userName ?? t("admin.aiUsage.userGone")}
                         </div>
                         <div className="text-xs text-muted-foreground">
-                          {r.userUsername
-                            ? `@${r.userUsername}`
-                            : t("admin.aiUsage.noUsername")}
+                          {r.userUsername ? `@${r.userUsername}` : t("admin.aiUsage.noUsername")}
                         </div>
                       </TableCell>
                       <TableCell className="text-sm text-muted-foreground">
@@ -250,16 +231,11 @@ export default function AdminAiUsage() {
                       <TableCell className="text-sm">
                         {t(`admin.aiUsage.op.${r.operation}`)}
                         {r.images > 0 && (
-                          <span className="tabular text-muted-foreground">
-                            {" "}
-                            ×{r.images}
-                          </span>
+                          <span className="tabular text-muted-foreground"> ×{r.images}</span>
                         )}
                       </TableCell>
                       <TableCell className="tabular text-right text-sm text-muted-foreground">
-                        {r.usd === null
-                          ? t("admin.aiUsage.costUnknown")
-                          : `$${r.usd.toFixed(4)}`}
+                        {r.usd === null ? t("admin.aiUsage.costUnknown") : `$${r.usd.toFixed(4)}`}
                       </TableCell>
                       <TableCell className="text-right text-sm">
                         <span className="tabular">
@@ -330,9 +306,7 @@ function StatCard({
       ) : (
         <div className="tabular font-heading text-xl font-bold">{value}</div>
       )}
-      {hint && !loading && (
-        <div className="tabular text-xs text-muted-foreground">{hint}</div>
-      )}
+      {hint && !loading && <div className="tabular text-xs text-muted-foreground">{hint}</div>}
     </Card>
   );
 }

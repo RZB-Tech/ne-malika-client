@@ -1,21 +1,9 @@
 "use client";
 
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { getMessages, loadMessages } from "@/lib/i18n/messages";
 import ru from "@/lib/i18n/locales/ru.json";
-import {
-  defaultLocale,
-  type Locale,
-  locales,
-  STORAGE_KEY,
-} from "@/lib/i18n/config";
+import { defaultLocale, type Locale, locales, STORAGE_KEY } from "@/lib/i18n/config";
 import { setRequestLocale } from "@/lib/api/mutator";
 
 type Vars = Record<string, string | number>;
@@ -71,16 +59,12 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
   );
 
   const t = useCallback(
-    (path: string, vars?: Vars) =>
-      interpolate(resolve(getMessages(locale) ?? ru, path), vars),
+    (path: string, vars?: Vars) => interpolate(resolve(getMessages(locale) ?? ru, path), vars),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [locale, dictVersion],
   );
 
-  const value = useMemo(
-    () => ({ locale, setLocale, t }),
-    [locale, setLocale, t],
-  );
+  const value = useMemo(() => ({ locale, setLocale, t }), [locale, setLocale, t]);
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
 }

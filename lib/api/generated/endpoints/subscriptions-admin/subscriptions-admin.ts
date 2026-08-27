@@ -28,10 +28,12 @@ import type {
   ActivateSubscriptionDto,
   AdminShopSubscriptionControllerPaymentsParams,
   AdminSubscriptionsControllerListParams,
+  AdminSubscriptionsControllerReportParams,
   PaginatedAdminSubscriptionsDto,
   PaginatedSubscriptionPaymentsDto,
   ReasonDto,
   SellerSubscriptionDto,
+  SubscriptionReportDto,
   TestPaymentLinkDto
 } from '../../schemas';
 
@@ -140,6 +142,100 @@ export function useAdminSubscriptionsControllerList<TData = Awaited<ReturnType<t
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getAdminSubscriptionsControllerListQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+/**
+ * Выручка, оплаты и разбивки по тарифам, провайдерам и магазинам. В выручку идут только оплаченные счёта — без тестовых прогонов и без тех, по которым провайдер вернул деньги; сколько таких отброшено, видно в excludedTest и excludedRefunded. Ряд по дням сплошной: сутки без оплат приходят нулями.
+ * @summary Отчёт по продажам подписок
+ */
+export const adminSubscriptionsControllerReport = (
+    params?: AdminSubscriptionsControllerReportParams,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<SubscriptionReportDto>(
+      {url: `/api/v1/admin/subscriptions/report`, method: 'GET',
+        params, signal
+    },
+      options);
+    }
+
+
+
+
+export const getAdminSubscriptionsControllerReportQueryKey = (params?: AdminSubscriptionsControllerReportParams,) => {
+    return [
+    `/api/v1/admin/subscriptions/report`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getAdminSubscriptionsControllerReportQueryOptions = <TData = Awaited<ReturnType<typeof adminSubscriptionsControllerReport>>, TError = ErrorType<unknown>>(params?: AdminSubscriptionsControllerReportParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminSubscriptionsControllerReport>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getAdminSubscriptionsControllerReportQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof adminSubscriptionsControllerReport>>> = ({ signal }) => adminSubscriptionsControllerReport(params, requestOptions, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof adminSubscriptionsControllerReport>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type AdminSubscriptionsControllerReportQueryResult = NonNullable<Awaited<ReturnType<typeof adminSubscriptionsControllerReport>>>
+export type AdminSubscriptionsControllerReportQueryError = ErrorType<unknown>
+
+
+export function useAdminSubscriptionsControllerReport<TData = Awaited<ReturnType<typeof adminSubscriptionsControllerReport>>, TError = ErrorType<unknown>>(
+ params: undefined |  AdminSubscriptionsControllerReportParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminSubscriptionsControllerReport>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof adminSubscriptionsControllerReport>>,
+          TError,
+          Awaited<ReturnType<typeof adminSubscriptionsControllerReport>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAdminSubscriptionsControllerReport<TData = Awaited<ReturnType<typeof adminSubscriptionsControllerReport>>, TError = ErrorType<unknown>>(
+ params?: AdminSubscriptionsControllerReportParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminSubscriptionsControllerReport>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof adminSubscriptionsControllerReport>>,
+          TError,
+          Awaited<ReturnType<typeof adminSubscriptionsControllerReport>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAdminSubscriptionsControllerReport<TData = Awaited<ReturnType<typeof adminSubscriptionsControllerReport>>, TError = ErrorType<unknown>>(
+ params?: AdminSubscriptionsControllerReportParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminSubscriptionsControllerReport>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Отчёт по продажам подписок
+ */
+
+export function useAdminSubscriptionsControllerReport<TData = Awaited<ReturnType<typeof adminSubscriptionsControllerReport>>, TError = ErrorType<unknown>>(
+ params?: AdminSubscriptionsControllerReportParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminSubscriptionsControllerReport>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getAdminSubscriptionsControllerReportQueryOptions(params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

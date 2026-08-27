@@ -54,9 +54,7 @@ export function ChatConversationHeader({
         {hasSubtitle && (
           <p className="mt-1 truncate text-xs text-muted-foreground">
             {lastMessage && <span>{lastMessage}</span>}
-            {lastMessage && chat.productName && (
-              <span aria-hidden="true"> — </span>
-            )}
+            {lastMessage && chat.productName && <span aria-hidden="true"> — </span>}
             {chat.productCardId ? (
               <Link
                 href={`/product/${chat.productCardId}`}

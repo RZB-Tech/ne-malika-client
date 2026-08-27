@@ -27,13 +27,7 @@ import { productToSnapshot } from "@/lib/product-snapshot";
 import { type Product, type Store } from "@/lib/data";
 import { cn } from "@/lib/utils";
 
-export function ProductDetail({
-  product,
-  store,
-}: {
-  product: Product;
-  store: Store;
-}) {
+export function ProductDetail({ product, store }: { product: Product; store: Store }) {
   const { t, locale } = useT();
   const [active, setActive] = useState(0);
   const [zoomed, setZoomed] = useState<number | null>(null);
@@ -43,9 +37,10 @@ export function ProductDetail({
   const gallery =
     photos.length > 0
       ? photos.map((src, i) => ({ src, hue: product.hue + i * 8 }))
-      : [product.hue, product.hue + 12, product.hue - 14, product.hue + 26].map(
-          (hue) => ({ src: undefined as string | undefined, hue }),
-        );
+      : [product.hue, product.hue + 12, product.hue - 14, product.hue + 26].map((hue) => ({
+          src: undefined as string | undefined,
+          hue,
+        }));
 
   const hours = formatWorkSchedule(store.workSchedule, t) || store.workingHours;
 
@@ -159,9 +154,7 @@ export function ProductDetail({
                         )}
                       >
                         <dt className="text-muted-foreground">{s.name}</dt>
-                        <dd className="font-medium text-foreground">
-                          {s.value}
-                        </dd>
+                        <dd className="font-medium text-foreground">{s.value}</dd>
                       </div>
                     ))}
                   </dl>
@@ -171,10 +164,7 @@ export function ProductDetail({
           </div>
 
           {}
-          <ReviewsSection
-            target={{ productId: Number(product.id) }}
-            ownerId={store.ownerId}
-          />
+          <ReviewsSection target={{ productId: Number(product.id) }} ownerId={store.ownerId} />
         </div>
 
         <div className="lg:self-start">
@@ -190,9 +180,7 @@ export function ProductDetail({
             {(product.ratingCount ?? 0) > 0 && (
               <div className="mt-2 flex items-center gap-2 text-sm">
                 <RatingStars value={product.rating ?? 0} />
-                <span className="font-medium tabular">
-                  {formatRating(product.rating ?? 0)}
-                </span>
+                <span className="font-medium tabular">{formatRating(product.rating ?? 0)}</span>
                 <span className="text-muted-foreground">
                   {t("reviews.count", { count: product.ratingCount ?? 0 })}
                 </span>
@@ -202,9 +190,7 @@ export function ProductDetail({
             <div className="mt-4 flex items-end gap-3">
               <span className="font-heading text-3xl font-bold tabular">
                 {product.price === null ? (
-                  <span className="text-2xl">
-                    {t("product.negotiableFull")}
-                  </span>
+                  <span className="text-2xl">{t("product.negotiableFull")}</span>
                 ) : (
                   <>
                     {formatPrice(product.price, locale)}
@@ -225,19 +211,14 @@ export function ProductDetail({
               {meta.map((m) => (
                 <div key={m.label} className="rounded-lg bg-muted/50 px-3 py-2">
                   <div className="text-muted-foreground">{m.label}</div>
-                  <div className="mt-0.5 font-medium text-foreground">
-                    {m.value}
-                  </div>
+                  <div className="mt-0.5 font-medium text-foreground">{m.value}</div>
                 </div>
               ))}
             </div>
 
             <Separator className="my-5" />
 
-            <Link
-              href={`/store/${store.slug}`}
-              className="group flex items-center gap-3"
-            >
+            <Link href={`/store/${store.slug}`} className="group flex items-center gap-3">
               <StoreAvatar
                 name={store.name}
                 hue={store.logoHue}
@@ -251,9 +232,7 @@ export function ProductDetail({
                     {store.name}
                   </span>
                 </span>
-                {hours && (
-                  <span className="text-xs text-muted-foreground">{hours}</span>
-                )}
+                {hours && <span className="text-xs text-muted-foreground">{hours}</span>}
               </span>
             </Link>
 
@@ -264,9 +243,7 @@ export function ProductDetail({
                   {store.address}
                 </div>
               )}
-              {store.phone && (
-                <RevealPhone phone={store.phone} productId={product.id} />
-              )}
+              {store.phone && <RevealPhone phone={store.phone} productId={product.id} />}
             </div>
 
             <div className="mt-5 grid gap-2">
@@ -303,10 +280,7 @@ export function ProductDetail({
             </div>
 
             <div className="mt-2 flex justify-center">
-              <ReportDialog
-                shopId={Number(product.storeId)}
-                productCardId={Number(product.id)}
-              />
+              <ReportDialog shopId={Number(product.storeId)} productCardId={Number(product.id)} />
             </div>
           </Card>
         </div>

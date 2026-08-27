@@ -43,9 +43,7 @@ export function ChatList({
         className={cn("border-0 bg-transparent", className)}
         icon={<MessageSquare className="size-5" />}
         title={t("chat.empty")}
-        description={
-          side === "seller" ? t("chat.emptySeller") : t("chat.emptyBuyer")
-        }
+        description={side === "seller" ? t("chat.emptySeller") : t("chat.emptyBuyer")}
       />
     );
   }
@@ -78,9 +76,7 @@ export function ChatList({
                 <span
                   className={cn(
                     "min-w-0 flex-1 truncate text-xs",
-                    chat.unread > 0
-                      ? "font-medium text-foreground"
-                      : "text-muted-foreground",
+                    chat.unread > 0 ? "font-medium text-foreground" : "text-muted-foreground",
                   )}
                 >
                   {chat.lastMessageText ?? chat.productName ?? ""}

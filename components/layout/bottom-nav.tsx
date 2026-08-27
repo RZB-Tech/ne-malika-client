@@ -2,14 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  Heart,
-  Home,
-  LayoutGrid,
-  MessageSquare,
-  Scale,
-  UserRound,
-} from "@/components/icons";
+import { Heart, Home, LayoutGrid, MessageSquare, Scale, UserRound } from "@/components/icons";
 import { LoginDialog } from "@/components/auth/login-dialog";
 import { useT } from "@/components/providers/i18n-provider";
 import { useAuth } from "@/lib/api/auth";
@@ -33,12 +26,7 @@ export function BottomNav() {
       className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-card pb-[env(safe-area-inset-bottom)] md:hidden"
     >
       <div className="flex h-14 items-stretch">
-        <Item
-          href="/"
-          icon={Home}
-          label={t("nav.home")}
-          active={pathname === "/"}
-        />
+        <Item href="/" icon={Home} label={t("nav.home")} active={pathname === "/"} />
         <Item icon={LayoutGrid} label={t("nav.catalog")} onClick={openCatalog} />
         <Item
           href="/messages"
@@ -112,15 +100,7 @@ function Item({
   );
 }
 
-function Body({
-  icon: Icon,
-  label,
-  count,
-}: {
-  icon: typeof Home;
-  label: string;
-  count?: number;
-}) {
+function Body({ icon: Icon, label, count }: { icon: typeof Home; label: string; count?: number }) {
   return (
     <>
       <span className="relative">

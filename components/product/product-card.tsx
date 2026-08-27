@@ -40,10 +40,7 @@ export const ProductCard = memo(function ProductCard({ product }: { product: Pro
       preload.src = url;
     }
 
-    const id = setInterval(
-      () => setActive((i) => (i + 1) % photos.length),
-      PHOTO_INTERVAL_MS,
-    );
+    const id = setInterval(() => setActive((i) => (i + 1) % photos.length), PHOTO_INTERVAL_MS);
     return () => clearInterval(id);
   }, [hovered, photos.length]); // eslint-disable-line react-hooks/exhaustive-deps
 

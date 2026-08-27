@@ -42,9 +42,7 @@ export function StatusPanel({
       ) : null}
       <h2 className="mt-4 font-heading text-lg font-semibold">{title}</h2>
       {description ? (
-        <p className="mt-1 max-w-sm text-sm leading-5 text-muted-foreground">
-          {description}
-        </p>
+        <p className="mt-1 max-w-sm text-sm leading-5 text-muted-foreground">{description}</p>
       ) : null}
       {action ? <div className="mt-5">{action}</div> : null}
     </div>

@@ -23,21 +23,14 @@ import {
   sellerSubscriptionsControllerInvoiceState,
   useSellerSubscriptionsControllerInvoice,
 } from "@/lib/api/generated/endpoints/subscriptions-seller/subscriptions-seller";
-import type {
-  InvoiceDto,
-  SellerSubscriptionDto,
-} from "@/lib/api/generated/schemas";
+import type { InvoiceDto, SellerSubscriptionDto } from "@/lib/api/generated/schemas";
 import type { PaidPlan } from "@/lib/api/types";
 import { useQueryClient } from "@tanstack/react-query";
 
 const POLL_MS = 5000;
 const POLL_LIMIT = 60;
 
-export function SubscriptionInvoice({
-  subscription,
-}: {
-  subscription: SellerSubscriptionDto;
-}) {
+export function SubscriptionInvoice({ subscription }: { subscription: SellerSubscriptionDto }) {
   const { t, locale } = useT();
   const queryClient = useQueryClient();
 
@@ -54,9 +47,7 @@ export function SubscriptionInvoice({
     const timer = setTimeout(() => {
       void (async () => {
         try {
-          const next = await sellerSubscriptionsControllerInvoiceState(
-            invoice.orderId,
-          );
+          const next = await sellerSubscriptionsControllerInvoiceState(invoice.orderId);
           setInvoice(next);
           setTicks((n) => n + 1);
           if (next.status === "paid") {
@@ -81,9 +72,7 @@ export function SubscriptionInvoice({
       setTicks(0);
       toast.success(t("seller.subscription.invoiceSent"));
     } catch (err) {
-      toast.error(
-        apiErrorMessage(err, t, "seller.subscription.invoiceFailed"),
-      );
+      toast.error(apiErrorMessage(err, t, "seller.subscription.invoiceFailed"));
     }
   };
 
@@ -93,20 +82,13 @@ export function SubscriptionInvoice({
         <h3 className="font-heading text-base font-bold tracking-tight">
           {t("seller.subscription.invoiceTitle")}
         </h3>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {t("seller.subscription.invoiceText")}
-        </p>
+        <p className="mt-1 text-sm text-muted-foreground">{t("seller.subscription.invoiceText")}</p>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
         <div className="space-y-1.5">
-          <Label htmlFor="invoice-plan">
-            {t("seller.subscription.invoicePlan")}
-          </Label>
-          <Select
-            value={plan}
-            onValueChange={(value) => setPlan(value as PaidPlan)}
-          >
+          <Label htmlFor="invoice-plan">{t("seller.subscription.invoicePlan")}</Label>
+          <Select value={plan} onValueChange={(value) => setPlan(value as PaidPlan)}>
             <SelectTrigger id="invoice-plan">
               <SelectValue />
             </SelectTrigger>
@@ -121,9 +103,7 @@ export function SubscriptionInvoice({
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="invoice-phone">
-            {t("seller.subscription.invoicePhone")}
-          </Label>
+          <Label htmlFor="invoice-phone">{t("seller.subscription.invoicePhone")}</Label>
           <Input
             id="invoice-phone"
             inputMode="tel"
@@ -134,10 +114,7 @@ export function SubscriptionInvoice({
           />
         </div>
 
-        <Button
-          onClick={() => void send()}
-          disabled={create.isPending || phone.trim().length < 9}
-        >
+        <Button onClick={() => void send()} disabled={create.isPending || phone.trim().length < 9}>
           {create.isPending ? (
             <Loader2 className="size-4 animate-spin" />
           ) : (
@@ -148,11 +125,7 @@ export function SubscriptionInvoice({
       </div>
 
       {invoice && (
-        <div
-          className={cnStatus(invoice.status)}
-          role="status"
-          aria-live="polite"
-        >
+        <div className={cnStatus(invoice.status)} role="status" aria-live="polite">
           {invoice.status === "paid" ? (
             <Check className="size-4 shrink-0 text-success" />
           ) : invoice.status === "cancelled" ? (
@@ -179,9 +152,7 @@ export function SubscriptionInvoice({
       )}
 
       {!subscription.active && (
-        <p className="text-xs text-muted-foreground">
-          {t("seller.subscription.invoiceHint")}
-        </p>
+        <p className="text-xs text-muted-foreground">{t("seller.subscription.invoiceHint")}</p>
       )}
     </Card>
   );
@@ -190,7 +161,6 @@ export function SubscriptionInvoice({
 function cnStatus(status: InvoiceDto["status"]): string {
   const base = "flex items-start gap-2 rounded-md border p-3 text-sm";
   if (status === "paid") return `${base} border-success/40 bg-success/5`;
-  if (status === "cancelled")
-    return `${base} border-destructive/40 bg-destructive/5`;
+  if (status === "cancelled") return `${base} border-destructive/40 bg-destructive/5`;
   return `${base} border-border bg-muted/40`;
 }

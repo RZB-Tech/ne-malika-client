@@ -22,9 +22,7 @@ export default function SellerSubscriptionPage() {
         <h1 className="font-heading text-2xl font-bold tracking-tight">
           {t("seller.subscription.title")}
         </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {t("seller.subscription.subtitle")}
-        </p>
+        <p className="mt-1 text-sm text-muted-foreground">{t("seller.subscription.subtitle")}</p>
       </div>
 
       {isLoading ? (
@@ -41,9 +39,7 @@ export default function SellerSubscriptionPage() {
         </div>
       ) : !shop ? (
         <Card className="items-start gap-3 p-6 text-sm">
-          <p className="text-muted-foreground">
-            {t("seller.subscription.needShop")}
-          </p>
+          <p className="text-muted-foreground">{t("seller.subscription.needShop")}</p>
           <Button asChild>
             <Link href="/seller/profile">{t("seller.nav.profile")}</Link>
           </Button>

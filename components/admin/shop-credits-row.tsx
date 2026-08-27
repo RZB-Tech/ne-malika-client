@@ -7,19 +7,14 @@ import { DetailRow } from "@/components/admin/detail-drawer";
 
 export function ShopCreditsRow({ shopId }: { shopId: number }) {
   const { t } = useT();
-  const { data, isLoading, isError } = useAdminCreditsControllerBalance(
-    shopId,
-    { query: { retry: false } },
-  );
+  const { data, isLoading, isError } = useAdminCreditsControllerBalance(shopId, {
+    query: { retry: false },
+  });
   const credits = data as unknown as { available?: number } | undefined;
 
   if (isLoading) return <Skeleton className="h-5 w-24" />;
   if (isError || !credits) {
-    return (
-      <p className="text-sm text-destructive">
-        {t("admin.credits.balanceFailed")}
-      </p>
-    );
+    return <p className="text-sm text-destructive">{t("admin.credits.balanceFailed")}</p>;
   }
 
   return (

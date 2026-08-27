@@ -3,13 +3,7 @@
 import { Cloud } from "@/components/icons";
 import { useT } from "@/components/providers/i18n-provider";
 
-export function SyncNotice({
-  isRemote,
-  prefix,
-}: {
-  isRemote: boolean;
-  prefix: string;
-}) {
+export function SyncNotice({ isRemote, prefix }: { isRemote: boolean; prefix: string }) {
   const { t } = useT();
 
   return (

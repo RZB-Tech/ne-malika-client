@@ -4,11 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Loader2, MapPin } from "@/components/icons";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import {
-  suggestPlaces,
-  type PlaceSuggestion,
-  type SuggestKind,
-} from "@/lib/geo-suggest";
+import { suggestPlaces, type PlaceSuggestion, type SuggestKind } from "@/lib/geo-suggest";
 
 export function AddressAutocomplete({
   value,

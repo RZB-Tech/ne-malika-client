@@ -21,7 +21,11 @@ export default function AdminSettings() {
   const { t } = useT();
   const run = useAdminMutation();
 
-  const { data: settings, isLoading, isError } = useAdminSettingsControllerGet({
+  const {
+    data: settings,
+    isLoading,
+    isError,
+  } = useAdminSettingsControllerGet({
     query: { retry: false },
   });
   const updateMutation = useAdminSettingsControllerUpdate();
@@ -55,21 +59,15 @@ export default function AdminSettings() {
   };
 
   const toggleAiChecks = (enabled: boolean) =>
-    run(
-      () => updateMutation.mutateAsync({ data: { aiChecksEnabled: enabled } }),
-      {
-        invalidate: [getAdminSettingsControllerGetQueryKey()],
-        successKey: enabled ? "admin.settings.aiOn" : "admin.settings.aiOff",
-        errorKey: "admin.settings.saveFailed",
-      },
-    );
+    run(() => updateMutation.mutateAsync({ data: { aiChecksEnabled: enabled } }), {
+      invalidate: [getAdminSettingsControllerGetQueryKey()],
+      successKey: enabled ? "admin.settings.aiOn" : "admin.settings.aiOff",
+      errorKey: "admin.settings.saveFailed",
+    });
 
   return (
     <div className="space-y-6">
-      <AdminPageHeader
-        title={t("admin.nav.settings")}
-        subtitle={t("admin.settings.subtitle")}
-      />
+      <AdminPageHeader title={t("admin.nav.settings")} subtitle={t("admin.settings.subtitle")} />
 
       {isError && (
         <Card className="border-destructive/40 bg-destructive/5 p-4 text-sm">
@@ -90,9 +88,7 @@ export default function AdminSettings() {
                 <Sparkles className="size-4 text-primary" />
                 {t("admin.settings.aiTitle")}
               </Label>
-              <p className="mt-1.5 text-sm text-muted-foreground">
-                {t("admin.settings.aiText")}
-              </p>
+              <p className="mt-1.5 text-sm text-muted-foreground">{t("admin.settings.aiText")}</p>
             </div>
             <Switch
               id="ai-checks"

@@ -602,7 +602,8 @@
       "reviews": "Sharhlar",
       "broadcast": "Tarqatma",
       "subscriptions": "Obunalar",
-      "shopBanners": "Sotuvchi bannerlari"
+      "shopBanners": "Sotuvchi bannerlari",
+      "subsReport": "Obuna savdolari"
     },
     "reviews": {
       "title": "Sharhlar",
@@ -1205,6 +1206,52 @@
         "pending": "Tekshiruvda",
         "approved": "Tasdiqlangan",
         "rejected": "Rad etilgan"
+      }
+    },
+    "subsReport": {
+      "title": "Obuna savdolari hisoboti",
+      "subtitle": "Obunalar qancha pul keltirdi, nima uchun va kim to‘laydi",
+      "salesTitle": "Kunlar bo‘yicha tushum va to‘lovlar",
+      "salesSubtitle": "To‘lov sanasi bo‘yicha hisoblanadi. Tushumga faqat olingan pul kiradi — sinov to‘lovlari va qaytarishlarsiz",
+      "days": "{days} kun",
+      "error": "Hisobotni yuklab bo‘lmadi",
+      "empty": "Tanlangan davrda to‘lov bo‘lmagan.",
+      "table": "Kunlar bo‘yicha jadval",
+      "date": "Kun",
+      "revenue": "Tushum",
+      "payments": "To‘lovlar",
+      "avgCheck": "O‘rtacha chek",
+      "payingShops": "To‘lagan do‘konlar",
+      "activeShops": "Amaldagi obunalar",
+      "newRevenue": "Birinchi to‘lovlar",
+      "newRevenueHint": "do‘kon birinchi marta to‘ladi",
+      "renewalRevenue": "Uzaytirishlar",
+      "renewalRevenueHint": "do‘kon avval ham to‘lagan",
+      "conversion": "To‘lovga yetib borish",
+      "conversionHint": "chiqarilgan hisoblardan to‘langani",
+      "forPeriod": "davr uchun",
+      "rightNow": "hozirga",
+      "paymentsCount": "to‘lovlar: {count}",
+      "excluded": "Tushumga kirmadi: sinov to‘lovlari — {test}, provayder qaytarishlari — {refunded}.",
+      "byPlanDaily": "Tariflar bo‘yicha tushum",
+      "byPlanDailySubtitle": "Ustun — kun, ichidagi qatlamlar — quyidan yuqoriga tariflar",
+      "byPlan": "Davr uchun tariflar bo‘yicha tushum",
+      "byProvider": "To‘lov usullari bo‘yicha tushum",
+      "byStatus": "Hisoblar nima bilan tugadi",
+      "byStatusSubtitle": "Hisob chiqarilgan sana bo‘yicha hisoblanadi, shuning uchun to‘lovlar bilan kunma-kun mos kelmaydi",
+      "topShops": "Tushum bo‘yicha do‘konlar",
+      "activeByPlan": "Hozir tariflarda",
+      "status": {
+        "paid": "To‘langan",
+        "prepared": "To‘lov kutilmoqda",
+        "pending": "Jarayonda",
+        "cancelled": "Bekor qilingan",
+        "failed": "O‘tmagan"
+      },
+      "provider": {
+        "click": "Click",
+        "payme": "Payme",
+        "manual": "Qo‘lda berilgan"
       }
     }
   },

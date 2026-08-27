@@ -58,10 +58,7 @@ function OAuthButton({
   const { start, isPending } = useTelegramLogin({
     botId,
     onSuccess: (data) => onAuth(data),
-    onError: (err) =>
-      onError?.(
-        apiErrorMessage(err, t, "auth.telegramCancelled"),
-      ),
+    onError: (err) => onError?.(apiErrorMessage(err, t, "auth.telegramCancelled")),
   });
 
   return (

@@ -65,20 +65,14 @@ export function TestPaymentDialog({
         {link ? (
           <div className="space-y-4">
             <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
-              <dt className="text-muted-foreground">
-                {t("admin.subscriptions.testAmount")}
-              </dt>
+              <dt className="text-muted-foreground">{t("admin.subscriptions.testAmount")}</dt>
               <dd className="tabular font-medium">
                 {t("admin.subscriptions.testSum", {
                   amount: formatNumber(link.amountUzs, locale),
                 })}
               </dd>
-              <dt className="text-muted-foreground">
-                {t("admin.subscriptions.testArmedUntil")}
-              </dt>
-              <dd className="tabular font-medium">
-                {formatTime(link.armedUntil, locale)}
-              </dd>
+              <dt className="text-muted-foreground">{t("admin.subscriptions.testArmedUntil")}</dt>
+              <dd className="tabular font-medium">{formatTime(link.armedUntil, locale)}</dd>
             </dl>
 
             <p className="rounded-md border border-amber-500/40 bg-amber-500/5 p-3 text-sm text-muted-foreground">
@@ -94,9 +88,7 @@ export function TestPaymentDialog({
               </Button>
               <Button variant="outline" onClick={copy} disabled={copied}>
                 <Copy className="size-4" />
-                {copied
-                  ? t("admin.subscriptions.testCopied")
-                  : t("admin.subscriptions.testCopy")}
+                {copied ? t("admin.subscriptions.testCopied") : t("admin.subscriptions.testCopy")}
               </Button>
             </div>
           </div>

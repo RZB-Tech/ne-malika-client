@@ -75,11 +75,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function ProductPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default async function ProductPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const numId = Number(id);
   if (!Number.isFinite(numId)) notFound();
@@ -114,9 +110,7 @@ export default async function ProductPage({
     "@context": "https://schema.org",
     "@type": "Product",
     name: raw.name,
-    description: raw.description
-      ? markdownToPlainText(raw.description)
-      : undefined,
+    description: raw.description ? markdownToPlainText(raw.description) : undefined,
     image: (raw.photos ?? []).map((k) => photoUrl(k)).filter(Boolean),
     sku: String(raw.id),
     additionalProperty: (raw.characteristics ?? []).map((c) => ({

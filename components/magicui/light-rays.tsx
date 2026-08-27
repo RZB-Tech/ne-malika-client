@@ -33,11 +33,7 @@ export interface LightRaysProps {
 const hexToRgb = (hex: string): [number, number, number] => {
   const m = hex.replace("#", "").match(/.{1,2}/g);
   if (!m) return [1, 1, 1];
-  return [
-    parseInt(m[0], 16) / 255,
-    parseInt(m[1], 16) / 255,
-    parseInt(m[2], 16) / 255,
-  ];
+  return [parseInt(m[0], 16) / 255, parseInt(m[1], 16) / 255, parseInt(m[2], 16) / 255];
 };
 
 const getAnchorAndDir = (

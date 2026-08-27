@@ -57,24 +57,14 @@ export function RowActionsMenu({ actions }: { actions: RowAction[] }) {
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuGroup>
           {normal.map((action) => (
-            <ActionItem
-              key={action.label}
-              action={action}
-              Item={DropdownMenuItem}
-            />
+            <ActionItem key={action.label} action={action} Item={DropdownMenuItem} />
           ))}
         </DropdownMenuGroup>
-        {normal.length > 0 && destructive.length > 0 && (
-          <DropdownMenuSeparator />
-        )}
+        {normal.length > 0 && destructive.length > 0 && <DropdownMenuSeparator />}
         {destructive.length > 0 && (
           <DropdownMenuGroup>
             {destructive.map((action) => (
-              <ActionItem
-                key={action.label}
-                action={action}
-                Item={DropdownMenuItem}
-              />
+              <ActionItem key={action.label} action={action} Item={DropdownMenuItem} />
             ))}
           </DropdownMenuGroup>
         )}
@@ -98,24 +88,14 @@ export function RowContextMenu({
       <ContextMenuContent className="w-56">
         <ContextMenuGroup>
           {normal.map((action) => (
-            <ActionItem
-              key={action.label}
-              action={action}
-              Item={ContextMenuItem}
-            />
+            <ActionItem key={action.label} action={action} Item={ContextMenuItem} />
           ))}
         </ContextMenuGroup>
-        {normal.length > 0 && destructive.length > 0 && (
-          <ContextMenuSeparator />
-        )}
+        {normal.length > 0 && destructive.length > 0 && <ContextMenuSeparator />}
         {destructive.length > 0 && (
           <ContextMenuGroup>
             {destructive.map((action) => (
-              <ActionItem
-                key={action.label}
-                action={action}
-                Item={ContextMenuItem}
-              />
+              <ActionItem key={action.label} action={action} Item={ContextMenuItem} />
             ))}
           </ContextMenuGroup>
         )}

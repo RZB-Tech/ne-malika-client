@@ -50,9 +50,7 @@ export function MyReviews() {
     return (
       <Card className="flex flex-col items-center gap-3 py-16 text-center">
         <Star className="size-8 text-muted-foreground/50" />
-        <p className="text-sm text-muted-foreground">
-          {t("account.reviews.guest")}
-        </p>
+        <p className="text-sm text-muted-foreground">{t("account.reviews.guest")}</p>
         <LoginDialog>
           <Button size="sm">{t("nav.login")}</Button>
         </LoginDialog>
@@ -101,9 +99,7 @@ export function MyReviews() {
             <ReviewStatusBadge status={review.status} />
           </div>
 
-          {review.text && (
-            <p className="mt-2 text-sm whitespace-pre-line">{review.text}</p>
-          )}
+          {review.text && <p className="mt-2 text-sm whitespace-pre-line">{review.text}</p>}
 
           {review.status === "rejected" && review.moderationNote && (
             <p className="mt-2 rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">
@@ -143,11 +139,7 @@ export function MyReviews() {
 
       {totalPages > 1 && (
         <div className="flex justify-center pt-2">
-          <Pagination
-            page={page}
-            totalPages={totalPages}
-            onChange={setPage}
-          />
+          <Pagination page={page} totalPages={totalPages} onChange={setPage} />
         </div>
       )}
 

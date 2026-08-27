@@ -10,11 +10,7 @@ import {
   Wallet,
 } from "@/components/icons";
 import { RequireRole } from "@/components/auth/require-role";
-import {
-  DashboardShell,
-  type NavItem,
-  type ShellBrand,
-} from "@/components/layout/dashboard-shell";
+import { DashboardShell, type NavItem, type ShellBrand } from "@/components/layout/dashboard-shell";
 import { useT } from "@/components/providers/i18n-provider";
 import { StoreAvatar } from "@/components/shared/store-avatar";
 import { AddProductDialog } from "@/components/seller/add-product-dialog";
@@ -66,11 +62,7 @@ function SellerLayoutInner({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <DashboardShell
-      items={items}
-      sectionLabel={t("seller.cabinet")}
-      brand={brand}
-    >
+    <DashboardShell items={items} sectionLabel={t("seller.cabinet")} brand={brand}>
       {children}
       <AddProductDialog />
     </DashboardShell>

@@ -71,9 +71,7 @@ export function CreditsDialog({
 
   const balance = balanceQuery.data as unknown as Balance | undefined;
   const available = balance?.available ?? 0;
-  const preview = previewQuery.data as unknown as
-    | { credits: number; markup: number }
-    | undefined;
+  const preview = previewQuery.data as unknown as { credits: number; markup: number } | undefined;
 
   const close = () => {
     setGrantAmount("");
@@ -173,32 +171,21 @@ export function CreditsDialog({
               : t("admin.credits.currentBalance", { available })}
         </p>
 
-        <Tabs
-          value={tab}
-          onValueChange={(v) => setTab(v as "grant" | "revoke")}
-        >
+        <Tabs value={tab} onValueChange={(v) => setTab(v as "grant" | "revoke")}>
           <TabsList className="w-full">
-            <TabsTrigger value="grant">
-              {t("admin.credits.grantTitle")}
-            </TabsTrigger>
-            <TabsTrigger value="revoke">
-              {t("admin.credits.revokeTitle")}
-            </TabsTrigger>
+            <TabsTrigger value="grant">{t("admin.credits.grantTitle")}</TabsTrigger>
+            <TabsTrigger value="revoke">{t("admin.credits.revokeTitle")}</TabsTrigger>
           </TabsList>
 
           {}
           <TabsContent value="grant" className="space-y-4 pt-2">
             <div className="space-y-1.5">
-              <Label htmlFor="grant-amount">
-                {t("admin.credits.amount")}
-              </Label>
+              <Label htmlFor="grant-amount">{t("admin.credits.amount")}</Label>
               <Input
                 id="grant-amount"
                 inputMode="decimal"
                 value={grantAmount}
-                onChange={(e) =>
-                  setGrantAmount(e.target.value.replace(/[^\d.]/g, ""))
-                }
+                onChange={(e) => setGrantAmount(e.target.value.replace(/[^\d.]/g, ""))}
                 placeholder="20"
                 className="tabular"
               />
@@ -228,11 +215,7 @@ export function CreditsDialog({
                 {t("common.cancel")}
               </Button>
               <Button onClick={grant} disabled={busy || !validGrant}>
-                {t(
-                  grantMutation.isPending
-                    ? "admin.credits.granting"
-                    : "admin.credits.grant",
-                )}
+                {t(grantMutation.isPending ? "admin.credits.granting" : "admin.credits.grant")}
               </Button>
             </DialogFooter>
           </TabsContent>
@@ -240,17 +223,13 @@ export function CreditsDialog({
           {}
           <TabsContent value="revoke" className="space-y-4 pt-2">
             <div className="space-y-1.5">
-              <Label htmlFor="revoke-amount">
-                {t("admin.credits.revokeAmount")}
-              </Label>
+              <Label htmlFor="revoke-amount">{t("admin.credits.revokeAmount")}</Label>
               <div className="flex gap-2">
                 <Input
                   id="revoke-amount"
                   inputMode="numeric"
                   value={revokeAmount}
-                  onChange={(e) =>
-                    setRevokeAmount(e.target.value.replace(/\D/g, ""))
-                  }
+                  onChange={(e) => setRevokeAmount(e.target.value.replace(/\D/g, ""))}
                   placeholder="5000"
                   className="tabular"
                 />
@@ -263,9 +242,7 @@ export function CreditsDialog({
                   {t("admin.credits.revokeAll")}
                 </Button>
               </div>
-              <p className="text-xs text-muted-foreground">
-                {t("admin.credits.revokeHint")}
-              </p>
+              <p className="text-xs text-muted-foreground">{t("admin.credits.revokeHint")}</p>
             </div>
 
             <div className="space-y-1.5">
@@ -283,16 +260,8 @@ export function CreditsDialog({
               <Button variant="outline" onClick={close} disabled={busy}>
                 {t("common.cancel")}
               </Button>
-              <Button
-                variant="destructive"
-                onClick={revoke}
-                disabled={busy || !validRevoke}
-              >
-                {t(
-                  revokeMutation.isPending
-                    ? "admin.credits.revoking"
-                    : "admin.credits.revoke",
-                )}
+              <Button variant="destructive" onClick={revoke} disabled={busy || !validRevoke}>
+                {t(revokeMutation.isPending ? "admin.credits.revoking" : "admin.credits.revoke")}
               </Button>
             </DialogFooter>
           </TabsContent>

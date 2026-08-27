@@ -10,12 +10,7 @@ export type PaidPlan = Exclude<SubscriptionPlan, "free">;
 
 export type BannerModerationStatus = "pending" | "approved" | "rejected";
 
-export type SubscriptionPaymentStatus =
-  | "pending"
-  | "prepared"
-  | "paid"
-  | "cancelled"
-  | "failed";
+export type SubscriptionPaymentStatus = "pending" | "prepared" | "paid" | "cancelled" | "failed";
 
 export type PaymentProvider = "click" | "payme" | "manual";
 
@@ -212,10 +207,7 @@ export interface AiProductCheck {
   productCardId: number;
   verdict: AiVerdict;
   checks: Partial<
-    Record<
-      "description" | "dataConsistency" | "photos" | "photoMatch",
-      AiCheckDetail
-    >
+    Record<"description" | "dataConsistency" | "photos" | "photoMatch", AiCheckDetail>
   >;
   summary: string | null;
   model: string;

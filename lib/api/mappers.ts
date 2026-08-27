@@ -12,16 +12,12 @@ import type {
 
 export function hueFromId(id: number | string): number {
   const n =
-    typeof id === "number"
-      ? id
-      : Array.from(String(id)).reduce((a, c) => a + c.charCodeAt(0), 0);
+    typeof id === "number" ? id : Array.from(String(id)).reduce((a, c) => a + c.charCodeAt(0), 0);
   return (n * 47) % 360;
 }
 
 function toPhotoUrls(photos: string[] | null | undefined): string[] {
-  return (photos ?? [])
-    .map((k) => photoUrl(k))
-    .filter((u): u is string => Boolean(u));
+  return (photos ?? []).map((k) => photoUrl(k)).filter((u): u is string => Boolean(u));
 }
 
 const MODERATION_BY_STATUS: Record<EntityStatus, ModerationStatus> = {
@@ -54,9 +50,7 @@ export function formatWorkSchedule(
     groups.set(hours, days);
   }
 
-  return [...groups]
-    .map(([hours, days]) => `${days.join(", ")} ${hours}`)
-    .join(" · ");
+  return [...groups].map(([hours, days]) => `${days.join(", ")} ${hours}`).join(" · ");
 }
 
 function toProduct(

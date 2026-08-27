@@ -6,11 +6,7 @@ import { useAuth } from "@/lib/api/auth";
 import { recordLocalView, type ViewedProduct } from "@/lib/history/local-history";
 import { trackProductView } from "@/lib/analytics";
 
-export function TrackProductView({
-  product,
-}: {
-  product: Omit<ViewedProduct, "viewedAt">;
-}) {
+export function TrackProductView({ product }: { product: Omit<ViewedProduct, "viewedAt"> }) {
   const { isAuthenticated, isHydrated } = useAuth();
   const { mutate } = useProductViewsControllerRecord();
 

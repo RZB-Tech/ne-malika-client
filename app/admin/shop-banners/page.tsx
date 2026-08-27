@@ -17,20 +17,13 @@ import { Pagination } from "@/components/shared/pagination";
 import { useT } from "@/components/providers/i18n-provider";
 import { formatDate } from "@/lib/format";
 import { localeShort, locales, type Locale } from "@/lib/i18n/config";
-import {
-  BANNER_ASPECT_CSS,
-  bannerImageUrl,
-  type AdminBanner,
-} from "@/lib/api/banners";
+import { BANNER_ASPECT_CSS, bannerImageUrl, type AdminBanner } from "@/lib/api/banners";
 import { useAdminShopBannersControllerList } from "@/lib/api/generated/endpoints/banners-admin/banners-admin";
 import type { AdminShopBannersControllerListStatus } from "@/lib/api/generated/schemas";
 
-const TABS = [
-  "pending",
-  "approved",
-  "rejected",
-  "all",
-] as const satisfies readonly (AdminShopBannersControllerListStatus | "all")[];
+const TABS = ["pending", "approved", "rejected", "all"] as const satisfies readonly (
+  AdminShopBannersControllerListStatus | "all"
+)[];
 
 type Tab = (typeof TABS)[number];
 
@@ -46,9 +39,7 @@ export default function AdminShopBanners() {
 
   const [tab, setTab] = useState<Tab>("pending");
   const [page, setPage] = useState(1);
-  const [moderating, setModerating] = useState<BannerModerationTarget | null>(
-    null,
-  );
+  const [moderating, setModerating] = useState<BannerModerationTarget | null>(null);
 
   const { data, isLoading, isError } = useAdminShopBannersControllerList(
     { page, limit: 20, status: tab === "all" ? undefined : tab },
@@ -96,17 +87,11 @@ export default function AdminShopBanners() {
       ) : banners.length === 0 && !isError ? (
         <Card className="flex flex-col items-center gap-3 py-16 text-center text-sm text-muted-foreground">
           <ImagePlus className="size-8 opacity-60" />
-          {t(
-            tab === "pending"
-              ? "admin.shopBanners.emptyPending"
-              : "admin.shopBanners.empty",
-          )}
+          {t(tab === "pending" ? "admin.shopBanners.emptyPending" : "admin.shopBanners.empty")}
         </Card>
       ) : (
         <>
-          <p className="text-xs text-muted-foreground">
-            {t("admin.shopBanners.hint")}
-          </p>
+          <p className="text-xs text-muted-foreground">{t("admin.shopBanners.hint")}</p>
 
           <div className="space-y-3">
             {banners.map((banner) => (
@@ -128,10 +113,7 @@ export default function AdminShopBanners() {
         onChange={setPage}
       />
 
-      <BannerModerateDialog
-        target={moderating}
-        onClose={() => setModerating(null)}
-      />
+      <BannerModerateDialog target={moderating} onClose={() => setModerating(null)} />
     </div>
   );
 }
@@ -163,9 +145,7 @@ function BannerCard({
               </Link>
             )}
             {banner.createdAt && (
-              <span className="tabular">
-                · {formatDate(banner.createdAt, locale)}
-              </span>
+              <span className="tabular">· {formatDate(banner.createdAt, locale)}</span>
             )}
           </div>
 
@@ -173,9 +153,7 @@ function BannerCard({
           <div className="flex flex-wrap gap-2">
             {locales.map((loc) => (
               <div key={loc} className="space-y-1">
-                <p className="text-[11px] font-medium text-muted-foreground">
-                  {localeShort[loc]}
-                </p>
+                <p className="text-[11px] font-medium text-muted-foreground">{localeShort[loc]}</p>
                 <div
                   style={{ aspectRatio: BANNER_ASPECT_CSS }}
                   className="w-44 overflow-hidden rounded-lg border border-border bg-muted"
@@ -197,9 +175,7 @@ function BannerCard({
                 {t("admin.shopBanners.link", { url: banner.linkUrl })}
               </p>
             ) : (
-              <p className="text-xs text-muted-foreground">
-                {t("admin.shopBanners.noLink")}
-              </p>
+              <p className="text-xs text-muted-foreground">{t("admin.shopBanners.noLink")}</p>
             )}
             {banner.status === "rejected" && banner.rejectReason && (
               <p className="text-xs text-destructive">

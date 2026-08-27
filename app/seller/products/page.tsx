@@ -4,14 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import {
-  MoreHorizontal,
-  Pencil,
-  PlusCircle,
-  Search,
-  Send,
-  Trash2,
-} from "@/components/icons";
+import { MoreHorizontal, Pencil, PlusCircle, Search, Send, Trash2 } from "@/components/icons";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -76,7 +69,9 @@ export default function SellerProducts() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="font-heading text-2xl font-bold tracking-tight">{t("seller.products.title")}</h1>
+          <h1 className="font-heading text-2xl font-bold tracking-tight">
+            {t("seller.products.title")}
+          </h1>
           <p className="mt-1 text-sm text-muted-foreground">{t("seller.products.subtitle")}</p>
         </div>
         {shop?.status === "active" && (
@@ -89,7 +84,12 @@ export default function SellerProducts() {
 
       <div className="relative max-w-sm">
         <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-        <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("seller.products.search")} className="pl-9" />
+        <Input
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder={t("seller.products.search")}
+          className="pl-9"
+        />
       </div>
 
       <Card className="overflow-hidden p-0">
@@ -121,7 +121,10 @@ export default function SellerProducts() {
                         iconClassName="size-4"
                       />
                       <div className="min-w-0">
-                        <Link href={`/seller/products/${p.id}`} className="line-clamp-1 text-sm font-medium hover:text-primary">
+                        <Link
+                          href={`/seller/products/${p.id}`}
+                          className="line-clamp-1 text-sm font-medium hover:text-primary"
+                        >
                           {p.name}
                         </Link>
                         <div className="text-xs text-muted-foreground">
@@ -133,7 +136,9 @@ export default function SellerProducts() {
                   <TableCell className="whitespace-nowrap text-sm font-medium tabular">
                     {priceText(p.price, locale, t)}
                   </TableCell>
-                  <TableCell><ModerationBadge status={p.moderation} /></TableCell>
+                  <TableCell>
+                    <ModerationBadge status={p.moderation} />
+                  </TableCell>
                   <TableCell onClick={(e) => e.stopPropagation()}>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -143,10 +148,14 @@ export default function SellerProducts() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem asChild>
-                          <Link href={`/product/${p.id}`}><Send className="size-4" /> {t("seller.products.viewOnSite")}</Link>
+                          <Link href={`/product/${p.id}`}>
+                            <Send className="size-4" /> {t("seller.products.viewOnSite")}
+                          </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
-                          <Link href={`/seller/products/${p.id}`}><Pencil className="size-4" /> {t("common.edit")}</Link>
+                          <Link href={`/seller/products/${p.id}`}>
+                            <Pencil className="size-4" /> {t("common.edit")}
+                          </Link>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <ConfirmDialog
@@ -156,12 +165,12 @@ export default function SellerProducts() {
                           destructive
                           onConfirm={() => remove(p.id, p.name)}
                         >
-                        <DropdownMenuItem
-                          variant="destructive"
-                          onSelect={(e) => e.preventDefault()}
-                        >
-                          <Trash2 className="size-4" /> {t("common.delete")}
-                        </DropdownMenuItem>
+                          <DropdownMenuItem
+                            variant="destructive"
+                            onSelect={(e) => e.preventDefault()}
+                          >
+                            <Trash2 className="size-4" /> {t("common.delete")}
+                          </DropdownMenuItem>
                         </ConfirmDialog>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -179,7 +188,9 @@ export default function SellerProducts() {
           </div>
         )}
         {!isLoading && list.length === 0 && (
-          <div className="py-16 text-center text-sm text-muted-foreground">{t("seller.products.empty")}</div>
+          <div className="py-16 text-center text-sm text-muted-foreground">
+            {t("seller.products.empty")}
+          </div>
         )}
       </Card>
     </div>

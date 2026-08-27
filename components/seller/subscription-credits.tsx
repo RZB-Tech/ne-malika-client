@@ -38,9 +38,7 @@ export function SubscriptionCredits() {
         <h2 className="font-heading text-lg font-bold tracking-tight">
           {t("seller.credits.title")}
         </h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {t("seller.credits.subtitle")}
-        </p>
+        <p className="mt-1 text-sm text-muted-foreground">{t("seller.credits.subtitle")}</p>
       </div>
 
       {isError && (
@@ -54,16 +52,10 @@ export function SubscriptionCredits() {
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-transparent">
-                <TableHead className="min-w-[120px]">
-                  {t("seller.credits.colDate")}
-                </TableHead>
+                <TableHead className="min-w-[120px]">{t("seller.credits.colDate")}</TableHead>
                 <TableHead>{t("seller.credits.colKind")}</TableHead>
-                <TableHead className="text-right">
-                  {t("seller.credits.colAmount")}
-                </TableHead>
-                <TableHead className="min-w-[220px]">
-                  {t("seller.credits.colNote")}
-                </TableHead>
+                <TableHead className="text-right">{t("seller.credits.colAmount")}</TableHead>
+                <TableHead className="min-w-[220px]">{t("seller.credits.colNote")}</TableHead>
                 <TableHead className="min-w-[160px] text-right">
                   {t("seller.credits.colBalance")}
                 </TableHead>
@@ -161,9 +153,7 @@ function Reason({ txn }: { txn: CreditTxnDto }) {
   const details: string[] = [];
   if (meta?.free) details.push(t(`seller.credits.free.${meta.free}`));
   if (meta?.fromSubscription) {
-    details.push(
-      t("seller.credits.fromSubscription", { count: meta.fromSubscription }),
-    );
+    details.push(t("seller.credits.fromSubscription", { count: meta.fromSubscription }));
   }
   if (meta?.fixed) details.push(t("seller.credits.fixed"));
   if (txn.note && headline !== txn.note) details.push(txn.note);
@@ -172,9 +162,7 @@ function Reason({ txn }: { txn: CreditTxnDto }) {
     <div className="text-sm">
       <div>{headline}</div>
       {details.length > 0 && (
-        <div className="mt-0.5 text-xs text-muted-foreground">
-          {details.join(" · ")}
-        </div>
+        <div className="mt-0.5 text-xs text-muted-foreground">{details.join(" · ")}</div>
       )}
     </div>
   );

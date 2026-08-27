@@ -26,8 +26,7 @@ const DEBOUNCE_MS = 300;
 const MARKETPLACE_BOX =
   "h-10 rounded-lg border-2 border-primary bg-card p-[3px] focus-within:ring-3 focus-within:ring-primary/15";
 
-const MARKETPLACE_SCOPE =
-  "h-full max-w-32 shrink-0 rounded-md px-2.5 text-[13px] font-normal";
+const MARKETPLACE_SCOPE = "h-full max-w-32 shrink-0 rounded-md px-2.5 text-[13px] font-normal";
 const MARKETPLACE_INPUT =
   "h-full min-w-0 flex-1 rounded-none bg-transparent px-2.5 text-sm shadow-none hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 dark:bg-transparent dark:hover:bg-transparent dark:focus-visible:bg-transparent";
 const MARKETPLACE_BUTTON = "h-full w-13 shrink-0 rounded-md px-0";
@@ -57,9 +56,7 @@ export function SearchBar({
 
   const [value, setValue] = useState(urlQuery);
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const activeRoot = roots.find(
-    (root) => root.slug === searchParams.get("category"),
-  );
+  const activeRoot = roots.find((root) => root.slug === searchParams.get("category"));
 
   const typed = useRef(false);
 
@@ -71,9 +68,7 @@ export function SearchBar({
 
   const catalogUrl = useCallback(
     (q: string) => {
-      const params = new URLSearchParams(
-        onCatalog ? searchParams.toString() : "",
-      );
+      const params = new URLSearchParams(onCatalog ? searchParams.toString() : "");
       if (q) params.set("q", q);
       else params.delete("q");
       const query = params.toString();
@@ -123,11 +118,7 @@ export function SearchBar({
     <form
       role="search"
       onSubmit={submit}
-      className={cn(
-        "relative flex w-full items-center",
-        marketplace && MARKETPLACE_BOX,
-        className,
-      )}
+      className={cn("relative flex w-full items-center", marketplace && MARKETPLACE_BOX, className)}
     >
       {!marketplace && (
         <Search
@@ -149,16 +140,10 @@ export function SearchBar({
               <span className="truncate">
                 {activeRoot?.name[locale] ?? t("catalog.everywhere")}
               </span>
-              <ChevronDown
-                data-icon="inline-end"
-                className="size-3.5 opacity-50"
-              />
+              <ChevronDown data-icon="inline-end" className="size-3.5 opacity-50" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent
-            align="start"
-            className="max-h-80 min-w-64 overflow-y-auto"
-          >
+          <DropdownMenuContent align="start" className="max-h-80 min-w-64 overflow-y-auto">
             <DropdownMenuLabel>{t("nav.catalog")}</DropdownMenuLabel>
             <DropdownMenuGroup>
               <DropdownMenuItem asChild>
@@ -186,19 +171,11 @@ export function SearchBar({
         }}
         aria-label={
           placeholder ??
-          t(
-            marketplace
-              ? "common.headerSearchPlaceholder"
-              : "common.searchPlaceholder",
-          )
+          t(marketplace ? "common.headerSearchPlaceholder" : "common.searchPlaceholder")
         }
         placeholder={
           placeholder ??
-          t(
-            marketplace
-              ? "common.headerSearchPlaceholder"
-              : "common.searchPlaceholder",
-          )
+          t(marketplace ? "common.headerSearchPlaceholder" : "common.searchPlaceholder")
         }
         className={cn(
           "pl-10 pr-10",
@@ -213,12 +190,7 @@ export function SearchBar({
           size="icon-xs"
           onClick={clear}
           aria-label={t("common.clear")}
-          className={cn(
-            marketplace
-              ?
-                "mr-1 shrink-0 text-muted-foreground"
-              : "absolute right-2",
-          )}
+          className={cn(marketplace ? "mr-1 shrink-0 text-muted-foreground" : "absolute right-2")}
         >
           <X />
         </Button>
@@ -248,11 +220,7 @@ export function SearchBarSkeleton({
 
   return (
     <div
-      className={cn(
-        "relative flex w-full items-center",
-        marketplace && MARKETPLACE_BOX,
-        className,
-      )}
+      className={cn("relative flex w-full items-center", marketplace && MARKETPLACE_BOX, className)}
     >
       {!marketplace && (
         <Search className="pointer-events-none absolute left-3.5 size-4 text-muted-foreground" />
@@ -268,10 +236,7 @@ export function SearchBarSkeleton({
           {" "}
         </Button>
       )}
-      <Input
-        disabled
-        className={cn("pl-10 pr-10", marketplace && MARKETPLACE_INPUT)}
-      />
+      <Input disabled className={cn("pl-10 pr-10", marketplace && MARKETPLACE_INPUT)} />
       {marketplace && (
         <Button disabled className={MARKETPLACE_BUTTON}>
           <Search />

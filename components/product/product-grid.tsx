@@ -4,13 +4,7 @@ import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { ProductCardSkeleton } from "./product-card";
 
-export function ProductGrid({
-  children,
-  className,
-}: {
-  children: ReactNode;
-  className?: string;
-}) {
+export function ProductGrid({ children, className }: { children: ReactNode; className?: string }) {
   return (
     <div
       className={cn(

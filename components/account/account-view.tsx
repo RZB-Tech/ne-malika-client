@@ -12,11 +12,7 @@ import { ViewHistory } from "./view-history";
 
 const tab = "px-2 text-xs sm:px-3.5 sm:text-sm";
 
-export function AccountView({
-  defaultTab = "history",
-}: {
-  defaultTab?: string;
-}) {
+export function AccountView({ defaultTab = "history" }: { defaultTab?: string }) {
   const { t } = useT();
 
   return (
@@ -24,9 +20,7 @@ export function AccountView({
       <h1 className="font-heading text-2xl font-bold tracking-tight sm:text-3xl">
         {t("account.title")}
       </h1>
-      <p className="mt-1.5 text-sm text-muted-foreground sm:text-base">
-        {t("account.subtitle")}
-      </p>
+      <p className="mt-1.5 text-sm text-muted-foreground sm:text-base">{t("account.subtitle")}</p>
 
       <Tabs defaultValue={defaultTab} className="mt-6 gap-6">
         <TabsList className="w-full max-w-xl overflow-x-auto">

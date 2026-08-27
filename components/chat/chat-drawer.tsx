@@ -35,32 +35,16 @@ export function ChatDrawer({
   }
 
   return (
-    <Drawer
-      direction="right"
-      open={open}
-      onOpenChange={setOpen}
-      handleOnly
-    >
+    <Drawer direction="right" open={open} onOpenChange={setOpen} handleOnly>
       <DrawerTrigger asChild>{children}</DrawerTrigger>
-      <DrawerContent
-        className={cn("flex flex-col p-0 sm:max-w-md", className)}
-      >
-        <DrawerBody
-          side={isSeller ? "seller" : "buyer"}
-          onClose={() => setOpen(false)}
-        />
+      <DrawerContent className={cn("flex flex-col p-0 sm:max-w-md", className)}>
+        <DrawerBody side={isSeller ? "seller" : "buyer"} onClose={() => setOpen(false)} />
       </DrawerContent>
     </Drawer>
   );
 }
 
-function DrawerBody({
-  side,
-  onClose,
-}: {
-  side: "buyer" | "seller";
-  onClose: () => void;
-}) {
+function DrawerBody({ side, onClose }: { side: "buyer" | "seller"; onClose: () => void }) {
   const { t } = useT();
   const { data, isPending } = useChats(side);
   const [activeId, setActiveId] = useState<number | null>(null);
@@ -73,9 +57,7 @@ function DrawerBody({
       {active ? (
         <>
           <DrawerHeader className="sr-only">
-            <DrawerTitle>
-              {side === "seller" ? active.buyerName : active.shopName}
-            </DrawerTitle>
+            <DrawerTitle>{side === "seller" ? active.buyerName : active.shopName}</DrawerTitle>
           </DrawerHeader>
           <ChatConversationHeader
             chat={active}
@@ -94,12 +76,7 @@ function DrawerBody({
       )}
 
       {active ? (
-        <ChatThread
-          chat={active}
-          side={side}
-          className="min-h-0 flex-1"
-          hideHeader
-        />
+        <ChatThread chat={active} side={side} className="min-h-0 flex-1" hideHeader />
       ) : (
         <>
           <div className="min-h-0 flex-1 overflow-y-auto">
@@ -115,9 +92,7 @@ function DrawerBody({
           {chats.length > 0 && side === "buyer" && (
             <div className="border-t border-border p-3">
               <Button asChild variant="outline" className="w-full" onClick={onClose}>
-                <Link href="/messages">
-                  {t("chat.openAll")}
-                </Link>
+                <Link href="/messages">{t("chat.openAll")}</Link>
               </Button>
             </div>
           )}

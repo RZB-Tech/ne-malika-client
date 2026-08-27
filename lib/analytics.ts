@@ -1,7 +1,6 @@
 import { productStatsControllerRecord } from "./api/generated/endpoints/product-stats/product-stats";
 import type { RecordProductEventDtoKind } from "./api/generated/schemas";
 
-
 const VISITOR_KEY = "nm_visitor_id";
 
 export type ContactKind = "phone" | "telegram";
@@ -21,10 +20,7 @@ export function visitorId(): string | null {
   }
 }
 
-function send(
-  productId: string | number,
-  kind: RecordProductEventDtoKind,
-): void {
+function send(productId: string | number, kind: RecordProductEventDtoKind): void {
   const visitor = visitorId();
   if (!visitor) return;
 
@@ -41,9 +37,6 @@ export function trackProductView(productId: string | number): void {
   send(productId, "view");
 }
 
-export function trackContact(
-  productId: string | number,
-  kind: ContactKind,
-): void {
+export function trackContact(productId: string | number, kind: ContactKind): void {
   send(productId, kind);
 }

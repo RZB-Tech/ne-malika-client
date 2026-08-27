@@ -1,7 +1,6 @@
 import type { Locale } from "@/lib/i18n/config";
 import { cn } from "@/lib/utils";
 
-
 const RU = (
   <>
     <rect width="24" height="8" fill="#fff" />
@@ -31,21 +30,12 @@ const BY_LOCALE: Record<Locale, React.ReactNode> = {
   "uz-Cyrl": UZ,
 };
 
-export function Flag({
-  locale,
-  className,
-}: {
-  locale: Locale;
-  className?: string;
-}) {
+export function Flag({ locale, className }: { locale: Locale; className?: string }) {
   return (
     <svg
       viewBox="0 0 24 24"
       aria-hidden
-      className={cn(
-        "size-4.5 shrink-0 rounded-full ring-1 ring-foreground/15",
-        className,
-      )}
+      className={cn("size-4.5 shrink-0 rounded-full ring-1 ring-foreground/15", className)}
     >
       {BY_LOCALE[locale]}
     </svg>

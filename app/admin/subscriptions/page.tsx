@@ -27,23 +27,13 @@ import {
 import { AdminPageHeader } from "@/components/admin/page-header";
 import { useAdminMutation } from "@/components/admin/use-admin-mutation";
 import { EntityStatusBadge } from "@/components/admin/entity-status-badge";
-import {
-  DetailDrawer,
-  DetailNote,
-} from "@/components/admin/detail-drawer";
-import {
-  RowActionsMenu,
-  RowContextMenu,
-  type RowAction,
-} from "@/components/admin/row-actions";
+import { DetailDrawer, DetailNote } from "@/components/admin/detail-drawer";
+import { RowActionsMenu, RowContextMenu, type RowAction } from "@/components/admin/row-actions";
 import {
   SubscriptionActivateDialog,
   type SubscriptionActivateTarget,
 } from "@/components/admin/subscription-activate-dialog";
-import {
-  TestPaymentDialog,
-  type TestPaymentTarget,
-} from "@/components/admin/test-payment-dialog";
+import { TestPaymentDialog, type TestPaymentTarget } from "@/components/admin/test-payment-dialog";
 import { Pagination } from "@/components/shared/pagination";
 import { useT } from "@/components/providers/i18n-provider";
 import { toast } from "sonner";
@@ -114,8 +104,7 @@ export default function AdminSubscriptions() {
   const [tab, setTab] = useState<Tab>("all");
   const [page, setPage] = useState(1);
   const [q, setQ] = useState("");
-  const [activating, setActivating] =
-    useState<SubscriptionActivateTarget | null>(null);
+  const [activating, setActivating] = useState<SubscriptionActivateTarget | null>(null);
   const [testTarget, setTestTarget] = useState<TestPaymentTarget | null>(null);
   const [testLink, setTestLink] = useState<TestPaymentLinkDto | null>(null);
   const [paymentsShop, setPaymentsShop] = useState<{
@@ -124,10 +113,7 @@ export default function AdminSubscriptions() {
   } | null>(null);
   const [paymentsPage, setPaymentsPage] = useState(1);
 
-  const tabParams = useMemo(
-    () => TABS.find((item) => item.value === tab)?.params ?? {},
-    [tab],
-  );
+  const tabParams = useMemo(() => TABS.find((item) => item.value === tab)?.params ?? {}, [tab]);
 
   const { data, isLoading, isError } = useAdminSubscriptionsControllerList(
     { page, limit: 20, q: q.trim() || undefined, ...tabParams },
@@ -270,27 +256,19 @@ export default function AdminSubscriptions() {
       )}
 
       {}
-      <p className="text-xs text-muted-foreground">
-        {t("admin.common.rowHint")}
-      </p>
+      <p className="text-xs text-muted-foreground">{t("admin.common.rowHint")}</p>
 
       <Card className="overflow-hidden p-0">
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-transparent">
-                <TableHead className="min-w-[200px]">
-                  {t("admin.subscriptions.colShop")}
-                </TableHead>
+                <TableHead className="min-w-[200px]">{t("admin.subscriptions.colShop")}</TableHead>
                 <TableHead>{t("admin.subscriptions.colOwner")}</TableHead>
                 <TableHead>{t("admin.subscriptions.colPlan")}</TableHead>
                 <TableHead>{t("admin.subscriptions.colUntil")}</TableHead>
-                <TableHead className="text-right">
-                  {t("admin.subscriptions.colDaysLeft")}
-                </TableHead>
-                <TableHead className="text-right">
-                  {t("admin.subscriptions.colCredits")}
-                </TableHead>
+                <TableHead className="text-right">{t("admin.subscriptions.colDaysLeft")}</TableHead>
+                <TableHead className="text-right">{t("admin.subscriptions.colCredits")}</TableHead>
                 <TableHead>{t("admin.subscriptions.colLastPayment")}</TableHead>
                 {}
                 <TableHead className="min-w-[150px]" />
@@ -302,16 +280,11 @@ export default function AdminSubscriptions() {
                 <RowContextMenu key={row.shopId} actions={actionsFor(row)}>
                   <TableRow
                     onClick={() => openPayments(row)}
-                    className={cn(
-                      "cursor-pointer",
-                      row.needsManualReview && "bg-destructive/5",
-                    )}
+                    className={cn("cursor-pointer", row.needsManualReview && "bg-destructive/5")}
                   >
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium">
-                          {row.shopName}
-                        </span>
+                        <span className="text-sm font-medium">{row.shopName}</span>
                         {row.shopStatus !== "active" && (
                           <EntityStatusBadge status={row.shopStatus} />
                         )}
@@ -321,9 +294,7 @@ export default function AdminSubscriptions() {
                     <TableCell>
                       <div className="text-sm">{row.ownerName}</div>
                       <div className="text-xs text-muted-foreground">
-                        {row.ownerUsername
-                          ? `@${row.ownerUsername}`
-                          : t("common.noUsername")}
+                        {row.ownerUsername ? `@${row.ownerUsername}` : t("common.noUsername")}
                       </div>
                     </TableCell>
 
@@ -352,18 +323,14 @@ export default function AdminSubscriptions() {
                     </TableCell>
 
                     <TableCell className="tabular whitespace-nowrap text-sm text-muted-foreground">
-                      {row.until
-                        ? formatDate(row.until, locale)
-                        : t("admin.subscriptions.never")}
+                      {row.until ? formatDate(row.until, locale) : t("admin.subscriptions.never")}
                     </TableCell>
 
                     <TableCell className="tabular whitespace-nowrap text-right text-sm">
                       {row.active && row.daysLeft !== null ? (
                         t("admin.subscriptions.days", { days: row.daysLeft })
                       ) : row.until ? (
-                        <span className="text-destructive">
-                          {t("admin.subscriptions.expired")}
-                        </span>
+                        <span className="text-destructive">{t("admin.subscriptions.expired")}</span>
                       ) : (
                         <span className="text-muted-foreground">
                           {t("admin.subscriptions.never")}
@@ -426,9 +393,7 @@ export default function AdminSubscriptions() {
         )}
         {!isLoading && rows.length === 0 && (
           <div className="py-16 text-center text-sm text-muted-foreground">
-            {q.trim()
-              ? t("common.nothingFound")
-              : t("admin.subscriptions.empty")}
+            {q.trim() ? t("common.nothingFound") : t("admin.subscriptions.empty")}
           </div>
         )}
       </Card>
@@ -440,10 +405,7 @@ export default function AdminSubscriptions() {
         onChange={setPage}
       />
 
-      <SubscriptionActivateDialog
-        target={activating}
-        onClose={() => setActivating(null)}
-      />
+      <SubscriptionActivateDialog target={activating} onClose={() => setActivating(null)} />
 
       <TestPaymentDialog
         target={testTarget}
@@ -495,9 +457,7 @@ function PaymentsDrawer({
       description={shop?.name}
     >
       {isError && (
-        <DetailNote tone="danger">
-          {t("seller.subscription.payments.loadFailed")}
-        </DetailNote>
+        <DetailNote tone="danger">{t("seller.subscription.payments.loadFailed")}</DetailNote>
       )}
 
       {isLoading ? (
@@ -534,23 +494,18 @@ function PaymentCard({ payment }: { payment: SubscriptionPaymentDto }) {
   return (
     <div className="rounded-lg border border-border p-3">
       <div className="flex items-baseline justify-between gap-3">
-        <span className="text-sm font-medium">
-          {planLabel(payment.plan, t)}
-        </span>
+        <span className="text-sm font-medium">{planLabel(payment.plan, t)}</span>
         <span className="tabular text-sm font-medium">
           {formatPrice(payment.amount, locale)} {t("common.currency")}
         </span>
       </div>
 
       <div className="mt-1 flex flex-wrap items-center gap-x-2 text-xs text-muted-foreground">
-        <span className="tabular">
-          {formatDate(payment.paidAt ?? payment.createdAt, locale)}
-        </span>
+        <span className="tabular">{formatDate(payment.paidAt ?? payment.createdAt, locale)}</span>
         <span>· {t(`seller.subscription.status.${payment.status}`)}</span>
         <span>· {t(`seller.subscription.provider.${payment.provider}`)}</span>
         <span className="tabular">
-          · {t("seller.subscription.payments.colBilling")}{" "}
-          {payment.merchantBillingId}
+          · {t("seller.subscription.payments.colBilling")} {payment.merchantBillingId}
         </span>
       </div>
 
@@ -582,9 +537,7 @@ function PaymentCard({ payment }: { payment: SubscriptionPaymentDto }) {
         </p>
       )}
 
-      {payment.note && (
-        <p className="mt-1 text-xs text-muted-foreground">{payment.note}</p>
-      )}
+      {payment.note && <p className="mt-1 text-xs text-muted-foreground">{payment.note}</p>}
 
       {payment.errorNote && (
         <p className="mt-1 text-xs text-destructive">

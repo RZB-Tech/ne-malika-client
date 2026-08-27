@@ -129,9 +129,7 @@ export function ProductDrawer({
                 iconClassName="size-6"
               />
             </button>
-            <div className="tabular text-xl font-bold">
-              {priceText(product.price, locale, t)}
-            </div>
+            <div className="tabular text-xl font-bold">{priceText(product.price, locale, t)}</div>
           </div>
 
           <PhotoLightbox
@@ -143,10 +141,7 @@ export function ProductDrawer({
 
           {product.description && (
             <DetailSection title={t("product.description")}>
-              <Markdown
-                text={product.description}
-                className="text-sm text-muted-foreground"
-              />
+              <Markdown text={product.description} className="text-sm text-muted-foreground" />
             </DetailSection>
           )}
 
@@ -174,10 +169,7 @@ export function ProductDrawer({
           )}
 
           {product.status === "hidden" && (
-            <DetailNote
-              tone="warning"
-              title={t("admin.productList.hiddenByAi")}
-            >
+            <DetailNote tone="warning" title={t("admin.productList.hiddenByAi")}>
               {t("admin.productList.hiddenByAiText")}
             </DetailNote>
           )}

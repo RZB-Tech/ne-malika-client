@@ -69,9 +69,7 @@ export function ChatThread({
         )}
 
         {!isPending && messages.length === 0 && (
-          <p className="py-8 text-center text-sm text-muted-foreground">
-            {t("chat.emptyThread")}
-          </p>
+          <p className="py-8 text-center text-sm text-muted-foreground">{t("chat.emptyThread")}</p>
         )}
 
         {messages.map((message) => (
@@ -140,9 +138,7 @@ function Bubble({
       <div
         className={cn(
           "max-w-[80%] rounded-2xl px-3.5 py-2.5 text-sm",
-          own
-            ? "bg-primary text-primary-foreground"
-            : "bg-muted text-foreground",
+          own ? "bg-primary text-primary-foreground" : "bg-muted text-foreground",
         )}
       >
         {message.kind === "ai" && (

@@ -44,8 +44,7 @@ export function createLocalListStore<T extends StoredItem>({
     if (typeof window !== "undefined") {
       try {
         window.localStorage.setItem(storageKey, JSON.stringify(items));
-      } catch {
-      }
+      } catch {}
     }
     listeners.forEach((l) => l());
   }

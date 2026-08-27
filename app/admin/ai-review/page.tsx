@@ -22,11 +22,7 @@ import {
 } from "@/lib/api/generated/endpoints/product-cards-admin/product-cards-admin";
 import { hueFromId } from "@/lib/api/mappers";
 import { photoUrl } from "@/lib/api/photo";
-import {
-  devAiReview,
-  devFallbackPage,
-  usingDevData,
-} from "@/lib/api/dev-fixtures";
+import { devAiReview, devFallbackPage, usingDevData } from "@/lib/api/dev-fixtures";
 import type { AiReviewRow, Paginated } from "@/lib/api/types";
 
 export default function AdminAiReview() {
@@ -34,9 +30,7 @@ export default function AdminAiReview() {
   const run = useAdminMutation();
 
   const [page, setPage] = useState(1);
-  const [zoomed, setZoomed] = useState<{ photos: string[]; name: string } | null>(
-    null,
-  );
+  const [zoomed, setZoomed] = useState<{ photos: string[]; name: string } | null>(null);
 
   const { data, isLoading, isError } = useAdminProductCardsControllerAiReview(
     { page, limit: 20 },
@@ -77,10 +71,7 @@ export default function AdminAiReview() {
 
   return (
     <div className="flex flex-col gap-6">
-      <AdminPageHeader
-        title={t("admin.aiReview.title")}
-        subtitle={t("admin.aiReview.subtitle")}
-      />
+      <AdminPageHeader title={t("admin.aiReview.title")} subtitle={t("admin.aiReview.subtitle")} />
 
       {isError && !isDevData && (
         <Card className="border-destructive/40 bg-destructive/5 p-4 text-sm">
@@ -101,9 +92,7 @@ export default function AdminAiReview() {
           <CheckCircle2 className="size-10 text-success" />
           <div>
             <div className="font-medium">{t("admin.aiReview.emptyTitle")}</div>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {t("admin.aiReview.emptyText")}
-            </p>
+            <p className="mt-1 text-sm text-muted-foreground">{t("admin.aiReview.emptyText")}</p>
           </div>
         </Card>
       )}
@@ -145,11 +134,7 @@ export default function AdminAiReview() {
               </div>
 
               <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => void recheck(row.productCardId)}
-                >
+                <Button variant="outline" size="sm" onClick={() => void recheck(row.productCardId)}>
                   <RefreshCw className="size-4" /> {t("admin.aiReview.recheck")}
                 </Button>
                 <Button size="sm" onClick={() => void approve(row.productCardId)}>

@@ -1,13 +1,7 @@
 import { parseMarkdown, type MarkdownText } from "@/lib/markdown";
 import { cn } from "@/lib/utils";
 
-export function Markdown({
-  text,
-  className,
-}: {
-  text: string;
-  className?: string;
-}) {
+export function Markdown({ text, className }: { text: string; className?: string }) {
   const blocks = parseMarkdown(text);
   if (blocks.length === 0) return null;
 

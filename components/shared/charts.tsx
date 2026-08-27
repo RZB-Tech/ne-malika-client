@@ -1,12 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 export function BarList({
   data,
   formatValue,
 }: {
-  data: { label: string; value: number; hue?: number }[];
+  data: { label: string; value: number; hue?: number; color?: string }[];
   formatValue?: (v: number) => string;
 }) {
   const max = Math.max(...data.map((d) => d.value), 1);
@@ -20,7 +21,7 @@ export function BarList({
               className="h-full rounded-full"
               style={{
                 width: `${(d.value / max) * 100}%`,
-                background: d.hue != null ? `oklch(0.6 0.16 ${d.hue})` : "var(--primary)",
+                background: d.color ?? (d.hue != null ? `oklch(0.6 0.16 ${d.hue})` : "var(--primary)"),
               }}
             />
           </div>
@@ -147,10 +148,158 @@ export function TrendPanel({
               left: `${Math.min(85, Math.max(15, (active! / Math.max(1, points.length - 1)) * 100))}%`,
             }}
           >
-            <span className="text-muted-foreground">
-              {formatDate(point.date)}
-            </span>{" "}
+            <span className="text-muted-foreground">{formatDate(point.date)}</span>{" "}
             <span className="font-medium">{formatValue(point.value)}</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export interface StackSeries {
+  key: string;
+  label: string;
+  color: string;
+}
+
+export interface StackPoint {
+  date: string;
+  values: Record<string, number>;
+}
+
+/**
+ * Столбцы с накоплением: сколько всего за сутки и из чего сложилось.
+ *
+ * Сегменты разделяет двухпиксельный просвет подложки, а не обводка — рамка
+ * добавила бы чернил, которые не несут данных. Значения по одному над каждым
+ * столбцом не подписываем: их несёт подсказка при наведении и таблица под
+ * графиком.
+ */
+export function StackedColumns({
+  points,
+  series,
+  formatValue,
+  formatDate,
+  emptyLabel,
+}: {
+  points: StackPoint[];
+  series: StackSeries[];
+  formatValue: (v: number) => string;
+  formatDate: (iso: string) => string;
+  emptyLabel: string;
+}) {
+  const [active, setActive] = useState<number | null>(null);
+
+  const totals = points.map((p) =>
+    series.reduce((acc, s) => acc + (p.values[s.key] ?? 0), 0),
+  );
+  const max = Math.max(...totals, 0);
+
+  if (max === 0) {
+    return <p className="text-sm text-muted-foreground">{emptyLabel}</p>;
+  }
+
+  const point = active === null ? null : points[active];
+
+  // На годовом периоде столбцов под четыре сотни: просвет между ними съел бы
+  // половину ширины, поэтому на плотных периодах столбцы стоят вплотную.
+  const dense = points.length > 120;
+
+  return (
+    <div className="min-w-0">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
+        {series.map((s) => (
+          <span key={s.key} className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <span
+              aria-hidden
+              className="size-2.5 shrink-0 rounded-sm"
+              style={{ background: s.color }}
+            />
+            {s.label}
+          </span>
+        ))}
+      </div>
+
+      <div className="relative mt-3" onPointerLeave={() => setActive(null)}>
+        <div
+          className={cn("flex h-40 items-end", !dense && "gap-px")}
+          role="img"
+          aria-label={`${series.map((s) => s.label).join(", ")}: ${formatValue(
+            totals.reduce((a, b) => a + b, 0),
+          )}`}
+        >
+          {points.map((p, i) => {
+            const total = totals[i];
+            return (
+              <div
+                key={p.date}
+                className="flex h-full flex-1 items-end justify-center"
+                onPointerEnter={() => setActive(i)}
+              >
+                <div
+                  className={cn(
+                    "flex w-full max-w-6 flex-col-reverse gap-[2px] overflow-hidden transition-opacity",
+                    dense ? "rounded-t-[1px]" : "rounded-t-[4px]",
+                    active !== null && active !== i && "opacity-55",
+                  )}
+                  style={{ height: total === 0 ? "1px" : `${(total / max) * 100}%` }}
+                >
+                  {total === 0 ? (
+                    <div className="h-px w-full bg-border" />
+                  ) : (
+                    series
+                      .filter((s) => (p.values[s.key] ?? 0) > 0)
+                      .map((s) => (
+                        <div
+                          key={s.key}
+                          // Доли задаём через flex-grow, а не процентами высоты:
+                          // проценты считаются от всей высоты столбца, и вместе
+                          // с просветами сумма вылезала бы за него — верхний
+                          // сегмент обрезался бы на пару пикселей.
+                          style={{
+                            flexGrow: p.values[s.key] ?? 0,
+                            flexBasis: 0,
+                            minHeight: 0,
+                            background: s.color,
+                          }}
+                        />
+                      ))
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="h-px w-full bg-border" />
+
+        {point && (
+          <div
+            className="pointer-events-none absolute -top-2 z-10 -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-md border bg-popover px-2 py-1.5 text-xs shadow-sm"
+            style={{
+              left: `${Math.min(88, Math.max(12, ((active! + 0.5) / points.length) * 100))}%`,
+            }}
+          >
+            <div className="text-muted-foreground">{formatDate(point.date)}</div>
+            {series
+              .filter((s) => (point.values[s.key] ?? 0) > 0)
+              .map((s) => (
+                <div key={s.key} className="mt-0.5 flex items-center gap-1.5">
+                  <span
+                    aria-hidden
+                    className="size-2 shrink-0 rounded-sm"
+                    style={{ background: s.color }}
+                  />
+                  <span className="text-muted-foreground">{s.label}</span>
+                  <span className="ml-auto font-medium">
+                    {formatValue(point.values[s.key] ?? 0)}
+                  </span>
+                </div>
+              ))}
+            <div className="mt-1 border-t pt-1 text-right font-medium">
+              {formatValue(totals[active!])}
+            </div>
           </div>
         )}
       </div>

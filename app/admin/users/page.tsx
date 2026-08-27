@@ -19,11 +19,7 @@ import { AdminPageHeader } from "@/components/admin/page-header";
 import { useAdminMutation } from "@/components/admin/use-admin-mutation";
 import { RoleBadge } from "@/components/shared/badges";
 import { Pagination } from "@/components/shared/pagination";
-import {
-  RowActionsMenu,
-  RowContextMenu,
-  type RowAction,
-} from "@/components/admin/row-actions";
+import { RowActionsMenu, RowContextMenu, type RowAction } from "@/components/admin/row-actions";
 import { useT } from "@/components/providers/i18n-provider";
 import { formatDate, initials } from "@/lib/format";
 import {
@@ -34,11 +30,7 @@ import {
   useAdminUsersControllerSetRole,
   useAdminUsersControllerUnblock,
 } from "@/lib/api/generated/endpoints/users-admin/users-admin";
-import {
-  devFallbackPage,
-  devUsers,
-  usingDevData,
-} from "@/lib/api/dev-fixtures";
+import { devFallbackPage, devUsers, usingDevData } from "@/lib/api/dev-fixtures";
 import type { AdminUserRow, Paginated, UserRole } from "@/lib/api/types";
 
 export default function AdminUsers() {
@@ -66,17 +58,14 @@ export default function AdminUsers() {
   const isDevData = usingDevData(data?.data);
 
   const block = async (id: number, reason: string) => {
-    const ok = await run(
-      () => blockMutation.mutateAsync({ id, data: { reason } }),
-      {
-        invalidate: [
-          getAdminUsersControllerListQueryKey(),
-          getAdminUsersControllerGetOneQueryKey(id),
-        ],
-        successKey: "admin.users.blocked",
-        errorKey: "common.actionFailed",
-      },
-    );
+    const ok = await run(() => blockMutation.mutateAsync({ id, data: { reason } }), {
+      invalidate: [
+        getAdminUsersControllerListQueryKey(),
+        getAdminUsersControllerGetOneQueryKey(id),
+      ],
+      successKey: "admin.users.blocked",
+      errorKey: "common.actionFailed",
+    });
     if (ok) setOpened(null);
   };
   const unblock = async (id: number) => {
@@ -91,25 +80,18 @@ export default function AdminUsers() {
     if (ok) setOpened(null);
   };
   const setRole = async (id: number, role: UserRole) => {
-    const ok = await run(
-      () => roleMutation.mutateAsync({ id, data: { role } }),
-      {
-        invalidate: [
-          getAdminUsersControllerListQueryKey(),
-          getAdminUsersControllerGetOneQueryKey(id),
-        ],
-        successKey:
-          role === "admin"
-            ? "admin.users.adminGranted"
-            : "admin.users.adminRevoked",
-        errorKey: "common.actionFailed",
-      },
-    );
+    const ok = await run(() => roleMutation.mutateAsync({ id, data: { role } }), {
+      invalidate: [
+        getAdminUsersControllerListQueryKey(),
+        getAdminUsersControllerGetOneQueryKey(id),
+      ],
+      successKey: role === "admin" ? "admin.users.adminGranted" : "admin.users.adminRevoked",
+      errorKey: "common.actionFailed",
+    });
     if (ok) setOpened(null);
   };
 
-  const demotedRole = (u: { shopId: number | null }): UserRole =>
-    u.shopId ? "seller" : "user";
+  const demotedRole = (u: { shopId: number | null }): UserRole => (u.shopId ? "seller" : "user");
 
   const actionsFor = (u: AdminUserRow): RowAction[] => [
     ...(u.shopId
@@ -152,10 +134,7 @@ export default function AdminUsers() {
 
   return (
     <div className="flex flex-col gap-6">
-      <AdminPageHeader
-        title={t("admin.users.title")}
-        subtitle={t("admin.users.subtitle")}
-      />
+      <AdminPageHeader title={t("admin.users.title")} subtitle={t("admin.users.subtitle")} />
 
       {isError && !isDevData && (
         <Card className="border-destructive/40 bg-destructive/5 p-4 text-sm">
@@ -174,17 +153,11 @@ export default function AdminUsers() {
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-transparent">
-                <TableHead className="min-w-[220px]">
-                  {t("admin.users.colUser")}
-                </TableHead>
+                <TableHead className="min-w-[220px]">{t("admin.users.colUser")}</TableHead>
                 <TableHead>{t("admin.users.colShop")}</TableHead>
                 <TableHead>{t("admin.users.colRole")}</TableHead>
-                <TableHead className="text-right">
-                  {t("admin.users.colCredits")}
-                </TableHead>
-                <TableHead className="text-right">
-                  {t("admin.users.colProducts")}
-                </TableHead>
+                <TableHead className="text-right">{t("admin.users.colCredits")}</TableHead>
+                <TableHead className="text-right">{t("admin.users.colProducts")}</TableHead>
                 <TableHead>{t("admin.users.colJoined")}</TableHead>
                 <TableHead className="w-10" />
               </TableRow>
@@ -192,17 +165,12 @@ export default function AdminUsers() {
             <TableBody>
               {rows.map((u) => (
                 <RowContextMenu key={u.id} actions={actionsFor(u)}>
-                  <TableRow
-                    onClick={() => setOpened(u)}
-                    className="cursor-pointer"
-                  >
+                  <TableRow onClick={() => setOpened(u)} className="cursor-pointer">
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <Avatar className="size-9">
                           <AvatarImage src={u.telegramPhoto ?? undefined} />
-                          <AvatarFallback>
-                            {initials(u.fullname)}
-                          </AvatarFallback>
+                          <AvatarFallback>{initials(u.fullname)}</AvatarFallback>
                         </Avatar>
                         <div className="min-w-0">
                           <div className="flex items-center gap-2 text-sm font-medium">
@@ -217,9 +185,7 @@ export default function AdminUsers() {
                             )}
                           </div>
                           <div className="text-xs text-muted-foreground">
-                            {u.telegramUsername
-                              ? `@${u.telegramUsername}`
-                              : u.phoneNumber ?? "—"}
+                            {u.telegramUsername ? `@${u.telegramUsername}` : (u.phoneNumber ?? "—")}
                           </div>
                         </div>
                       </div>
@@ -233,14 +199,9 @@ export default function AdminUsers() {
                     <TableCell className="tabular text-right text-sm">
                       {u.shopId === null
                         ? "—"
-                        : Math.max(
-                            0,
-                            (u.creditsBalance ?? 0) - (u.creditsReserved ?? 0),
-                          )}
+                        : Math.max(0, (u.creditsBalance ?? 0) - (u.creditsReserved ?? 0))}
                     </TableCell>
-                    <TableCell className="tabular text-right text-sm">
-                      {u.productCount}
-                    </TableCell>
+                    <TableCell className="tabular text-right text-sm">{u.productCount}</TableCell>
                     <TableCell className="tabular whitespace-nowrap text-sm text-muted-foreground">
                       {formatDate(u.createdAt, locale)}
                     </TableCell>

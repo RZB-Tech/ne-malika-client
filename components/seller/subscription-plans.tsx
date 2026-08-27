@@ -14,17 +14,10 @@ import { formatDate, formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { useSubscriptionsControllerPlans } from "@/lib/api/generated/endpoints/subscriptions-public/subscriptions-public";
 import { useSellerSubscriptionsControllerCheckout } from "@/lib/api/generated/endpoints/subscriptions-seller/subscriptions-seller";
-import type {
-  SellerSubscriptionDto,
-  SubscriptionPlanDto,
-} from "@/lib/api/generated/schemas";
+import type { SellerSubscriptionDto, SubscriptionPlanDto } from "@/lib/api/generated/schemas";
 import type { PaidPlan } from "@/lib/api/types";
 
-export function SubscriptionPlans({
-  subscription,
-}: {
-  subscription: SellerSubscriptionDto;
-}) {
+export function SubscriptionPlans({ subscription }: { subscription: SellerSubscriptionDto }) {
   const { t, locale } = useT();
   const [busy, setBusy] = useState<PaidPlan | null>(null);
 
@@ -66,12 +59,8 @@ export function SubscriptionPlans({
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="font-heading text-lg font-bold tracking-tight">
-          {t("seller.plans.title")}
-        </h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {t("seller.plans.subtitle")}
-        </p>
+        <h2 className="font-heading text-lg font-bold tracking-tight">{t("seller.plans.title")}</h2>
+        <p className="mt-1 text-sm text-muted-foreground">{t("seller.plans.subtitle")}</p>
       </div>
 
       {warning && (
@@ -115,9 +104,7 @@ export function SubscriptionPlans({
         </div>
       )}
 
-      <p className="text-xs text-muted-foreground">
-        {t("seller.subscription.payHint")}
-      </p>
+      <p className="text-xs text-muted-foreground">{t("seller.subscription.payHint")}</p>
     </div>
   );
 }
@@ -146,23 +133,15 @@ function PlanCard({
   return (
     <Card className={cn("gap-0 p-5", current && "ring-2 ring-primary")}>
       <div className="flex items-center justify-between gap-2">
-        <h3 className="font-heading text-lg font-bold tracking-tight">
-          {planLabel(plan.id, t)}
-        </h3>
+        <h3 className="font-heading text-lg font-bold tracking-tight">{planLabel(plan.id, t)}</h3>
         {current ? (
           <Badge>{t("seller.plans.current")}</Badge>
         ) : top ? (
-          <Badge
-            variant="outline"
-            className="border-transparent bg-primary/10 text-primary"
-          >
+          <Badge variant="outline" className="border-transparent bg-primary/10 text-primary">
             {t("seller.plans.best")}
           </Badge>
         ) : second ? (
-          <Badge
-            variant="outline"
-            className="border-transparent bg-muted text-muted-foreground"
-          >
+          <Badge variant="outline" className="border-transparent bg-muted text-muted-foreground">
             {t("seller.plans.recommended")}
           </Badge>
         ) : null}
@@ -174,9 +153,7 @@ function PlanCard({
         })}
       </div>
 
-      <p className="mt-2 text-sm text-muted-foreground">
-        {t(`seller.plans.${plan.id}.note`)}
-      </p>
+      <p className="mt-2 text-sm text-muted-foreground">{t(`seller.plans.${plan.id}.note`)}</p>
 
       <ul className="mt-4 space-y-2 text-sm">
         <FeatureLine
@@ -203,11 +180,7 @@ function PlanCard({
         />
         <FeatureLine
           off={plan.bannerSlots === 0}
-          text={t(
-            plan.bannerSlots > 0
-              ? "seller.plans.bannerLine"
-              : "seller.plans.bannerNoLine",
-          )}
+          text={t(plan.bannerSlots > 0 ? "seller.plans.bannerLine" : "seller.plans.bannerNoLine")}
         />
         <FeatureLine
           text={

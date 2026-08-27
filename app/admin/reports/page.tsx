@@ -27,11 +27,7 @@ import {
   getAdminShopsControllerListQueryKey,
   useAdminShopsControllerAbolish,
 } from "@/lib/api/generated/endpoints/shops-admin/shops-admin";
-import {
-  devFallbackPage,
-  devReports,
-  usingDevData,
-} from "@/lib/api/dev-fixtures";
+import { devFallbackPage, devReports, usingDevData } from "@/lib/api/dev-fixtures";
 import type { Paginated, ReportRow } from "@/lib/api/types";
 
 export default function AdminReports() {
@@ -84,10 +80,7 @@ export default function AdminReports() {
 
   return (
     <div className="space-y-6">
-      <AdminPageHeader
-        title={t("admin.reports.title")}
-        subtitle={t("admin.reports.subtitle")}
-      />
+      <AdminPageHeader title={t("admin.reports.title")} subtitle={t("admin.reports.subtitle")} />
 
       {isError && !isDevData && (
         <Card className="border-destructive/40 bg-destructive/5 p-4 text-sm">
@@ -120,11 +113,17 @@ export default function AdminReports() {
                     <Badge variant="secondary">
                       {t(r.productCardId ? "admin.reports.onProduct" : "admin.reports.onShop")}
                     </Badge>
-                    <Link href={`/store/${r.shopId}`} className="hover:text-foreground hover:underline">
+                    <Link
+                      href={`/store/${r.shopId}`}
+                      className="hover:text-foreground hover:underline"
+                    >
                       {t("admin.reports.shopRef", { id: r.shopId })}
                     </Link>
                     {r.productCardId && (
-                      <Link href={`/product/${r.productCardId}`} className="hover:text-foreground hover:underline">
+                      <Link
+                        href={`/product/${r.productCardId}`}
+                        className="hover:text-foreground hover:underline"
+                      >
                         {t("admin.reports.productRef", { id: r.productCardId })}
                       </Link>
                     )}
@@ -138,7 +137,11 @@ export default function AdminReports() {
                       title={t("admin.reports.abolishProduct")}
                       onConfirm={(reason) => onAbolishProduct(r.productCardId!, reason)}
                     >
-                      <Button size="sm" variant="ghost" className="gap-1.5 text-muted-foreground hover:text-destructive">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="gap-1.5 text-muted-foreground hover:text-destructive"
+                      >
                         <Ban className="size-3.5" /> {t("admin.reports.onProduct")}
                       </Button>
                     </AbolishDialog>
@@ -148,7 +151,11 @@ export default function AdminReports() {
                     description={t("admin.reports.abolishShopText")}
                     onConfirm={(reason) => onAbolishShop(r.shopId, reason)}
                   >
-                    <Button size="sm" variant="ghost" className="gap-1.5 text-muted-foreground hover:text-destructive">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="gap-1.5 text-muted-foreground hover:text-destructive"
+                    >
                       <Store className="size-3.5" /> {t("admin.reports.onShop")}
                     </Button>
                   </AbolishDialog>

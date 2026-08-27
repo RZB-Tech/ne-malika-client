@@ -84,9 +84,7 @@ export function AddProductForm({
   const [model, setModel] = useState("");
   const [description, setDescription] = useState("");
   const [state, setState] = useState<"new" | "old">("new");
-  const [specs, setSpecs] = useState<{ name: string; value: string }[]>([
-    { name: "", value: "" },
-  ]);
+  const [specs, setSpecs] = useState<{ name: string; value: string }[]>([{ name: "", value: "" }]);
   const [photos, setPhotos] = useState<UploadedPhoto[]>([]);
   const [price, setPrice] = useState("");
   const [negotiable, setNegotiable] = useState(false);
@@ -149,9 +147,7 @@ export function AddProductForm({
       if (onDone) onDone();
       else router.push("/seller/products");
     } catch (err) {
-      toast.error(
-        apiErrorMessage(err, t, "seller.add.createFailed"),
-      );
+      toast.error(apiErrorMessage(err, t, "seller.add.createFailed"));
     } finally {
       setSubmitting(false);
     }
@@ -164,7 +160,9 @@ export function AddProductForm({
       {!embedded && (
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h1 className="font-heading text-2xl font-bold tracking-tight">{t("seller.add.title")}</h1>
+            <h1 className="font-heading text-2xl font-bold tracking-tight">
+              {t("seller.add.title")}
+            </h1>
             <p className="mt-1 text-sm text-muted-foreground">{t("seller.add.subtitle")}</p>
           </div>
         </div>
@@ -185,9 +183,7 @@ export function AddProductForm({
 
       {shopAbolished && (
         <Card className="border-destructive/40 bg-destructive/5 p-4 text-sm">
-          <p className="font-medium text-destructive">
-            {t("seller.shop.abolishedShort")}
-          </p>
+          <p className="font-medium text-destructive">{t("seller.shop.abolishedShort")}</p>
           {shop?.abolishReason && (
             <p className="mt-1 text-muted-foreground">
               {t("common.reasonLine", { reason: shop.abolishReason })}
@@ -234,9 +230,7 @@ export function AddProductForm({
                 setState(before.state);
               }}
               onPhotoStored={(photoId, key) =>
-                setPhotos((prev) =>
-                  prev.map((p) => (p.id === photoId ? { ...p, key } : p)),
-                )
+                setPhotos((prev) => prev.map((p) => (p.id === photoId ? { ...p, key } : p)))
               }
               disabled={shopAbolished}
             />
@@ -259,11 +253,21 @@ export function AddProductForm({
           <div className="grid gap-5 sm:grid-cols-2">
             <div className={field}>
               <Label htmlFor="brand">{t("seller.add.brand")}</Label>
-              <Input id="brand" value={brand} onChange={(e) => setBrand(e.target.value)} placeholder="NVIDIA" />
+              <Input
+                id="brand"
+                value={brand}
+                onChange={(e) => setBrand(e.target.value)}
+                placeholder="NVIDIA"
+              />
             </div>
             <div className={field}>
               <Label htmlFor="model">{t("seller.add.model")}</Label>
-              <Input id="model" value={model} onChange={(e) => setModel(e.target.value)} placeholder="RTX 4070" />
+              <Input
+                id="model"
+                value={model}
+                onChange={(e) => setModel(e.target.value)}
+                placeholder="RTX 4070"
+              />
             </div>
           </div>
 
@@ -276,9 +280,7 @@ export function AddProductForm({
                 text={description}
                 onResult={setDescription}
                 onPhotoStored={(photoId, key) =>
-                  setPhotos((prev) =>
-                    prev.map((p) => (p.id === photoId ? { ...p, key } : p)),
-                  )
+                  setPhotos((prev) => prev.map((p) => (p.id === photoId ? { ...p, key } : p)))
                 }
               />
             </div>
@@ -289,9 +291,7 @@ export function AddProductForm({
               onChange={(e) => setDescription(e.target.value)}
               placeholder={t("seller.add.descriptionPlaceholder")}
             />
-            <p className="text-xs text-muted-foreground">
-              {t("ai.description.markdownHint")}
-            </p>
+            <p className="text-xs text-muted-foreground">{t("ai.description.markdownHint")}</p>
           </div>
 
           <div className={field}>
@@ -305,7 +305,9 @@ export function AddProductForm({
 
           <div className="grid gap-5 sm:grid-cols-2">
             <div className={field}>
-              <Label htmlFor="price">{t("seller.add.price")}, {t("common.currency")}</Label>
+              <Label htmlFor="price">
+                {t("seller.add.price")}, {t("common.currency")}
+              </Label>
               <Input
                 id="price"
                 type="text"
@@ -317,10 +319,7 @@ export function AddProductForm({
                 disabled={negotiable}
               />
               <label className="flex cursor-pointer items-center gap-2 pt-1 text-sm text-muted-foreground">
-                <Checkbox
-                  checked={negotiable}
-                  onCheckedChange={(v) => setNegotiable(v === true)}
-                />
+                <Checkbox checked={negotiable} onCheckedChange={(v) => setNegotiable(v === true)} />
                 {t("seller.add.negotiable")}
               </label>
             </div>
@@ -349,14 +348,18 @@ export function AddProductForm({
                 placeholder={t("seller.add.specName")}
                 value={s.name}
                 onChange={(e) =>
-                  setSpecs((arr) => arr.map((x, j) => (j === i ? { ...x, name: e.target.value } : x)))
+                  setSpecs((arr) =>
+                    arr.map((x, j) => (j === i ? { ...x, name: e.target.value } : x)),
+                  )
                 }
               />
               <Input
                 placeholder={t("seller.add.specValue")}
                 value={s.value}
                 onChange={(e) =>
-                  setSpecs((arr) => arr.map((x, j) => (j === i ? { ...x, value: e.target.value } : x)))
+                  setSpecs((arr) =>
+                    arr.map((x, j) => (j === i ? { ...x, value: e.target.value } : x)),
+                  )
                 }
               />
               <Button
@@ -364,7 +367,9 @@ export function AddProductForm({
                 variant="ghost"
                 size="icon"
                 className="shrink-0 text-muted-foreground hover:text-destructive"
-                onClick={() => setSpecs((arr) => (arr.length > 1 ? arr.filter((_, j) => j !== i) : arr))}
+                onClick={() =>
+                  setSpecs((arr) => (arr.length > 1 ? arr.filter((_, j) => j !== i) : arr))
+                }
               >
                 <Trash2 className="size-4" />
               </Button>
@@ -385,43 +390,27 @@ export function AddProductForm({
 
       <Card className="p-6">
         <SectionTitle index={3}>{t("seller.add.section3")}</SectionTitle>
-        <PhotoDropzone
-          photos={photos}
-          onChange={setPhotos}
-          onPhotoClick={setAiPhoto}
-        />
-        <p className="mt-2 text-xs text-muted-foreground">
-          {t("admin.form.photoHint")}
-        </p>
+        <PhotoDropzone photos={photos} onChange={setPhotos} onPhotoClick={setAiPhoto} />
+        <p className="mt-2 text-xs text-muted-foreground">{t("admin.form.photoHint")}</p>
 
         <PhotoAiDialog
           photo={aiPhoto}
           onClose={() => setAiPhoto(null)}
           onApply={(generated) => {
-            const { photos: next, dropped } = applyGenerated(
-              photos,
-              aiPhoto?.id,
-              generated,
-            );
+            const { photos: next, dropped } = applyGenerated(photos, aiPhoto?.id, generated);
             setPhotos(next);
             if (dropped > 0) {
               toast.error(t("admin.photoAi.tooManyPhotos", { count: dropped }));
             }
           }}
           onPhotoStored={(photoId, key) =>
-            setPhotos((prev) =>
-              prev.map((p) => (p.id === photoId ? { ...p, key } : p)),
-            )
+            setPhotos((prev) => prev.map((p) => (p.id === photoId ? { ...p, key } : p)))
           }
         />
       </Card>
 
       <div className="flex flex-wrap justify-end gap-3 rounded-xl bg-card p-3 ring-1 ring-foreground/10">
-        <Button
-          type="submit"
-          className="gap-2"
-          disabled={submitting || shopAbolished}
-        >
+        <Button type="submit" className="gap-2" disabled={submitting || shopAbolished}>
           <Send className="size-4" />
           {submitting ? t("common.loading") : t("seller.add.publish")}
         </Button>

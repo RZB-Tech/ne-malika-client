@@ -47,23 +47,16 @@ export function BannerForm({ banner }: { banner: Banner | null }) {
 
   const [title, setTitle] = useState(banner?.title ?? "");
   const [linkUrl, setLinkUrl] = useState(banner?.linkUrl ?? "");
-  const [slots, setSlots] = useState<Slots>(() =>
-    banner ? storedSlots(banner) : EMPTY_SLOTS,
-  );
+  const [slots, setSlots] = useState<Slots>(() => (banner ? storedSlots(banner) : EMPTY_SLOTS));
   const [saving, setSaving] = useState(false);
 
   const objectUrls = useRef<string[]>([]);
-  useEffect(
-    () => () => objectUrls.current.forEach((url) => URL.revokeObjectURL(url)),
-    [],
-  );
+  useEffect(() => () => objectUrls.current.forEach((url) => URL.revokeObjectURL(url)), []);
 
   const pick = async (locale: Locale, file: File) => {
     const problem = await checkBannerImage(file);
     if (problem) {
-      toast.error(
-        t(`seller.banner.err.${problem}`, { sizes: BANNER_FORMATS_LABEL }),
-      );
+      toast.error(t(`seller.banner.err.${problem}`, { sizes: BANNER_FORMATS_LABEL }));
       return;
     }
     const preview = URL.createObjectURL(file);
@@ -148,9 +141,7 @@ export function BannerForm({ banner }: { banner: Banner | null }) {
             onChange={(e) => setTitle(e.target.value)}
             placeholder={t("seller.banner.namePlaceholder")}
           />
-          <p className="text-xs text-muted-foreground">
-            {t("seller.banner.nameHint")}
-          </p>
+          <p className="text-xs text-muted-foreground">{t("seller.banner.nameHint")}</p>
         </div>
 
         <div className="flex flex-col gap-3">
@@ -179,9 +170,7 @@ export function BannerForm({ banner }: { banner: Banner | null }) {
             onChange={(e) => setLinkUrl(e.target.value)}
             placeholder="/product/12"
           />
-          <p className="text-xs text-muted-foreground">
-            {t("seller.banner.linkHint")}
-          </p>
+          <p className="text-xs text-muted-foreground">{t("seller.banner.linkHint")}</p>
         </div>
 
         <div className="flex justify-end">
@@ -263,12 +252,7 @@ function SlotPicker({
             <Copy className="size-4" />
           </Button>
         )}
-        <Button
-          type="button"
-          size="sm"
-          variant="outline"
-          onClick={() => inputRef.current?.click()}
-        >
+        <Button type="button" size="sm" variant="outline" onClick={() => inputRef.current?.click()}>
           {t(slot ? "seller.banner.replace" : "seller.banner.pick")}
         </Button>
       </div>
@@ -288,12 +272,7 @@ function SlotPicker({
   );
 }
 
-function changedFrom(
-  banner: Banner,
-  title: string,
-  linkUrl: string,
-  slots: Slots,
-): boolean {
+function changedFrom(banner: Banner, title: string, linkUrl: string, slots: Slots): boolean {
   return (
     title.trim() !== banner.title ||
     linkUrl.trim() !== (banner.linkUrl ?? "") ||

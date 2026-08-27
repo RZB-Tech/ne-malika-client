@@ -4,9 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useT } from "@/components/providers/i18n-provider";
 import { apiErrorMessage } from "@/lib/api/errors";
-import {
-  useSetTelegramNotifications,
-} from "@/lib/api/notify";
+import { useSetTelegramNotifications } from "@/lib/api/notify";
 import {
   hasPushSubscription,
   permissionState,
@@ -17,9 +15,7 @@ import {
 export function usePushChannel() {
   const { t } = useT();
   const [deviceSubscribed, setDeviceSubscribed] = useState<boolean | null>(null);
-  const [requested, setRequested] = useState<NotificationPermission | null>(
-    null,
-  );
+  const [requested, setRequested] = useState<NotificationPermission | null>(null);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
@@ -78,10 +74,7 @@ export function useTelegramChannel() {
   const toggle = useCallback(
     (enabled: boolean) => {
       setTelegram.mutate(enabled, {
-        onSuccess: () =>
-          toast.success(
-            enabled ? t("notify.telegramOn") : t("notify.telegramOff"),
-          ),
+        onSuccess: () => toast.success(enabled ? t("notify.telegramOn") : t("notify.telegramOff")),
         onError: () => toast.error(t("push.failed")),
       });
     },

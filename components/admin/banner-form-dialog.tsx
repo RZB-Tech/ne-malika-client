@@ -56,24 +56,14 @@ export function BannerFormDialog({
     <Dialog open={target !== undefined} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
         {target !== undefined && (
-          <FormBody
-            key={target?.id ?? "new"}
-            banner={target}
-            onDone={() => onOpenChange(false)}
-          />
+          <FormBody key={target?.id ?? "new"} banner={target} onDone={() => onOpenChange(false)} />
         )}
       </DialogContent>
     </Dialog>
   );
 }
 
-function FormBody({
-  banner,
-  onDone,
-}: {
-  banner: Banner | null;
-  onDone: () => void;
-}) {
+function FormBody({ banner, onDone }: { banner: Banner | null; onDone: () => void }) {
   const { t } = useT();
   const queryClient = useQueryClient();
 
@@ -83,23 +73,16 @@ function FormBody({
   const [title, setTitle] = useState(banner?.title ?? "");
   const [linkUrl, setLinkUrl] = useState(banner?.linkUrl ?? "");
   const [isActive, setIsActive] = useState(banner?.isActive ?? true);
-  const [slots, setSlots] = useState<Slots>(() =>
-    banner ? storedSlots(banner) : EMPTY_SLOTS,
-  );
+  const [slots, setSlots] = useState<Slots>(() => (banner ? storedSlots(banner) : EMPTY_SLOTS));
   const [saving, setSaving] = useState(false);
 
   const objectUrls = useRef<string[]>([]);
-  useEffect(
-    () => () => objectUrls.current.forEach((url) => URL.revokeObjectURL(url)),
-    [],
-  );
+  useEffect(() => () => objectUrls.current.forEach((url) => URL.revokeObjectURL(url)), []);
 
   const pick = async (locale: Locale, file: File) => {
     const problem = await checkBannerImage(file);
     if (problem) {
-      toast.error(
-        t(`admin.banners.err.${problem}`, { sizes: BANNER_FORMATS_LABEL }),
-      );
+      toast.error(t(`admin.banners.err.${problem}`, { sizes: BANNER_FORMATS_LABEL }));
       return;
     }
     const preview = URL.createObjectURL(file);
@@ -154,14 +137,10 @@ function FormBody({
       await queryClient.invalidateQueries({
         queryKey: getAdminBannersControllerFindAllQueryKey(),
       });
-      toast.success(
-        t(banner ? "admin.banners.updated" : "admin.banners.created"),
-      );
+      toast.success(t(banner ? "admin.banners.updated" : "admin.banners.created"));
       onDone();
     } catch (err) {
-      toast.error(
-        apiErrorMessage(err, t, "admin.banners.saveFailed"),
-      );
+      toast.error(apiErrorMessage(err, t, "admin.banners.saveFailed"));
     } finally {
       setSaving(false);
     }
@@ -186,9 +165,7 @@ function FormBody({
           onChange={(e) => setTitle(e.target.value)}
           placeholder={t("admin.banners.namePlaceholder")}
         />
-        <p className="text-xs text-muted-foreground">
-          {t("admin.banners.nameHint")}
-        </p>
+        <p className="text-xs text-muted-foreground">{t("admin.banners.nameHint")}</p>
       </div>
 
       <div className="flex flex-col gap-3">
@@ -212,9 +189,7 @@ function FormBody({
           onChange={(e) => setLinkUrl(e.target.value)}
           placeholder="/product/12"
         />
-        <p className="text-xs text-muted-foreground">
-          {t("admin.banners.linkHint")}
-        </p>
+        <p className="text-xs text-muted-foreground">{t("admin.banners.linkHint")}</p>
       </div>
 
       <label className="flex cursor-pointer items-center justify-between gap-4 rounded-lg border border-border p-3">
@@ -291,12 +266,7 @@ function SlotPicker({
             <Copy className="size-4" />
           </Button>
         )}
-        <Button
-          type="button"
-          size="sm"
-          variant="outline"
-          onClick={() => inputRef.current?.click()}
-        >
+        <Button type="button" size="sm" variant="outline" onClick={() => inputRef.current?.click()}>
           {t(slot ? "admin.banners.replace" : "admin.banners.pick")}
         </Button>
       </div>

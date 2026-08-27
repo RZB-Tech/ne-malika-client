@@ -18,11 +18,7 @@ import { formatDate, formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { SellerSubscriptionDto } from "@/lib/api/generated/schemas";
 
-export function SubscriptionState({
-  subscription,
-}: {
-  subscription: SellerSubscriptionDto;
-}) {
+export function SubscriptionState({ subscription }: { subscription: SellerSubscriptionDto }) {
   const { t, locale } = useT();
   const s = subscription;
 
@@ -40,9 +36,7 @@ export function SubscriptionState({
       <Card className="p-5">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <div className="text-sm text-muted-foreground">
-              {t("seller.subscription.current")}
-            </div>
+            <div className="text-sm text-muted-foreground">{t("seller.subscription.current")}</div>
             <div className="mt-1 font-heading text-2xl font-bold tracking-tight">
               {planLabel(s.plan, t)}
             </div>
@@ -51,21 +45,11 @@ export function SubscriptionState({
             variant="outline"
             className={cn(
               "gap-1 border-transparent font-medium",
-              s.active
-                ? "bg-success/12 text-success"
-                : "bg-muted text-muted-foreground",
+              s.active ? "bg-success/12 text-success" : "bg-muted text-muted-foreground",
             )}
           >
-            {s.active ? (
-              <CheckCircle2 className="size-3" />
-            ) : (
-              <Clock className="size-3" />
-            )}
-            {t(
-              s.active
-                ? "seller.subscription.active"
-                : "seller.subscription.inactive",
-            )}
+            {s.active ? <CheckCircle2 className="size-3" /> : <Clock className="size-3" />}
+            {t(s.active ? "seller.subscription.active" : "seller.subscription.inactive")}
           </Badge>
         </div>
 
@@ -74,9 +58,7 @@ export function SubscriptionState({
           {s.until ? (
             <span>
               {t("seller.subscription.until")}{" "}
-              <span className="tabular font-medium">
-                {formatDate(s.until, locale)}
-              </span>
+              <span className="tabular font-medium">{formatDate(s.until, locale)}</span>
               {s.daysLeft !== null && (
                 <span className="text-muted-foreground">
                   {" · "}
@@ -87,27 +69,17 @@ export function SubscriptionState({
               )}
             </span>
           ) : (
-            <span className="text-muted-foreground">
-              {t("seller.subscription.untilNever")}
-            </span>
+            <span className="text-muted-foreground">{t("seller.subscription.untilNever")}</span>
           )}
         </div>
 
         {!s.active && (
           <div className="mt-4 rounded-lg bg-muted/50 p-3 text-sm">
             <p className="font-medium">
-              {t(
-                s.until
-                  ? "seller.subscription.expired"
-                  : "seller.subscription.none",
-              )}
+              {t(s.until ? "seller.subscription.expired" : "seller.subscription.none")}
             </p>
             <p className="mt-1 text-muted-foreground">
-              {t(
-                s.until
-                  ? "seller.subscription.expiredText"
-                  : "seller.subscription.noneText",
-              )}
+              {t(s.until ? "seller.subscription.expiredText" : "seller.subscription.noneText")}
             </p>
           </div>
         )}
@@ -143,18 +115,14 @@ export function SubscriptionState({
           {s.creditsReserved > 0 && (
             <p>
               {t("seller.subscription.creditsReserved")}:{" "}
-              <span className="tabular">
-                {formatPrice(s.creditsReserved, locale)}
-              </span>
+              <span className="tabular">{formatPrice(s.creditsReserved, locale)}</span>
             </p>
           )}
           {}
           {!s.active && s.subscriptionCredits > 0 && (
             <p className="text-warning">
               {t("seller.subscription.creditsLocked")}:{" "}
-              <span className="tabular">
-                {formatPrice(s.subscriptionCredits, locale)}
-              </span>
+              <span className="tabular">{formatPrice(s.subscriptionCredits, locale)}</span>
             </p>
           )}
         </div>
@@ -177,19 +145,13 @@ export function SubscriptionState({
           <Feature
             icon={BarChart3}
             label={t("seller.subscription.promo")}
-            value={t(
-              s.promoted
-                ? "seller.subscription.promoYes"
-                : "seller.subscription.promoNo",
-            )}
+            value={t(s.promoted ? "seller.subscription.promoYes" : "seller.subscription.promoNo")}
           />
           <Feature
             icon={ImageIcon}
             label={t("seller.subscription.banner")}
             value={t(
-              s.bannerSlots > 0
-                ? "seller.subscription.bannerYes"
-                : "seller.subscription.bannerNo",
+              s.bannerSlots > 0 ? "seller.subscription.bannerYes" : "seller.subscription.bannerNo",
             )}
           />
           <Feature
@@ -219,12 +181,7 @@ function Amount({
   const { locale } = useT();
   return (
     <div>
-      <div
-        className={cn(
-          "tabular font-heading text-2xl font-bold",
-          accent && "text-primary",
-        )}
-      >
+      <div className={cn("tabular font-heading text-2xl font-bold", accent && "text-primary")}>
         {formatPrice(value, locale)}
       </div>
       <div className="mt-0.5 text-sm font-medium">{label}</div>
@@ -252,9 +209,7 @@ function Feature({
       <div className="min-w-0">
         <div className="text-sm font-medium">{label}</div>
         <div className="mt-0.5 text-sm text-muted-foreground">{value}</div>
-        {note && (
-          <div className="mt-0.5 text-xs text-muted-foreground">{note}</div>
-        )}
+        {note && <div className="mt-0.5 text-xs text-muted-foreground">{note}</div>}
       </div>
     </div>
   );

@@ -44,11 +44,7 @@ export function useViewHistory() {
   const { user, isAuthenticated, isHydrated } = useAuth();
   const queryClient = useQueryClient();
 
-  const local = useSyncExternalStore(
-    subscribeLocalHistory,
-    getLocalHistory,
-    getEmptyHistory,
-  );
+  const local = useSyncExternalStore(subscribeLocalHistory, getLocalHistory, getEmptyHistory);
 
   const enabled = isHydrated && isAuthenticated;
 
@@ -57,8 +53,7 @@ export function useViewHistory() {
     { query: { enabled } },
   );
 
-  const { mutateAsync: syncViews, isPending: isSyncing } =
-    useProductViewsControllerSync();
+  const { mutateAsync: syncViews, isPending: isSyncing } = useProductViewsControllerSync();
   const { mutateAsync: removeRemote } = useProductViewsControllerRemove();
   const { mutateAsync: clearRemote } = useProductViewsControllerClear();
 

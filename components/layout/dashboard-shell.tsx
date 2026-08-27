@@ -62,10 +62,7 @@ export function DashboardShell({
 
   return (
     <SidebarProvider>
-      <Sidebar
-        collapsible="icon"
-        className="group-data-[side=left]:border-r-0"
-      >
+      <Sidebar collapsible="icon" className="group-data-[side=left]:border-r-0">
         <SidebarHeader className="h-16 justify-center px-4 group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:px-0">
           <Logo className="group-data-[collapsible=icon]:hidden" />
           <LogoMark className="hidden text-primary group-data-[collapsible=icon]:block" />
@@ -118,13 +115,8 @@ export function DashboardShell({
           </div>
         </header>
 
-        <div
-          ref={scrollRef}
-          className="flex-1 overflow-y-auto bg-card md:rounded-tl-2xl"
-        >
-          <div className="mx-auto w-full px-4 py-8 sm:px-6 lg:px-10">
-            {children}
-          </div>
+        <div ref={scrollRef} className="flex-1 overflow-y-auto bg-card md:rounded-tl-2xl">
+          <div className="mx-auto w-full px-4 py-8 sm:px-6 lg:px-10">{children}</div>
         </div>
       </SidebarInset>
     </SidebarProvider>
@@ -148,11 +140,7 @@ function NavMenu({ items }: { items: NavItem[] }) {
     <SidebarMenu className="gap-1">
       {items.map((item) => (
         <SidebarMenuItem key={item.href}>
-          <SidebarMenuButton
-            asChild
-            isActive={item.href === activeHref}
-            tooltip={item.label}
-          >
+          <SidebarMenuButton asChild isActive={item.href === activeHref} tooltip={item.label}>
             {item.onSelect ? (
               <button type="button" onClick={item.onSelect}>
                 <item.icon />
@@ -188,9 +176,7 @@ function BrandBadge({ brand }: { brand: ShellBrand }) {
           {brand.avatar}
           <div className="grid flex-1 text-left leading-tight">
             <span className="truncate text-sm font-medium">{brand.title}</span>
-            <span className="truncate text-xs text-muted-foreground">
-              {brand.subtitle}
-            </span>
+            <span className="truncate text-xs text-muted-foreground">{brand.subtitle}</span>
           </div>
         </SidebarMenuButton>
       </SidebarMenuItem>

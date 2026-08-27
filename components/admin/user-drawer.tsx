@@ -67,9 +67,7 @@ export function UserDrawer({
           </>
         )
       }
-      description={
-        user && t("admin.users.since", { date: formatDate(user.createdAt, locale) })
-      }
+      description={user && t("admin.users.since", { date: formatDate(user.createdAt, locale) })}
       footer={
         user && (
           <>
@@ -77,9 +75,7 @@ export function UserDrawer({
               <Button
                 variant="ghost"
                 className={drawerAction.warning}
-                onClick={() =>
-                  void onSetRole(user.id, user.shopId ? "seller" : "user")
-                }
+                onClick={() => void onSetRole(user.id, user.shopId ? "seller" : "user")}
               >
                 <ShieldOff className="size-4" /> {t("admin.users.dropAdminShort")}
               </Button>
@@ -119,10 +115,7 @@ export function UserDrawer({
                 description={t("admin.users.blockText")}
                 onConfirm={(reason) => onBlock(user.id, reason)}
               >
-                <Button
-                  variant="ghost"
-                  className={`col-span-2 ${drawerAction.danger}`}
-                >
+                <Button variant="ghost" className={`col-span-2 ${drawerAction.danger}`}>
                   <UserX className="size-4" /> {t("admin.users.block")}
                 </Button>
               </AbolishDialog>
@@ -140,9 +133,7 @@ export function UserDrawer({
             </Avatar>
             <div className="min-w-0">
               <div className="truncate text-sm text-muted-foreground">
-                {user.telegramUsername
-                  ? `@${user.telegramUsername}`
-                  : t("common.noUsername")}
+                {user.telegramUsername ? `@${user.telegramUsername}` : t("common.noUsername")}
               </div>
               <div className="tabular truncate text-sm">
                 {user.phoneNumber ?? t("admin.users.phoneMissing")}
@@ -158,29 +149,18 @@ export function UserDrawer({
                   value={
                     <span className="inline-flex items-center gap-2">
                       {user.shopName}
-                      {user.shopStatus && (
-                        <EntityStatusBadge status={user.shopStatus} />
-                      )}
+                      {user.shopStatus && <EntityStatusBadge status={user.shopStatus} />}
                     </span>
                   }
                 />
-                <DetailRow
-                  label={t("admin.common.productCount")}
-                  value={user.productCount}
-                />
+                <DetailRow label={t("admin.common.productCount")} value={user.productCount} />
                 <DetailRow
                   label={t("admin.users.lastChange")}
-                  value={
-                    user.lastProductAt
-                      ? formatDate(user.lastProductAt, locale)
-                      : "—"
-                  }
+                  value={user.lastProductAt ? formatDate(user.lastProductAt, locale) : "—"}
                 />
               </>
             ) : (
-              <p className="text-sm text-muted-foreground">
-                {t("admin.users.noShop")}
-              </p>
+              <p className="text-sm text-muted-foreground">{t("admin.users.noShop")}</p>
             )}
           </DetailSection>
 
@@ -199,9 +179,7 @@ export function UserDrawer({
             {isLoading ? (
               <Skeleton className="h-20 w-full" />
             ) : activity.length === 0 ? (
-              <p className="text-sm text-muted-foreground">
-                {t("admin.users.noProducts")}
-              </p>
+              <p className="text-sm text-muted-foreground">{t("admin.users.noProducts")}</p>
             ) : (
               <ul className="flex flex-col gap-2">
                 {activity.map((p) => (
@@ -212,8 +190,7 @@ export function UserDrawer({
                     <div className="min-w-0">
                       <div className="truncate text-sm">{p.name}</div>
                       <div className="text-xs text-muted-foreground">
-                        {formatDate(p.updatedAt, locale)} ·{" "}
-                        {priceText(p.price, locale, t)}
+                        {formatDate(p.updatedAt, locale)} · {priceText(p.price, locale, t)}
                       </div>
                     </div>
                     <EntityStatusBadge status={p.status} />

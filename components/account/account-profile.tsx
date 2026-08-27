@@ -76,12 +76,8 @@ export function AccountProfile() {
           <AvatarFallback>{user.fullname.slice(0, 1).toUpperCase()}</AvatarFallback>
         </Avatar>
         <div className="min-w-0">
-          <p className="truncate font-heading text-lg font-semibold">
-            {user.fullname}
-          </p>
-          {username && (
-            <p className="truncate text-sm text-muted-foreground">@{username}</p>
-          )}
+          <p className="truncate font-heading text-lg font-semibold">{user.fullname}</p>
+          {username && <p className="truncate text-sm text-muted-foreground">@{username}</p>}
         </div>
       </div>
 
@@ -98,21 +94,13 @@ export function AccountProfile() {
 
       <div className="mt-6 grid gap-2 sm:grid-cols-2">
         <Button asChild variant="outline" className="gap-2">
-          <Link
-            href={
-              isAdmin ? "/admin" : isSeller ? "/seller" : "/seller/profile"
-            }
-          >
+          <Link href={isAdmin ? "/admin" : isSeller ? "/seller" : "/seller/profile"}>
             {isSeller || isAdmin ? (
               <LayoutDashboard className="size-4" />
             ) : (
               <Store className="size-4" />
             )}
-            {isAdmin
-              ? t("nav.admin")
-              : isSeller
-                ? t("nav.sellerCabinet")
-                : t("nav.becomeSeller")}
+            {isAdmin ? t("nav.admin") : isSeller ? t("nav.sellerCabinet") : t("nav.becomeSeller")}
           </Link>
         </Button>
         <Button variant="ghost" className="gap-2 text-destructive" onClick={onLogout}>

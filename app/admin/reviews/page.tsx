@@ -47,19 +47,11 @@ function AiVerdictLine({
   const { t } = useT();
 
   if (byHuman) {
-    return (
-      <p className="mt-2 text-xs text-muted-foreground">
-        {t("admin.reviews.byHuman")}
-      </p>
-    );
+    return <p className="mt-2 text-xs text-muted-foreground">{t("admin.reviews.byHuman")}</p>;
   }
 
   if (!verdict) {
-    return (
-      <p className="mt-2 text-xs text-warning">
-        {t("admin.reviews.aiMissing")}
-      </p>
-    );
+    return <p className="mt-2 text-xs text-warning">{t("admin.reviews.aiMissing")}</p>;
   }
 
   return (
@@ -81,21 +73,16 @@ export default function AdminReviews() {
   const list = useQuery({
     queryKey: [KEY, params] as const,
     queryFn: ({ signal }) =>
-      adminReviewsControllerList(
-        params,
-        undefined,
-        signal,
-      ) as unknown as Promise<Paginated<AdminReview>>,
+      adminReviewsControllerList(params, undefined, signal) as unknown as Promise<
+        Paginated<AdminReview>
+      >,
     retry: false,
   });
 
   const stats = useQuery({
     queryKey: [KEY, "stats"] as const,
     queryFn: ({ signal }) =>
-      adminReviewsControllerStats(
-        undefined,
-        signal,
-      ) as unknown as Promise<ReviewStatusCounts>,
+      adminReviewsControllerStats(undefined, signal) as unknown as Promise<ReviewStatusCounts>,
     retry: false,
   });
 
@@ -132,10 +119,7 @@ export default function AdminReviews() {
 
   return (
     <div className="space-y-6">
-      <AdminPageHeader
-        title={t("admin.reviews.title")}
-        subtitle={t("admin.reviews.subtitle")}
-      />
+      <AdminPageHeader title={t("admin.reviews.title")} subtitle={t("admin.reviews.subtitle")} />
 
       <Tabs
         value={status}
@@ -180,9 +164,7 @@ export default function AdminReviews() {
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                     <RatingStars value={review.rating} />
-                    <span className="font-medium text-foreground">
-                      {review.authorName}
-                    </span>
+                    <span className="font-medium text-foreground">{review.authorName}</span>
                     <Link
                       href={`/store/${review.shopId}`}
                       className="hover:text-foreground hover:underline"

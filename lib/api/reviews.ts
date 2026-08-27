@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  useInfiniteQuery,
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   reviewsControllerCreate,
   reviewsControllerList,
@@ -14,12 +9,7 @@ import {
   reviewsControllerSummary,
   reviewsControllerUpdate,
 } from "@/lib/api/generated/endpoints/reviews/reviews";
-import type {
-  OwnReview,
-  Paginated,
-  PublicReview,
-  ReviewSummary,
-} from "./types";
+import type { OwnReview, Paginated, PublicReview, ReviewSummary } from "./types";
 
 export type ReviewTarget = { productId: number } | { shopId: number };
 
@@ -27,9 +17,7 @@ const REVIEWS_KEY = "/api/v1/reviews";
 const PRODUCTS_KEY = "/api/v1/product-cards";
 
 function targetParams(target: ReviewTarget) {
-  return "productId" in target
-    ? { product_id: target.productId }
-    : { shop_id: target.shopId };
+  return "productId" in target ? { product_id: target.productId } : { shop_id: target.shopId };
 }
 
 export function useReviewsFeed(target: ReviewTarget, limit = 10) {
@@ -53,11 +41,7 @@ export function useReviewSummary(target: ReviewTarget) {
   return useQuery({
     queryKey: [REVIEWS_KEY, "summary", params] as const,
     queryFn: ({ signal }) =>
-      reviewsControllerSummary(
-        params,
-        undefined,
-        signal,
-      ) as unknown as Promise<ReviewSummary>,
+      reviewsControllerSummary(params, undefined, signal) as unknown as Promise<ReviewSummary>,
   });
 }
 
@@ -82,9 +66,7 @@ export function useMyReviews(page: number, limit = 20) {
   return useQuery({
     queryKey: [REVIEWS_KEY, "mine", params] as const,
     queryFn: ({ signal }) =>
-      reviewsControllerMine(params, undefined, signal) as unknown as Promise<
-        Paginated<OwnReview>
-      >,
+      reviewsControllerMine(params, undefined, signal) as unknown as Promise<Paginated<OwnReview>>,
   });
 }
 

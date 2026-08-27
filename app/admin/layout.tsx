@@ -4,6 +4,7 @@ import {
   BarChart3,
   Coins,
   Flag,
+  Handshake,
   ImageIcon,
   Package,
   Settings,
@@ -16,11 +17,7 @@ import {
   Wallet,
 } from "@/components/icons";
 import { RequireRole } from "@/components/auth/require-role";
-import {
-  DashboardShell,
-  type NavItem,
-  type ShellBrand,
-} from "@/components/layout/dashboard-shell";
+import { DashboardShell, type NavItem, type ShellBrand } from "@/components/layout/dashboard-shell";
 import { useT } from "@/components/providers/i18n-provider";
 import { useAuth } from "@/lib/api/auth";
 
@@ -46,6 +43,11 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
     { href: "/admin/banners", label: t("admin.nav.banners"), icon: ImageIcon },
     { href: "/admin/shop-banners", label: t("admin.nav.shopBanners"), icon: ShieldCheck },
     { href: "/admin/subscriptions", label: t("admin.nav.subscriptions"), icon: Wallet },
+    {
+      href: "/admin/subscriptions/report",
+      label: t("admin.nav.subsReport"),
+      icon: Handshake,
+    },
     { href: "/admin/ai-review", label: t("admin.nav.aiReview"), icon: Sparkles },
     { href: "/admin/ai-usage", label: t("admin.nav.aiUsage"), icon: Coins },
     { href: "/admin/broadcast", label: t("admin.nav.broadcast"), icon: Send },
@@ -63,11 +65,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <DashboardShell
-      items={items}
-      sectionLabel={t("admin.panel")}
-      brand={brand}
-    >
+    <DashboardShell items={items} sectionLabel={t("admin.panel")} brand={brand}>
       {children}
     </DashboardShell>
   );

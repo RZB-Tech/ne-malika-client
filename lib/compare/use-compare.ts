@@ -14,11 +14,7 @@ import {
 import type { ProductSnapshot } from "@/lib/product-snapshot";
 
 export function useCompare() {
-  const items = useSyncExternalStore(
-    subscribeLocalCompare,
-    getLocalCompare,
-    getEmptyCompare,
-  );
+  const items = useSyncExternalStore(subscribeLocalCompare, getLocalCompare, getEmptyCompare);
 
   const toggle = useCallback((product: ProductSnapshot): boolean => {
     if (getLocalCompare().some((p) => p.id === product.id)) {
@@ -29,10 +25,7 @@ export function useCompare() {
   }, []);
 
   const ids = useMemo(() => items.map((p) => p.id), [items]);
-  const has = useCallback(
-    (id: number) => items.some((p) => p.id === id),
-    [items],
-  );
+  const has = useCallback((id: number) => items.some((p) => p.id === id), [items]);
 
   return {
     items: items as CompareProduct[],

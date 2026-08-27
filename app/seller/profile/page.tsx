@@ -86,15 +86,12 @@ export default function SellerProfile() {
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const tgUsername = telegram.trim()
-      ? parseTelegramUsername(telegram)
-      : null;
+    const tgUsername = telegram.trim() ? parseTelegramUsername(telegram) : null;
 
     const found: Record<string, string> = {};
     if (name.trim().length < 2) found.name = t("seller.profile.needName");
     if (!shop && !phone.trim()) found.phone = t("seller.profile.needPhone");
-    if (telegram.trim() && !tgUsername)
-      found.telegram = t("seller.profile.badTelegram");
+    if (telegram.trim() && !tgUsername) found.telegram = t("seller.profile.badTelegram");
 
     setErrors(found);
     if (Object.keys(found).length > 0) {
@@ -137,9 +134,7 @@ export default function SellerProfile() {
       setLogo(null);
       toast.success(t("seller.profile.saved"));
     } catch (err) {
-      toast.error(
-        apiErrorMessage(err, t, "seller.profile.saveFailed"),
-      );
+      toast.error(apiErrorMessage(err, t, "seller.profile.saveFailed"));
     } finally {
       setSaving(false);
     }
@@ -225,7 +220,12 @@ export default function SellerProfile() {
           </div>
           <div className={field}>
             <Label htmlFor="sdesc">{t("seller.profile.description")}</Label>
-            <Textarea id="sdesc" rows={3} value={description} onChange={(e) => setDescription(e.target.value)} />
+            <Textarea
+              id="sdesc"
+              rows={3}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
           </div>
           <div className="grid gap-5 sm:grid-cols-2">
             <div className={field}>
@@ -273,8 +273,7 @@ export default function SellerProfile() {
                   aria-invalid={Boolean(errors.telegram)}
                   onChange={(e) => {
                     setTelegram(e.target.value);
-                    if (errors.telegram)
-                      setErrors((p) => ({ ...p, telegram: "" }));
+                    if (errors.telegram) setErrors((p) => ({ ...p, telegram: "" }));
                   }}
                   onBlur={() => {
                     const u = parseTelegramUsername(telegram);
@@ -305,17 +304,9 @@ export default function SellerProfile() {
 
       <div className="flex flex-col items-end gap-2">
         <Button type="submit" disabled={saving}>
-          {saving
-            ? t("common.loading")
-            : shop
-              ? t("common.save")
-              : t("seller.shop.create")}
+          {saving ? t("common.loading") : shop ? t("common.save") : t("seller.shop.create")}
         </Button>
-        {!shop && (
-          <p className="text-xs text-muted-foreground">
-            {t("seller.shop.afterCreate")}
-          </p>
-        )}
+        {!shop && <p className="text-xs text-muted-foreground">{t("seller.shop.afterCreate")}</p>}
       </div>
     </form>
   );

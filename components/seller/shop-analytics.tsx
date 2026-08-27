@@ -3,15 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
-import {
-  Eye,
-  Handshake,
-  HardDriveDownload,
-  Loader2,
-  Lock,
-  Phone,
-  Users,
-} from "@/components/icons";
+import { Eye, Handshake, HardDriveDownload, Loader2, Lock, Phone, Users } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -86,27 +78,16 @@ export function ShopAnalytics({
     <div className="space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="min-w-0">
-          <Tabs
-            value={String(days)}
-            onValueChange={(value) => onDaysChange(Number(value))}
-          >
+          <Tabs value={String(days)} onValueChange={(value) => onDaysChange(Number(value))}>
             <TabsList>
               {ANALYTICS_RANGES.map((range) => {
                 const locked = range > analyticsDays;
                 return (
-                  <TabsTrigger
-                    key={range}
-                    value={String(range)}
-                    disabled={locked}
-                  >
+                  <TabsTrigger key={range} value={String(range)} disabled={locked}>
                     {locked && <Lock className="size-3.5" />}
                     {t(`seller.analytics.range${range}`)}
                     {}
-                    {locked && (
-                      <span className="sr-only">
-                        {t("seller.analytics.rangeLocked")}
-                      </span>
-                    )}
+                    {locked && <span className="sr-only">{t("seller.analytics.rangeLocked")}</span>}
                   </TabsTrigger>
                 );
               })}
@@ -144,9 +125,7 @@ export function ShopAnalytics({
               ) : (
                 <HardDriveDownload className="size-4" />
               )}
-              {exporting
-                ? t("seller.analytics.exporting")
-                : t("seller.analytics.export")}
+              {exporting ? t("seller.analytics.exporting") : t("seller.analytics.export")}
             </Button>
           ) : (
             <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -180,11 +159,7 @@ export function ShopAnalytics({
       ) : (
         <>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <StatCard
-              label={t("seller.analytics.views")}
-              value={num(data.views)}
-              icon={Eye}
-            />
+            <StatCard label={t("seller.analytics.views")} value={num(data.views)} icon={Eye} />
             <StatCard
               label={t("seller.analytics.visits")}
               value={num(data.visits)}

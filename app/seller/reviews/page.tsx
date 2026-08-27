@@ -23,10 +23,7 @@ export default function SellerReviews() {
   const summary = useQuery({
     queryKey: [KEY, "summary"] as const,
     queryFn: ({ signal }) =>
-      sellerReviewsControllerSummary(
-        undefined,
-        signal,
-      ) as unknown as Promise<ReviewSummary>,
+      sellerReviewsControllerSummary(undefined, signal) as unknown as Promise<ReviewSummary>,
     retry: false,
   });
 
@@ -34,11 +31,9 @@ export default function SellerReviews() {
   const list = useQuery({
     queryKey: [KEY, params] as const,
     queryFn: ({ signal }) =>
-      sellerReviewsControllerList(
-        params,
-        undefined,
-        signal,
-      ) as unknown as Promise<Paginated<PublicReview>>,
+      sellerReviewsControllerList(params, undefined, signal) as unknown as Promise<
+        Paginated<PublicReview>
+      >,
     retry: false,
   });
 
@@ -52,9 +47,7 @@ export default function SellerReviews() {
         <h1 className="font-heading text-2xl font-bold tracking-tight">
           {t("seller.reviews.title")}
         </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {t("seller.reviews.subtitle")}
-        </p>
+        <p className="mt-1 text-sm text-muted-foreground">{t("seller.reviews.subtitle")}</p>
       </div>
 
       {summary.isLoading ? (
@@ -62,13 +55,9 @@ export default function SellerReviews() {
       ) : count > 0 ? (
         <Card className="grid gap-6 p-5 sm:grid-cols-[auto_minmax(0,1fr)] sm:gap-10">
           <div className="flex flex-col items-center justify-center gap-1">
-            <span className="font-heading text-4xl font-bold tabular">
-              {formatRating(average)}
-            </span>
+            <span className="font-heading text-4xl font-bold tabular">{formatRating(average)}</span>
             <RatingStars value={average} size="md" />
-            <span className="text-xs text-muted-foreground">
-              {t("reviews.count", { count })}
-            </span>
+            <span className="text-xs text-muted-foreground">{t("reviews.count", { count })}</span>
           </div>
 
           <div className="flex flex-col justify-center gap-1.5">
@@ -114,9 +103,7 @@ export default function SellerReviews() {
               <Card key={review.id} className="p-4">
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
                   <RatingStars value={review.rating} />
-                  <span className="font-medium text-foreground">
-                    {review.authorName}
-                  </span>
+                  <span className="font-medium text-foreground">{review.authorName}</span>
                   {review.productCardId && (
                     <Link
                       href={`/product/${review.productCardId}`}
@@ -127,11 +114,7 @@ export default function SellerReviews() {
                   )}
                   <span>· {formatDate(review.createdAt, locale)}</span>
                 </div>
-                {review.text && (
-                  <p className="mt-2 text-sm whitespace-pre-line">
-                    {review.text}
-                  </p>
-                )}
+                {review.text && <p className="mt-2 text-sm whitespace-pre-line">{review.text}</p>}
               </Card>
             ))}
           </div>

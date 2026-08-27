@@ -19,10 +19,7 @@ import { useT } from "@/components/providers/i18n-provider";
 import { useCompare } from "@/lib/compare/use-compare";
 import { AI_COMPARE_MIN, useAiCompare } from "@/lib/api/ai-compare";
 import { apiErrorMessage } from "@/lib/api/errors";
-import type {
-  AiCompareProductDto,
-  AiCompareResultDto,
-} from "@/lib/api/generated/schemas";
+import type { AiCompareProductDto, AiCompareResultDto } from "@/lib/api/generated/schemas";
 import { cn } from "@/lib/utils";
 
 export function AiComparePanel() {
@@ -143,9 +140,7 @@ function Result({ result }: { result: AiCompareResultDto }) {
 }
 
 function hasNotes(product: AiCompareProductDto): boolean {
-  return (
-    product.pros.length > 0 || product.cons.length > 0 || Boolean(product.bestFor)
-  );
+  return product.pros.length > 0 || product.cons.length > 0 || Boolean(product.bestFor);
 }
 
 function SpecTable({ result }: { result: AiCompareResultDto }) {
@@ -153,9 +148,7 @@ function SpecTable({ result }: { result: AiCompareResultDto }) {
 
   return (
     <div>
-      <h3 className="mb-2 text-sm font-medium text-muted-foreground">
-        {t("aiCompare.specs")}
-      </h3>
+      <h3 className="mb-2 text-sm font-medium text-muted-foreground">{t("aiCompare.specs")}</h3>
 
       <div className="overflow-x-auto rounded-xl border border-border">
         <table className="w-full border-collapse text-sm">
@@ -167,10 +160,7 @@ function SpecTable({ result }: { result: AiCompareResultDto }) {
                   key={product.id}
                   className="min-w-[140px] border-l border-border p-3 text-left align-top text-sm font-medium sm:min-w-[180px]"
                 >
-                  <Link
-                    href={`/product/${product.id}`}
-                    className="line-clamp-2 hover:text-primary"
-                  >
+                  <Link href={`/product/${product.id}`} className="line-clamp-2 hover:text-primary">
                     {product.name}
                   </Link>
                 </th>
@@ -230,10 +220,7 @@ function ProductNotes({ product }: { product: AiCompareProductDto }) {
 
   return (
     <div className="rounded-xl border border-border p-4">
-      <Link
-        href={`/product/${product.id}`}
-        className="line-clamp-2 font-medium hover:text-primary"
-      >
+      <Link href={`/product/${product.id}`} className="line-clamp-2 font-medium hover:text-primary">
         {product.name}
       </Link>
 
@@ -261,9 +248,7 @@ function ProductNotes({ product }: { product: AiCompareProductDto }) {
 
       {product.bestFor && (
         <p className="mt-3 text-xs text-muted-foreground">
-          <span className="font-medium text-foreground">
-            {t("aiCompare.bestFor")}:{" "}
-          </span>
+          <span className="font-medium text-foreground">{t("aiCompare.bestFor")}: </span>
           {product.bestFor}
         </p>
       )}
@@ -291,18 +276,14 @@ function Verdict({ result }: { result: AiCompareResultDto }) {
           {best && (
             <span className="inline-flex items-center gap-1.5 rounded-lg bg-card px-2.5 py-1.5 text-xs">
               <Trophy className="size-3.5 text-primary" />
-              <span className="text-muted-foreground">
-                {t("aiCompare.strongest")}:
-              </span>
+              <span className="text-muted-foreground">{t("aiCompare.strongest")}:</span>
               <span className="font-medium">{best}</span>
             </span>
           )}
           {value && (
             <span className="inline-flex items-center gap-1.5 rounded-lg bg-card px-2.5 py-1.5 text-xs">
               <Wallet className="size-3.5 text-primary" />
-              <span className="text-muted-foreground">
-                {t("aiCompare.value")}:
-              </span>
+              <span className="text-muted-foreground">{t("aiCompare.value")}:</span>
               <span className="font-medium">{value}</span>
             </span>
           )}

@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useSyncExternalStore,
-} from "react";
+import { createContext, useCallback, useContext, useEffect, useSyncExternalStore } from "react";
 import {
   authControllerLogout,
   authControllerRefresh,
@@ -15,13 +9,7 @@ import {
 } from "./generated/endpoints/auth/auth";
 import type { AuthResponseDto, TelegramWidgetDto } from "./generated/schemas";
 import { DEV_ROLE } from "./dev-fixtures";
-import {
-  clearAuth,
-  getAccessToken,
-  getCurrentUser,
-  setAuth,
-  subscribe,
-} from "./token-store";
+import { clearAuth, getAccessToken, getCurrentUser, setAuth, subscribe } from "./token-store";
 
 export type TelegramUser = TelegramWidgetDto;
 
@@ -44,9 +32,8 @@ const subscribeNoop = () => () => {};
 
 function readMiniAppInitData(): string | null {
   if (typeof window === "undefined") return null;
-  const wa = (
-    window as unknown as { Telegram?: { WebApp?: { initData?: string } } }
-  ).Telegram?.WebApp;
+  const wa = (window as unknown as { Telegram?: { WebApp?: { initData?: string } } }).Telegram
+    ?.WebApp;
   return wa?.initData && wa.initData.length > 0 ? wa.initData : null;
 }
 

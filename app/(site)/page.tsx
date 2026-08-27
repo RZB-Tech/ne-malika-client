@@ -6,18 +6,11 @@ import { CatalogView } from "@/components/catalog/catalog-view";
 import { getBanners, getPublicProducts } from "@/lib/api/server";
 import { randomCatalogSeed } from "@/lib/catalog-seed";
 import type { Paginated, PublicProductCard } from "@/lib/api/types";
-import {
-  SITE_NAME,
-  SITE_URL,
-  SITE_DESCRIPTION,
-  SITE_KEYWORDS,
-  absoluteUrl,
-} from "@/lib/seo";
+import { SITE_NAME, SITE_URL, SITE_DESCRIPTION, SITE_KEYWORDS, absoluteUrl } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: {
-    absolute:
-      "neMalika — компьютерный рынок Малика (Malika) в Ташкенте онлайн",
+    absolute: "neMalika — компьютерный рынок Малика (Malika) в Ташкенте онлайн",
   },
   description: SITE_DESCRIPTION,
   keywords: SITE_KEYWORDS,

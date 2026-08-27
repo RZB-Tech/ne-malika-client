@@ -2,11 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Check, ChevronDown, Lock, Search } from "@/components/icons";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
 import { useT } from "@/components/providers/i18n-provider";
 import { useCategories, findCategory } from "@/lib/api/categories";
@@ -57,10 +53,7 @@ export function CategorySelect({
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
 
-  const options = useMemo(
-    () => buildOptions(roots, locale),
-    [roots, locale],
-  );
+  const options = useMemo(() => buildOptions(roots, locale), [roots, locale]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -128,9 +121,7 @@ export function CategorySelect({
                     <p className="flex flex-wrap items-baseline gap-x-1.5 px-2 pb-1 pt-2 text-xs font-medium text-muted-foreground">
                       {o.group}
                       {locked && (
-                        <span className="font-normal">
-                          {t("category.restrictedHint")}
-                        </span>
+                        <span className="font-normal">{t("category.restrictedHint")}</span>
                       )}
                     </p>
                   )}
@@ -155,9 +146,7 @@ export function CategorySelect({
                     {locked ? (
                       <Lock className="size-3.5 shrink-0 opacity-60" />
                     ) : (
-                      o.id === value && (
-                        <Check className="size-4 shrink-0 text-primary" />
-                      )
+                      o.id === value && <Check className="size-4 shrink-0 text-primary" />
                     )}
                   </button>
                 </div>

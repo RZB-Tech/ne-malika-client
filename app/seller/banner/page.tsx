@@ -12,11 +12,7 @@ import { BannerStatusBadge } from "@/components/shared/badges";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { BannerForm } from "@/components/seller/banner-form";
 import { useT } from "@/components/providers/i18n-provider";
-import {
-  BANNER_ASPECT_CSS,
-  bannerImageUrl,
-  type Banner,
-} from "@/lib/api/banners";
+import { BANNER_ASPECT_CSS, bannerImageUrl, type Banner } from "@/lib/api/banners";
 import type { BannerModerationStatus } from "@/lib/api/types";
 import type { Locale } from "@/lib/i18n/config";
 import { useSellerSubscription } from "@/lib/api/subscription";
@@ -83,9 +79,7 @@ export default function SellerBanner() {
         <h1 className="font-heading text-2xl font-bold tracking-tight">
           {t("seller.banner.title")}
         </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {t("seller.banner.subtitle")}
-        </p>
+        <p className="mt-1 text-sm text-muted-foreground">{t("seller.banner.subtitle")}</p>
       </div>
 
       {}
@@ -104,11 +98,7 @@ export default function SellerBanner() {
         <>
           {}
           {banner && (
-            <BannerCard
-              banner={banner}
-              locale={locale}
-              onRemove={() => onRemove(banner.id)}
-            />
+            <BannerCard banner={banner} locale={locale} onRemove={() => onRemove(banner.id)} />
           )}
 
           {!locked && !banner && (
@@ -136,9 +126,7 @@ function LockedCard() {
     <Card className="flex flex-col items-center gap-3 px-6 py-14 text-center">
       <Lock className="size-8 text-muted-foreground opacity-60" />
       <p className="font-medium">{t("seller.banner.locked")}</p>
-      <p className="max-w-md text-sm text-muted-foreground">
-        {t("seller.banner.lockedText")}
-      </p>
+      <p className="max-w-md text-sm text-muted-foreground">{t("seller.banner.lockedText")}</p>
       <Button asChild className="mt-1">
         <Link href="/seller/subscription">{t("seller.banner.upgrade")}</Link>
       </Button>
@@ -180,9 +168,7 @@ function BannerCard({
             <BannerStatusBadge status={banner.status} />
           </div>
 
-          <p className="text-sm text-muted-foreground">
-            {t(statusText)}
-          </p>
+          <p className="text-sm text-muted-foreground">{t(statusText)}</p>
 
           {banner.status === "rejected" && banner.rejectReason && (
             <p className="text-sm text-destructive">

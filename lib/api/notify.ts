@@ -31,10 +31,7 @@ export function useNotificationChannels(enabled = true) {
   return useQuery<NotificationChannels>({
     queryKey: [CHANNELS_KEY] as const,
     queryFn: async ({ signal }) => {
-      const { data } = await axiosInstance.get<NotificationChannels>(
-        CHANNELS_KEY,
-        { signal },
-      );
+      const { data } = await axiosInstance.get<NotificationChannels>(CHANNELS_KEY, { signal });
       return data;
     },
     enabled: enabled && isHydrated && isAuthenticated,
@@ -47,10 +44,7 @@ export function useSetTelegramNotifications() {
 
   return useMutation({
     mutationFn: async (enabled: boolean) => {
-      const { data } = await axiosInstance.patch<NotificationChannels>(
-        TELEGRAM_URL,
-        { enabled },
-      );
+      const { data } = await axiosInstance.patch<NotificationChannels>(TELEGRAM_URL, { enabled });
       return data;
     },
     onSuccess: (data) => queryClient.setQueryData([CHANNELS_KEY], data),

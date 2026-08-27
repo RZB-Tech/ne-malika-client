@@ -26,12 +26,7 @@ export function Pagination({
       </span>
 
       <div className="flex items-center gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          disabled={page <= 1}
-          onClick={() => onChange(page - 1)}
-        >
+        <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => onChange(page - 1)}>
           <ChevronLeft className="size-4" /> {t("common.back")}
         </Button>
         <span className="tabular text-sm text-muted-foreground">

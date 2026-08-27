@@ -38,11 +38,7 @@ import { ProductAutofillButton } from "@/components/shared/product-autofill-butt
 import { ModerationBadge } from "@/components/shared/badges";
 import { ProductStatsCard } from "@/components/seller/product-stats";
 import { CategorySelect } from "@/components/seller/category-select";
-import {
-  PhotoDropzone,
-  storedPhoto,
-  type UploadedPhoto,
-} from "@/components/seller/photo-dropzone";
+import { PhotoDropzone, storedPhoto, type UploadedPhoto } from "@/components/seller/photo-dropzone";
 import { useT } from "@/components/providers/i18n-provider";
 import { PhotoAiDialog } from "@/components/shared/photo-ai-dialog";
 import { applyGenerated } from "@/components/shared/apply-generated";
@@ -110,9 +106,7 @@ export function SellerProductDetail({ id }: { id: number }) {
     setState(row.state);
     setCategoryId(row.categoryId ?? null);
     setSpecs(row.characteristics ?? []);
-    setPhotos(
-      (row.photos ?? []).map((key) => storedPhoto(key, photoUrl(key) ?? "", row.name)),
-    );
+    setPhotos((row.photos ?? []).map((key) => storedPhoto(key, photoUrl(key) ?? "", row.name)));
   }
 
   if (isLoading) {
@@ -173,9 +167,7 @@ export function SellerProductDetail({ id }: { id: number }) {
       await queryClient.invalidateQueries();
       toast.success(t("seller.detail.recheckSent"));
     } catch (err) {
-      toast.error(
-        apiErrorMessage(err, t, "seller.detail.recheckFailed"),
-      );
+      toast.error(apiErrorMessage(err, t, "seller.detail.recheckFailed"));
     }
   };
 
@@ -246,9 +238,7 @@ export function SellerProductDetail({ id }: { id: number }) {
                     setState(before.state);
                   }}
                   onPhotoStored={(photoId, key) =>
-                    setPhotos((prev) =>
-                      prev.map((p) => (p.id === photoId ? { ...p, key } : p)),
-                    )
+                    setPhotos((prev) => prev.map((p) => (p.id === photoId ? { ...p, key } : p)))
                   }
                   disabled={row.status === "abolished"}
                 />
@@ -261,7 +251,9 @@ export function SellerProductDetail({ id }: { id: number }) {
                 <Input id="pname" value={name} onChange={(e) => setName(e.target.value)} />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="pprice">{t("seller.add.price")}, {t("common.currency")}</Label>
+                <Label htmlFor="pprice">
+                  {t("seller.add.price")}, {t("common.currency")}
+                </Label>
                 <Input
                   id="pprice"
                   inputMode="numeric"
@@ -307,16 +299,17 @@ export function SellerProductDetail({ id }: { id: number }) {
                     text={description}
                     onResult={setDescription}
                     onPhotoStored={(photoId, key) =>
-                      setPhotos((prev) =>
-                        prev.map((p) => (p.id === photoId ? { ...p, key } : p)),
-                      )
+                      setPhotos((prev) => prev.map((p) => (p.id === photoId ? { ...p, key } : p)))
                     }
                   />
                 </div>
-                <Textarea id="pdesc" rows={3} value={description} onChange={(e) => setDescription(e.target.value)} />
-                <p className="text-xs text-muted-foreground">
-                  {t("ai.description.markdownHint")}
-                </p>
+                <Textarea
+                  id="pdesc"
+                  rows={3}
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                />
+                <p className="text-xs text-muted-foreground">{t("ai.description.markdownHint")}</p>
               </div>
             </div>
 
@@ -350,19 +343,29 @@ export function SellerProductDetail({ id }: { id: number }) {
       <ProductStatsCard productId={id} />
 
       <Card className="p-6">
-        <h2 className="mb-4 font-heading text-lg font-bold tracking-tight">{t("seller.add.section2")}</h2>
+        <h2 className="mb-4 font-heading text-lg font-bold tracking-tight">
+          {t("seller.add.section2")}
+        </h2>
         <div className="space-y-3">
           {specs.map((s, i) => (
             <div key={i} className="flex items-center gap-3">
               <Input
                 placeholder={t("seller.add.specName")}
                 value={s.key}
-                onChange={(e) => setSpecs((arr) => arr.map((x, j) => (j === i ? { ...x, key: e.target.value } : x)))}
+                onChange={(e) =>
+                  setSpecs((arr) =>
+                    arr.map((x, j) => (j === i ? { ...x, key: e.target.value } : x)),
+                  )
+                }
               />
               <Input
                 placeholder={t("seller.add.specValue")}
                 value={s.value}
-                onChange={(e) => setSpecs((arr) => arr.map((x, j) => (j === i ? { ...x, value: e.target.value } : x)))}
+                onChange={(e) =>
+                  setSpecs((arr) =>
+                    arr.map((x, j) => (j === i ? { ...x, value: e.target.value } : x)),
+                  )
+                }
               />
               <Button
                 type="button"
@@ -396,34 +399,24 @@ export function SellerProductDetail({ id }: { id: number }) {
       />
 
       <Card className="p-6">
-        <h2 className="mb-4 font-heading text-lg font-bold tracking-tight">{t("seller.add.section3")}</h2>
-        <PhotoDropzone
-          photos={photos}
-          onChange={setPhotos}
-          onPhotoClick={setAiPhoto}
-        />
-        <p className="mt-2 text-xs text-muted-foreground">
-          {t("admin.form.photoHint")}
-        </p>
+        <h2 className="mb-4 font-heading text-lg font-bold tracking-tight">
+          {t("seller.add.section3")}
+        </h2>
+        <PhotoDropzone photos={photos} onChange={setPhotos} onPhotoClick={setAiPhoto} />
+        <p className="mt-2 text-xs text-muted-foreground">{t("admin.form.photoHint")}</p>
 
         <PhotoAiDialog
           photo={aiPhoto}
           onClose={() => setAiPhoto(null)}
           onApply={(generated) => {
-            const { photos: next, dropped } = applyGenerated(
-              photos,
-              aiPhoto?.id,
-              generated,
-            );
+            const { photos: next, dropped } = applyGenerated(photos, aiPhoto?.id, generated);
             setPhotos(next);
             if (dropped > 0) {
               toast.error(t("admin.photoAi.tooManyPhotos", { count: dropped }));
             }
           }}
           onPhotoStored={(photoId, key) =>
-            setPhotos((prev) =>
-              prev.map((p) => (p.id === photoId ? { ...p, key } : p)),
-            )
+            setPhotos((prev) => prev.map((p) => (p.id === photoId ? { ...p, key } : p)))
           }
         />
       </Card>
@@ -504,27 +497,18 @@ function AiCheckPanel({
             <ui.Icon className="size-5" />
             {t(ui.key)}
           </div>
-          {check?.summary && (
-            <p className="text-sm text-muted-foreground">{check.summary}</p>
-          )}
+          {check?.summary && <p className="text-sm text-muted-foreground">{check.summary}</p>}
           <div className="grid gap-2 sm:grid-cols-2">
             {Object.entries(check?.checks ?? {}).map(([key, detail]) => {
               if (!detail) return null;
               const aspect = VERDICT_UI[detail.verdict];
               return (
-                <div
-                  key={key}
-                  className="rounded-lg border border-border p-3 text-sm"
-                >
-                  <div
-                    className={`flex items-center gap-1.5 font-medium ${aspect.cls}`}
-                  >
+                <div key={key} className="rounded-lg border border-border p-3 text-sm">
+                  <div className={`flex items-center gap-1.5 font-medium ${aspect.cls}`}>
                     <aspect.Icon className="size-4" />
                     {ASPECT_KEYS[key] ? t(ASPECT_KEYS[key]) : key}
                   </div>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    {detail.notes}
-                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">{detail.notes}</p>
                 </div>
               );
             })}

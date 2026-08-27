@@ -16,15 +16,12 @@ import type { AxiosError } from "axios";
 
 export function StoreDetailConnected({ id }: { id: number }) {
   const { t } = useT();
-  const { data, isLoading, isError, error, refetch } = useShopsControllerGetPublic(
-    id,
-    {
-      query: {
-        select: (raw) => raw as unknown as PublicShop,
-        retry: false,
-      },
+  const { data, isLoading, isError, error, refetch } = useShopsControllerGetPublic(id, {
+    query: {
+      select: (raw) => raw as unknown as PublicShop,
+      retry: false,
     },
-  );
+  });
 
   if (isLoading) {
     return (
@@ -56,9 +53,7 @@ export function StoreDetailConnected({ id }: { id: number }) {
   }
 
   const store = mapShop(data);
-  const products = (data.productCards ?? []).map((pc) =>
-    mapProductRow(pc, data.name),
-  );
+  const products = (data.productCards ?? []).map((pc) => mapProductRow(pc, data.name));
 
   return <StoreDetail store={store} products={products} />;
 }

@@ -62,9 +62,7 @@ export function SubscriptionPayments() {
                 <TableHead className="min-w-[140px]">
                   {t("seller.subscription.payments.colDate")}
                 </TableHead>
-                <TableHead>
-                  {t("seller.subscription.payments.colPlan")}
-                </TableHead>
+                <TableHead>{t("seller.subscription.payments.colPlan")}</TableHead>
                 <TableHead className="text-right">
                   {t("seller.subscription.payments.colAmount")}
                 </TableHead>
@@ -100,15 +98,11 @@ export function SubscriptionPayments() {
                         <div className="text-xs text-muted-foreground">
                           {p.provider === "manual"
                             ? t("seller.subscription.payments.manual")
-                            : t(
-                                `seller.subscription.provider.${p.provider}`,
-                              )}
+                            : t(`seller.subscription.provider.${p.provider}`)}
                         </div>
                       </TableCell>
 
-                      <TableCell className="align-top text-sm">
-                        {planLabel(p.plan, t)}
-                      </TableCell>
+                      <TableCell className="align-top text-sm">{planLabel(p.plan, t)}</TableCell>
 
                       <TableCell className="tabular align-top text-right text-sm whitespace-nowrap">
                         {priceText(p.amount, locale, t)}
@@ -186,16 +180,9 @@ export function SubscriptionPayments() {
   );
 }
 
-function PaymentStatusBadge({
-  status,
-}: {
-  status: SubscriptionPaymentDtoStatus;
-}) {
+function PaymentStatusBadge({ status }: { status: SubscriptionPaymentDtoStatus }) {
   const { t } = useT();
-  const cfg: Record<
-    SubscriptionPaymentDtoStatus,
-    { cls: string; Icon: typeof Clock }
-  > = {
+  const cfg: Record<SubscriptionPaymentDtoStatus, { cls: string; Icon: typeof Clock }> = {
     pending: { cls: "bg-warning/15 text-warning", Icon: Clock },
     prepared: { cls: "bg-warning/15 text-warning", Icon: Clock },
     paid: { cls: "bg-success/12 text-success", Icon: CheckCircle2 },
@@ -209,10 +196,7 @@ function PaymentStatusBadge({
   const { cls, Icon } = cfg[known];
 
   return (
-    <Badge
-      variant="outline"
-      className={cn("gap-1 border-transparent font-medium", cls)}
-    >
+    <Badge variant="outline" className={cn("gap-1 border-transparent font-medium", cls)}>
       <Icon className="size-3" />
       {t(`seller.subscription.status.${known}`)}
     </Badge>

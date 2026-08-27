@@ -65,9 +65,7 @@ export function FixDescriptionButton({
       setRevision({ before, after: result.text });
       toast.success(t("ai.description.done"));
     } catch (err) {
-      toast.error(
-        apiErrorMessage(err, t, "ai.description.failed"),
-      );
+      toast.error(apiErrorMessage(err, t, "ai.description.failed"));
     } finally {
       setBusy(false);
     }
@@ -102,11 +100,7 @@ export function FixDescriptionButton({
         disabled={busy || disabled}
         title={t("ai.description.hint")}
       >
-        {busy ? (
-          <Loader2 className="size-3.5 animate-spin" />
-        ) : (
-          <Wand2 className="size-3.5" />
-        )}
+        {busy ? <Loader2 className="size-3.5 animate-spin" /> : <Wand2 className="size-3.5" />}
         {t("ai.description.action")}
       </Button>
     </div>

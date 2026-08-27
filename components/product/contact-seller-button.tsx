@@ -31,9 +31,7 @@ export function ContactSellerButton({
         onClick={() => trackContact(productId, "telegram")}
       >
         <TelegramIcon className="size-4 shrink-0" />
-        <span className="min-w-0 truncate">
-          {label ?? t("product.contactSeller")}
-        </span>
+        <span className="min-w-0 truncate">{label ?? t("product.contactSeller")}</span>
       </a>
     </Button>
   );

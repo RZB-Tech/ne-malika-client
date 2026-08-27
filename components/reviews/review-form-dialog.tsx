@@ -65,9 +65,7 @@ export function ReviewFormDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>
-            {t(existing ? "reviews.form.editTitle" : "reviews.form.title")}
-          </DialogTitle>
+          <DialogTitle>{t(existing ? "reviews.form.editTitle" : "reviews.form.title")}</DialogTitle>
           <DialogDescription>{t("reviews.form.moderated")}</DialogDescription>
         </DialogHeader>
 
@@ -96,11 +94,7 @@ export function ReviewFormDialog({
         </div>
 
         <DialogFooter>
-          <Button
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-            disabled={save.isPending}
-          >
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={save.isPending}>
             {t("common.cancel")}
           </Button>
           <Button onClick={submit} disabled={save.isPending}>
