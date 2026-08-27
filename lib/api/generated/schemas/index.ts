@@ -184,6 +184,7 @@ export * from './syncProductViewsDto';
 export * from './telegramAuthDto';
 export * from './telegramChannelDto';
 export * from './telegramWidgetDto';
+export * from './testPaymentLinkDto';
 export * from './topProductDto';
 export * from './unsubscribePushDto';
 export * from './updateBannerDto';

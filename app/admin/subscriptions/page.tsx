@@ -9,6 +9,7 @@ import {
   Search,
   TriangleAlert,
   Wallet,
+  Wrench,
 } from "@/components/icons";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -39,9 +40,15 @@ import {
   SubscriptionActivateDialog,
   type SubscriptionActivateTarget,
 } from "@/components/admin/subscription-activate-dialog";
+import {
+  TestPaymentDialog,
+  type TestPaymentTarget,
+} from "@/components/admin/test-payment-dialog";
 import { Pagination } from "@/components/shared/pagination";
 import { useT } from "@/components/providers/i18n-provider";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { apiErrorMessage } from "@/lib/api/errors";
 import { formatDate, formatPrice } from "@/lib/format";
 import { planLabel } from "@/lib/api/subscription";
 import type { AdminSubscriptionRow, Paginated } from "@/lib/api/types";
@@ -49,11 +56,13 @@ import {
   getAdminSubscriptionsControllerListQueryKey,
   useAdminShopSubscriptionControllerCancel,
   useAdminShopSubscriptionControllerPayments,
+  useAdminShopSubscriptionControllerTestCheckout,
   useAdminSubscriptionsControllerList,
 } from "@/lib/api/generated/endpoints/subscriptions-admin/subscriptions-admin";
 import type {
   AdminSubscriptionsControllerListParams,
   SubscriptionPaymentDto,
+  TestPaymentLinkDto,
 } from "@/lib/api/generated/schemas";
 
 /** Горизонт вкладки «Истекают»: неделя — столько занимает разговор о продлении. */
@@ -118,6 +127,13 @@ export default function AdminSubscriptions() {
   const [q, setQ] = useState("");
   const [activating, setActivating] =
     useState<SubscriptionActivateTarget | null>(null);
+  /**
+   * Проверка кассы: цель и полученная ссылка держатся раздельно. Цель ставится
+   * до запроса — чтобы заголовок окна знал магазин, — а ссылка приходит после,
+   * и окно открывается только когда есть обе.
+   */
+  const [testTarget, setTestTarget] = useState<TestPaymentTarget | null>(null);
+  const [testLink, setTestLink] = useState<TestPaymentLinkDto | null>(null);
   const [paymentsShop, setPaymentsShop] = useState<{
     id: number;
     name: string;
@@ -146,6 +162,7 @@ export default function AdminSubscriptions() {
   );
 
   const cancelMutation = useAdminShopSubscriptionControllerCancel();
+  const testCheckoutMutation = useAdminShopSubscriptionControllerTestCheckout();
 
   const rows = data?.data ?? [];
   const meta = data?.meta;
@@ -156,6 +173,26 @@ export default function AdminSubscriptions() {
       successKey: "admin.subscriptions.cancelled",
       errorKey: "admin.subscriptions.actionFailed",
     });
+  };
+
+  /**
+   * Открыть окно тестовой оплаты и показать ссылку.
+   *
+   * Без `invalidate`: окно живёт на магазине, а в списке подписок его не видно
+   * — обновлять там нечего. Тоста об успехе тоже нет: успех и есть открывшееся
+   * окно со ссылкой, и второе сообщение о нём было бы шумом.
+   */
+  const armTest = async (row: AdminSubscriptionRow) => {
+    setTestTarget({ shopId: row.shopId, shopName: row.shopName });
+    try {
+      const link = await testCheckoutMutation.mutateAsync({
+        shopId: row.shopId,
+      });
+      setTestLink(link as TestPaymentLinkDto);
+    } catch (err) {
+      setTestTarget(null);
+      toast.error(apiErrorMessage(err, t, "admin.subscriptions.testFailed"));
+    }
   };
 
   const openPayments = (row: AdminSubscriptionRow) => {
@@ -187,6 +224,16 @@ export default function AdminSubscriptions() {
           until: row.until,
           subscriptionCredits: row.subscriptionCredits,
         }),
+    },
+    {
+      label: t("admin.subscriptions.test"),
+      icon: Wrench,
+      withConfirm: {
+        title: t("admin.subscriptions.testConfirmTitle"),
+        description: t("admin.subscriptions.testConfirmText"),
+        confirmLabel: t("admin.subscriptions.testConfirmAction"),
+        onConfirm: () => armTest(row),
+      },
     },
     ...(row.active
       ? [
@@ -441,6 +488,15 @@ export default function AdminSubscriptions() {
       <SubscriptionActivateDialog
         target={activating}
         onClose={() => setActivating(null)}
+      />
+
+      <TestPaymentDialog
+        target={testTarget}
+        link={testLink}
+        onClose={() => {
+          setTestTarget(null);
+          setTestLink(null);
+        }}
       />
 
       <PaymentsDrawer

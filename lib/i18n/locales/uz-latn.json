@@ -1141,7 +1141,22 @@
       "openShop": "Do‘konni ochish",
       "actionFailed": "Amalni bajarib bo‘lmadi",
       "empty": "Hozircha obunalar yo‘q",
-      "loadFailed": "Obunalarni yuklab bo‘lmadi. Bo‘lim faqat administratorlar uchun."
+      "loadFailed": "Obunalarni yuklab bo‘lmadi. Bo‘lim faqat administratorlar uchun.",
+      "test": "Sinov to‘lovi",
+      "testConfirmTitle": "Sinov to‘lovi oynasi ochilsinmi?",
+      "testConfirmText": "Do‘kon uchun 30 daqiqalik oyna ochiladi: shu vaqt ichida kassa ramziy summani qabul qiladi. Obuna esa BERILMAYDI — faqat to‘lovning o‘tishi tekshiriladi. Birinchi muvaffaqiyatli to‘lovdan keyin oyna o‘zi yopiladi.",
+      "testConfirmAction": "Oynani ochish",
+      "testTitle": "Kassani tekshirish",
+      "testText": "«{shop}» do‘koni uchun oyna ochildi. Quyidagi havola orqali to‘lang.",
+      "testAmount": "Summa",
+      "testSum": "{amount} so‘m",
+      "testArmedUntil": "Oyna ochiq",
+      "testWarn": "Obuna berilmaydi: na kredit, na muddat. Muvaffaqiyatli to‘lov faqat kassa, imzo va qayta chaqiruv ishlayotganini bildiradi — to‘lov do‘kon tarixida ko‘rinadi.",
+      "testOpen": "Kassani ochish",
+      "testCopy": "Nusxalash",
+      "testCopied": "Havola nusxalandi",
+      "testCopyFailed": "Nusxalab bo‘lmadi — yonidagi tugma bilan havolani oching",
+      "testFailed": "Sinov to‘lovi oynasini ochib bo‘lmadi"
     },
     "shopBanners": {
       "title": "Sotuvchi bannerlari",

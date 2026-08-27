@@ -31,7 +31,8 @@ import type {
   PaginatedAdminSubscriptionsDto,
   PaginatedSubscriptionPaymentsDto,
   ReasonDto,
-  SellerSubscriptionDto
+  SellerSubscriptionDto,
+  TestPaymentLinkDto
 } from '../../schemas';
 
 import { customInstance } from '../../../mutator';
@@ -314,6 +315,68 @@ export const useAdminShopSubscriptionControllerActivate = <TError = ErrorType<vo
         TContext
       > => {
       return useMutation(getAdminShopSubscriptionControllerActivateMutationOptions(options), queryClient);
+    }
+    /**
+ * @summary Открыть окно тестовой оплаты и выдать ссылку
+ */
+export const adminShopSubscriptionControllerTestCheckout = (
+    shopId: number,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<TestPaymentLinkDto>(
+      {url: `/api/v1/admin/shops/${shopId}/subscription/test-checkout`, method: 'POST', signal
+    },
+      options);
+    }
+
+
+
+
+export const getAdminShopSubscriptionControllerTestCheckoutMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminShopSubscriptionControllerTestCheckout>>, TError,{shopId: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof adminShopSubscriptionControllerTestCheckout>>, TError,{shopId: number}, TContext> => {
+
+const mutationKey = ['adminShopSubscriptionControllerTestCheckout'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminShopSubscriptionControllerTestCheckout>>, {shopId: number}> = (props) => {
+          const {shopId} = props ?? {};
+
+          return  adminShopSubscriptionControllerTestCheckout(shopId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AdminShopSubscriptionControllerTestCheckoutMutationResult = NonNullable<Awaited<ReturnType<typeof adminShopSubscriptionControllerTestCheckout>>>
+
+    export type AdminShopSubscriptionControllerTestCheckoutMutationError = ErrorType<void>
+
+    /**
+ * @summary Открыть окно тестовой оплаты и выдать ссылку
+ */
+export const useAdminShopSubscriptionControllerTestCheckout = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminShopSubscriptionControllerTestCheckout>>, TError,{shopId: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof adminShopSubscriptionControllerTestCheckout>>,
+        TError,
+        {shopId: number},
+        TContext
+      > => {
+      return useMutation(getAdminShopSubscriptionControllerTestCheckoutMutationOptions(options), queryClient);
     }
     /**
  * @summary Оборвать оплаченный период досрочно
