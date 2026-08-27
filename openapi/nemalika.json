@@ -4731,6 +4731,88 @@
         ]
       }
     },
+    "/api/v1/seller/subscription/invoice": {
+      "post": {
+        "operationId": "SellerSubscriptionsController_invoice",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateInvoiceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Неверный номер телефона"
+          },
+          "503": {
+            "description": "Merchant API не настроен"
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Выставить счёт на номер телефона",
+        "tags": [
+          "subscriptions-seller"
+        ]
+      }
+    },
+    "/api/v1/seller/subscription/invoice/{orderId}": {
+      "get": {
+        "operationId": "SellerSubscriptionsController_invoiceState",
+        "parameters": [
+          {
+            "name": "orderId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Счёт не найден"
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Состояние выставленного счёта",
+        "tags": [
+          "subscriptions-seller"
+        ]
+      }
+    },
     "/api/v1/seller/subscription/payments": {
       "get": {
         "operationId": "SellerSubscriptionsController_payments",
@@ -8460,6 +8542,72 @@
           "plan",
           "amountUzs",
           "url"
+        ]
+      },
+      "CreateInvoiceDto": {
+        "type": "object",
+        "properties": {
+          "plan": {
+            "type": "string",
+            "enum": [
+              "start",
+              "pro",
+              "max"
+            ]
+          },
+          "phone": {
+            "type": "string",
+            "description": "Телефон плательщика: 998XXXXXXXXX либо 9 цифр",
+            "example": "998901234567"
+          }
+        },
+        "required": [
+          "plan",
+          "phone"
+        ]
+      },
+      "InvoiceDto": {
+        "type": "object",
+        "properties": {
+          "invoiceId": {
+            "type": "number",
+            "description": "Номер счёта в системе Click"
+          },
+          "orderId": {
+            "type": "number",
+            "description": "Наш номер заказа"
+          },
+          "plan": {
+            "type": "string",
+            "enum": [
+              "start",
+              "pro",
+              "max"
+            ]
+          },
+          "amountUzs": {
+            "type": "number"
+          },
+          "phone": {
+            "type": "string",
+            "description": "Куда ушёл счёт"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "paid",
+              "cancelled"
+            ]
+          }
+        },
+        "required": [
+          "invoiceId",
+          "orderId",
+          "plan",
+          "amountUzs",
+          "phone",
+          "status"
         ]
       },
       "SubscriptionPaymentDto": {

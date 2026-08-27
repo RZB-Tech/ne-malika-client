@@ -405,7 +405,19 @@
         "click": "Click",
         "payme": "Payme",
         "manual": "Qo‘lda"
-      }
+      },
+      "invoiceTitle": "Telefonga hisob",
+      "invoiceText": "Hisobni Click ilovasiga yuboramiz — to‘lovni o‘sha yerda tasdiqlang. QR’dan ishonchliroq: buyurtma raqami hisob bilan birga ketadi.",
+      "invoicePlan": "Tarif",
+      "invoicePhone": "Telefon raqami",
+      "invoiceSend": "Hisob yuborish",
+      "invoiceSent": "Hisob yuborildi — Click ilovasida tasdiqlang",
+      "invoiceWaiting": "{amount} so‘mlik hisob {phone} raqamiga yuborildi. Buyurtma №{order}. Ilovada tasdiqlashni kutmoqdamiz…",
+      "invoicePaid": "To‘lov o‘tdi — obuna faol",
+      "invoiceCancelled": "Hisob bekor qilindi",
+      "invoiceStale": "Tasdiq hali yo‘q. Buyurtma №{order} — keyinroq sahifani yangilang yoki havola orqali to‘lang",
+      "invoiceFailed": "Hisobni yuborib bo‘lmadi",
+      "invoiceHint": "Hisob Click’ga bog‘langan raqamga keladi. Obuna tasdiqdan so‘ng darhol yoqiladi."
     },
     "plans": {
       "title": "Tariflar",

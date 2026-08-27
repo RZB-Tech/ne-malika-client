@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SubscriptionCredits } from "@/components/seller/subscription-credits";
+import { SubscriptionInvoice } from "@/components/seller/subscription-invoice";
 import { SubscriptionPayments } from "@/components/seller/subscription-payments";
 import { SubscriptionPlans } from "@/components/seller/subscription-plans";
 import { SubscriptionState } from "@/components/seller/subscription-state";
@@ -55,6 +56,7 @@ export default function SellerSubscriptionPage() {
         <>
           <SubscriptionState subscription={subscription} />
           <SubscriptionPlans subscription={subscription} />
+          <SubscriptionInvoice subscription={subscription} />
           <SubscriptionPayments />
           <SubscriptionCredits />
         </>

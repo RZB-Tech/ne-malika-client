@@ -26,6 +26,8 @@ import type {
 
 import type {
   CreateCheckoutDto,
+  CreateInvoiceDto,
+  InvoiceDto,
   PaginatedSubscriptionPaymentsDto,
   PaymentLinkDto,
   SellerSubscriptionDto,
@@ -212,6 +214,162 @@ export const useSellerSubscriptionsControllerCheckout = <TError = ErrorType<void
       return useMutation(getSellerSubscriptionsControllerCheckoutMutationOptions(options), queryClient);
     }
     /**
+ * @summary Выставить счёт на номер телефона
+ */
+export const sellerSubscriptionsControllerInvoice = (
+    createInvoiceDto: BodyType<CreateInvoiceDto>,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<InvoiceDto>(
+      {url: `/api/v1/seller/subscription/invoice`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createInvoiceDto, signal
+    },
+      options);
+    }
+
+
+
+
+export const getSellerSubscriptionsControllerInvoiceMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof sellerSubscriptionsControllerInvoice>>, TError,{data: BodyType<CreateInvoiceDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof sellerSubscriptionsControllerInvoice>>, TError,{data: BodyType<CreateInvoiceDto>}, TContext> => {
+
+const mutationKey = ['sellerSubscriptionsControllerInvoice'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof sellerSubscriptionsControllerInvoice>>, {data: BodyType<CreateInvoiceDto>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  sellerSubscriptionsControllerInvoice(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SellerSubscriptionsControllerInvoiceMutationResult = NonNullable<Awaited<ReturnType<typeof sellerSubscriptionsControllerInvoice>>>
+    export type SellerSubscriptionsControllerInvoiceMutationBody = BodyType<CreateInvoiceDto>
+    export type SellerSubscriptionsControllerInvoiceMutationError = ErrorType<void>
+
+    /**
+ * @summary Выставить счёт на номер телефона
+ */
+export const useSellerSubscriptionsControllerInvoice = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof sellerSubscriptionsControllerInvoice>>, TError,{data: BodyType<CreateInvoiceDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof sellerSubscriptionsControllerInvoice>>,
+        TError,
+        {data: BodyType<CreateInvoiceDto>},
+        TContext
+      > => {
+      return useMutation(getSellerSubscriptionsControllerInvoiceMutationOptions(options), queryClient);
+    }
+    /**
+ * @summary Состояние выставленного счёта
+ */
+export const sellerSubscriptionsControllerInvoiceState = (
+    orderId: number,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<InvoiceDto>(
+      {url: `/api/v1/seller/subscription/invoice/${orderId}`, method: 'GET', signal
+    },
+      options);
+    }
+
+
+
+
+export const getSellerSubscriptionsControllerInvoiceStateQueryKey = (orderId: number,) => {
+    return [
+    `/api/v1/seller/subscription/invoice/${orderId}`
+    ] as const;
+    }
+
+
+export const getSellerSubscriptionsControllerInvoiceStateQueryOptions = <TData = Awaited<ReturnType<typeof sellerSubscriptionsControllerInvoiceState>>, TError = ErrorType<void>>(orderId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof sellerSubscriptionsControllerInvoiceState>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getSellerSubscriptionsControllerInvoiceStateQueryKey(orderId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof sellerSubscriptionsControllerInvoiceState>>> = ({ signal }) => sellerSubscriptionsControllerInvoiceState(orderId, requestOptions, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: orderId !== null && orderId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof sellerSubscriptionsControllerInvoiceState>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type SellerSubscriptionsControllerInvoiceStateQueryResult = NonNullable<Awaited<ReturnType<typeof sellerSubscriptionsControllerInvoiceState>>>
+export type SellerSubscriptionsControllerInvoiceStateQueryError = ErrorType<void>
+
+
+export function useSellerSubscriptionsControllerInvoiceState<TData = Awaited<ReturnType<typeof sellerSubscriptionsControllerInvoiceState>>, TError = ErrorType<void>>(
+ orderId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof sellerSubscriptionsControllerInvoiceState>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof sellerSubscriptionsControllerInvoiceState>>,
+          TError,
+          Awaited<ReturnType<typeof sellerSubscriptionsControllerInvoiceState>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useSellerSubscriptionsControllerInvoiceState<TData = Awaited<ReturnType<typeof sellerSubscriptionsControllerInvoiceState>>, TError = ErrorType<void>>(
+ orderId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof sellerSubscriptionsControllerInvoiceState>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof sellerSubscriptionsControllerInvoiceState>>,
+          TError,
+          Awaited<ReturnType<typeof sellerSubscriptionsControllerInvoiceState>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useSellerSubscriptionsControllerInvoiceState<TData = Awaited<ReturnType<typeof sellerSubscriptionsControllerInvoiceState>>, TError = ErrorType<void>>(
+ orderId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof sellerSubscriptionsControllerInvoiceState>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Состояние выставленного счёта
+ */
+
+export function useSellerSubscriptionsControllerInvoiceState<TData = Awaited<ReturnType<typeof sellerSubscriptionsControllerInvoiceState>>, TError = ErrorType<void>>(
+ orderId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof sellerSubscriptionsControllerInvoiceState>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getSellerSubscriptionsControllerInvoiceStateQueryOptions(orderId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+/**
  * @summary История платежей за подписку
  */
 export const sellerSubscriptionsControllerPayments = (
