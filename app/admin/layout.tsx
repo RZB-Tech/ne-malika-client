@@ -2,9 +2,7 @@
 
 import {
   BarChart3,
-  Coins,
   Flag,
-  Handshake,
   ImageIcon,
   Package,
   Settings,
@@ -17,7 +15,11 @@ import {
   Wallet,
 } from "@/components/icons";
 import { RequireRole } from "@/components/auth/require-role";
-import { DashboardShell, type NavItem, type ShellBrand } from "@/components/layout/dashboard-shell";
+import {
+  DashboardShell,
+  type NavGroup,
+  type ShellBrand,
+} from "@/components/layout/dashboard-shell";
 import { useT } from "@/components/providers/i18n-provider";
 import { useAuth } from "@/lib/api/auth";
 
@@ -33,25 +35,68 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
   const { t } = useT();
   const { user } = useAuth();
 
-  const items: NavItem[] = [
-    { href: "/admin", label: t("admin.nav.dashboard"), icon: BarChart3, exact: true },
-    { href: "/admin/reports", label: t("admin.nav.reports"), icon: Flag },
-    { href: "/admin/reviews", label: t("admin.nav.reviews"), icon: Star },
-    { href: "/admin/sellers", label: t("admin.nav.sellers"), icon: Store },
-    { href: "/admin/users", label: t("admin.nav.users"), icon: Users },
-    { href: "/admin/products", label: t("admin.nav.products"), icon: Package },
-    { href: "/admin/banners", label: t("admin.nav.banners"), icon: ImageIcon },
-    { href: "/admin/shop-banners", label: t("admin.nav.shopBanners"), icon: ShieldCheck },
-    { href: "/admin/subscriptions", label: t("admin.nav.subscriptions"), icon: Wallet },
+  const groups: NavGroup[] = [
     {
-      href: "/admin/subscriptions/report",
-      label: t("admin.nav.subsReport"),
-      icon: Handshake,
+      label: t("admin.nav.groupOverview"),
+      items: [{ href: "/admin", label: t("admin.nav.dashboard"), icon: BarChart3, exact: true }],
     },
-    { href: "/admin/ai-review", label: t("admin.nav.aiReview"), icon: Sparkles },
-    { href: "/admin/ai-usage", label: t("admin.nav.aiUsage"), icon: Coins },
-    { href: "/admin/broadcast", label: t("admin.nav.broadcast"), icon: Send },
-    { href: "/admin/settings", label: t("admin.nav.settings"), icon: Settings },
+    {
+      label: t("admin.nav.groupModeration"),
+      items: [
+        { href: "/admin/reports", label: t("admin.nav.reports"), icon: Flag },
+        { href: "/admin/reviews", label: t("admin.nav.reviews"), icon: Star },
+        {
+          href: "/admin/ai-review",
+          label: t("admin.nav.ai"),
+          icon: Sparkles,
+          items: [
+            { href: "/admin/ai-review", label: t("admin.nav.aiReview") },
+            { href: "/admin/ai-usage", label: t("admin.nav.aiUsage") },
+          ],
+        },
+      ],
+    },
+    {
+      label: t("admin.nav.groupCatalog"),
+      items: [
+        { href: "/admin/sellers", label: t("admin.nav.sellers"), icon: Store },
+        { href: "/admin/products", label: t("admin.nav.products"), icon: Package },
+        {
+          href: "/admin/banners",
+          label: t("admin.nav.banners"),
+          icon: ImageIcon,
+          items: [
+            { href: "/admin/banners", label: t("admin.nav.bannersMain") },
+            { href: "/admin/shop-banners", label: t("admin.nav.bannersShops") },
+          ],
+        },
+      ],
+    },
+    {
+      label: t("admin.nav.groupFinance"),
+      items: [
+        {
+          href: "/admin/subscriptions",
+          label: t("admin.nav.subscriptions"),
+          icon: Wallet,
+          items: [
+            { href: "/admin/subscriptions", label: t("admin.nav.subsPlans") },
+            { href: "/admin/subscriptions/report", label: t("admin.nav.subsSales") },
+          ],
+        },
+      ],
+    },
+    {
+      label: t("admin.nav.groupAudience"),
+      items: [
+        { href: "/admin/users", label: t("admin.nav.users"), icon: Users },
+        { href: "/admin/broadcast", label: t("admin.nav.broadcast"), icon: Send },
+      ],
+    },
+    {
+      label: t("admin.nav.groupSystem"),
+      items: [{ href: "/admin/settings", label: t("admin.nav.settings"), icon: Settings }],
+    },
   ];
 
   const brand: ShellBrand = {
@@ -65,7 +110,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <DashboardShell items={items} sectionLabel={t("admin.panel")} brand={brand}>
+    <DashboardShell items={groups} sectionLabel={t("admin.panel")} brand={brand}>
       {children}
     </DashboardShell>
   );

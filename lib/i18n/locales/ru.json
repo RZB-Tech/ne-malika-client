@@ -603,7 +603,18 @@
       "broadcast": "Рассылка",
       "subscriptions": "Подписки",
       "shopBanners": "Баннеры продавцов",
-      "subsReport": "Продажи подписок"
+      "subsReport": "Продажи подписок",
+      "groupOverview": "Обзор",
+      "groupModeration": "Модерация",
+      "groupCatalog": "Каталог",
+      "groupFinance": "Финансы",
+      "groupAudience": "Аудитория",
+      "groupSystem": "Система",
+      "ai": "ИИ",
+      "bannersMain": "Главные",
+      "bannersShops": "Магазинов",
+      "subsPlans": "Все подписки",
+      "subsSales": "Продажи"
     },
     "reviews": {
       "title": "Отзывы",

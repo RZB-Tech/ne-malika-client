@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef } from "react";
-import { ArrowLeft, type AppIcon } from "@/components/icons";
+import { Fragment, useEffect, useRef, useState } from "react";
+import { ArrowLeft, ChevronRight, type AppIcon } from "@/components/icons";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import {
   Sidebar,
   SidebarContent,
@@ -16,15 +17,27 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
   SidebarProvider,
   SidebarRail,
+  SidebarSeparator,
   SidebarTrigger,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { Logo, LogoMark } from "@/components/shared/logo";
 import { LanguageSwitch } from "@/components/shared/language-switch";
 import { UserMenu } from "@/components/auth/user-menu";
 import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
 import { useT } from "@/components/providers/i18n-provider";
+
+export interface NavSubItem {
+  href: string;
+  label: string;
+  exact?: boolean;
+  badge?: number;
+}
 
 export interface NavItem {
   href: string;
@@ -33,6 +46,14 @@ export interface NavItem {
   exact?: boolean;
   onSelect?: () => void;
   badge?: number;
+  /** Подвкладки: пункт становится раскрывающимся, href ведёт на первую из них. */
+  items?: NavSubItem[];
+}
+
+/** Раздел меню: подписанная группа пунктов, отделённая от соседних. */
+export interface NavGroup {
+  label?: string;
+  items: NavItem[];
 }
 
 export interface ShellBrand {
@@ -41,13 +62,28 @@ export interface ShellBrand {
   subtitle: string;
 }
 
+function toGroups(nav: NavItem[] | NavGroup[], fallbackLabel: string): NavGroup[] {
+  const grouped = nav.length > 0 && Array.isArray((nav[0] as NavGroup).items);
+  return grouped ? (nav as NavGroup[]) : [{ label: fallbackLabel, items: nav as NavItem[] }];
+}
+
+function flatten(groups: NavGroup[]): { href: string; exact?: boolean }[] {
+  return groups.flatMap((group) =>
+    group.items.flatMap((item) =>
+      item.items?.length
+        ? item.items.map((sub) => ({ href: sub.href, exact: sub.exact }))
+        : [{ href: item.href, exact: item.exact }],
+    ),
+  );
+}
+
 export function DashboardShell({
   items,
   sectionLabel,
   brand,
   children,
 }: {
-  items: NavItem[];
+  items: NavItem[] | NavGroup[];
   sectionLabel: string;
   brand?: ShellBrand;
   children: React.ReactNode;
@@ -55,6 +91,15 @@ export function DashboardShell({
   const { t } = useT();
   const pathname = usePathname();
   const scrollRef = useRef<HTMLDivElement>(null);
+  const groups = toGroups(items, sectionLabel);
+
+  const activeHref = flatten(groups).reduce<string | null>((best, entry) => {
+    const matches = entry.exact
+      ? pathname === entry.href
+      : pathname === entry.href || pathname.startsWith(entry.href + "/");
+    if (matches && (best === null || entry.href.length > best.length)) return entry.href;
+    return best;
+  }, null);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: 0 });
@@ -69,12 +114,17 @@ export function DashboardShell({
         </SidebarHeader>
 
         <SidebarContent>
-          <SidebarGroup>
-            <SidebarGroupLabel>{sectionLabel}</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <NavMenu items={items} />
-            </SidebarGroupContent>
-          </SidebarGroup>
+          {groups.map((group, i) => (
+            <Fragment key={group.label ?? i}>
+              {i > 0 && <SidebarSeparator className="my-0" />}
+              <SidebarGroup className="py-1">
+                {group.label && <SidebarGroupLabel>{group.label}</SidebarGroupLabel>}
+                <SidebarGroupContent>
+                  <NavMenu items={group.items} activeHref={activeHref} />
+                </SidebarGroupContent>
+              </SidebarGroup>
+            </Fragment>
+          ))}
         </SidebarContent>
 
         <SidebarFooter className="gap-3 pb-4">
@@ -123,44 +173,98 @@ export function DashboardShell({
   );
 }
 
-function NavMenu({ items }: { items: NavItem[] }) {
-  const pathname = usePathname();
+function NavBadge({ value }: { value: number }) {
+  return (
+    <span className="ml-auto inline-flex min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[11px] font-semibold text-primary-foreground tabular group-data-[collapsible=icon]:hidden">
+      {value > 99 ? "99+" : value}
+    </span>
+  );
+}
 
-  const activeHref = items.reduce<string | null>((best, item) => {
-    const matches = item.exact
-      ? pathname === item.href
-      : pathname === item.href || pathname.startsWith(item.href + "/");
-    if (matches && (best === null || item.href.length > best.length)) {
-      return item.href;
-    }
-    return best;
-  }, null);
-
+function NavMenu({ items, activeHref }: { items: NavItem[]; activeHref: string | null }) {
   return (
     <SidebarMenu className="gap-1">
-      {items.map((item) => (
-        <SidebarMenuItem key={item.href}>
-          <SidebarMenuButton asChild isActive={item.href === activeHref} tooltip={item.label}>
-            {item.onSelect ? (
-              <button type="button" onClick={item.onSelect}>
-                <item.icon />
-                <span>{item.label}</span>
-              </button>
-            ) : (
-              <Link href={item.href}>
-                <item.icon />
-                <span>{item.label}</span>
-                {item.badge ? (
-                  <span className="ml-auto inline-flex min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[11px] font-semibold text-primary-foreground tabular group-data-[collapsible=icon]:hidden">
-                    {item.badge > 99 ? "99+" : item.badge}
-                  </span>
-                ) : null}
-              </Link>
-            )}
-          </SidebarMenuButton>
-        </SidebarMenuItem>
-      ))}
+      {items.map((item) =>
+        item.items?.length ? (
+          <NavCollapsibleItem key={item.href} item={item} activeHref={activeHref} />
+        ) : (
+          <SidebarMenuItem key={item.href}>
+            <SidebarMenuButton asChild isActive={item.href === activeHref} tooltip={item.label}>
+              {item.onSelect ? (
+                <button type="button" onClick={item.onSelect}>
+                  <item.icon />
+                  <span>{item.label}</span>
+                </button>
+              ) : (
+                <Link href={item.href}>
+                  <item.icon />
+                  <span>{item.label}</span>
+                  {item.badge ? <NavBadge value={item.badge} /> : null}
+                </Link>
+              )}
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        ),
+      )}
     </SidebarMenu>
+  );
+}
+
+function NavCollapsibleItem({ item, activeHref }: { item: NavItem; activeHref: string | null }) {
+  const { state, isMobile } = useSidebar();
+  const subItems = item.items ?? [];
+  const hasActive = subItems.some((sub) => sub.href === activeHref);
+  const [open, setOpen] = useState(hasActive);
+  const [wasActive, setWasActive] = useState(hasActive);
+  const iconOnly = state === "collapsed" && !isMobile;
+
+  // Раскрываем раздел, когда переходим на его подвкладку.
+  if (hasActive !== wasActive) {
+    setWasActive(hasActive);
+    if (hasActive) setOpen(true);
+  }
+
+  // В свёрнутом режиме подвкладки скрыты — ведём сразу на первую из них.
+  if (iconOnly) {
+    return (
+      <SidebarMenuItem>
+        <SidebarMenuButton asChild isActive={hasActive} tooltip={item.label}>
+          <Link href={subItems[0]?.href ?? item.href}>
+            <item.icon />
+            <span>{item.label}</span>
+          </Link>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+    );
+  }
+
+  return (
+    <Collapsible asChild open={open} onOpenChange={setOpen} className="group/collapsible">
+      <SidebarMenuItem>
+        <CollapsibleTrigger asChild>
+          {/* Без tooltip: иначе кнопка обёрнута в Tooltip и asChild не навесит обработчик. */}
+          <SidebarMenuButton isActive={hasActive && !open}>
+            <item.icon />
+            <span>{item.label}</span>
+            <ChevronRight className="ml-auto size-4 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+          </SidebarMenuButton>
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <SidebarMenuSub className="mt-1">
+            {subItems.map((sub) => (
+              <SidebarMenuSubItem key={sub.href}>
+                <SidebarMenuSubButton asChild isActive={sub.href === activeHref}>
+                  <Link href={sub.href}>
+                    <span>{sub.label}</span>
+                    {sub.badge ? <NavBadge value={sub.badge} /> : null}
+                  </Link>
+                </SidebarMenuSubButton>
+              </SidebarMenuSubItem>
+            ))}
+          </SidebarMenuSub>
+        </CollapsibleContent>
+      </SidebarMenuItem>
+    </Collapsible>
   );
 }
 

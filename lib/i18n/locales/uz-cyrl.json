@@ -603,7 +603,18 @@
       "broadcast": "Тарқатма",
       "subscriptions": "Обуналар",
       "shopBanners": "Сотувчи баннерлари",
-      "subsReport": "Обуна савдолари"
+      "subsReport": "Обуна савдолари",
+      "groupOverview": "Умумий",
+      "groupModeration": "Модерация",
+      "groupCatalog": "Каталог",
+      "groupFinance": "Молия",
+      "groupAudience": "Аудитория",
+      "groupSystem": "Тизим",
+      "ai": "АИ",
+      "bannersMain": "Асосий",
+      "bannersShops": "Дўконлар",
+      "subsPlans": "Барча обуналар",
+      "subsSales": "Савдолар"
     },
     "reviews": {
       "title": "Шарҳлар",

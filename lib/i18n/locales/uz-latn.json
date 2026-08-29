@@ -603,7 +603,18 @@
       "broadcast": "Tarqatma",
       "subscriptions": "Obunalar",
       "shopBanners": "Sotuvchi bannerlari",
-      "subsReport": "Obuna savdolari"
+      "subsReport": "Obuna savdolari",
+      "groupOverview": "Umumiy",
+      "groupModeration": "Moderatsiya",
+      "groupCatalog": "Katalog",
+      "groupFinance": "Moliya",
+      "groupAudience": "Auditoriya",
+      "groupSystem": "Tizim",
+      "ai": "AI",
+      "bannersMain": "Asosiy",
+      "bannersShops": "Doʻkonlar",
+      "subsPlans": "Barcha obunalar",
+      "subsSales": "Savdolar"
     },
     "reviews": {
       "title": "Sharhlar",
