@@ -29,6 +29,7 @@ import type {
   AdminShopSubscriptionControllerPaymentsParams,
   AdminSubscriptionsControllerListParams,
   AdminSubscriptionsControllerReportParams,
+  CreateTestPaymentDto,
   PaginatedAdminSubscriptionsDto,
   PaginatedSubscriptionPaymentsDto,
   ReasonDto,
@@ -413,16 +414,20 @@ export const useAdminShopSubscriptionControllerActivate = <TError = ErrorType<vo
       return useMutation(getAdminShopSubscriptionControllerActivateMutationOptions(options), queryClient);
     }
     /**
- * @summary Открыть окно тестовой оплаты и выдать ссылку
+ * Открывает счёт с тестовой суммой: оплата по нему проходит через боевой протокол, но подписку не выдаёт. Для Payme это же и есть заказ для песочницы — в ответе номер заказа, сумма в тийинах, имя поля account и ID кассы.
+ * @summary Завести фейковый счёт для проверки кассы
  */
 export const adminShopSubscriptionControllerTestCheckout = (
     shopId: number,
+    createTestPaymentDto: BodyType<CreateTestPaymentDto>,
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
 
 
       return customInstance<TestPaymentLinkDto>(
-      {url: `/api/v1/admin/shops/${shopId}/subscription/test-checkout`, method: 'POST', signal
+      {url: `/api/v1/admin/shops/${shopId}/subscription/test-checkout`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createTestPaymentDto, signal
     },
       options);
     }
@@ -431,8 +436,8 @@ export const adminShopSubscriptionControllerTestCheckout = (
 
 
 export const getAdminShopSubscriptionControllerTestCheckoutMutationOptions = <TError = ErrorType<void>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminShopSubscriptionControllerTestCheckout>>, TError,{shopId: number}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof adminShopSubscriptionControllerTestCheckout>>, TError,{shopId: number}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminShopSubscriptionControllerTestCheckout>>, TError,{shopId: number;data: BodyType<CreateTestPaymentDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof adminShopSubscriptionControllerTestCheckout>>, TError,{shopId: number;data: BodyType<CreateTestPaymentDto>}, TContext> => {
 
 const mutationKey = ['adminShopSubscriptionControllerTestCheckout'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -444,10 +449,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminShopSubscriptionControllerTestCheckout>>, {shopId: number}> = (props) => {
-          const {shopId} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminShopSubscriptionControllerTestCheckout>>, {shopId: number;data: BodyType<CreateTestPaymentDto>}> = (props) => {
+          const {shopId,data} = props ?? {};
 
-          return  adminShopSubscriptionControllerTestCheckout(shopId,requestOptions)
+          return  adminShopSubscriptionControllerTestCheckout(shopId,data,requestOptions)
         }
 
 
@@ -458,18 +463,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type AdminShopSubscriptionControllerTestCheckoutMutationResult = NonNullable<Awaited<ReturnType<typeof adminShopSubscriptionControllerTestCheckout>>>
-
+    export type AdminShopSubscriptionControllerTestCheckoutMutationBody = BodyType<CreateTestPaymentDto>
     export type AdminShopSubscriptionControllerTestCheckoutMutationError = ErrorType<void>
 
     /**
- * @summary Открыть окно тестовой оплаты и выдать ссылку
+ * @summary Завести фейковый счёт для проверки кассы
  */
 export const useAdminShopSubscriptionControllerTestCheckout = <TError = ErrorType<void>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminShopSubscriptionControllerTestCheckout>>, TError,{shopId: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminShopSubscriptionControllerTestCheckout>>, TError,{shopId: number;data: BodyType<CreateTestPaymentDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof adminShopSubscriptionControllerTestCheckout>>,
         TError,
-        {shopId: number},
+        {shopId: number;data: BodyType<CreateTestPaymentDto>},
         TContext
       > => {
       return useMutation(getAdminShopSubscriptionControllerTestCheckoutMutationOptions(options), queryClient);

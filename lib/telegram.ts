@@ -27,6 +27,13 @@ export function telegramUrl(username: string): string {
   return `https://t.me/${username.replace(/^@/, "")}`;
 }
 
+/** Техподдержка: аккаунт, в который пишут пользователи. Переопределяется env. */
+export const SUPPORT_USERNAME = (
+  process.env.NEXT_PUBLIC_SUPPORT_TELEGRAM || "nemalika_support"
+).replace(/^@/, "");
+export const SUPPORT_HANDLE = `@${SUPPORT_USERNAME}`;
+export const SUPPORT_URL = telegramUrl(SUPPORT_USERNAME);
+
 export function buildTelegramUrl(
   username: string,
   opts?: { productName?: string; productId?: string; greeting?: string },

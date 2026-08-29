@@ -14,9 +14,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { TelegramIcon } from "@/components/icons/telegram-icon";
 import { useT } from "@/components/providers/i18n-provider";
 import { useAuth } from "@/lib/api/auth";
 import { initials } from "@/lib/format";
+import { SUPPORT_HANDLE, SUPPORT_URL } from "@/lib/telegram";
 import { cn } from "@/lib/utils";
 
 export function UserMenu({ trigger }: { trigger?: ReactNode } = {}) {
@@ -83,6 +85,14 @@ export function UserMenu({ trigger }: { trigger?: ReactNode } = {}) {
             )}
             {cabinetLabel}
           </Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <a href={SUPPORT_URL} target="_blank" rel="noreferrer">
+            <TelegramIcon className="size-4" />
+            <span className="flex-1">{t("nav.support")}</span>
+            <span className="text-xs text-muted-foreground">{SUPPORT_HANDLE}</span>
+          </a>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem variant="destructive" onSelect={onLogout}>

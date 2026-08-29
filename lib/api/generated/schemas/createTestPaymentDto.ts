@@ -5,12 +5,15 @@
  * Маркетплейс компьютерной техники — REST API для веб-витрины (Next.js) и Telegram mini-app. Покупать можно без авторизации; вход через Telegram нужен продавцу, администратору и покупателю, который хочет видеть историю просмотров на всех своих устройствах.
  * OpenAPI spec version: 1.0.0
  */
-import type { CreateCheckoutDtoPlan } from './createCheckoutDtoPlan';
-import type { CreateCheckoutDtoProvider } from './createCheckoutDtoProvider';
+import type { CreateTestPaymentDtoProvider } from './createTestPaymentDtoProvider';
 
-export interface CreateCheckoutDto {
-  /** Тариф, за который платим */
-  plan: CreateCheckoutDtoPlan;
-  /** Касса, через которую платим. По умолчанию Click */
-  provider?: CreateCheckoutDtoProvider;
+export interface CreateTestPaymentDto {
+  /** Касса, для которой заводим счёт. По умолчанию Click */
+  provider?: CreateTestPaymentDtoProvider;
+  /**
+     * Сумма счёта в сумах. По умолчанию SUBSCRIPTION_TEST_PRICE_UZS. Не должна совпадать с ценой боевого тарифа
+     * @minimum 1
+     * @maximum 100000000
+     */
+  amountUzs?: number;
 }

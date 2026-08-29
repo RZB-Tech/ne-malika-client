@@ -10,11 +10,16 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useT } from "@/components/providers/i18n-provider";
 import { apiErrorMessage } from "@/lib/api/errors";
 import { planLabel, planRank } from "@/lib/api/subscription";
+import { PAYME_ENABLED } from "@/lib/payments";
 import { formatDate, formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { useSubscriptionsControllerPlans } from "@/lib/api/generated/endpoints/subscriptions-public/subscriptions-public";
 import { useSellerSubscriptionsControllerCheckout } from "@/lib/api/generated/endpoints/subscriptions-seller/subscriptions-seller";
-import type { SellerSubscriptionDto, SubscriptionPlanDto } from "@/lib/api/generated/schemas";
+import type {
+  CreateCheckoutDtoProvider,
+  SellerSubscriptionDto,
+  SubscriptionPlanDto,
+} from "@/lib/api/generated/schemas";
 import type { PaidPlan } from "@/lib/api/types";
 
 export function SubscriptionPlans({ subscription }: { subscription: SellerSubscriptionDto }) {
@@ -45,10 +50,10 @@ export function SubscriptionPlans({ subscription }: { subscription: SellerSubscr
         })
       : null;
 
-  const pay = async (plan: PaidPlan) => {
+  const pay = async (plan: PaidPlan, provider: CreateCheckoutDtoProvider) => {
     setBusy(plan);
     try {
-      const link = await checkout.mutateAsync({ data: { plan } });
+      const link = await checkout.mutateAsync({ data: { plan, provider } });
       window.location.assign(link.url);
     } catch (err) {
       toast.error(apiErrorMessage(err, t, "seller.subscription.payFailed"));
@@ -98,7 +103,7 @@ export function SubscriptionPlans({ subscription }: { subscription: SellerSubscr
               second={plan.id === secondId}
               busy={busy === plan.id}
               disabled={busy !== null}
-              onPay={() => void pay(plan.id)}
+              onPay={(provider) => void pay(plan.id, provider)}
             />
           ))}
         </div>
@@ -126,7 +131,7 @@ function PlanCard({
   second: boolean;
   busy: boolean;
   disabled: boolean;
-  onPay: () => void;
+  onPay: (provider: CreateCheckoutDtoProvider) => void;
 }) {
   const { t, locale } = useT();
 
@@ -195,17 +200,30 @@ function PlanCard({
         className="mt-5 w-full"
         variant={current || !renewable ? "default" : "outline"}
         disabled={disabled}
-        onClick={onPay}
+        onClick={() => onPay("click")}
       >
         {busy && <Loader2 className="size-4 animate-spin" />}
         {busy
           ? t("seller.subscription.paying")
-          : current
-            ? t("seller.subscription.renew")
-            : renewable
-              ? t("seller.subscription.change")
-              : t("seller.subscription.pay")}
+          : PAYME_ENABLED
+            ? t("seller.subscription.payClick")
+            : current
+              ? t("seller.subscription.renew")
+              : renewable
+                ? t("seller.subscription.change")
+                : t("seller.subscription.pay")}
       </Button>
+
+      {PAYME_ENABLED && (
+        <Button
+          className="mt-2 w-full"
+          variant="outline"
+          disabled={disabled}
+          onClick={() => onPay("payme")}
+        >
+          {t("seller.subscription.payPayme")}
+        </Button>
+      )}
     </Card>
   );
 }

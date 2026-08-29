@@ -5,11 +5,25 @@
  * Маркетплейс компьютерной техники — REST API для веб-витрины (Next.js) и Telegram mini-app. Покупать можно без авторизации; вход через Telegram нужен продавцу, администратору и покупателю, который хочет видеть историю просмотров на всех своих устройствах.
  * OpenAPI spec version: 1.0.0
  */
+import type { TestPaymentLinkDtoProvider } from './testPaymentLinkDtoProvider';
 
 export interface TestPaymentLinkDto {
+  /** Касса, для которой заведён счёт */
+  provider: TestPaymentLinkDtoProvider;
+  /** Номер заказа в нашем биллинге: у Click он же merchant_trans_id, у Payme — значение account.<accountField> */
+  orderId: number;
   /** Сумма проверки в сумах */
   amountUzs: number;
-  /** До какого момента открыто окно: позже эта же сумма будет отбита кодом -2 */
+  /** Та же сумма в тийинах — в этих единицах её ждёт Payme */
+  amountTiyin: number;
+  /** Имя поля account, под которым касса Payme ждёт номер заказа */
+  accountField: string;
+  /**
+     * ID кассы провайдера — нужен для запросов в песочницу
+     * @nullable
+     */
+  merchantId: string | null;
+  /** До какого момента открыт счёт: позже оплата этой суммы будет отбита */
   armedUntil: string;
   /** Адрес кассы провайдера — открывается в новой вкладке */
   url: string;

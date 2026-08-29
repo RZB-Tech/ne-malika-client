@@ -80,7 +80,8 @@
     "becomeSeller": "Sotuvchi bo‘lish",
     "logout": "Chiqish",
     "messages": "Xabarlar",
-    "messagesShort": "Chat"
+    "messagesShort": "Chat",
+    "support": "Yordam"
   },
   "home": {
     "banners": {
@@ -417,7 +418,9 @@
       "invoiceCancelled": "Hisob bekor qilindi",
       "invoiceStale": "Tasdiq hali yo‘q. Buyurtma №{order} — keyinroq sahifani yangilang yoki havola orqali to‘lang",
       "invoiceFailed": "Hisobni yuborib bo‘lmadi",
-      "invoiceHint": "Hisob Click’ga bog‘langan raqamga keladi. Obuna tasdiqdan so‘ng darhol yoqiladi."
+      "invoiceHint": "Hisob Click’ga bog‘langan raqamga keladi. Obuna tasdiqdan so‘ng darhol yoqiladi.",
+      "payClick": "Click orqali toʻlash",
+      "payPayme": "Payme orqali toʻlash"
     },
     "plans": {
       "title": "Tariflar",
@@ -1171,7 +1174,7 @@
       "testConfirmText": "Do‘kon uchun 30 daqiqalik oyna ochiladi: shu vaqt ichida kassa ramziy summani qabul qiladi. Obuna esa BERILMAYDI — faqat to‘lovning o‘tishi tekshiriladi. Birinchi muvaffaqiyatli to‘lovdan keyin oyna o‘zi yopiladi.",
       "testConfirmAction": "Oynani ochish",
       "testTitle": "Kassani tekshirish",
-      "testText": "«{shop}» do‘koni uchun oyna ochildi. Quyidagi havola orqali to‘lang.",
+      "testText": "«{shop}» doʻkoni uchun sinov hisobi: toʻlov jangovar protokol boʻyicha oʻtadi, lekin obuna berilmaydi.",
       "testAmount": "Summa",
       "testSum": "{amount} so‘m",
       "testArmedUntil": "Oyna ochiq",
@@ -1180,7 +1183,23 @@
       "testCopy": "Nusxalash",
       "testCopied": "Havola nusxalandi",
       "testCopyFailed": "Nusxalab bo‘lmadi — yonidagi tugma bilan havolani oching",
-      "testFailed": "Sinov to‘lovi oynasini ochib bo‘lmadi"
+      "testFailed": "Sinov to‘lovi oynasini ochib bo‘lmadi",
+      "testProvider": "Kassa",
+      "testOrderId": "Buyurtma raqami",
+      "testTiyin": "Summa tiyinda",
+      "testTiyinHint": "{tiyin} tiyin — Payme summani shu birlikda kutadi",
+      "testAccountField": "account maydoni",
+      "testMerchantId": "Kassa ID",
+      "testSandbox": "Sinov maydoni uchun soʻrov",
+      "testAmountLabel": "Summa soʻmda",
+      "testAmountPlaceholder": "1000",
+      "testAmountHint": "Boʻsh qoldirilsa — sozlamalardagi sinov summasi olinadi",
+      "testAmountInvalid": "Summa — noldan katta butun son",
+      "testCreate": "Hisob ochish",
+      "testCreating": "Ochilmoqda…",
+      "testAgain": "Yana bitta hisob ochish",
+      "testCopiedValue": "Nusxalandi",
+      "testCopiedRequest": "Soʻrov nusxalandi"
     },
     "shopBanners": {
       "title": "Sotuvchi bannerlari",
@@ -1512,7 +1531,8 @@
   "footer": {
     "rights": "Barcha huquqlar himoyalangan.",
     "disclaimer": "Platforma mahsulotlar to‘lovi va yetkazib berishda ishtirok etmaydi.",
-    "sell": "neMalika’da sotish"
+    "sell": "neMalika’da sotish",
+    "support": "Yordam"
   },
   "chat": {
     "writeToSeller": "Sotuvchiga yozish",
