@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Fragment, useEffect, useRef, useState } from "react";
-import { ArrowLeft, ChevronRight, type AppIcon } from "@/components/icons";
+import { ArrowLeft, ChevronDown, ChevronRight, type AppIcon } from "@/components/icons";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import {
   Sidebar,
@@ -54,6 +54,8 @@ export interface NavItem {
 export interface NavGroup {
   label?: string;
   items: NavItem[];
+  /** Раздел с заголовком сворачивается по клику; false — всегда развёрнут. */
+  collapsible?: boolean;
 }
 
 export interface ShellBrand {
@@ -64,7 +66,8 @@ export interface ShellBrand {
 
 function toGroups(nav: NavItem[] | NavGroup[], fallbackLabel: string): NavGroup[] {
   const grouped = nav.length > 0 && Array.isArray((nav[0] as NavGroup).items);
-  return grouped ? (nav as NavGroup[]) : [{ label: fallbackLabel, items: nav as NavItem[] }];
+  if (grouped) return nav as NavGroup[];
+  return [{ label: fallbackLabel, items: nav as NavItem[], collapsible: false }];
 }
 
 function flatten(groups: NavGroup[]): { href: string; exact?: boolean }[] {
@@ -117,12 +120,7 @@ export function DashboardShell({
           {groups.map((group, i) => (
             <Fragment key={group.label ?? i}>
               {i > 0 && <SidebarSeparator className="my-0" />}
-              <SidebarGroup className="py-1">
-                {group.label && <SidebarGroupLabel>{group.label}</SidebarGroupLabel>}
-                <SidebarGroupContent>
-                  <NavMenu items={group.items} activeHref={activeHref} />
-                </SidebarGroupContent>
-              </SidebarGroup>
+              <NavSection group={group} activeHref={activeHref} />
             </Fragment>
           ))}
         </SidebarContent>
@@ -178,6 +176,53 @@ function NavBadge({ value }: { value: number }) {
     <span className="ml-auto inline-flex min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[11px] font-semibold text-primary-foreground tabular group-data-[collapsible=icon]:hidden">
       {value > 99 ? "99+" : value}
     </span>
+  );
+}
+
+function NavSection({ group, activeHref }: { group: NavGroup; activeHref: string | null }) {
+  const { state, isMobile } = useSidebar();
+  const iconOnly = state === "collapsed" && !isMobile;
+  const hasActive = group.items.some(
+    (item) => item.href === activeHref || (item.items ?? []).some((sub) => sub.href === activeHref),
+  );
+  const [open, setOpen] = useState(true);
+  const [wasActive, setWasActive] = useState(hasActive);
+
+  // Раскрываем раздел, когда переходим на страницу внутри него.
+  if (hasActive !== wasActive) {
+    setWasActive(hasActive);
+    if (hasActive) setOpen(true);
+  }
+
+  const menu = <NavMenu items={group.items} activeHref={activeHref} />;
+
+  // В иконочном режиме заголовки разделов скрыты — сворачивать нечем.
+  if (!group.label || group.collapsible === false || iconOnly) {
+    return (
+      <SidebarGroup className="py-1">
+        {group.label && <SidebarGroupLabel>{group.label}</SidebarGroupLabel>}
+        <SidebarGroupContent>{menu}</SidebarGroupContent>
+      </SidebarGroup>
+    );
+  }
+
+  return (
+    <Collapsible open={open} onOpenChange={setOpen} className="group/section">
+      <SidebarGroup className="py-1">
+        <SidebarGroupLabel
+          asChild
+          className="cursor-pointer hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+        >
+          <CollapsibleTrigger>
+            <span className="truncate">{group.label}</span>
+            <ChevronDown className="ml-auto size-4 shrink-0 transition-transform duration-200 group-data-[state=closed]/section:-rotate-90" />
+          </CollapsibleTrigger>
+        </SidebarGroupLabel>
+        <CollapsibleContent>
+          <SidebarGroupContent>{menu}</SidebarGroupContent>
+        </CollapsibleContent>
+      </SidebarGroup>
+    </Collapsible>
   );
 }
 
