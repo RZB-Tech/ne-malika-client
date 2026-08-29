@@ -259,17 +259,20 @@ export default function AdminSellers() {
                 <RowContextMenu key={s.id} actions={actionsFor(s)}>
                   <TableRow onClick={() => setOpened(s)} className="cursor-pointer">
                     <TableCell>
-                      <div className="flex items-center gap-3">
+                      <div className="flex max-w-[360px] items-center gap-3">
                         <StoreAvatar
                           name={s.name}
                           hue={hueFromId(s.id)}
                           src={photoUrl(s.photo)}
-                          className="size-9 rounded-lg text-sm"
+                          className="size-9 shrink-0 rounded-lg text-sm"
                         />
                         <div className="min-w-0">
-                          <div className="text-sm font-medium">{s.name}</div>
+                          <div className="truncate text-sm font-medium">{s.name}</div>
                           {s.abolishReason && (
-                            <div className="line-clamp-1 text-xs text-destructive">
+                            <div
+                              className="truncate text-xs text-destructive"
+                              title={s.abolishReason}
+                            >
                               {s.abolishReason}
                             </div>
                           )}

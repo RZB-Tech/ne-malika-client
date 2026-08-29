@@ -251,7 +251,7 @@ export default function AdminProducts() {
                 <RowContextMenu key={p.id} actions={actionsFor(p)}>
                   <TableRow onClick={() => setOpened(p)} className="cursor-pointer">
                     <TableCell>
-                      <div className="flex items-center gap-3">
+                      <div className="flex max-w-[420px] items-center gap-3">
                         <ProductImage
                           hue={hueFromId(p.id)}
                           categorySlug=""
@@ -261,9 +261,12 @@ export default function AdminProducts() {
                           iconClassName="size-4"
                         />
                         <div className="min-w-0">
-                          <div className="line-clamp-1 text-sm font-medium">{p.name}</div>
+                          <div className="truncate text-sm font-medium">{p.name}</div>
                           {p.abolishReason && (
-                            <div className="line-clamp-1 text-xs text-destructive">
+                            <div
+                              className="truncate text-xs text-destructive"
+                              title={p.abolishReason}
+                            >
                               {p.abolishReason}
                             </div>
                           )}
