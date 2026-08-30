@@ -52,7 +52,7 @@ export function UserMenu({ trigger }: { trigger?: ReactNode } = {}) {
         asChild={Boolean(trigger)}
         className={cn(
           !trigger &&
-            "ml-1 rounded-full outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+          "ml-1 rounded-full outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
         )}
       >
         {trigger ?? (
@@ -91,7 +91,6 @@ export function UserMenu({ trigger }: { trigger?: ReactNode } = {}) {
           <a href={SUPPORT_URL} target="_blank" rel="noreferrer">
             <TelegramIcon className="size-4" />
             <span className="flex-1">{t("nav.support")}</span>
-            <span className="text-xs text-muted-foreground">{SUPPORT_HANDLE}</span>
           </a>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
