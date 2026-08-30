@@ -93,6 +93,10 @@ function useStickyOpen(id: string | undefined, defaultOpen: boolean, forceOpen: 
     if (!id || forceOpen) return;
     try {
       const saved = window.localStorage.getItem(NAV_STATE_PREFIX + id);
+      // Прочитать хранилище прямо в рендере нельзя: на сервере его нет, и
+      // разметка разъедется при гидратации. Значит, только после монтирования —
+      // ровно один раз за загрузку страницы, каскада перерисовок тут нет.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       if (saved !== null) setOpen(saved === "1");
     } catch {
       // Приватный режим или запрет на хранилище — меню просто не помнит.
