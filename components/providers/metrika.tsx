@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { Suspense, useEffect, useRef } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import Script from "next/script";
 import { hit, METRIKA_ID } from "@/lib/metrika";
@@ -69,8 +69,9 @@ function Pageviews() {
 }
 
 /**
- * Тег Метрики и трекинг переходов. Без NEXT_PUBLIC_YANDEX_METRIKA_ID
- * не рендерит ничего — на локальной машине счётчика просто нет.
+ * Тег Метрики и трекинг переходов. Номер по умолчанию зашит в lib/metrika.ts,
+ * так что счётчик работает без настройки; ничего не рендерит только когда его
+ * выключили явно — NEXT_PUBLIC_YANDEX_METRIKA_ID=0.
  */
 export function Metrika() {
   const id = METRIKA_ID;
@@ -83,7 +84,13 @@ export function Metrika() {
         strategy="afterInteractive"
         dangerouslySetInnerHTML={{ __html: snippet(id) }}
       />
-      <Pageviews />
+      {/* Граница только вокруг Pageviews: внутри useSearchParams, и без неё
+          статический рендер всей страницы уехал бы в динамический. Тег при
+          этом остаётся снаружи — иначе он вместе с Pageviews выпадал бы из
+          серверной разметки и не искался бы в исходнике страницы. */}
+      <Suspense fallback={null}>
+        <Pageviews />
+      </Suspense>
       <noscript>
         <div>
           {/* Пиксель для посетителей без JS — next/image здесь неприменим:
