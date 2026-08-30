@@ -21,6 +21,14 @@ ARG NEXT_PUBLIC_S3_PUBLIC_BASE
 ARG NEXT_PUBLIC_YANDEX_SUGGEST_KEY
 ARG NEXT_PUBLIC_TELEGRAM_BOT_ID
 ARG NEXT_PUBLIC_TELEGRAM_BOT_USERNAME
+ARG NEXT_PUBLIC_SUPPORT_TELEGRAM
+ARG NEXT_PUBLIC_PAYME_ENABLED
+ARG NEXT_PUBLIC_YANDEX_METRIKA_ID
+
+# Все NEXT_PUBLIC_* вшиваются в бандл здесь, на этапе build. Не переданные
+# сюда переменные до сайта не доедут: подставить их окружением запущенного
+# контейнера уже нельзя. Появилась новая — добавляйте её сразу в трёх местах:
+# .env.example, этот список и build-args в .github/workflows/cd.yml.
 
 ENV NEXT_STANDALONE=1
 RUN pnpm build

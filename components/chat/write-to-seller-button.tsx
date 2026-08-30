@@ -18,6 +18,7 @@ import { useT } from "@/components/providers/i18n-provider";
 import { useAuth } from "@/lib/api/auth";
 import { useChats, useStartChat } from "@/lib/api/chats";
 import { apiErrorMessage } from "@/lib/api/errors";
+import { GOALS, reachGoal } from "@/lib/metrika";
 import { ChatThread } from "./chat-thread";
 import { cn } from "@/lib/utils";
 
@@ -100,7 +101,12 @@ function ChatSheetBody({ productId, shopId }: { productId?: number; shopId?: num
     start.mutate(
       { productCardId: productId, shopId, text: value },
       {
-        onSuccess: () => setText(""),
+        // Цель на доставленном сообщении, а не на открытии панели: открыть
+        // и передумать — не контакт с продавцом.
+        onSuccess: () => {
+          setText("");
+          reachGoal(GOALS.chatStart, { productId, shopId });
+        },
         onError: (error) => toast.error(apiErrorMessage(error, t, "chat.sendFailed")),
       },
     );

@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Inter, Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import NextTopLoader from "nextjs-toploader";
 import "./globals.css";
 import { I18nProvider } from "@/components/providers/i18n-provider";
 import { QueryProvider } from "@/components/providers/query-provider";
 import { ChatStream } from "@/components/providers/chat-stream";
+import { Metrika } from "@/components/providers/metrika";
 import { AuthProvider } from "@/lib/api/auth";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
@@ -58,6 +60,11 @@ export default function RootLayout({
         <script src="https://telegram.org/js/telegram-web-app.js" async />
       </head>
       <body suppressHydrationWarning className="flex min-h-full flex-col">
+        {/* Suspense обязателен: внутри useSearchParams, без границы он увёл бы
+            весь сайт в динамический рендер. */}
+        <Suspense fallback={null}>
+          <Metrika />
+        </Suspense>
         <NextTopLoader color="var(--primary)" height={2} shadow={false} showSpinner={false} />
         <QueryProvider>
           <AuthProvider>

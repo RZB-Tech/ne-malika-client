@@ -12,6 +12,7 @@ import { apiErrorMessage } from "@/lib/api/errors";
 import { planLabel, planRank } from "@/lib/api/subscription";
 import { PAYME_ENABLED } from "@/lib/payments";
 import { formatDate, formatPrice } from "@/lib/format";
+import { GOALS, reachGoal } from "@/lib/metrika";
 import { cn } from "@/lib/utils";
 import { useSubscriptionsControllerPlans } from "@/lib/api/generated/endpoints/subscriptions-public/subscriptions-public";
 import { useSellerSubscriptionsControllerCheckout } from "@/lib/api/generated/endpoints/subscriptions-seller/subscriptions-seller";
@@ -54,6 +55,9 @@ export function SubscriptionPlans({ subscription }: { subscription: SellerSubscr
     setBusy(plan);
     try {
       const link = await checkout.mutateAsync({ data: { plan, provider } });
+      // Уход на кассу — последнее, что мы видим на своём домене: дальше
+      // человек уже на стороне Payme или Click. Цель ставим до редиректа.
+      reachGoal(GOALS.subscriptionCheckout, { plan, provider });
       window.location.assign(link.url);
     } catch (err) {
       toast.error(apiErrorMessage(err, t, "seller.subscription.payFailed"));

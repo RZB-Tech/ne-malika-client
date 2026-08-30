@@ -31,6 +31,7 @@ import { useSellerProductCardsControllerCreate } from "@/lib/api/generated/endpo
 import { resolvePhotoKeys } from "@/lib/api/upload";
 import { formatPriceInput, parsePriceInput } from "@/lib/format";
 import { cleanSpecs, withBrandModel } from "@/lib/product-form";
+import { GOALS, reachGoal } from "@/lib/metrika";
 
 function SectionTitle({
   index,
@@ -139,6 +140,8 @@ export function AddProductForm({
           characteristics: characteristics.length ? characteristics : undefined,
         },
       });
+
+      reachGoal(GOALS.productCreated, { shopId: shop.id, categoryId });
 
       await queryClient.invalidateQueries();
       toast.success(t("seller.add.publish"), {

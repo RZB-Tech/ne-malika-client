@@ -10,8 +10,7 @@
     "lint": "eslint",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "gen:api": "orval --config ./orval.config.ts",
-    "stats": "node scripts/metrika-contacts.mjs"
+    "gen:api": "orval --config ./orval.config.ts"
   },
   "dependencies": {
     "@hugeicons/core-free-icons": "^4.2.3",

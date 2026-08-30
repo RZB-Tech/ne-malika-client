@@ -16,6 +16,8 @@ import { Button } from "@/components/ui/button";
 import { useT } from "@/components/providers/i18n-provider";
 import { useAuth, type TelegramUser } from "@/lib/api/auth";
 import { TelegramOAuthButton } from "@/components/auth/telegram-oauth-button";
+import { GOALS, reachGoal, setUserId } from "@/lib/metrika";
+import type { AuthUserDto } from "@/lib/api/generated/schemas";
 
 export function LoginDialog({
   children,
@@ -32,7 +34,14 @@ export function LoginDialog({
 
   const hasOAuth = Boolean(process.env.NEXT_PUBLIC_TELEGRAM_BOT_ID);
 
-  const finish = (role?: string) => {
+  const finish = (user?: AuthUserDto) => {
+    const role = user?.role;
+
+    reachGoal(GOALS.login, { role });
+    // Идентификатор склеивает визиты одного человека с разных устройств —
+    // без него вход с телефона и с ноутбука в отчётах два разных посетителя.
+    if (user?.id !== undefined) setUserId(user.id);
+
     setOpen(false);
     if (redirectTo === null) return;
     router.push(redirectTo ?? (role === "admin" ? "/admin" : "/seller"));
@@ -49,7 +58,7 @@ export function LoginDialog({
     setLoading(true);
     try {
       const res = await loginWithInitData(initData);
-      finish(res.user?.role);
+      finish(res.user);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : t("auth.loginFailed"));
     } finally {
@@ -61,7 +70,7 @@ export function LoginDialog({
     setLoading(true);
     try {
       const res = await loginWithTelegramUser(tgUser);
-      finish(res.user?.role);
+      finish(res.user);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : t("auth.loginFailed"));
     } finally {

@@ -32,6 +32,7 @@ import { dataUrlToBlob, uploadPhoto } from "@/lib/api/upload";
 import { hueFromId } from "@/lib/api/mappers";
 import { photoUrl } from "@/lib/api/photo";
 import { parseTelegramUsername, telegramUrl } from "@/lib/telegram";
+import { GOALS, reachGoal } from "@/lib/metrika";
 
 export default function SellerProfile() {
   const { t } = useT();
@@ -126,6 +127,8 @@ export default function SellerProfile() {
         await updateMutation.mutateAsync({ id: shop.id, data: payload });
       } else {
         await createMutation.mutateAsync({ data: payload });
+        // Ответ у эндпоинта пустой (void), поэтому id магазина в цель не кладём.
+        reachGoal(GOALS.shopCreated);
         await refreshSession();
       }
 

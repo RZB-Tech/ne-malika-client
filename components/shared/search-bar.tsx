@@ -18,6 +18,7 @@ import { CategoryIcon } from "@/components/shared/category-icon";
 import { cn } from "@/lib/utils";
 import { useT } from "@/components/providers/i18n-provider";
 import { useCategories } from "@/lib/api/categories";
+import { GOALS, reachGoal } from "@/lib/metrika";
 
 const CATALOG_PATH = "/";
 
@@ -80,7 +81,11 @@ export function SearchBar({
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     typed.current = false;
-    router.push(catalogUrl(value.trim()));
+    const query = value.trim();
+    // Цель ставим на явную отправку, а не на дебаунс-набор: иначе одна фраза
+    // насчитала бы столько достижений, сколько в ней букв.
+    if (query) reachGoal(GOALS.search, { query });
+    router.push(catalogUrl(query));
   };
 
   const clear = () => {
