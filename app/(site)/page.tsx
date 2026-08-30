@@ -6,6 +6,7 @@ import { CatalogView } from "@/components/catalog/catalog-view";
 import { getBanners, getPublicProducts } from "@/lib/api/server";
 import { randomCatalogSeed } from "@/lib/catalog-seed";
 import type { Paginated, PublicProductCard } from "@/lib/api/types";
+import { serializeJsonLd } from "@/lib/json-ld";
 import { SITE_NAME, SITE_URL, SITE_DESCRIPTION, SITE_KEYWORDS, absoluteUrl } from "@/lib/seo";
 
 export const metadata: Metadata = {
@@ -73,7 +74,7 @@ export default async function HomePage() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
       />
       <BannerCarousel banners={banners} />
       <Suspense>

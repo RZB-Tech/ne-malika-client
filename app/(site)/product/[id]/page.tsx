@@ -6,6 +6,7 @@ import { getPublicProduct, getPublicShop } from "@/lib/api/server";
 import { mapPublicProductCard, mapShop } from "@/lib/api/mappers";
 import { photoUrl } from "@/lib/api/photo";
 import { markdownToPlainText } from "@/lib/markdown";
+import { serializeJsonLd } from "@/lib/json-ld";
 import type { Store } from "@/lib/data";
 import { SITE_NAME, absoluteUrl } from "@/lib/seo";
 
@@ -135,7 +136,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
       />
       <TrackProductView
         product={{
