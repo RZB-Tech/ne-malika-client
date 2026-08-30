@@ -70,6 +70,48 @@ function toGroups(nav: NavItem[] | NavGroup[], fallbackLabel: string): NavGroup[
   return [{ label: fallbackLabel, items: nav as NavItem[], collapsible: false }];
 }
 
+const NAV_STATE_PREFIX = "nemalika.nav.";
+
+/**
+ * Раскрыт ли раздел, с памятью между заходами.
+ *
+ * Ключ — href, а не подпись: подписи локализованы и после смены языка
+ * состояние разъехалось бы. Восстановление одно на загрузку страницы:
+ * при клиентской навигации шелл не размонтируется, а раздел с открытой
+ * внутри страницей сворачивать обратно нельзя, что бы ни лежало в памяти.
+ *
+ * Возвращает [состояние, переключение с записью, установка без записи].
+ * Второе — для клика по заголовку, третье — для авто-раскрытия при переходе.
+ */
+function useStickyOpen(id: string | undefined, defaultOpen: boolean, forceOpen: boolean) {
+  const [open, setOpen] = useState(defaultOpen);
+  const restored = useRef(false);
+
+  useEffect(() => {
+    if (restored.current) return;
+    restored.current = true;
+    if (!id || forceOpen) return;
+    try {
+      const saved = window.localStorage.getItem(NAV_STATE_PREFIX + id);
+      if (saved !== null) setOpen(saved === "1");
+    } catch {
+      // Приватный режим или запрет на хранилище — меню просто не помнит.
+    }
+  }, [id, forceOpen]);
+
+  const toggle = (next: boolean) => {
+    setOpen(next);
+    if (!id) return;
+    try {
+      window.localStorage.setItem(NAV_STATE_PREFIX + id, next ? "1" : "0");
+    } catch {
+      // см. выше
+    }
+  };
+
+  return [open, toggle, setOpen] as const;
+}
+
 function flatten(groups: NavGroup[]): { href: string; exact?: boolean }[] {
   return groups.flatMap((group) =>
     group.items.flatMap((item) =>
@@ -185,10 +227,15 @@ function NavSection({ group, activeHref }: { group: NavGroup; activeHref: string
   const hasActive = group.items.some(
     (item) => item.href === activeHref || (item.items ?? []).some((sub) => sub.href === activeHref),
   );
-  const [open, setOpen] = useState(true);
+  // Раздел без подписи не сворачивается — и запоминать по нему нечего.
+  // Префикс разводит ключи разделов и раскрывающихся пунктов: href у них
+  // может совпасть, а состояние у каждого своё.
+  const stickyId = group.label ? `sec:${group.items[0]?.href ?? ""}` : undefined;
+  const [open, toggle, setOpen] = useStickyOpen(stickyId, true, hasActive);
   const [wasActive, setWasActive] = useState(hasActive);
 
-  // Раскрываем раздел, когда переходим на страницу внутри него.
+  // Раскрываем раздел, когда переходим на страницу внутри него. Без записи:
+  // это не решение пользователя свернуть или развернуть, а следствие перехода.
   if (hasActive !== wasActive) {
     setWasActive(hasActive);
     if (hasActive) setOpen(true);
@@ -207,7 +254,7 @@ function NavSection({ group, activeHref }: { group: NavGroup; activeHref: string
   }
 
   return (
-    <Collapsible open={open} onOpenChange={setOpen} className="group/section">
+    <Collapsible open={open} onOpenChange={toggle} className="group/section">
       <SidebarGroup className="py-1">
         <SidebarGroupLabel
           asChild
@@ -259,7 +306,8 @@ function NavCollapsibleItem({ item, activeHref }: { item: NavItem; activeHref: s
   const { state, isMobile } = useSidebar();
   const subItems = item.items ?? [];
   const hasActive = subItems.some((sub) => sub.href === activeHref);
-  const [open, setOpen] = useState(hasActive);
+  const subTotal = subItems.reduce((sum, sub) => sum + (sub.badge ?? 0), 0);
+  const [open, toggle, setOpen] = useStickyOpen(`item:${item.href}`, hasActive, hasActive);
   const [wasActive, setWasActive] = useState(hasActive);
   const iconOnly = state === "collapsed" && !isMobile;
 
@@ -284,13 +332,16 @@ function NavCollapsibleItem({ item, activeHref }: { item: NavItem; activeHref: s
   }
 
   return (
-    <Collapsible asChild open={open} onOpenChange={setOpen} className="group/collapsible">
+    <Collapsible asChild open={open} onOpenChange={toggle} className="group/collapsible">
       <SidebarMenuItem>
         <CollapsibleTrigger asChild>
           {/* Без tooltip: иначе кнопка обёрнута в Tooltip и asChild не навесит обработчик. */}
           <SidebarMenuButton isActive={hasActive && !open}>
             <item.icon />
             <span>{item.label}</span>
+            {/* Свёрнутый пункт прячет бейджи подвкладок — показываем их сумму,
+                иначе о работе внутри узнаёшь, только раскрыв раздел. */}
+            {!open && subTotal > 0 ? <NavBadge value={subTotal} /> : null}
             <ChevronRight className="ml-auto size-4 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
           </SidebarMenuButton>
         </CollapsibleTrigger>

@@ -22,6 +22,7 @@ import {
 } from "@/components/layout/dashboard-shell";
 import { useT } from "@/components/providers/i18n-provider";
 import { useAuth } from "@/lib/api/auth";
+import { useAdminNavCounts } from "@/lib/api/admin-nav";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -34,23 +35,40 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 function AdminLayoutInner({ children }: { children: React.ReactNode }) {
   const { t } = useT();
   const { user } = useAuth();
+  const counts = useAdminNavCounts();
 
+  // Заголовок над одним пунктом — лишняя строка и лишний клик, поэтому
+  // одиночные разделы идут без подписи: сводка сверху, подписки и настройки
+  // снизу. Подписанными остались только те, где пунктов правда несколько.
   const groups: NavGroup[] = [
     {
-      label: t("admin.nav.groupOverview"),
       items: [{ href: "/admin", label: t("admin.nav.dashboard"), icon: BarChart3, exact: true }],
     },
     {
       label: t("admin.nav.groupModeration"),
       items: [
-        { href: "/admin/reports", label: t("admin.nav.reports"), icon: Flag },
-        { href: "/admin/reviews", label: t("admin.nav.reviews"), icon: Star },
+        {
+          href: "/admin/reports",
+          label: t("admin.nav.reports"),
+          icon: Flag,
+          badge: counts.reports,
+        },
+        {
+          href: "/admin/reviews",
+          label: t("admin.nav.reviews"),
+          icon: Star,
+          badge: counts.reviews,
+        },
         {
           href: "/admin/ai-review",
           label: t("admin.nav.ai"),
           icon: Sparkles,
           items: [
-            { href: "/admin/ai-review", label: t("admin.nav.aiReview") },
+            {
+              href: "/admin/ai-review",
+              label: t("admin.nav.aiReview"),
+              badge: counts.aiReview,
+            },
             { href: "/admin/ai-usage", label: t("admin.nav.aiUsage") },
           ],
         },
@@ -73,7 +91,13 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
       ],
     },
     {
-      label: t("admin.nav.groupFinance"),
+      label: t("admin.nav.groupAudience"),
+      items: [
+        { href: "/admin/users", label: t("admin.nav.users"), icon: Users },
+        { href: "/admin/broadcast", label: t("admin.nav.broadcast"), icon: Send },
+      ],
+    },
+    {
       items: [
         {
           href: "/admin/subscriptions",
@@ -84,18 +108,8 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
             { href: "/admin/subscriptions/report", label: t("admin.nav.subsSales") },
           ],
         },
+        { href: "/admin/settings", label: t("admin.nav.settings"), icon: Settings },
       ],
-    },
-    {
-      label: t("admin.nav.groupAudience"),
-      items: [
-        { href: "/admin/users", label: t("admin.nav.users"), icon: Users },
-        { href: "/admin/broadcast", label: t("admin.nav.broadcast"), icon: Send },
-      ],
-    },
-    {
-      label: t("admin.nav.groupSystem"),
-      items: [{ href: "/admin/settings", label: t("admin.nav.settings"), icon: Settings }],
     },
   ];
 
