@@ -3179,11 +3179,22 @@
           "201": {
             "description": "Жалоба создана"
           },
+          "403": {
+            "description": "Жалоба на собственный магазин"
+          },
           "404": {
             "description": "Магазин или товар не найден"
+          },
+          "409": {
+            "description": "Жалоба уже была оставлена"
           }
         },
-        "summary": "Оставить жалобу на магазин или товар (без авторизации)",
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Оставить жалобу на магазин или товар",
         "tags": [
           "reports"
         ]
@@ -6436,7 +6447,7 @@
         "properties": {
           "endpoint": {
             "type": "string",
-            "description": "Адрес push-сервиса браузера из PushSubscription.endpoint"
+            "description": "Адрес push-сервиса браузера из PushSubscription.endpoint. Принимается только https-адрес известного push-сервиса: по этому адресу ходит сам сервер, и произвольный хост означал бы SSRF"
           },
           "p256dh": {
             "type": "string",

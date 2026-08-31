@@ -53,7 +53,7 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
 };
 
 /**
- * @summary Оставить жалобу на магазин или товар (без авторизации)
+ * @summary Оставить жалобу на магазин или товар
  */
 export const reportsControllerCreate = (
     createReportDto: BodyType<CreateReportDto>,
@@ -104,7 +104,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type ReportsControllerCreateMutationError = ErrorType<void>
 
     /**
- * @summary Оставить жалобу на магазин или товар (без авторизации)
+ * @summary Оставить жалобу на магазин или товар
  */
 export const useReportsControllerCreate = <TError = ErrorType<void>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reportsControllerCreate>>, TError,{data: BodyType<CreateReportDto>}, TContext>, request?: SecondParameter<typeof customInstance>}

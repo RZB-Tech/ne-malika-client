@@ -7,7 +7,7 @@
  */
 
 export interface SubscribePushDto {
-  /** Адрес push-сервиса браузера из PushSubscription.endpoint */
+  /** Адрес push-сервиса браузера из PushSubscription.endpoint. Принимается только https-адрес известного push-сервиса: по этому адресу ходит сам сервер, и произвольный хост означал бы SSRF */
   endpoint: string;
   /** Ключ p256dh из PushSubscription.getKey */
   p256dh: string;

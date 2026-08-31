@@ -1526,7 +1526,10 @@
     "submit": "Yuborish",
     "tooShort": "Muammoni batafsilroq yozing (kamida 5 belgi)",
     "sent": "Shikoyat yuborildi. Rahmat!",
-    "failed": "Shikoyatni yuborib bo‘lmadi"
+    "failed": "Shikoyatni yuborib bo‘lmadi",
+    "ownShop": "O‘z do‘koningizga shikoyat qila olmaysiz",
+    "already": "Siz bunga allaqachon shikoyat qilgansiz",
+    "tooOften": "Juda tez-tez. Bir daqiqadan so‘ng urinib ko‘ring"
   },
   "footer": {
     "rights": "Barcha huquqlar himoyalangan.",
