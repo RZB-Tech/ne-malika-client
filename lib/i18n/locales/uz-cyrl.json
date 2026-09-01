@@ -62,7 +62,9 @@
     "total": "Жами: {count}",
     "noUsername": "username йўқ",
     "logoutFailed": "Чиқиб бўлмади",
-    "actionFailed": "Амални бажариб бўлмади"
+    "actionFailed": "Амални бажариб бўлмади",
+    "showMore": "Тўлиқ кўрсатиш",
+    "showLess": "Йиғиш"
   },
   "nav": {
     "catalog": "Каталог",

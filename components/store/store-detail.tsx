@@ -24,6 +24,7 @@ import { ReportDialog } from "@/components/shared/report-dialog";
 import { StatusPanel } from "@/components/shared/status-panel";
 import { StoreAvatar } from "@/components/shared/store-avatar";
 import { ReviewsSection } from "@/components/reviews/reviews-section";
+import { Expandable } from "@/components/shared/expandable";
 import { useT } from "@/components/providers/i18n-provider";
 import { formatWorkSchedule } from "@/lib/api/mappers";
 import { formatDate, formatRating } from "@/lib/format";
@@ -92,9 +93,11 @@ export function StoreDetail({ store, products = [] }: { store: Store; products?:
                   </Badge>
                 )}
               </div>
-              <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-                {store.description}
-              </p>
+              <Expandable className="mt-1.5 max-w-2xl" collapsedHeight={120}>
+                <p className="text-sm leading-relaxed whitespace-pre-line text-muted-foreground">
+                  {store.description}
+                </p>
+              </Expandable>
             </div>
             <div className="flex gap-2">
               {store.telegram && (

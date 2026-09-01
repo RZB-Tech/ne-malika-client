@@ -62,7 +62,9 @@
     "total": "Jami: {count}",
     "noUsername": "username yo‘q",
     "logoutFailed": "Chiqib bo‘lmadi",
-    "actionFailed": "Amalni bajarib bo‘lmadi"
+    "actionFailed": "Amalni bajarib bo‘lmadi",
+    "showMore": "To‘liq ko‘rsatish",
+    "showLess": "Yig‘ish"
   },
   "nav": {
     "catalog": "Katalog",

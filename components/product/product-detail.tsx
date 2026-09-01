@@ -19,6 +19,7 @@ import { ReportDialog } from "@/components/shared/report-dialog";
 import { StoreAvatar } from "@/components/shared/store-avatar";
 import { RatingStars } from "@/components/shared/rating-stars";
 import { Markdown } from "@/components/shared/markdown";
+import { Expandable } from "@/components/shared/expandable";
 import { ReviewsSection } from "@/components/reviews/reviews-section";
 import { useT } from "@/components/providers/i18n-provider";
 import { formatWorkSchedule } from "@/lib/api/mappers";
@@ -133,10 +134,12 @@ export function ProductDetail({ product, store }: { product: Product; store: Sto
                 <h2 className="font-heading text-xl font-bold tracking-tight">
                   {t("product.description")}
                 </h2>
-                <Markdown
-                  text={product.description}
-                  className="mt-3 max-w-2xl leading-relaxed text-muted-foreground"
-                />
+                <Expandable className="mt-3 max-w-2xl">
+                  <Markdown
+                    text={product.description}
+                    className="leading-relaxed text-muted-foreground"
+                  />
+                </Expandable>
               </section>
 
               {product.specs.length > 0 && (

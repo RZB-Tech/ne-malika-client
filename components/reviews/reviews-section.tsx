@@ -10,6 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { LoginDialog } from "@/components/auth/login-dialog";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { RatingStars } from "@/components/shared/rating-stars";
+import { Expandable } from "@/components/shared/expandable";
 import { ReviewFormDialog } from "./review-form-dialog";
 import { useT } from "@/components/providers/i18n-provider";
 import { useAuth } from "@/lib/api/auth";
@@ -203,7 +204,11 @@ function MyReview({
       <div className="mt-2">
         <RatingStars value={review.rating} />
       </div>
-      {review.text && <p className="mt-2 text-sm whitespace-pre-line">{review.text}</p>}
+      {review.text && (
+        <Expandable className="mt-2" collapsedHeight={120}>
+          <p className="text-sm whitespace-pre-line">{review.text}</p>
+        </Expandable>
+      )}
 
       {review.status === "rejected" && review.moderationNote && (
         <p className="mt-2 rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">
@@ -257,7 +262,9 @@ function ReviewItem({ review }: { review: PublicReview }) {
       )}
 
       {review.text && (
-        <p className="mt-2 text-sm leading-relaxed whitespace-pre-line">{review.text}</p>
+        <Expandable className="mt-2" collapsedHeight={120}>
+          <p className="text-sm leading-relaxed whitespace-pre-line">{review.text}</p>
+        </Expandable>
       )}
     </div>
   );

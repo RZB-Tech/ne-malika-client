@@ -62,7 +62,9 @@
     "total": "Всего: {count}",
     "noUsername": "без username",
     "logoutFailed": "Не удалось выйти",
-    "actionFailed": "Не удалось выполнить действие"
+    "actionFailed": "Не удалось выполнить действие",
+    "showMore": "Показать полностью",
+    "showLess": "Свернуть"
   },
   "nav": {
     "catalog": "Каталог",
