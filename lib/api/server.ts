@@ -1,6 +1,10 @@
 import "server-only";
 
-import type { PublicBannerDto } from "./generated/schemas";
+import type {
+  PublicBannerDto,
+  PublicShopListItemDto,
+  ShopsControllerFindAllSort,
+} from "./generated/schemas";
 import type { PublicProductCard, PublicShop, Paginated } from "./types";
 
 const ORIGIN = (
@@ -53,14 +57,18 @@ export function getPublicProducts(
     limit?: number;
     sort?: string;
     seed?: string;
+    shopId?: number;
+    categoryId?: number;
   } = {},
 ): Promise<Paginated<PublicProductCard> | null> {
-  const { page = 1, limit = 24, sort = "newest", seed } = params;
+  const { page = 1, limit = 24, sort = "newest", seed, shopId, categoryId } = params;
   const qs = new URLSearchParams({
     page: String(page),
     limit: String(limit),
     sort,
     ...(seed ? { seed } : {}),
+    ...(shopId ? { shop_id: String(shopId) } : {}),
+    ...(categoryId ? { category_id: String(categoryId) } : {}),
   }).toString();
   return getJson<Paginated<PublicProductCard>>(`/product-cards?${qs}`, seed ? 0 : 120);
 }
@@ -71,4 +79,21 @@ export async function getBanners(): Promise<PublicBannerDto[]> {
 
 export async function getAllProductIds(): Promise<{ id: number; updatedAt: string }[]> {
   return (await getJson<{ id: number; updatedAt: string }[]>("/product-cards/sitemap", 3600)) ?? [];
+}
+
+export function getPublicShops(
+  params: { page?: number; limit?: number; q?: string; sort?: ShopsControllerFindAllSort } = {},
+): Promise<Paginated<PublicShopListItemDto> | null> {
+  const { page = 1, limit = 24, q, sort = "products" } = params;
+  const qs = new URLSearchParams({
+    page: String(page),
+    limit: String(limit),
+    sort,
+    ...(q ? { q } : {}),
+  }).toString();
+  return getJson<Paginated<PublicShopListItemDto>>(`/shops?${qs}`, 300);
+}
+
+export async function getAllShopIds(): Promise<{ id: number; updatedAt: string }[]> {
+  return (await getJson<{ id: number; updatedAt: string }[]>("/shops/sitemap", 3600)) ?? [];
 }

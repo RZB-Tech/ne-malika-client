@@ -1,14 +1,22 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ProductDetail } from "@/components/product/product-detail";
+import { ProductRail } from "@/components/product/product-rail";
 import { TrackProductView } from "@/components/product/track-product-view";
-import { getPublicProduct, getPublicShop } from "@/lib/api/server";
+import { PageContainer } from "@/components/layout/page-container";
+import { getPublicProduct, getPublicProducts, getPublicShop } from "@/lib/api/server";
 import { mapPublicProductCard, mapShop } from "@/lib/api/mappers";
 import { photoUrl } from "@/lib/api/photo";
 import { markdownToPlainText } from "@/lib/markdown";
 import { serializeJsonLd } from "@/lib/json-ld";
 import type { Store } from "@/lib/data";
 import { SITE_NAME, absoluteUrl } from "@/lib/seo";
+
+// Берём с запасом: из выдачи выпадет сам товар, а для «похожих» ещё и все
+// карточки этого же магазина.
+const RAIL_FETCH = 16;
+
+const RAIL_SIZE = 8;
 
 function specsSummary(
   characteristics: { key: string; value: string }[] | null | undefined,
@@ -86,7 +94,26 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
 
   const product = mapPublicProductCard(raw);
 
-  const shopRaw = await getPublicShop(raw.shopId);
+  const [shopRaw, storeList, categoryList] = await Promise.all([
+    getPublicShop(raw.shopId),
+    getPublicProducts({ shopId: raw.shopId, limit: RAIL_FETCH, sort: "newest" }),
+    raw.categoryId
+      ? getPublicProducts({ categoryId: raw.categoryId, limit: RAIL_FETCH, sort: "newest" })
+      : Promise.resolve(null),
+  ]);
+
+  const fromStore = (storeList?.data ?? [])
+    .filter((p) => p.id !== raw.id)
+    .slice(0, RAIL_SIZE)
+    .map(mapPublicProductCard);
+
+  // Товары того же магазина уже показаны рядом — во второй ленте они были бы
+  // повтором, поэтому «похожие» берём из категории за вычетом этого магазина.
+  const similar = (categoryList?.data ?? [])
+    .filter((p) => p.id !== raw.id && p.shopId !== raw.shopId)
+    .slice(0, RAIL_SIZE)
+    .map(mapPublicProductCard);
+
   const store: Store = shopRaw
     ? mapShop(shopRaw)
     : {
@@ -130,13 +157,41 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
             url: absoluteUrl(`/product/${raw.id}`),
             seller: { "@type": "Organization", name: raw.shopName },
           },
+    // Оценка уже показана на странице звёздами — без этого блока поисковик
+    // её не видит и звёзд в выдаче не рисует. Без отзывов блок не выводим:
+    // aggregateRating с нулём Google считает ошибкой разметки.
+    aggregateRating:
+      raw.ratingCount && raw.ratingCount > 0
+        ? {
+            "@type": "AggregateRating",
+            ratingValue: Number((raw.ratingAvg ?? 0).toFixed(1)),
+            reviewCount: raw.ratingCount,
+            bestRating: 5,
+            worstRating: 1,
+          }
+        : undefined,
+  };
+
+  const breadcrumbsLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: SITE_NAME, item: absoluteUrl("/") },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: raw.shopName,
+        item: absoluteUrl(`/store/${raw.shopId}`),
+      },
+      { "@type": "ListItem", position: 3, name: raw.name },
+    ],
   };
 
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd([jsonLd, breadcrumbsLd]) }}
       />
       <TrackProductView
         product={{
@@ -150,6 +205,11 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
         }}
       />
       <ProductDetail product={product} store={store} />
+
+      <PageContainer className="pb-12">
+        <ProductRail titleKey="product.moreFromStore" products={fromStore} />
+        <ProductRail titleKey="product.similar" products={similar} />
+      </PageContainer>
     </>
   );
 }

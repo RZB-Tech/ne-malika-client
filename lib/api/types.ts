@@ -106,7 +106,29 @@ export interface ShopRow {
   updatedAt: string;
 }
 
-export interface PublicShop extends ShopRow {
+/**
+ * Публичная карточка магазина отдаёт не всю строку: баланс кредитов, тариф и
+ * расход автозаполнений с неё сняты, поэтому от ShopRow она не наследуется.
+ */
+export interface PublicShopRow {
+  id: number;
+  owner: number;
+  name: string;
+  description: string | null;
+  photo: string | null;
+  telegramLink: string;
+  contact: string;
+  address: string | null;
+  workSchedule: WorkScheduleEntry[] | null;
+  location: number[] | null;
+  ratingAvg?: number;
+  ratingCount?: number;
+  status: EntityStatus;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PublicShop extends PublicShopRow {
   productCards: ProductCardRow[];
 }
 

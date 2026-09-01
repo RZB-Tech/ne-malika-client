@@ -9,3 +9,7 @@ pnpm-lock.yaml
 next-env.d.ts
 *.tsbuildinfo
 .vercel
+
+# Клиент API собирает orval своим форматом. Прогон prettier переписывает
+# все 200 файлов, а следующий gen:api возвращает их обратно — вечный шум в diff.
+lib/api/generated

@@ -10,9 +10,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "App"
-        ]
+        "tags": ["App"]
       }
     },
     "/api/v1/auth/telegram": {
@@ -45,9 +43,7 @@
           }
         },
         "summary": "Вход через Telegram Mini App (initData)",
-        "tags": [
-          "auth"
-        ]
+        "tags": ["auth"]
       }
     },
     "/api/v1/auth/telegram/widget": {
@@ -80,9 +76,7 @@
           }
         },
         "summary": "Вход через Telegram Login Widget (браузер)",
-        "tags": [
-          "auth"
-        ]
+        "tags": ["auth"]
       }
     },
     "/api/v1/auth/refresh": {
@@ -105,9 +99,7 @@
           }
         },
         "summary": "Обновление access-токена по httpOnly refresh-cookie",
-        "tags": [
-          "auth"
-        ]
+        "tags": ["auth"]
       }
     },
     "/api/v1/auth/logout": {
@@ -120,9 +112,7 @@
           }
         },
         "summary": "Выход — очищает refresh-cookie",
-        "tags": [
-          "auth"
-        ]
+        "tags": ["auth"]
       }
     },
     "/api/v1/admin/users": {
@@ -164,9 +154,7 @@
           }
         ],
         "summary": "Все пользователи с их магазином и числом товаров",
-        "tags": [
-          "users-admin"
-        ]
+        "tags": ["users-admin"]
       }
     },
     "/api/v1/admin/users/{id}": {
@@ -193,9 +181,7 @@
           }
         ],
         "summary": "Карточка пользователя и его последние изменённые товары",
-        "tags": [
-          "users-admin"
-        ]
+        "tags": ["users-admin"]
       }
     },
     "/api/v1/admin/users/{id}/role": {
@@ -232,9 +218,7 @@
           }
         ],
         "summary": "Выдать или снять права администратора",
-        "tags": [
-          "users-admin"
-        ]
+        "tags": ["users-admin"]
       }
     },
     "/api/v1/admin/users/{id}/block": {
@@ -271,9 +255,7 @@
           }
         ],
         "summary": "Заблокировать продавца. В отличие от упразднения магазина закрывает вход в кабинет",
-        "tags": [
-          "users-admin"
-        ]
+        "tags": ["users-admin"]
       }
     },
     "/api/v1/admin/users/{id}/unblock": {
@@ -300,9 +282,96 @@
           }
         ],
         "summary": "Снять блокировку с продавца",
-        "tags": [
-          "users-admin"
-        ]
+        "tags": ["users-admin"]
+      }
+    },
+    "/api/v1/shops": {
+      "get": {
+        "description": "Магазины без единого активного товара в выдачу не попадают. Телефон в списке не отдаётся — он есть в карточке магазина, где раскрывается по нажатию и учитывается как контакт.",
+        "operationId": "ShopsController_findAll",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Номер страницы",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Размер страницы",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "description": "Текстовый поиск по названию и адресу магазина",
+            "schema": {
+              "example": "техно",
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "required": false,
+            "in": "query",
+            "description": "products — сначала магазины с наибольшим ассортиментом (по умолчанию: покупателю нужен выбор, а не магазин с одной оценкой); rating — по средней оценке, магазины без отзывов уходят в конец",
+            "schema": {
+              "default": "products",
+              "type": "string",
+              "enum": ["products", "rating", "newest", "name"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedPublicShopsDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Каталог магазинов: только активные и только с товарами",
+        "tags": ["shops-public"]
+      }
+    },
+    "/api/v1/shops/sitemap": {
+      "get": {
+        "operationId": "ShopsController_sitemap",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ShopSitemapEntryDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "id и дата изменения магазинов с товарами (для sitemap)",
+        "tags": ["shops-public"]
       }
     },
     "/api/v1/shops/{id}": {
@@ -327,9 +396,7 @@
           }
         },
         "summary": "Карточка магазина с его активными товарами",
-        "tags": [
-          "shops-public"
-        ]
+        "tags": ["shops-public"]
       }
     },
     "/api/v1/seller/shops": {
@@ -347,9 +414,7 @@
           }
         ],
         "summary": "Список собственных магазинов",
-        "tags": [
-          "shops-seller"
-        ]
+        "tags": ["shops-seller"]
       },
       "post": {
         "operationId": "SellerShopsController_create",
@@ -381,9 +446,7 @@
           }
         ],
         "summary": "Создать магазин (покупатель при этом становится продавцом)",
-        "tags": [
-          "shops-seller"
-        ]
+        "tags": ["shops-seller"]
       }
     },
     "/api/v1/seller/shops/{id}": {
@@ -410,9 +473,7 @@
           }
         ],
         "summary": "Получить свой магазин по id",
-        "tags": [
-          "shops-seller"
-        ]
+        "tags": ["shops-seller"]
       },
       "put": {
         "operationId": "SellerShopsController_update",
@@ -447,9 +508,7 @@
           }
         ],
         "summary": "Обновить свой магазин",
-        "tags": [
-          "shops-seller"
-        ]
+        "tags": ["shops-seller"]
       },
       "delete": {
         "operationId": "SellerShopsController_remove",
@@ -474,9 +533,7 @@
           }
         ],
         "summary": "Удалить свой магазин (каскадно удаляет его товары)",
-        "tags": [
-          "shops-seller"
-        ]
+        "tags": ["shops-seller"]
       }
     },
     "/api/v1/admin/shops": {
@@ -528,9 +585,7 @@
           }
         ],
         "summary": "Все магазины с числом товаров, с поиском по магазину и владельцу",
-        "tags": [
-          "shops-admin"
-        ]
+        "tags": ["shops-admin"]
       }
     },
     "/api/v1/admin/shops/{id}/abolish": {
@@ -567,9 +622,7 @@
           }
         ],
         "summary": "Упразднить магазин с обязательной причиной",
-        "tags": [
-          "shops-admin"
-        ]
+        "tags": ["shops-admin"]
       }
     },
     "/api/v1/admin/shops/{id}/restore": {
@@ -596,9 +649,7 @@
           }
         ],
         "summary": "Вернуть упразднённый магазин в работу",
-        "tags": [
-          "shops-admin"
-        ]
+        "tags": ["shops-admin"]
       }
     },
     "/api/v1/admin/shops/{id}/restricted-categories": {
@@ -635,9 +686,7 @@
           }
         ],
         "summary": "Выдать или отозвать доступ магазина к закрытым разделам каталога («Смартфоны» и «Планшеты»)",
-        "tags": [
-          "shops-admin"
-        ]
+        "tags": ["shops-admin"]
       }
     },
     "/api/v1/admin/shops/{id}": {
@@ -664,9 +713,7 @@
           }
         ],
         "summary": "Удалить магазин навсегда (каскадом удаляет товары, владелец снова покупатель)",
-        "tags": [
-          "shops-admin"
-        ]
+        "tags": ["shops-admin"]
       }
     },
     "/api/v1/admin/shops/{shopId}/credits": {
@@ -700,9 +747,7 @@
           }
         ],
         "summary": "Баланс кредитов магазина",
-        "tags": [
-          "credits-admin"
-        ]
+        "tags": ["credits-admin"]
       },
       "post": {
         "operationId": "AdminCreditsController_grant",
@@ -744,9 +789,7 @@
           }
         ],
         "summary": "Начислить кредиты магазину",
-        "tags": [
-          "credits-admin"
-        ]
+        "tags": ["credits-admin"]
       }
     },
     "/api/v1/admin/shops/{shopId}/credits/history": {
@@ -796,9 +839,7 @@
           }
         ],
         "summary": "История начислений и списаний",
-        "tags": [
-          "credits-admin"
-        ]
+        "tags": ["credits-admin"]
       }
     },
     "/api/v1/admin/shops/{shopId}/credits/revoke": {
@@ -842,9 +883,7 @@
           }
         ],
         "summary": "Отобрать кредиты у магазина",
-        "tags": [
-          "credits-admin"
-        ]
+        "tags": ["credits-admin"]
       }
     },
     "/api/v1/admin/credits/preview": {
@@ -878,9 +917,7 @@
           }
         ],
         "summary": "Сколько кредитов даст сумма",
-        "tags": [
-          "credits-admin"
-        ]
+        "tags": ["credits-admin"]
       }
     },
     "/api/v1/seller/credits": {
@@ -908,9 +945,7 @@
           }
         ],
         "summary": "Мои кредиты: купленные и подписочные",
-        "tags": [
-          "credits-seller"
-        ]
+        "tags": ["credits-seller"]
       }
     },
     "/api/v1/seller/credits/history": {
@@ -959,9 +994,7 @@
           }
         ],
         "summary": "История начислений, списаний и сгораний",
-        "tags": [
-          "credits-seller"
-        ]
+        "tags": ["credits-seller"]
       }
     },
     "/api/v1/admin/settings": {
@@ -986,9 +1019,7 @@
           }
         ],
         "summary": "Текущие настройки платформы",
-        "tags": [
-          "settings"
-        ]
+        "tags": ["settings"]
       },
       "patch": {
         "operationId": "AdminSettingsController_update",
@@ -1021,9 +1052,7 @@
           }
         ],
         "summary": "Изменить настройки платформы",
-        "tags": [
-          "settings"
-        ]
+        "tags": ["settings"]
       }
     },
     "/api/v1/categories": {
@@ -1046,9 +1075,7 @@
           }
         },
         "summary": "Дерево категорий каталога: корни с вложенными подкатегориями",
-        "tags": [
-          "categories"
-        ]
+        "tags": ["categories"]
       }
     },
     "/api/v1/product-cards": {
@@ -1126,10 +1153,7 @@
             "in": "query",
             "schema": {
               "type": "string",
-              "enum": [
-                "new",
-                "old"
-              ]
+              "enum": ["new", "old"]
             }
           },
           {
@@ -1169,12 +1193,7 @@
             "schema": {
               "default": "newest",
               "type": "string",
-              "enum": [
-                "price_asc",
-                "price_desc",
-                "newest",
-                "random"
-              ]
+              "enum": ["price_asc", "price_desc", "newest", "random"]
             }
           },
           {
@@ -1212,9 +1231,7 @@
           }
         },
         "summary": "Список товаров с фильтрами, поиском и пагинацией",
-        "tags": [
-          "product-cards-public"
-        ]
+        "tags": ["product-cards-public"]
       }
     },
     "/api/v1/product-cards/sitemap": {
@@ -1227,9 +1244,7 @@
           }
         },
         "summary": "id и дата изменения всех активных товаров (для sitemap)",
-        "tags": [
-          "product-cards-public"
-        ]
+        "tags": ["product-cards-public"]
       }
     },
     "/api/v1/product-cards/{id}": {
@@ -1251,9 +1266,7 @@
           }
         },
         "summary": "Карточка товара",
-        "tags": [
-          "product-cards-public"
-        ]
+        "tags": ["product-cards-public"]
       }
     },
     "/api/v1/seller/shops/{shopId}/product-cards": {
@@ -1280,9 +1293,7 @@
           }
         ],
         "summary": "Список товаров своего магазина (включая упразднённые)",
-        "tags": [
-          "product-cards-seller"
-        ]
+        "tags": ["product-cards-seller"]
       },
       "post": {
         "operationId": "SellerProductCardsController_create",
@@ -1317,9 +1328,7 @@
           }
         ],
         "summary": "Создать товар в своём магазине",
-        "tags": [
-          "product-cards-seller"
-        ]
+        "tags": ["product-cards-seller"]
       }
     },
     "/api/v1/seller/product-cards/{id}": {
@@ -1356,9 +1365,7 @@
           }
         ],
         "summary": "Обновить свой товар",
-        "tags": [
-          "product-cards-seller"
-        ]
+        "tags": ["product-cards-seller"]
       },
       "delete": {
         "operationId": "SellerProductCardsController_remove",
@@ -1383,9 +1390,7 @@
           }
         ],
         "summary": "Удалить свой товар",
-        "tags": [
-          "product-cards-seller"
-        ]
+        "tags": ["product-cards-seller"]
       }
     },
     "/api/v1/seller/product-cards/{id}/ai-check": {
@@ -1412,9 +1417,7 @@
           }
         ],
         "summary": "Результат последней ИИ-проверки своего товара",
-        "tags": [
-          "product-cards-seller"
-        ]
+        "tags": ["product-cards-seller"]
       }
     },
     "/api/v1/seller/product-cards/{id}/recheck": {
@@ -1441,9 +1444,7 @@
           }
         ],
         "summary": "Отправить свой товар на повторную ИИ-проверку",
-        "tags": [
-          "product-cards-seller"
-        ]
+        "tags": ["product-cards-seller"]
       }
     },
     "/api/v1/admin/product-cards": {
@@ -1490,12 +1491,7 @@
             "description": "Без параметра возвращаются товары во всех статусах",
             "schema": {
               "type": "string",
-              "enum": [
-                "active",
-                "hidden",
-                "abolished",
-                "pending"
-              ]
+              "enum": ["active", "hidden", "abolished", "pending"]
             }
           },
           {
@@ -1529,9 +1525,7 @@
           }
         ],
         "summary": "Все товары с фильтром по статусу — включая скрытые и упразднённые",
-        "tags": [
-          "product-cards-admin"
-        ]
+        "tags": ["product-cards-admin"]
       }
     },
     "/api/v1/admin/product-cards/ai-review": {
@@ -1573,9 +1567,7 @@
           }
         ],
         "summary": "Очередь ручной модерации: проверки со сбоем сервиса или вердиктом fail",
-        "tags": [
-          "product-cards-admin"
-        ]
+        "tags": ["product-cards-admin"]
       }
     },
     "/api/v1/admin/product-cards/shops/{shopId}": {
@@ -1612,9 +1604,7 @@
           }
         ],
         "summary": "Создать товар в любом магазине",
-        "tags": [
-          "product-cards-admin"
-        ]
+        "tags": ["product-cards-admin"]
       }
     },
     "/api/v1/admin/product-cards/{id}": {
@@ -1651,9 +1641,7 @@
           }
         ],
         "summary": "Отредактировать любой товар",
-        "tags": [
-          "product-cards-admin"
-        ]
+        "tags": ["product-cards-admin"]
       },
       "delete": {
         "operationId": "AdminProductCardsController_remove",
@@ -1678,9 +1666,7 @@
           }
         ],
         "summary": "Удалить товар безвозвратно. Для обратимой блокировки — abolish",
-        "tags": [
-          "product-cards-admin"
-        ]
+        "tags": ["product-cards-admin"]
       }
     },
     "/api/v1/admin/product-cards/{id}/recheck": {
@@ -1707,9 +1693,7 @@
           }
         ],
         "summary": "Отправить товар на ИИ-проверку заново",
-        "tags": [
-          "product-cards-admin"
-        ]
+        "tags": ["product-cards-admin"]
       }
     },
     "/api/v1/admin/product-cards/{id}/abolish": {
@@ -1746,9 +1730,7 @@
           }
         ],
         "summary": "Упразднить товар с обязательной причиной",
-        "tags": [
-          "product-cards-admin"
-        ]
+        "tags": ["product-cards-admin"]
       }
     },
     "/api/v1/admin/product-cards/{id}/restore": {
@@ -1775,9 +1757,7 @@
           }
         ],
         "summary": "Вернуть товар, автоматически скрытый ИИ-проверкой, в публичную выдачу",
-        "tags": [
-          "product-cards-admin"
-        ]
+        "tags": ["product-cards-admin"]
       }
     },
     "/api/v1/seller/uploads": {
@@ -1812,9 +1792,7 @@
           }
         ],
         "summary": "Получить presigned-ссылку для прямой загрузки фото в S3",
-        "tags": [
-          "files"
-        ]
+        "tags": ["files"]
       }
     },
     "/api/v1/files/{key}": {
@@ -1864,9 +1842,7 @@
           }
         },
         "summary": "Получить файл из S3 по ключу",
-        "tags": [
-          "files"
-        ]
+        "tags": ["files"]
       }
     },
     "/api/v1/admin/broadcasts": {
@@ -1918,9 +1894,7 @@
           }
         ],
         "summary": "История рассылок",
-        "tags": [
-          "broadcasts-admin"
-        ]
+        "tags": ["broadcasts-admin"]
       },
       "post": {
         "operationId": "AdminBroadcastsController_send",
@@ -1953,9 +1927,7 @@
           }
         ],
         "summary": "Запустить рассылку в Telegram (доставка идёт в фоне)",
-        "tags": [
-          "broadcasts-admin"
-        ]
+        "tags": ["broadcasts-admin"]
       }
     },
     "/api/v1/admin/broadcasts/audience": {
@@ -1967,11 +1939,7 @@
             "required": true,
             "in": "query",
             "schema": {
-              "enum": [
-                "all",
-                "sellers",
-                "buyers"
-              ],
+              "enum": ["all", "sellers", "buyers"],
               "type": "string"
             }
           }
@@ -1994,9 +1962,7 @@
           }
         ],
         "summary": "Сколько адресатов получит рассылку",
-        "tags": [
-          "broadcasts-admin"
-        ]
+        "tags": ["broadcasts-admin"]
       }
     },
     "/api/v1/notifications/channels": {
@@ -2021,9 +1987,7 @@
           }
         ],
         "summary": "Состояние каналов уведомлений",
-        "tags": [
-          "notifications"
-        ]
+        "tags": ["notifications"]
       }
     },
     "/api/v1/notifications/telegram": {
@@ -2058,9 +2022,7 @@
           }
         ],
         "summary": "Включить или выключить уведомления в Telegram",
-        "tags": [
-          "notifications"
-        ]
+        "tags": ["notifications"]
       }
     },
     "/api/v1/push/config": {
@@ -2080,9 +2042,7 @@
           }
         },
         "summary": "Публичный ключ VAPID и доступность канала",
-        "tags": [
-          "push"
-        ]
+        "tags": ["push"]
       }
     },
     "/api/v1/push/state": {
@@ -2107,9 +2067,7 @@
           }
         ],
         "summary": "Есть ли у пользователя подписка",
-        "tags": [
-          "push"
-        ]
+        "tags": ["push"]
       }
     },
     "/api/v1/push/subscribe": {
@@ -2137,9 +2095,7 @@
           }
         ],
         "summary": "Подписать браузер на уведомления",
-        "tags": [
-          "push"
-        ]
+        "tags": ["push"]
       },
       "delete": {
         "operationId": "PushController_unsubscribe",
@@ -2165,9 +2121,7 @@
           }
         ],
         "summary": "Отписать браузер",
-        "tags": [
-          "push"
-        ]
+        "tags": ["push"]
       }
     },
     "/api/v1/product-autofill/price": {
@@ -2192,9 +2146,7 @@
           }
         ],
         "summary": "Цена следующего автозаполнения: бесплатно по норме или безлимиту тарифа либо по прайсу, плюс остаток кредитов магазина",
-        "tags": [
-          "product-autofill"
-        ]
+        "tags": ["product-autofill"]
       }
     },
     "/api/v1/product-autofill": {
@@ -2229,9 +2181,7 @@
           }
         ],
         "summary": "Заполнить описание и характеристики товара по его фотографиям",
-        "tags": [
-          "product-autofill"
-        ]
+        "tags": ["product-autofill"]
       }
     },
     "/api/v1/admin/ai-usage": {
@@ -2286,12 +2236,7 @@
             "description": "Вид операции",
             "schema": {
               "type": "string",
-              "enum": [
-                "prompt",
-                "description",
-                "image",
-                "autofill"
-              ]
+              "enum": ["prompt", "description", "image", "autofill"]
             }
           },
           {
@@ -2316,9 +2261,7 @@
           }
         ],
         "summary": "Журнал обращений к ИИ: кто и для какого магазина генерировал, во что это обошлось",
-        "tags": [
-          "ai-usage-admin"
-        ]
+        "tags": ["ai-usage-admin"]
       }
     },
     "/api/v1/admin/ai-usage/totals": {
@@ -2336,9 +2279,7 @@
           }
         ],
         "summary": "Итоги за всё время: число запросов, расход у OpenRouter по платным, подписочным и площадочным операциям и снятые кредиты",
-        "tags": [
-          "ai-usage-admin"
-        ]
+        "tags": ["ai-usage-admin"]
       }
     },
     "/api/v1/ai-compare": {
@@ -2381,9 +2322,7 @@
           }
         },
         "summary": "ИИ-сравнение товаров по составляющим",
-        "tags": [
-          "ai-compare"
-        ]
+        "tags": ["ai-compare"]
       }
     },
     "/api/v1/me/product-views": {
@@ -2432,9 +2371,7 @@
           }
         ],
         "summary": "История просмотров, свежие сверху",
-        "tags": [
-          "me-product-views"
-        ]
+        "tags": ["me-product-views"]
       },
       "post": {
         "operationId": "ProductViewsController_record",
@@ -2460,9 +2397,7 @@
           }
         ],
         "summary": "Отметить просмотр карточки товара",
-        "tags": [
-          "me-product-views"
-        ]
+        "tags": ["me-product-views"]
       },
       "delete": {
         "operationId": "ProductViewsController_clear",
@@ -2478,9 +2413,7 @@
           }
         ],
         "summary": "Очистить историю целиком",
-        "tags": [
-          "me-product-views"
-        ]
+        "tags": ["me-product-views"]
       }
     },
     "/api/v1/me/product-views/sync": {
@@ -2508,9 +2441,7 @@
           }
         ],
         "summary": "Перенести историю, накопленную до входа (localStorage)",
-        "tags": [
-          "me-product-views"
-        ]
+        "tags": ["me-product-views"]
       }
     },
     "/api/v1/me/product-views/{productCardId}": {
@@ -2537,9 +2468,7 @@
           }
         ],
         "summary": "Убрать один товар из истории",
-        "tags": [
-          "me-product-views"
-        ]
+        "tags": ["me-product-views"]
       }
     },
     "/api/v1/product-cards/{id}/events": {
@@ -2583,9 +2512,7 @@
           }
         },
         "summary": "Отметить просмотр карточки или контакт с продавцом",
-        "tags": [
-          "product-stats"
-        ]
+        "tags": ["product-stats"]
       }
     },
     "/api/v1/seller/product-cards/{id}/stats": {
@@ -2633,9 +2560,7 @@
           }
         ],
         "summary": "Просмотры и контакты по своей карточке",
-        "tags": [
-          "product-stats-seller"
-        ]
+        "tags": ["product-stats-seller"]
       }
     },
     "/api/v1/seller/analytics": {
@@ -2679,9 +2604,7 @@
           }
         ],
         "summary": "Сводка по магазину: график, итоги, топ товаров",
-        "tags": [
-          "shop-analytics-seller"
-        ]
+        "tags": ["shop-analytics-seller"]
       }
     },
     "/api/v1/seller/analytics/searches": {
@@ -2741,9 +2664,7 @@
           }
         ],
         "summary": "По каким запросам находили товары магазина",
-        "tags": [
-          "shop-analytics-seller"
-        ]
+        "tags": ["shop-analytics-seller"]
       }
     },
     "/api/v1/seller/analytics/export.csv": {
@@ -2787,9 +2708,7 @@
           }
         ],
         "summary": "Выгрузка аналитики магазина в CSV",
-        "tags": [
-          "shop-analytics-seller"
-        ]
+        "tags": ["shop-analytics-seller"]
       }
     },
     "/api/v1/admin/stats/activity": {
@@ -2827,9 +2746,7 @@
           }
         ],
         "summary": "Активность площадки по дням",
-        "tags": [
-          "stats-admin"
-        ]
+        "tags": ["stats-admin"]
       }
     },
     "/api/v1/me/favorites": {
@@ -2878,9 +2795,7 @@
           }
         ],
         "summary": "Избранное, недавно добавленные сверху",
-        "tags": [
-          "me-favorites"
-        ]
+        "tags": ["me-favorites"]
       },
       "post": {
         "operationId": "FavoritesController_add",
@@ -2906,9 +2821,7 @@
           }
         ],
         "summary": "Добавить товар в избранное",
-        "tags": [
-          "me-favorites"
-        ]
+        "tags": ["me-favorites"]
       },
       "delete": {
         "operationId": "FavoritesController_clear",
@@ -2924,9 +2837,7 @@
           }
         ],
         "summary": "Очистить избранное целиком",
-        "tags": [
-          "me-favorites"
-        ]
+        "tags": ["me-favorites"]
       }
     },
     "/api/v1/me/favorites/sync": {
@@ -2954,9 +2865,7 @@
           }
         ],
         "summary": "Перенести избранное, накопленное до входа (localStorage)",
-        "tags": [
-          "me-favorites"
-        ]
+        "tags": ["me-favorites"]
       }
     },
     "/api/v1/me/favorites/{productCardId}": {
@@ -2983,9 +2892,7 @@
           }
         ],
         "summary": "Убрать товар из избранного",
-        "tags": [
-          "me-favorites"
-        ]
+        "tags": ["me-favorites"]
       }
     },
     "/api/v1/image-gen/balance": {
@@ -3010,9 +2917,7 @@
           }
         ],
         "summary": "Остаток кредитов магазина на ИИ",
-        "tags": [
-          "image-gen"
-        ]
+        "tags": ["image-gen"]
       }
     },
     "/api/v1/image-gen/history": {
@@ -3049,9 +2954,7 @@
           }
         ],
         "summary": "Ранее сгенерированные картинки по этой же фотографии",
-        "tags": [
-          "image-gen"
-        ]
+        "tags": ["image-gen"]
       }
     },
     "/api/v1/image-gen/prompt": {
@@ -3079,9 +2982,7 @@
           }
         ],
         "summary": "Составить промпт по фотографии товара",
-        "tags": [
-          "image-gen"
-        ]
+        "tags": ["image-gen"]
       }
     },
     "/api/v1/image-gen/description": {
@@ -3116,9 +3017,7 @@
           }
         ],
         "summary": "Исправить описание товара, сверяясь с его фотографией",
-        "tags": [
-          "image-gen"
-        ]
+        "tags": ["image-gen"]
       }
     },
     "/api/v1/image-gen/generate": {
@@ -3156,9 +3055,7 @@
           }
         ],
         "summary": "Перерисовать фотографию товара: 1–4 варианта на выбор",
-        "tags": [
-          "image-gen"
-        ]
+        "tags": ["image-gen"]
       }
     },
     "/api/v1/reports": {
@@ -3195,9 +3092,7 @@
           }
         ],
         "summary": "Оставить жалобу на магазин или товар",
-        "tags": [
-          "reports"
-        ]
+        "tags": ["reports"]
       }
     },
     "/api/v1/admin/reports": {
@@ -3257,9 +3152,7 @@
           }
         ],
         "summary": "Список жалоб с фильтрами по магазину/товару (администратор)",
-        "tags": [
-          "reports"
-        ]
+        "tags": ["reports"]
       }
     },
     "/api/v1/admin/reports/{id}": {
@@ -3286,9 +3179,7 @@
           }
         ],
         "summary": "Удалить разобранную жалобу",
-        "tags": [
-          "reports"
-        ]
+        "tags": ["reports"]
       }
     },
     "/api/v1/reviews": {
@@ -3345,9 +3236,7 @@
           }
         },
         "summary": "Опубликованные отзывы о товаре или магазине",
-        "tags": [
-          "reviews"
-        ]
+        "tags": ["reviews"]
       },
       "post": {
         "operationId": "ReviewsController_create",
@@ -3379,9 +3268,7 @@
           }
         ],
         "summary": "Оставить отзыв (публикуется после проверки)",
-        "tags": [
-          "reviews"
-        ]
+        "tags": ["reviews"]
       }
     },
     "/api/v1/reviews/summary": {
@@ -3438,9 +3325,7 @@
           }
         },
         "summary": "Средняя оценка и разбивка по звёздам",
-        "tags": [
-          "reviews"
-        ]
+        "tags": ["reviews"]
       }
     },
     "/api/v1/reviews/mine": {
@@ -3502,9 +3387,7 @@
           }
         ],
         "summary": "Мои отзывы, включая ожидающие проверки",
-        "tags": [
-          "reviews"
-        ]
+        "tags": ["reviews"]
       }
     },
     "/api/v1/reviews/{id}": {
@@ -3541,9 +3424,7 @@
           }
         ],
         "summary": "Изменить свой отзыв — он снова уходит на проверку",
-        "tags": [
-          "reviews"
-        ]
+        "tags": ["reviews"]
       },
       "delete": {
         "operationId": "ReviewsController_remove",
@@ -3568,9 +3449,7 @@
           }
         ],
         "summary": "Удалить свой отзыв",
-        "tags": [
-          "reviews"
-        ]
+        "tags": ["reviews"]
       }
     },
     "/api/v1/admin/reviews": {
@@ -3627,11 +3506,7 @@
             "schema": {
               "example": "pending",
               "type": "string",
-              "enum": [
-                "pending",
-                "approved",
-                "rejected"
-              ]
+              "enum": ["pending", "approved", "rejected"]
             }
           }
         ],
@@ -3646,9 +3521,7 @@
           }
         ],
         "summary": "Отзывы с фильтром по статусу — очередь модерации",
-        "tags": [
-          "reviews-admin"
-        ]
+        "tags": ["reviews-admin"]
       }
     },
     "/api/v1/admin/reviews/stats": {
@@ -3666,9 +3539,7 @@
           }
         ],
         "summary": "Сколько отзывов ждёт проверки, принято и отклонено",
-        "tags": [
-          "reviews-admin"
-        ]
+        "tags": ["reviews-admin"]
       }
     },
     "/api/v1/admin/reviews/{id}/approve": {
@@ -3695,9 +3566,7 @@
           }
         ],
         "summary": "Опубликовать отзыв",
-        "tags": [
-          "reviews-admin"
-        ]
+        "tags": ["reviews-admin"]
       }
     },
     "/api/v1/admin/reviews/{id}/recheck": {
@@ -3724,9 +3593,7 @@
           }
         ],
         "summary": "Прогнать отзыв через ИИ-проверку заново",
-        "tags": [
-          "reviews-admin"
-        ]
+        "tags": ["reviews-admin"]
       }
     },
     "/api/v1/admin/reviews/{id}/reject": {
@@ -3763,9 +3630,7 @@
           }
         ],
         "summary": "Отклонить отзыв с причиной — её увидит автор",
-        "tags": [
-          "reviews-admin"
-        ]
+        "tags": ["reviews-admin"]
       }
     },
     "/api/v1/admin/reviews/{id}": {
@@ -3792,9 +3657,7 @@
           }
         ],
         "summary": "Удалить отзыв безвозвратно",
-        "tags": [
-          "reviews-admin"
-        ]
+        "tags": ["reviews-admin"]
       }
     },
     "/api/v1/seller/reviews": {
@@ -3856,9 +3719,7 @@
           }
         ],
         "summary": "Отзывы о моём магазине и его товарах",
-        "tags": [
-          "reviews-seller"
-        ]
+        "tags": ["reviews-seller"]
       }
     },
     "/api/v1/seller/reviews/summary": {
@@ -3876,9 +3737,7 @@
           }
         ],
         "summary": "Моя средняя оценка и разбивка по звёздам",
-        "tags": [
-          "reviews-seller"
-        ]
+        "tags": ["reviews-seller"]
       }
     },
     "/api/v1/chats/stream": {
@@ -3897,9 +3756,7 @@
           }
         ],
         "summary": "Поток событий переписки (SSE)",
-        "tags": [
-          "chats"
-        ]
+        "tags": ["chats"]
       }
     },
     "/api/v1/chats": {
@@ -3938,10 +3795,7 @@
             "schema": {
               "default": "buyer",
               "type": "string",
-              "enum": [
-                "buyer",
-                "seller"
-              ]
+              "enum": ["buyer", "seller"]
             }
           }
         ],
@@ -3963,9 +3817,7 @@
           }
         ],
         "summary": "Мои переписки",
-        "tags": [
-          "chats"
-        ]
+        "tags": ["chats"]
       },
       "post": {
         "description": "Находит начатый разговор о том же товаре или заводит новый и сразу отправляет первое сообщение.",
@@ -4005,9 +3857,7 @@
           }
         ],
         "summary": "Написать продавцу",
-        "tags": [
-          "chats"
-        ]
+        "tags": ["chats"]
       }
     },
     "/api/v1/chats/unread": {
@@ -4032,9 +3882,7 @@
           }
         ],
         "summary": "Сколько непрочитанного в обеих ролях",
-        "tags": [
-          "chats"
-        ]
+        "tags": ["chats"]
       }
     },
     "/api/v1/chats/{id}/messages": {
@@ -4095,9 +3943,7 @@
           }
         ],
         "summary": "Сообщения переписки",
-        "tags": [
-          "chats"
-        ]
+        "tags": ["chats"]
       },
       "post": {
         "operationId": "ChatsController_send",
@@ -4142,9 +3988,7 @@
           }
         ],
         "summary": "Отправить сообщение",
-        "tags": [
-          "chats"
-        ]
+        "tags": ["chats"]
       }
     },
     "/api/v1/banners": {
@@ -4168,9 +4012,7 @@
           }
         },
         "summary": "Баннеры главной страницы в порядке показа",
-        "tags": [
-          "banners-public"
-        ]
+        "tags": ["banners-public"]
       }
     },
     "/api/v1/admin/banners": {
@@ -4198,9 +4040,7 @@
           }
         ],
         "summary": "Все баннеры, включая выключенные (администратор)",
-        "tags": [
-          "banners-admin"
-        ]
+        "tags": ["banners-admin"]
       },
       "post": {
         "operationId": "AdminBannersController_create",
@@ -4233,9 +4073,7 @@
           }
         ],
         "summary": "Добавить баннер на главную",
-        "tags": [
-          "banners-admin"
-        ]
+        "tags": ["banners-admin"]
       }
     },
     "/api/v1/admin/banners/reorder": {
@@ -4276,9 +4114,7 @@
           }
         ],
         "summary": "Задать порядок баннеров в карусели",
-        "tags": [
-          "banners-admin"
-        ]
+        "tags": ["banners-admin"]
       }
     },
     "/api/v1/admin/banners/{id}": {
@@ -4325,9 +4161,7 @@
           }
         ],
         "summary": "Изменить баннер",
-        "tags": [
-          "banners-admin"
-        ]
+        "tags": ["banners-admin"]
       },
       "delete": {
         "operationId": "AdminBannersController_remove",
@@ -4352,9 +4186,7 @@
           }
         ],
         "summary": "Удалить баннер",
-        "tags": [
-          "banners-admin"
-        ]
+        "tags": ["banners-admin"]
       }
     },
     "/api/v1/seller/banners": {
@@ -4385,9 +4217,7 @@
           }
         ],
         "summary": "Баннеры своего магазина, включая ждущие модерации и отклонённые",
-        "tags": [
-          "banners-seller"
-        ]
+        "tags": ["banners-seller"]
       },
       "post": {
         "description": "Баннер создаётся со статусом pending и попадёт в карусель только после одобрения администратором.",
@@ -4430,9 +4260,7 @@
           }
         ],
         "summary": "Загрузить баннер на модерацию",
-        "tags": [
-          "banners-seller"
-        ]
+        "tags": ["banners-seller"]
       }
     },
     "/api/v1/seller/banners/{id}": {
@@ -4486,9 +4314,7 @@
           }
         ],
         "summary": "Изменить свой баннер",
-        "tags": [
-          "banners-seller"
-        ]
+        "tags": ["banners-seller"]
       },
       "delete": {
         "operationId": "SellerBannersController_remove",
@@ -4513,9 +4339,7 @@
           }
         ],
         "summary": "Удалить свой баннер",
-        "tags": [
-          "banners-seller"
-        ]
+        "tags": ["banners-seller"]
       }
     },
     "/api/v1/admin/shop-banners": {
@@ -4553,11 +4377,7 @@
             "schema": {
               "example": "pending",
               "type": "string",
-              "enum": [
-                "pending",
-                "approved",
-                "rejected"
-              ]
+              "enum": ["pending", "approved", "rejected"]
             }
           },
           {
@@ -4589,9 +4409,7 @@
           }
         ],
         "summary": "Баннеры продавцов: очередь модерации и архив",
-        "tags": [
-          "banners-admin"
-        ]
+        "tags": ["banners-admin"]
       }
     },
     "/api/v1/admin/shop-banners/{id}/moderate": {
@@ -4642,9 +4460,7 @@
           }
         ],
         "summary": "Одобрить или отклонить баннер продавца",
-        "tags": [
-          "banners-admin"
-        ]
+        "tags": ["banners-admin"]
       }
     },
     "/api/v1/subscriptions/plans": {
@@ -4667,9 +4483,7 @@
           }
         },
         "summary": "Тарифы подписки магазина и их цены",
-        "tags": [
-          "subscriptions-public"
-        ]
+        "tags": ["subscriptions-public"]
       }
     },
     "/api/v1/seller/subscription": {
@@ -4697,9 +4511,7 @@
           }
         ],
         "summary": "Моя подписка: тариф, срок, кредиты и лимиты",
-        "tags": [
-          "subscriptions-seller"
-        ]
+        "tags": ["subscriptions-seller"]
       }
     },
     "/api/v1/seller/subscription/checkout": {
@@ -4737,9 +4549,7 @@
           }
         ],
         "summary": "Получить ссылку на оплату тарифа",
-        "tags": [
-          "subscriptions-seller"
-        ]
+        "tags": ["subscriptions-seller"]
       }
     },
     "/api/v1/seller/subscription/invoice": {
@@ -4780,9 +4590,7 @@
           }
         ],
         "summary": "Выставить счёт на номер телефона",
-        "tags": [
-          "subscriptions-seller"
-        ]
+        "tags": ["subscriptions-seller"]
       }
     },
     "/api/v1/seller/subscription/invoice/{orderId}": {
@@ -4819,9 +4627,7 @@
           }
         ],
         "summary": "Состояние выставленного счёта",
-        "tags": [
-          "subscriptions-seller"
-        ]
+        "tags": ["subscriptions-seller"]
       }
     },
     "/api/v1/seller/subscription/payments": {
@@ -4870,9 +4676,7 @@
           }
         ],
         "summary": "История платежей за подписку",
-        "tags": [
-          "subscriptions-seller"
-        ]
+        "tags": ["subscriptions-seller"]
       }
     },
     "/api/v1/admin/subscriptions": {
@@ -4909,12 +4713,7 @@
             "description": "ДЕЙСТВУЮЩИЙ тариф, а не записанный в магазине: `max` вернёт только тех, у кого он ещё оплачен, а `free` — всех остальных, включая просроченных бывших подписчиков",
             "schema": {
               "type": "string",
-              "enum": [
-                "free",
-                "start",
-                "pro",
-                "max"
-              ]
+              "enum": ["free", "start", "pro", "max"]
             }
           },
           {
@@ -4967,9 +4766,7 @@
           }
         ],
         "summary": "Подписки магазинов: тариф, срок и флаги ручного разбора",
-        "tags": [
-          "subscriptions-admin"
-        ]
+        "tags": ["subscriptions-admin"]
       }
     },
     "/api/v1/admin/subscriptions/report": {
@@ -5007,9 +4804,7 @@
           }
         ],
         "summary": "Отчёт по продажам подписок",
-        "tags": [
-          "subscriptions-admin"
-        ]
+        "tags": ["subscriptions-admin"]
       }
     },
     "/api/v1/admin/shops/{shopId}/subscription/payments": {
@@ -5066,9 +4861,7 @@
           }
         ],
         "summary": "Платежи магазина за подписку",
-        "tags": [
-          "subscriptions-admin"
-        ]
+        "tags": ["subscriptions-admin"]
       }
     },
     "/api/v1/admin/shops/{shopId}/subscription/activate": {
@@ -5115,9 +4908,7 @@
           }
         ],
         "summary": "Выдать подписку вручную",
-        "tags": [
-          "subscriptions-admin"
-        ]
+        "tags": ["subscriptions-admin"]
       }
     },
     "/api/v1/admin/shops/{shopId}/subscription/test-checkout": {
@@ -5171,9 +4962,7 @@
           }
         ],
         "summary": "Завести фейковый счёт для проверки кассы",
-        "tags": [
-          "subscriptions-admin"
-        ]
+        "tags": ["subscriptions-admin"]
       }
     },
     "/api/v1/admin/shops/{shopId}/subscription/cancel": {
@@ -5220,9 +5009,7 @@
           }
         ],
         "summary": "Оборвать оплаченный период досрочно",
-        "tags": [
-          "subscriptions-admin"
-        ]
+        "tags": ["subscriptions-admin"]
       }
     }
   },
@@ -5330,9 +5117,7 @@
             "example": "query_id=AAH...&user=%7B%22id%22...&auth_date=1720000000&hash=abc123..."
           }
         },
-        "required": [
-          "initData"
-        ]
+        "required": ["initData"]
       },
       "AuthUserDto": {
         "type": "object",
@@ -5347,11 +5132,7 @@
           },
           "role": {
             "type": "string",
-            "enum": [
-              "user",
-              "seller",
-              "admin"
-            ],
+            "enum": ["user", "seller", "admin"],
             "example": "user"
           },
           "telegramUsername": {
@@ -5401,10 +5182,7 @@
             "$ref": "#/components/schemas/AuthUserDto"
           }
         },
-        "required": [
-          "accessToken",
-          "user"
-        ]
+        "required": ["accessToken", "user"]
       },
       "TelegramWidgetDto": {
         "type": "object",
@@ -5438,28 +5216,18 @@
             "description": "Подпись Telegram"
           }
         },
-        "required": [
-          "id",
-          "auth_date",
-          "hash"
-        ]
+        "required": ["id", "auth_date", "hash"]
       },
       "SetRoleDto": {
         "type": "object",
         "properties": {
           "role": {
             "type": "string",
-            "enum": [
-              "user",
-              "seller",
-              "admin"
-            ],
+            "enum": ["user", "seller", "admin"],
             "example": "admin"
           }
         },
-        "required": [
-          "role"
-        ]
+        "required": ["role"]
       },
       "ReasonDto": {
         "type": "object",
@@ -5472,24 +5240,14 @@
             "example": "Множественные жалобы на мошенничество"
           }
         },
-        "required": [
-          "reason"
-        ]
+        "required": ["reason"]
       },
       "WorkScheduleEntryDto": {
         "type": "object",
         "properties": {
           "day": {
             "type": "string",
-            "enum": [
-              "Mo",
-              "Tu",
-              "We",
-              "Th",
-              "Fr",
-              "Sa",
-              "Su"
-            ],
+            "enum": ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"],
             "example": "Mo"
           },
           "start": {
@@ -5507,12 +5265,127 @@
             "example": false
           }
         },
+        "required": ["day", "start", "end", "isHoliday"]
+      },
+      "PublicShopListItemDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "TechnoDom"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "photo": {
+            "type": "string",
+            "nullable": true,
+            "description": "Ключ логотипа в S3"
+          },
+          "address": {
+            "type": "string",
+            "nullable": true
+          },
+          "telegramLink": {
+            "type": "string",
+            "example": "https://t.me/technodom_uz"
+          },
+          "workSchedule": {
+            "nullable": true,
+            "description": "Часы работы; null — магазин их не заполнил",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkScheduleEntryDto"
+            }
+          },
+          "ratingAvg": {
+            "type": "number",
+            "example": 4.6,
+            "description": "Средняя оценка, 0 — без отзывов"
+          },
+          "ratingCount": {
+            "type": "number",
+            "example": 23
+          },
+          "productCount": {
+            "type": "number",
+            "example": 48,
+            "description": "Сколько активных товаров в магазине сейчас"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Когда магазин появился на площадке"
+          }
+        },
         "required": [
-          "day",
-          "start",
-          "end",
-          "isHoliday"
+          "id",
+          "name",
+          "description",
+          "photo",
+          "address",
+          "telegramLink",
+          "workSchedule",
+          "ratingAvg",
+          "ratingCount",
+          "productCount",
+          "createdAt"
         ]
+      },
+      "PaginationMetaDto": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "number",
+            "example": 1
+          },
+          "limit": {
+            "type": "number",
+            "example": 20
+          },
+          "total": {
+            "type": "number",
+            "example": 42
+          },
+          "totalPages": {
+            "type": "number",
+            "example": 3
+          }
+        },
+        "required": ["page", "limit", "total", "totalPages"]
+      },
+      "PaginatedPublicShopsDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicShopListItemDto"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PaginationMetaDto"
+          }
+        },
+        "required": ["data", "meta"]
+      },
+      "ShopSitemapEntryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "example": 1
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "Дата последнего изменения магазина"
+          }
+        },
+        "required": ["id", "updatedAt"]
       },
       "CreateShopDto": {
         "type": "object",
@@ -5552,19 +5425,14 @@
           },
           "location": {
             "description": "[latitude, longitude]",
-            "example": [
-              41.311081,
-              69.240562
-            ],
+            "example": [41.311081, 69.240562],
             "type": "array",
             "items": {
               "type": "number"
             }
           }
         },
-        "required": [
-          "name"
-        ]
+        "required": ["name"]
       },
       "UpdateShopDto": {
         "type": "object",
@@ -5604,10 +5472,7 @@
           },
           "location": {
             "description": "[latitude, longitude]",
-            "example": [
-              41.311081,
-              69.240562
-            ],
+            "example": [41.311081, 69.240562],
             "type": "array",
             "items": {
               "type": "number"
@@ -5624,9 +5489,7 @@
             "description": "Выдать (true) или отозвать (false) право выкладывать товары в закрытые разделы каталога — «Смартфоны» и «Планшеты»"
           }
         },
-        "required": [
-          "enabled"
-        ]
+        "required": ["enabled"]
       },
       "ShopCreditsDto": {
         "type": "object",
@@ -5644,11 +5507,7 @@
             "description": "Доступно к трате"
           }
         },
-        "required": [
-          "balance",
-          "reserved",
-          "available"
-        ]
+        "required": ["balance", "reserved", "available"]
       },
       "GrantCreditsDto": {
         "type": "object",
@@ -5666,9 +5525,7 @@
             "description": "Комментарий для истории: номер платежа, договорённость"
           }
         },
-        "required": [
-          "amountUsd"
-        ]
+        "required": ["amountUsd"]
       },
       "GrantResultDto": {
         "type": "object",
@@ -5685,11 +5542,7 @@
             "description": "Множитель, применённый при начислении"
           }
         },
-        "required": [
-          "balance",
-          "credits",
-          "markup"
-        ]
+        "required": ["balance", "credits", "markup"]
       },
       "RevokeCreditsDto": {
         "type": "object",
@@ -5706,9 +5559,7 @@
             "description": "Комментарий для истории: за что сняли"
           }
         },
-        "required": [
-          "credits"
-        ]
+        "required": ["credits"]
       },
       "RevokeResultDto": {
         "type": "object",
@@ -5722,10 +5573,7 @@
             "description": "Сколько кредитов сняли на самом деле: могло быть меньше запрошенного"
           }
         },
-        "required": [
-          "balance",
-          "taken"
-        ]
+        "required": ["balance", "taken"]
       },
       "CreditPreviewDto": {
         "type": "object",
@@ -5738,10 +5586,7 @@
             "type": "number"
           }
         },
-        "required": [
-          "credits",
-          "markup"
-        ]
+        "required": ["credits", "markup"]
       },
       "SellerCreditsDto": {
         "type": "object",
@@ -5767,25 +5612,14 @@
             "description": "Из них доступны к трате сейчас. Ноль, если подписка истекла: кредиты не сгорели, но и потратить их нельзя"
           }
         },
-        "required": [
-          "balance",
-          "reserved",
-          "available",
-          "subscription",
-          "usable"
-        ]
+        "required": ["balance", "reserved", "available", "subscription", "usable"]
       },
       "CreditTxnMetaDto": {
         "type": "object",
         "properties": {
           "operation": {
             "type": "string",
-            "enum": [
-              "prompt",
-              "description",
-              "image",
-              "autofill"
-            ],
+            "enum": ["prompt", "description", "image", "autofill"],
             "description": "За что списано"
           },
           "images": {
@@ -5794,21 +5628,12 @@
           },
           "promo": {
             "type": "string",
-            "enum": [
-              "welcome",
-              "welcome_topup",
-              "subscription",
-              "subscription_burn"
-            ],
+            "enum": ["welcome", "welcome_topup", "subscription", "subscription_burn"],
             "description": "Метка выдачи: подарок, выдача нормы подписки или сгорание остатка"
           },
           "plan": {
             "type": "string",
-            "enum": [
-              "start",
-              "pro",
-              "max"
-            ],
+            "enum": ["start", "pro", "max"],
             "description": "Тариф, по которому выдано или сожжено"
           },
           "fromSubscription": {
@@ -5817,10 +5642,7 @@
           },
           "free": {
             "type": "string",
-            "enum": [
-              "quota",
-              "unlimited"
-            ],
+            "enum": ["quota", "unlimited"],
             "description": "Автозаполнение прошло по месячной норме либо по безлимиту"
           },
           "fixed": {
@@ -5841,12 +5663,7 @@
           },
           "kind": {
             "type": "string",
-            "enum": [
-              "grant",
-              "spend",
-              "refund",
-              "adjust"
-            ],
+            "enum": ["grant", "spend", "refund", "adjust"],
             "description": "grant — начисление, spend — списание за запрос, adjust — правка человеком либо сгорание подписочного остатка"
           },
           "amount": {
@@ -5891,33 +5708,6 @@
           "createdAt"
         ]
       },
-      "PaginationMetaDto": {
-        "type": "object",
-        "properties": {
-          "page": {
-            "type": "number",
-            "example": 1
-          },
-          "limit": {
-            "type": "number",
-            "example": 20
-          },
-          "total": {
-            "type": "number",
-            "example": 42
-          },
-          "totalPages": {
-            "type": "number",
-            "example": 3
-          }
-        },
-        "required": [
-          "page",
-          "limit",
-          "total",
-          "totalPages"
-        ]
-      },
       "PaginatedCreditsHistoryDto": {
         "type": "object",
         "properties": {
@@ -5931,10 +5721,7 @@
             "$ref": "#/components/schemas/PaginationMetaDto"
           }
         },
-        "required": [
-          "data",
-          "meta"
-        ]
+        "required": ["data", "meta"]
       },
       "AppSettingsDto": {
         "type": "object",
@@ -5952,9 +5739,7 @@
             "example": 2
           }
         },
-        "required": [
-          "aiChecksEnabled"
-        ]
+        "required": ["aiChecksEnabled"]
       },
       "CategoryNameDto": {
         "type": "object",
@@ -5972,11 +5757,7 @@
             "example": "Ноутбуклар"
           }
         },
-        "required": [
-          "ru",
-          "uz-Latn",
-          "uz-Cyrl"
-        ]
+        "required": ["ru", "uz-Latn", "uz-Cyrl"]
       },
       "CategoryDto": {
         "type": "object",
@@ -6011,13 +5792,7 @@
             }
           }
         },
-        "required": [
-          "id",
-          "slug",
-          "name",
-          "restricted",
-          "children"
-        ]
+        "required": ["id", "slug", "name", "restricted", "children"]
       },
       "CharacteristicDto": {
         "type": "object",
@@ -6035,10 +5810,7 @@
             "maxLength": 500
           }
         },
-        "required": [
-          "key",
-          "value"
-        ]
+        "required": ["key", "value"]
       },
       "CreateProductCardDto": {
         "type": "object",
@@ -6077,10 +5849,7 @@
           },
           "state": {
             "type": "string",
-            "enum": [
-              "new",
-              "old"
-            ],
+            "enum": ["new", "old"],
             "example": "new"
           },
           "characteristics": {
@@ -6101,11 +5870,7 @@
             }
           }
         },
-        "required": [
-          "name",
-          "photos",
-          "state"
-        ]
+        "required": ["name", "photos", "state"]
       },
       "UpdateProductCardDto": {
         "type": "object",
@@ -6144,10 +5909,7 @@
           },
           "state": {
             "type": "string",
-            "enum": [
-              "new",
-              "old"
-            ],
+            "enum": ["new", "old"],
             "example": "new"
           },
           "characteristics": {
@@ -6174,18 +5936,12 @@
         "properties": {
           "contentType": {
             "type": "string",
-            "enum": [
-              "image/jpeg",
-              "image/png",
-              "image/webp"
-            ],
+            "enum": ["image/jpeg", "image/png", "image/webp"],
             "description": "MIME-тип загружаемого файла",
             "example": "image/jpeg"
           }
         },
-        "required": [
-          "contentType"
-        ]
+        "required": ["contentType"]
       },
       "UploadUrlResponseDto": {
         "type": "object",
@@ -6216,13 +5972,7 @@
             "description": "Через сколько секунд ссылка истечёт"
           }
         },
-        "required": [
-          "key",
-          "publicUrl",
-          "uploadUrl",
-          "fields",
-          "expiresInSec"
-        ]
+        "required": ["key", "publicUrl", "uploadUrl", "fields", "expiresInSec"]
       },
       "BroadcastDto": {
         "type": "object",
@@ -6232,11 +5982,7 @@
           },
           "audience": {
             "type": "string",
-            "enum": [
-              "all",
-              "sellers",
-              "buyers"
-            ]
+            "enum": ["all", "sellers", "buyers"]
           },
           "text": {
             "type": "string"
@@ -6289,21 +6035,14 @@
             "description": "Сколько браузеров подписано на уведомления"
           }
         },
-        "required": [
-          "count",
-          "push"
-        ]
+        "required": ["count", "push"]
       },
       "CreateBroadcastDto": {
         "type": "object",
         "properties": {
           "audience": {
             "type": "string",
-            "enum": [
-              "all",
-              "sellers",
-              "buyers"
-            ]
+            "enum": ["all", "sellers", "buyers"]
           },
           "text": {
             "type": "string",
@@ -6312,10 +6051,7 @@
             "description": "Текст сообщения. Допускается HTML-разметка Telegram."
           }
         },
-        "required": [
-          "audience",
-          "text"
-        ]
+        "required": ["audience", "text"]
       },
       "BroadcastStartedDto": {
         "type": "object",
@@ -6329,10 +6065,7 @@
             "description": "Сколько адресатов найдено на момент запуска"
           }
         },
-        "required": [
-          "id",
-          "recipients"
-        ]
+        "required": ["id", "recipients"]
       },
       "PushChannelDto": {
         "type": "object",
@@ -6351,11 +6084,7 @@
             "description": "Подписан ли этот человек хотя бы с одного устройства"
           }
         },
-        "required": [
-          "available",
-          "publicKey",
-          "subscribed"
-        ]
+        "required": ["available", "publicKey", "subscribed"]
       },
       "TelegramChannelDto": {
         "type": "object",
@@ -6378,12 +6107,7 @@
             "description": "Готовая ссылка на бота. Собрана на сервере: username знает только он"
           }
         },
-        "required": [
-          "available",
-          "linked",
-          "enabled",
-          "url"
-        ]
+        "required": ["available", "linked", "enabled", "url"]
       },
       "NotificationChannelsDto": {
         "type": "object",
@@ -6395,10 +6119,7 @@
             "$ref": "#/components/schemas/TelegramChannelDto"
           }
         },
-        "required": [
-          "push",
-          "telegram"
-        ]
+        "required": ["push", "telegram"]
       },
       "SetTelegramNotificationsDto": {
         "type": "object",
@@ -6408,9 +6129,7 @@
             "description": "Включить или выключить уведомления в Telegram"
           }
         },
-        "required": [
-          "enabled"
-        ]
+        "required": ["enabled"]
       },
       "PushConfigDto": {
         "type": "object",
@@ -6425,10 +6144,7 @@
             "description": "Публичный ключ VAPID — им браузер оформляет подписку"
           }
         },
-        "required": [
-          "enabled",
-          "publicKey"
-        ]
+        "required": ["enabled", "publicKey"]
       },
       "PushStateDto": {
         "type": "object",
@@ -6438,9 +6154,7 @@
             "description": "Есть ли у пользователя хотя бы одна подписка"
           }
         },
-        "required": [
-          "subscribed"
-        ]
+        "required": ["subscribed"]
       },
       "SubscribePushDto": {
         "type": "object",
@@ -6462,11 +6176,7 @@
             "description": "Чтобы человек узнал своё устройство в списке подписок"
           }
         },
-        "required": [
-          "endpoint",
-          "p256dh",
-          "auth"
-        ]
+        "required": ["endpoint", "p256dh", "auth"]
       },
       "UnsubscribePushDto": {
         "type": "object",
@@ -6475,9 +6185,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "endpoint"
-        ]
+        "required": ["endpoint"]
       },
       "AutofillPriceDto": {
         "type": "object",
@@ -6522,12 +6230,7 @@
           },
           "plan": {
             "type": "string",
-            "enum": [
-              "free",
-              "start",
-              "pro",
-              "max"
-            ],
+            "enum": ["free", "start", "pro", "max"],
             "example": "start",
             "description": "Действующий тариф. Считается по сроку подписки, а не по колонке магазина: после истечения в ней намеренно остаётся купленный тариф"
           },
@@ -6595,17 +6298,11 @@
           },
           "state": {
             "type": "string",
-            "enum": [
-              "new",
-              "old"
-            ],
+            "enum": ["new", "old"],
             "description": "Состояние, выбранное продавцом. Слово продавца тут последнее"
           }
         },
-        "required": [
-          "photoKeys",
-          "name"
-        ]
+        "required": ["photoKeys", "name"]
       },
       "AutofilledProductDto": {
         "type": "object",
@@ -6641,10 +6338,7 @@
           },
           "state": {
             "type": "string",
-            "enum": [
-              "new",
-              "old"
-            ],
+            "enum": ["new", "old"],
             "nullable": true,
             "description": "null — по фотографиям и тексту состояние не определить"
           },
@@ -6694,10 +6388,7 @@
           },
           "values": {
             "description": "Значение у каждого товара, в порядке products. «—» — продавец не указал.",
-            "example": [
-              "Ryzen 5 5600",
-              "Core i5-11400F"
-            ],
+            "example": ["Ryzen 5 5600", "Core i5-11400F"],
             "type": "array",
             "items": {
               "type": "string"
@@ -6715,12 +6406,7 @@
             "example": ""
           }
         },
-        "required": [
-          "component",
-          "values",
-          "bestId",
-          "note"
-        ]
+        "required": ["component", "values", "bestId", "note"]
       },
       "AiCompareProductDto": {
         "type": "object",
@@ -6751,13 +6437,7 @@
             "example": "Игры в 1080p и монтаж дома"
           }
         },
-        "required": [
-          "id",
-          "name",
-          "pros",
-          "cons",
-          "bestFor"
-        ]
+        "required": ["id", "name", "pros", "cons", "bestFor"]
       },
       "AiCompareVerdictDto": {
         "type": "object",
@@ -6777,11 +6457,7 @@
             "description": "Итог одним абзацем"
           }
         },
-        "required": [
-          "bestId",
-          "valueId",
-          "text"
-        ]
+        "required": ["bestId", "valueId", "text"]
       },
       "AiCompareResultDto": {
         "type": "object",
@@ -6814,13 +6490,7 @@
             "description": "Ответ отдан из кэша: те же товары уже сравнивали, к модели не ходили"
           }
         },
-        "required": [
-          "comparable",
-          "summary",
-          "rows",
-          "products",
-          "verdict"
-        ]
+        "required": ["comparable", "summary", "rows", "products", "verdict"]
       },
       "ProductViewDto": {
         "type": "object",
@@ -6860,10 +6530,7 @@
           },
           "state": {
             "type": "string",
-            "enum": [
-              "new",
-              "old"
-            ]
+            "enum": ["new", "old"]
           },
           "viewedAt": {
             "type": "string",
@@ -6901,10 +6568,7 @@
             "$ref": "#/components/schemas/PaginationMetaDto"
           }
         },
-        "required": [
-          "data",
-          "meta"
-        ]
+        "required": ["data", "meta"]
       },
       "RecordProductViewDto": {
         "type": "object",
@@ -6915,9 +6579,7 @@
             "example": 10
           }
         },
-        "required": [
-          "product_card_id"
-        ]
+        "required": ["product_card_id"]
       },
       "SyncProductViewItemDto": {
         "type": "object",
@@ -6932,9 +6594,7 @@
             "example": "2026-07-30T14:05:00.000Z"
           }
         },
-        "required": [
-          "product_card_id"
-        ]
+        "required": ["product_card_id"]
       },
       "SyncProductViewsDto": {
         "type": "object",
@@ -6947,9 +6607,7 @@
             }
           }
         },
-        "required": [
-          "items"
-        ]
+        "required": ["items"]
       },
       "RecordProductEventDto": {
         "type": "object",
@@ -6957,11 +6615,7 @@
           "kind": {
             "type": "string",
             "description": "view — открытие карточки, phone — раскрытие телефона, telegram — переход в чат",
-            "enum": [
-              "view",
-              "phone",
-              "telegram"
-            ],
+            "enum": ["view", "phone", "telegram"],
             "example": "view"
           },
           "visitor_id": {
@@ -6970,10 +6624,7 @@
             "example": "9f1c3a54-7b2e-4c11-9a0d-2f5e8b6c1d33"
           }
         },
-        "required": [
-          "kind",
-          "visitor_id"
-        ]
+        "required": ["kind", "visitor_id"]
       },
       "DailyPointDto": {
         "type": "object",
@@ -6994,11 +6645,7 @@
             "example": 31
           }
         },
-        "required": [
-          "date",
-          "views",
-          "visitors"
-        ]
+        "required": ["date", "views", "visitors"]
       },
       "ProductStatsDto": {
         "type": "object",
@@ -7247,10 +6894,7 @@
             "example": 37
           }
         },
-        "required": [
-          "query",
-          "shows"
-        ]
+        "required": ["query", "shows"]
       },
       "ActivityPointDto": {
         "type": "object",
@@ -7286,14 +6930,7 @@
             "example": 96
           }
         },
-        "required": [
-          "date",
-          "products",
-          "shops",
-          "users",
-          "views",
-          "contacts"
-        ]
+        "required": ["date", "products", "shops", "users", "views", "contacts"]
       },
       "AdminActivityDto": {
         "type": "object",
@@ -7378,10 +7015,7 @@
           },
           "state": {
             "type": "string",
-            "enum": [
-              "new",
-              "old"
-            ]
+            "enum": ["new", "old"]
           },
           "addedAt": {
             "type": "string",
@@ -7413,10 +7047,7 @@
             "$ref": "#/components/schemas/PaginationMetaDto"
           }
         },
-        "required": [
-          "data",
-          "meta"
-        ]
+        "required": ["data", "meta"]
       },
       "AddFavoriteDto": {
         "type": "object",
@@ -7427,9 +7058,7 @@
             "example": 10
           }
         },
-        "required": [
-          "product_card_id"
-        ]
+        "required": ["product_card_id"]
       },
       "SyncFavoriteItemDto": {
         "type": "object",
@@ -7444,9 +7073,7 @@
             "example": "2026-07-30T14:05:00.000Z"
           }
         },
-        "required": [
-          "product_card_id"
-        ]
+        "required": ["product_card_id"]
       },
       "SyncFavoritesDto": {
         "type": "object",
@@ -7459,9 +7086,7 @@
             }
           }
         },
-        "required": [
-          "items"
-        ]
+        "required": ["items"]
       },
       "ImageGenBalanceDto": {
         "type": "object",
@@ -7477,10 +7102,7 @@
             "example": 8400
           }
         },
-        "required": [
-          "allowed",
-          "credits"
-        ]
+        "required": ["allowed", "credits"]
       },
       "StoredImageDto": {
         "type": "object",
@@ -7499,12 +7121,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "key",
-          "url",
-          "prompt",
-          "createdAt"
-        ]
+        "required": ["key", "url", "prompt", "createdAt"]
       },
       "DescribePromptDto": {
         "type": "object",
@@ -7521,16 +7138,11 @@
           },
           "style": {
             "type": "string",
-            "enum": [
-              "infographic",
-              "photo"
-            ],
+            "enum": ["infographic", "photo"],
             "default": "infographic"
           }
         },
-        "required": [
-          "photoKey"
-        ]
+        "required": ["photoKey"]
       },
       "RewriteDescriptionDto": {
         "type": "object",
@@ -7552,10 +7164,7 @@
             "description": "Название товара. Модель его не переписывает, но опирается на него"
           }
         },
-        "required": [
-          "photoKey",
-          "text"
-        ]
+        "required": ["photoKey", "text"]
       },
       "RewrittenDescriptionDto": {
         "type": "object",
@@ -7565,9 +7174,7 @@
             "description": "Исправленное описание"
           }
         },
-        "required": [
-          "text"
-        ]
+        "required": ["text"]
       },
       "GenerateImagesDto": {
         "type": "object",
@@ -7590,10 +7197,7 @@
           },
           "style": {
             "type": "string",
-            "enum": [
-              "infographic",
-              "photo"
-            ],
+            "enum": ["infographic", "photo"],
             "default": "infographic"
           },
           "count": {
@@ -7604,11 +7208,7 @@
           },
           "quality": {
             "type": "string",
-            "enum": [
-              "low",
-              "medium",
-              "high"
-            ],
+            "enum": ["low", "medium", "high"],
             "default": "medium"
           },
           "size": {
@@ -7626,10 +7226,7 @@
             "default": "960x1280"
           }
         },
-        "required": [
-          "photoKey",
-          "prompt"
-        ]
+        "required": ["photoKey", "prompt"]
       },
       "GeneratedImageDto": {
         "type": "object",
@@ -7642,10 +7239,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "key",
-          "url"
-        ]
+        "required": ["key", "url"]
       },
       "CreateReportDto": {
         "type": "object",
@@ -7666,10 +7260,7 @@
             "example": 10
           }
         },
-        "required": [
-          "context",
-          "shop_id"
-        ]
+        "required": ["context", "shop_id"]
       },
       "CreateReviewDto": {
         "type": "object",
@@ -7696,9 +7287,7 @@
             "example": "Забрал в день заказа, продавец всё показал и проверил."
           }
         },
-        "required": [
-          "rating"
-        ]
+        "required": ["rating"]
       },
       "UpdateReviewDto": {
         "type": "object",
@@ -7726,9 +7315,7 @@
             "description": "Причину видит автор отзыва, поэтому пишется человеческим языком"
           }
         },
-        "required": [
-          "reason"
-        ]
+        "required": ["reason"]
       },
       "ChatDto": {
         "type": "object",
@@ -7820,10 +7407,7 @@
             "$ref": "#/components/schemas/PaginationMetaDto"
           }
         },
-        "required": [
-          "data",
-          "meta"
-        ]
+        "required": ["data", "meta"]
       },
       "ChatUnreadDto": {
         "type": "object",
@@ -7837,10 +7421,7 @@
             "description": "Непрочитанное в переписках моего магазина"
           }
         },
-        "required": [
-          "buyer",
-          "seller"
-        ]
+        "required": ["buyer", "seller"]
       },
       "ChatMessageDto": {
         "type": "object",
@@ -7851,11 +7432,7 @@
           },
           "kind": {
             "type": "string",
-            "enum": [
-              "buyer",
-              "seller",
-              "ai"
-            ],
+            "enum": ["buyer", "seller", "ai"],
             "description": "Чей голос. «ai» — автоответ от имени магазина"
           },
           "text": {
@@ -7871,13 +7448,7 @@
             "format": "date-time"
           }
         },
-        "required": [
-          "id",
-          "kind",
-          "text",
-          "readAt",
-          "createdAt"
-        ]
+        "required": ["id", "kind", "text", "readAt", "createdAt"]
       },
       "PaginatedChatMessagesDto": {
         "type": "object",
@@ -7892,10 +7463,7 @@
             "$ref": "#/components/schemas/PaginationMetaDto"
           }
         },
-        "required": [
-          "data",
-          "meta"
-        ]
+        "required": ["data", "meta"]
       },
       "StartChatDto": {
         "type": "object",
@@ -7916,9 +7484,7 @@
             "example": "Здравствуйте! Ещё в наличии?"
           }
         },
-        "required": [
-          "text"
-        ]
+        "required": ["text"]
       },
       "ChatStartedDto": {
         "type": "object",
@@ -7928,9 +7494,7 @@
             "description": "id переписки — начатой сейчас или найденной"
           }
         },
-        "required": [
-          "id"
-        ]
+        "required": ["id"]
       },
       "SendMessageDto": {
         "type": "object",
@@ -7941,9 +7505,7 @@
             "example": "Да, могу отложить до завтра"
           }
         },
-        "required": [
-          "text"
-        ]
+        "required": ["text"]
       },
       "PublicBannerDto": {
         "type": "object",
@@ -7974,14 +7536,7 @@
             "example": "/product/12"
           }
         },
-        "required": [
-          "id",
-          "title",
-          "photoRu",
-          "photoUzLatn",
-          "photoUzCyrl",
-          "linkUrl"
-        ]
+        "required": ["id", "title", "photoRu", "photoUzLatn", "photoUzCyrl", "linkUrl"]
       },
       "BannerDto": {
         "type": "object",
@@ -8026,11 +7581,7 @@
           },
           "status": {
             "type": "string",
-            "enum": [
-              "pending",
-              "approved",
-              "rejected"
-            ],
+            "enum": ["pending", "approved", "rejected"],
             "example": "pending"
           },
           "rejectReason": {
@@ -8110,22 +7661,13 @@
             "description": "Порядок в карусели: меньше — раньше"
           }
         },
-        "required": [
-          "title",
-          "photoRu",
-          "photoUzLatn",
-          "photoUzCyrl"
-        ]
+        "required": ["title", "photoRu", "photoUzLatn", "photoUzCyrl"]
       },
       "ReorderBannersDto": {
         "type": "object",
         "properties": {
           "ids": {
-            "example": [
-              3,
-              1,
-              2
-            ],
+            "example": [3, 1, 2],
             "description": "id баннеров в желаемом порядке показа",
             "type": "array",
             "items": {
@@ -8133,9 +7675,7 @@
             }
           }
         },
-        "required": [
-          "ids"
-        ]
+        "required": ["ids"]
       },
       "UpdateBannerDto": {
         "type": "object",
@@ -8213,12 +7753,7 @@
             "description": "Куда ведёт клик: абсолютный https-адрес или путь от корня сайта. Пусто — баннер показывается, но не кликается"
           }
         },
-        "required": [
-          "title",
-          "photoRu",
-          "photoUzLatn",
-          "photoUzCyrl"
-        ]
+        "required": ["title", "photoRu", "photoUzLatn", "photoUzCyrl"]
       },
       "UpdateShopBannerDto": {
         "type": "object",
@@ -8296,11 +7831,7 @@
           },
           "status": {
             "type": "string",
-            "enum": [
-              "pending",
-              "approved",
-              "rejected"
-            ],
+            "enum": ["pending", "approved", "rejected"],
             "example": "pending"
           },
           "rejectReason": {
@@ -8355,20 +7886,14 @@
             "$ref": "#/components/schemas/PaginationMetaDto"
           }
         },
-        "required": [
-          "data",
-          "meta"
-        ]
+        "required": ["data", "meta"]
       },
       "ModerateBannerDto": {
         "type": "object",
         "properties": {
           "status": {
             "type": "string",
-            "enum": [
-              "approved",
-              "rejected"
-            ],
+            "enum": ["approved", "rejected"],
             "example": "approved",
             "description": "Решение: approved — баннер уходит в карусель, rejected — возвращается продавцу с причиной"
           },
@@ -8380,20 +7905,14 @@
             "description": "Причина отказа — её читает продавец. Обязательна при status = rejected"
           }
         },
-        "required": [
-          "status"
-        ]
+        "required": ["status"]
       },
       "SubscriptionPlanDto": {
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
-            "enum": [
-              "start",
-              "pro",
-              "max"
-            ],
+            "enum": ["start", "pro", "max"],
             "description": "Идентификатор тарифа. `free` не продаётся и в прайс не входит"
           },
           "priceUzs": {
@@ -8468,25 +7987,14 @@
             "example": "2026-09-01"
           }
         },
-        "required": [
-          "free",
-          "unlimited",
-          "left",
-          "limit",
-          "resetsAt"
-        ]
+        "required": ["free", "unlimited", "left", "limit", "resetsAt"]
       },
       "SellerSubscriptionDto": {
         "type": "object",
         "properties": {
           "plan": {
             "type": "string",
-            "enum": [
-              "free",
-              "start",
-              "pro",
-              "max"
-            ],
+            "enum": ["free", "start", "pro", "max"],
             "description": "ДЕЙСТВУЮЩИЙ тариф. У просроченной подписки здесь `free`, даже если в магазине по-прежнему записан оплаченный когда-то `max`"
           },
           "active": {
@@ -8556,47 +8064,30 @@
         "properties": {
           "plan": {
             "type": "string",
-            "enum": [
-              "start",
-              "pro",
-              "max"
-            ],
+            "enum": ["start", "pro", "max"],
             "description": "Тариф, за который платим",
             "example": "pro"
           },
           "provider": {
             "type": "string",
-            "enum": [
-              "click",
-              "payme"
-            ],
+            "enum": ["click", "payme"],
             "description": "Касса, через которую платим. По умолчанию Click",
             "example": "click"
           }
         },
-        "required": [
-          "plan"
-        ]
+        "required": ["plan"]
       },
       "PaymentLinkDto": {
         "type": "object",
         "properties": {
           "provider": {
             "type": "string",
-            "enum": [
-              "click",
-              "payme",
-              "manual"
-            ],
+            "enum": ["click", "payme", "manual"],
             "example": "click"
           },
           "plan": {
             "type": "string",
-            "enum": [
-              "start",
-              "pro",
-              "max"
-            ]
+            "enum": ["start", "pro", "max"]
           },
           "amountUzs": {
             "type": "number",
@@ -8608,23 +8099,14 @@
             "example": "https://my.click.uz/services/pay?service_id=..."
           }
         },
-        "required": [
-          "provider",
-          "plan",
-          "amountUzs",
-          "url"
-        ]
+        "required": ["provider", "plan", "amountUzs", "url"]
       },
       "CreateInvoiceDto": {
         "type": "object",
         "properties": {
           "plan": {
             "type": "string",
-            "enum": [
-              "start",
-              "pro",
-              "max"
-            ]
+            "enum": ["start", "pro", "max"]
           },
           "phone": {
             "type": "string",
@@ -8632,10 +8114,7 @@
             "example": "998901234567"
           }
         },
-        "required": [
-          "plan",
-          "phone"
-        ]
+        "required": ["plan", "phone"]
       },
       "InvoiceDto": {
         "type": "object",
@@ -8650,11 +8129,7 @@
           },
           "plan": {
             "type": "string",
-            "enum": [
-              "start",
-              "pro",
-              "max"
-            ]
+            "enum": ["start", "pro", "max"]
           },
           "amountUzs": {
             "type": "number"
@@ -8665,21 +8140,10 @@
           },
           "status": {
             "type": "string",
-            "enum": [
-              "pending",
-              "paid",
-              "cancelled"
-            ]
+            "enum": ["pending", "paid", "cancelled"]
           }
         },
-        "required": [
-          "invoiceId",
-          "orderId",
-          "plan",
-          "amountUzs",
-          "phone",
-          "status"
-        ]
+        "required": ["invoiceId", "orderId", "plan", "amountUzs", "phone", "status"]
       },
       "SubscriptionPaymentDto": {
         "type": "object",
@@ -8689,20 +8153,11 @@
           },
           "provider": {
             "type": "string",
-            "enum": [
-              "click",
-              "payme",
-              "manual"
-            ]
+            "enum": ["click", "payme", "manual"]
           },
           "plan": {
             "type": "string",
-            "enum": [
-              "free",
-              "start",
-              "pro",
-              "max"
-            ],
+            "enum": ["free", "start", "pro", "max"],
             "description": "Тариф, за который заплатили. Снимок на момент оплаты: тариф магазина с тех пор мог поменяться"
           },
           "amount": {
@@ -8711,13 +8166,7 @@
           },
           "status": {
             "type": "string",
-            "enum": [
-              "pending",
-              "prepared",
-              "paid",
-              "cancelled",
-              "failed"
-            ]
+            "enum": ["pending", "prepared", "paid", "cancelled", "failed"]
           },
           "merchantBillingId": {
             "type": "number",
@@ -8816,10 +8265,7 @@
             "$ref": "#/components/schemas/PaginationMetaDto"
           }
         },
-        "required": [
-          "data",
-          "meta"
-        ]
+        "required": ["data", "meta"]
       },
       "AdminSubscriptionRowDto": {
         "type": "object",
@@ -8846,22 +8292,12 @@
           },
           "plan": {
             "type": "string",
-            "enum": [
-              "free",
-              "start",
-              "pro",
-              "max"
-            ],
+            "enum": ["free", "start", "pro", "max"],
             "description": "ДЕЙСТВУЮЩИЙ тариф: у просроченной подписки здесь `free`"
           },
           "storedPlan": {
             "type": "string",
-            "enum": [
-              "free",
-              "start",
-              "pro",
-              "max"
-            ],
+            "enum": ["free", "start", "pro", "max"],
             "description": "Тариф, записанный в магазине. У просроченной подписки остаётся прежним — так видно, чем магазин пользовался"
           },
           "active": {
@@ -8927,10 +8363,7 @@
             "$ref": "#/components/schemas/PaginationMetaDto"
           }
         },
-        "required": [
-          "data",
-          "meta"
-        ]
+        "required": ["data", "meta"]
       },
       "SubscriptionSalesPointDto": {
         "type": "object",
@@ -8966,25 +8399,14 @@
             "example": 600000
           }
         },
-        "required": [
-          "date",
-          "revenue",
-          "payments",
-          "start",
-          "pro",
-          "max"
-        ]
+        "required": ["date", "revenue", "payments", "start", "pro", "max"]
       },
       "SubscriptionPlanSliceDto": {
         "type": "object",
         "properties": {
           "plan": {
             "type": "string",
-            "enum": [
-              "start",
-              "pro",
-              "max"
-            ]
+            "enum": ["start", "pro", "max"]
           },
           "payments": {
             "type": "number",
@@ -8997,22 +8419,14 @@
             "example": 2520000
           }
         },
-        "required": [
-          "plan",
-          "payments",
-          "revenue"
-        ]
+        "required": ["plan", "payments", "revenue"]
       },
       "SubscriptionProviderSliceDto": {
         "type": "object",
         "properties": {
           "provider": {
             "type": "string",
-            "enum": [
-              "click",
-              "payme",
-              "manual"
-            ]
+            "enum": ["click", "payme", "manual"]
           },
           "payments": {
             "type": "number",
@@ -9025,24 +8439,14 @@
             "example": 2520000
           }
         },
-        "required": [
-          "provider",
-          "payments",
-          "revenue"
-        ]
+        "required": ["provider", "payments", "revenue"]
       },
       "SubscriptionStatusSliceDto": {
         "type": "object",
         "properties": {
           "status": {
             "type": "string",
-            "enum": [
-              "pending",
-              "prepared",
-              "paid",
-              "cancelled",
-              "failed"
-            ]
+            "enum": ["pending", "prepared", "paid", "cancelled", "failed"]
           },
           "payments": {
             "type": "number",
@@ -9050,10 +8454,7 @@
             "example": 4
           }
         },
-        "required": [
-          "status",
-          "payments"
-        ]
+        "required": ["status", "payments"]
       },
       "SubscriptionTopShopDto": {
         "type": "object",
@@ -9077,23 +8478,14 @@
             "example": 900000
           }
         },
-        "required": [
-          "shopId",
-          "name",
-          "payments",
-          "revenue"
-        ]
+        "required": ["shopId", "name", "payments", "revenue"]
       },
       "SubscriptionActivePlanDto": {
         "type": "object",
         "properties": {
           "plan": {
             "type": "string",
-            "enum": [
-              "start",
-              "pro",
-              "max"
-            ]
+            "enum": ["start", "pro", "max"]
           },
           "shops": {
             "type": "number",
@@ -9101,10 +8493,7 @@
             "example": 18
           }
         },
-        "required": [
-          "plan",
-          "shops"
-        ]
+        "required": ["plan", "shops"]
       },
       "SubscriptionReportDto": {
         "type": "object",
@@ -9226,11 +8615,7 @@
         "properties": {
           "plan": {
             "type": "string",
-            "enum": [
-              "start",
-              "pro",
-              "max"
-            ],
+            "enum": ["start", "pro", "max"],
             "description": "Тариф, который выдаём",
             "example": "max"
           },
@@ -9249,19 +8634,14 @@
             "example": "Оплата по счёту №142 от 12.08"
           }
         },
-        "required": [
-          "plan"
-        ]
+        "required": ["plan"]
       },
       "CreateTestPaymentDto": {
         "type": "object",
         "properties": {
           "provider": {
             "type": "string",
-            "enum": [
-              "click",
-              "payme"
-            ],
+            "enum": ["click", "payme"],
             "description": "Касса, для которой заводим счёт. По умолчанию Click",
             "example": "payme"
           },
@@ -9279,11 +8659,7 @@
         "properties": {
           "provider": {
             "type": "string",
-            "enum": [
-              "click",
-              "payme",
-              "manual"
-            ],
+            "enum": ["click", "payme", "manual"],
             "description": "Касса, для которой заведён счёт",
             "example": "payme"
           },

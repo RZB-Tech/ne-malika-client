@@ -8,6 +8,7 @@ import {
   ArrowDownRight01Icon,
   ArrowLeft01Icon,
   ArrowRight01Icon,
+  ArrowUpDownIcon,
   ArrowUpRight01Icon,
   BalanceScaleIcon,
   BanIcon,
@@ -38,6 +39,7 @@ import {
   DiscIcon,
   EyeIcon,
   Fan01Icon,
+  FilterHorizontalIcon,
   FavouriteIcon,
   Flag02Icon,
   GamepadIcon,
@@ -126,6 +128,7 @@ export const Armchair = make(ArmchairIcon, "Armchair");
 export const ArrowDownRight = make(ArrowDownRight01Icon, "ArrowDownRight");
 export const ArrowLeft = make(ArrowLeft01Icon, "ArrowLeft");
 export const ArrowRight = make(ArrowRight01Icon, "ArrowRight");
+export const ArrowUpDown = make(ArrowUpDownIcon, "ArrowUpDown");
 export const ArrowUpRight = make(ArrowUpRight01Icon, "ArrowUpRight");
 export const Ban = make(BanIcon, "Ban");
 export const BarChart3 = make(Analytics01Icon, "BarChart3");
@@ -158,6 +161,7 @@ export const Disc = make(DiscIcon, "Disc");
 export const ExternalLink = make(LinkSquare02Icon, "ExternalLink");
 export const Eye = make(EyeIcon, "Eye");
 export const Fan = make(Fan01Icon, "Fan");
+export const Filter = make(FilterHorizontalIcon, "Filter");
 export const Flag = make(Flag02Icon, "Flag");
 export const Gamepad2 = make(GamepadIcon, "Gamepad2");
 export const Handshake = make(HandshakeIcon, "Handshake");

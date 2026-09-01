@@ -20,6 +20,12 @@ import type {
   UseQueryResult
 } from '@tanstack/react-query';
 
+import type {
+  PaginatedPublicShopsDto,
+  ShopSitemapEntryDto,
+  ShopsControllerFindAllParams
+} from '../../schemas';
+
 import { customInstance } from '../../../mutator';
 import type { ErrorType } from '../../../mutator';
 
@@ -42,6 +48,192 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   }
   return result;
 };
+
+/**
+ * Магазины без единого активного товара в выдачу не попадают. Телефон в списке не отдаётся — он есть в карточке магазина, где раскрывается по нажатию и учитывается как контакт.
+ * @summary Каталог магазинов: только активные и только с товарами
+ */
+export const shopsControllerFindAll = (
+    params?: ShopsControllerFindAllParams,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<PaginatedPublicShopsDto>(
+      {url: `/api/v1/shops`, method: 'GET',
+        params, signal
+    },
+      options);
+    }
+
+
+
+
+export const getShopsControllerFindAllQueryKey = (params?: ShopsControllerFindAllParams,) => {
+    return [
+    `/api/v1/shops`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getShopsControllerFindAllQueryOptions = <TData = Awaited<ReturnType<typeof shopsControllerFindAll>>, TError = ErrorType<unknown>>(params?: ShopsControllerFindAllParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof shopsControllerFindAll>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getShopsControllerFindAllQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof shopsControllerFindAll>>> = ({ signal }) => shopsControllerFindAll(params, requestOptions, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof shopsControllerFindAll>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ShopsControllerFindAllQueryResult = NonNullable<Awaited<ReturnType<typeof shopsControllerFindAll>>>
+export type ShopsControllerFindAllQueryError = ErrorType<unknown>
+
+
+export function useShopsControllerFindAll<TData = Awaited<ReturnType<typeof shopsControllerFindAll>>, TError = ErrorType<unknown>>(
+ params: undefined |  ShopsControllerFindAllParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof shopsControllerFindAll>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof shopsControllerFindAll>>,
+          TError,
+          Awaited<ReturnType<typeof shopsControllerFindAll>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useShopsControllerFindAll<TData = Awaited<ReturnType<typeof shopsControllerFindAll>>, TError = ErrorType<unknown>>(
+ params?: ShopsControllerFindAllParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof shopsControllerFindAll>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof shopsControllerFindAll>>,
+          TError,
+          Awaited<ReturnType<typeof shopsControllerFindAll>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useShopsControllerFindAll<TData = Awaited<ReturnType<typeof shopsControllerFindAll>>, TError = ErrorType<unknown>>(
+ params?: ShopsControllerFindAllParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof shopsControllerFindAll>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Каталог магазинов: только активные и только с товарами
+ */
+
+export function useShopsControllerFindAll<TData = Awaited<ReturnType<typeof shopsControllerFindAll>>, TError = ErrorType<unknown>>(
+ params?: ShopsControllerFindAllParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof shopsControllerFindAll>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getShopsControllerFindAllQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+/**
+ * @summary id и дата изменения магазинов с товарами (для sitemap)
+ */
+export const shopsControllerSitemap = (
+
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<ShopSitemapEntryDto[]>(
+      {url: `/api/v1/shops/sitemap`, method: 'GET', signal
+    },
+      options);
+    }
+
+
+
+
+export const getShopsControllerSitemapQueryKey = () => {
+    return [
+    `/api/v1/shops/sitemap`
+    ] as const;
+    }
+
+
+export const getShopsControllerSitemapQueryOptions = <TData = Awaited<ReturnType<typeof shopsControllerSitemap>>, TError = ErrorType<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof shopsControllerSitemap>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getShopsControllerSitemapQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof shopsControllerSitemap>>> = ({ signal }) => shopsControllerSitemap(requestOptions, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof shopsControllerSitemap>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ShopsControllerSitemapQueryResult = NonNullable<Awaited<ReturnType<typeof shopsControllerSitemap>>>
+export type ShopsControllerSitemapQueryError = ErrorType<unknown>
+
+
+export function useShopsControllerSitemap<TData = Awaited<ReturnType<typeof shopsControllerSitemap>>, TError = ErrorType<unknown>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof shopsControllerSitemap>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof shopsControllerSitemap>>,
+          TError,
+          Awaited<ReturnType<typeof shopsControllerSitemap>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useShopsControllerSitemap<TData = Awaited<ReturnType<typeof shopsControllerSitemap>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof shopsControllerSitemap>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof shopsControllerSitemap>>,
+          TError,
+          Awaited<ReturnType<typeof shopsControllerSitemap>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useShopsControllerSitemap<TData = Awaited<ReturnType<typeof shopsControllerSitemap>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof shopsControllerSitemap>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary id и дата изменения магазинов с товарами (для sitemap)
+ */
+
+export function useShopsControllerSitemap<TData = Awaited<ReturnType<typeof shopsControllerSitemap>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof shopsControllerSitemap>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getShopsControllerSitemapQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
 
 /**
  * @summary Карточка магазина с его активными товарами

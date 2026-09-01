@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Store } from "@/components/icons";
+import { Store, Tag } from "@/components/icons";
 import { TelegramIcon } from "@/components/icons/telegram-icon";
 import { LanguageSwitch } from "@/components/shared/language-switch";
 import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
@@ -18,10 +18,18 @@ export function SiteFooter() {
       {}
       <PageContainer className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 border-b border-border py-5">
         <Link
-          href="/seller/profile"
+          href="/stores"
           className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-foreground transition-colors outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/40"
         >
           <Store className="size-4 text-muted-foreground" />
+          {t("nav.stores")}
+        </Link>
+
+        <Link
+          href="/seller/profile"
+          className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-foreground transition-colors outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/40"
+        >
+          <Tag className="size-4 text-muted-foreground" />
           {t("footer.sell")}
         </Link>
 

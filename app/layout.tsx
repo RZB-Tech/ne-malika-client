@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import NextTopLoader from "nextjs-toploader";
 import "./globals.css";
@@ -40,6 +40,16 @@ export const metadata: Metadata = {
   description:
     "Витрина компьютерной техники: комплектующие, готовые сборки и периферия от проверенных магазинов. Поиск, фильтры и связь с продавцом напрямую в Telegram.",
   verification: { yandex: "f7605f24203c66e8" },
+  appleWebApp: { capable: true, title: "neMalika", statusBarStyle: "default" },
+};
+
+// Цвет строки браузера совпадает с фоном страницы в текущей теме — иначе на
+// телефоне сверху остаётся полоса от чужой темы.
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f5f7fa" },
+    { media: "(prefers-color-scheme: dark)", color: "#07090e" },
+  ],
 };
 
 export default function RootLayout({

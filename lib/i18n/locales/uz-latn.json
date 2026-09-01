@@ -81,7 +81,8 @@
     "logout": "Chiqish",
     "messages": "Xabarlar",
     "messagesShort": "Chat",
-    "support": "Yordam"
+    "support": "Yordam",
+    "stores": "Do‘konlar"
   },
   "home": {
     "banners": {
@@ -112,7 +113,8 @@
     "sort": {
       "latest": "Oxirgi qo‘shilganlar",
       "priceAsc": "Avval arzonlari",
-      "priceDesc": "Avval qimmatlari"
+      "priceDesc": "Avval qimmatlari",
+      "default": "Standart tartib"
     },
     "filters": "Filtrlar",
     "loadMore": "Yana ko‘rsatish",
@@ -123,7 +125,9 @@
     "loadError": "Mahsulotlarni yuklab bo‘lmadi. Ulanishni tekshirib, qayta urinib ko‘ring.",
     "categoriesLoadError": "Katalog bo‘limlarini yuklab bo‘lmadi. Qayta urinib ko‘ring.",
     "allSections": "Barcha bo‘limlar",
-    "everywhere": "Hamma joyda"
+    "everywhere": "Hamma joyda",
+    "anyState": "Farqi yo‘q",
+    "applyFilters": "Ko‘rsatish"
   },
   "availability": {
     "in_stock": "Sotuvda bor",
@@ -154,7 +158,9 @@
     "stateOld": "Ishlatilgan",
     "notFound": "Mahsulot topilmadi",
     "notFoundText": "Ehtimol, sotuvchi uni chop etishdan olib tashlagan yoki o‘chirgan.",
-    "toCatalog": "Katalogga"
+    "toCatalog": "Katalogga",
+    "similar": "O‘xshash mahsulotlar",
+    "moreFromStore": "Shu do‘kondan yana"
   },
   "store": {
     "products": "Mahsulotlar",
@@ -1558,5 +1564,23 @@
     "sent": "Yuborildi",
     "read": "O‘qildi",
     "pushPrompt": "Sotuvchi javob berganda xabar beramiz — varaq yopiq bo‘lsa ham."
+  },
+  "stores": {
+    "title": "Malika bozori do‘konlari",
+    "subtitle": "Hozir mahsuloti bor sotuvchilar — reyting, manzil va ish vaqti bilan.",
+    "searchPlaceholder": "Do‘kon nomi yoki manzil…",
+    "sort": {
+      "products": "Ko‘p mahsulot",
+      "rating": "Yuqori reyting",
+      "newest": "Yangi do‘konlar",
+      "name": "Alifbo bo‘yicha"
+    },
+    "productCount": "{count} ta mahsulot",
+    "noRating": "Sharhlarsiz",
+    "allStores": "Barcha do‘konlar",
+    "emptyTitle": "Do‘konlar topilmadi",
+    "emptyText": "So‘rovni o‘zgartirib ko‘ring.",
+    "errorTitle": "Do‘konlar katalogi ishlamayapti",
+    "loadError": "Do‘konlarni yuklab bo‘lmadi. Ulanishni tekshirib, qayta urinib ko‘ring."
   }
 }
