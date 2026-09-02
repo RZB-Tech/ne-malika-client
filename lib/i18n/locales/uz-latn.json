@@ -563,9 +563,7 @@
       },
       "ai": {
         "title": "Bannerni chizdirish",
-        "hint": "Model bannerni do‘kon nomi, katalog bo‘limlari va so‘nggi mahsulotlar bo‘yicha yig‘adi. Avval ruscha variant — yoqsa, xuddi shu ko‘rinishda o‘zbekchasini tayyorlaymiz.",
-        "accent": "Banner nima haqida",
-        "accentPlaceholder": "Noutbuklar kuzgi chegirmasi",
+        "hint": "Model do‘konni tahlil qiladi — nomi, katalog bo‘limlari, mahsulotlari va ularning suratlari — va nima chizishni hamda bannerni qanday nomlashni o‘zi o‘ylab topadi. Hech narsa kiritish shart emas. Avval ruscha versiya: yoqsa, xuddi shu ko‘rinishda o‘zbekchasini tayyorlaymiz.",
         "makeRu": "Ruschasini chizdirish",
         "againRu": "Qaytadan chizdirish",
         "makeUz": "O‘zbekchasini tayyorlash",
@@ -579,7 +577,9 @@
         "price": "Har bir rasm uchun {price} kredit",
         "balance": "Balans: {balance}",
         "noCredits": "Kredit yetarli emas",
-        "failed": "Bannerni chizib bo‘lmadi"
+        "failed": "Bannerni chizib bo‘lmadi",
+        "needShop": "Avval do‘konni tanlang — model nima chizishni shundan tushunadi",
+        "freeForAdmin": "Kredit yechilmaydi"
       }
     },
     "credits": {

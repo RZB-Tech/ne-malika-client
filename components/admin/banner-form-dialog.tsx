@@ -32,6 +32,8 @@ import {
   type BannerLocale,
 } from "@/lib/api/banners";
 import type { AdminShopRow } from "@/lib/api/types";
+import type { GeneratedBannerDto } from "@/lib/api/generated/schemas";
+import { BannerAiPanel } from "@/components/seller/banner-ai-panel";
 import { apiErrorMessage } from "@/lib/api/errors";
 import { photoUrl } from "@/lib/api/photo";
 import { uploadPhoto } from "@/lib/api/upload";
@@ -101,6 +103,20 @@ function FormBody({
   const [saving, setSaving] = useState(false);
 
   const shopName = shops.find((shop) => shop.id === shopId)?.name;
+
+  /**
+   * Нарисованное моделью уже лежит в хранилище — в слот кладём готовый ключ.
+   * Название и ссылку подставляем только в пустые поля: их придумала модель,
+   * но написанное администратором вручную важнее.
+   */
+  const applyGenerated = (locale: BannerLocale, result: GeneratedBannerDto) => {
+    setSlots((s) => ({
+      ...s,
+      [locale]: { key: result.key, preview: photoUrl(result.key) ?? "" },
+    }));
+    if (result.title) setTitle((current) => current.trim() || result.title!);
+    setLinkUrl((current) => current.trim() || result.linkUrl);
+  };
 
   const objectUrls = useRef<string[]>([]);
   useEffect(() => () => objectUrls.current.forEach((url) => URL.revokeObjectURL(url)), []);
@@ -232,6 +248,15 @@ function FormBody({
 
       <div className="flex flex-col gap-3">
         <Label>{t("admin.banners.images")}</Label>
+
+        {/* Магазин передаём даже пустым: панель сама скажет, что его надо выбрать. */}
+        <BannerAiPanel
+          shopId={shopId}
+          currentRuKey={slots.ru?.key}
+          onGenerated={applyGenerated}
+          disabled={saving}
+        />
+
         {BANNER_LOCALES.map((locale) => (
           <SlotPicker
             key={locale}

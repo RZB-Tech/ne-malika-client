@@ -22,6 +22,7 @@ import {
 } from "@/lib/api/banners";
 import { BannerAiPanel } from "./banner-ai-panel";
 import { apiErrorMessage } from "@/lib/api/errors";
+import type { GeneratedBannerDto } from "@/lib/api/generated/schemas";
 import { photoUrl } from "@/lib/api/photo";
 import { uploadPhoto } from "@/lib/api/upload";
 import { cn } from "@/lib/utils";
@@ -76,9 +77,19 @@ export function BannerForm({ banner }: { banner: Banner | null }) {
     toast.success(t("seller.banner.copiedToAll"));
   };
 
-  /** Нарисованное моделью уже лежит в хранилище — в слот кладём готовый ключ. */
-  const applyGenerated = (locale: BannerLocale, key: string) => {
-    setSlots((s) => ({ ...s, [locale]: { key, preview: photoUrl(key) ?? "" } }));
+  /**
+   * Нарисованное моделью уже лежит в хранилище — в слот кладём готовый ключ.
+   *
+   * Название и ссылку подставляем только в пустые поля: их придумала модель,
+   * но если продавец успел написать своё, перезатирать его работу нельзя.
+   */
+  const applyGenerated = (locale: BannerLocale, result: GeneratedBannerDto) => {
+    setSlots((s) => ({
+      ...s,
+      [locale]: { key: result.key, preview: photoUrl(result.key) ?? "" },
+    }));
+    if (result.title) setTitle((current) => current.trim() || result.title!);
+    setLinkUrl((current) => current.trim() || result.linkUrl);
   };
 
   const dirty = !banner || changedFrom(banner, title, linkUrl, slots);
