@@ -4660,7 +4660,7 @@
     },
     "/api/v1/seller/banners/ai/ru": {
       "post": {
-        "description": "Берёт название магазина, его разделы каталога и до трёх товаров с фотографиями. Не нравится — вызовите ещё раз, каждый вызов платный.",
+        "description": "Модель разбирает магазин — название, разделы каталога, товары и их фотографии — и сама придумывает, что нарисовать и как назвать баннер. Вводить ничего не нужно. Не нравится — вызовите ещё раз, каждый вызов платный.",
         "operationId": "SellerBannerAiController_generateRu",
         "parameters": [],
         "requestBody": {
@@ -4749,6 +4749,127 @@
         "summary": "Перевести принятый баннер на узбекский",
         "tags": [
           "banners-seller"
+        ]
+      }
+    },
+    "/api/v1/admin/banners/ai/price": {
+      "get": {
+        "operationId": "AdminBannerAiController_price",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BannerAiPriceDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Во сколько обходится генерация. Администратору — без списания",
+        "tags": [
+          "banners-admin"
+        ]
+      }
+    },
+    "/api/v1/admin/banners/ai/ru": {
+      "post": {
+        "description": "Модель разбирает выбранный магазин — название, разделы каталога, товары и их фотографии — и сама придумывает, что нарисовать и как назвать баннер. Ссылка ведёт на страницу магазина.",
+        "operationId": "AdminBannerAiController_generateRu",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminGenerateBannerDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeneratedBannerDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Магазин не найден"
+          },
+          "502": {
+            "description": "Модель не нарисовала баннер"
+          },
+          "503": {
+            "description": "ИИ-функции выключены: нет ключа"
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Нарисовать баннер магазину на русском",
+        "tags": [
+          "banners-admin"
+        ]
+      }
+    },
+    "/api/v1/admin/banners/ai/uz": {
+      "post": {
+        "description": "Рисует ту же картинку с узбекскими надписями: вёрстка, фон и товары остаются прежними.",
+        "operationId": "AdminBannerAiController_generateUz",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminTranslateBannerDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeneratedBannerDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Русский баннер не найден"
+          },
+          "404": {
+            "description": "Магазин не найден"
+          },
+          "502": {
+            "description": "Модель не нарисовала баннер"
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Перевести принятый баннер на узбекский",
+        "tags": [
+          "banners-admin"
         ]
       }
     },
@@ -8609,7 +8730,7 @@
           "balance": {
             "type": "number",
             "nullable": true,
-            "description": "Доступный остаток кредитов магазина",
+            "description": "Доступный остаток кредитов магазина. null — списания не будет (администратор) либо тариф не даёт баннер",
             "example": 8400
           }
         },
@@ -8633,12 +8754,6 @@
             "items": {
               "type": "number"
             }
-          },
-          "accent": {
-            "type": "string",
-            "maxLength": 200,
-            "example": "Осенняя распродажа ноутбуков",
-            "description": "О чём баннер. Пусто — модель напишет текст по названию магазина и его товарам."
           }
         }
       },
@@ -8654,6 +8769,17 @@
             "type": "string",
             "description": "Готовый адрес картинки"
           },
+          "title": {
+            "type": "string",
+            "nullable": true,
+            "example": "Баннер магазина «ТехноМаркет» — ноутбуки",
+            "description": "Название баннера, придуманное моделью. У перевода пусто: название уже выбрано на первом шаге и не меняется"
+          },
+          "linkUrl": {
+            "type": "string",
+            "example": "/store/12",
+            "description": "Куда ведёт клик — страница магазина, подставляется сама"
+          },
           "balance": {
             "type": "number",
             "nullable": true,
@@ -8664,6 +8790,8 @@
         "required": [
           "key",
           "url",
+          "title",
+          "linkUrl",
           "balance"
         ]
       },
@@ -8673,11 +8801,55 @@
           "photoKey": {
             "type": "string",
             "format": "uuid",
-            "description": "Ключ русского баннера из POST /seller/banners/ai/ru — тот, который понравился"
+            "description": "Ключ русского баннера из POST .../ai/ru — тот, который понравился"
           }
         },
         "required": [
           "photoKey"
+        ]
+      },
+      "AdminGenerateBannerDto": {
+        "type": "object",
+        "properties": {
+          "productIds": {
+            "maxItems": 3,
+            "example": [
+              10,
+              12
+            ],
+            "description": "Какие товары показать на баннере. Пусто — возьмём последние опубликованные товары магазина.",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "shopId": {
+            "type": "number",
+            "example": 12,
+            "description": "Магазин, для которого рисуем баннер"
+          }
+        },
+        "required": [
+          "shopId"
+        ]
+      },
+      "AdminTranslateBannerDto": {
+        "type": "object",
+        "properties": {
+          "photoKey": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Ключ русского баннера из POST .../ai/ru — тот, который понравился"
+          },
+          "shopId": {
+            "type": "number",
+            "example": 12,
+            "description": "Тот же магазин, что и на первом шаге"
+          }
+        },
+        "required": [
+          "photoKey",
+          "shopId"
         ]
       },
       "AdminBannerDto": {

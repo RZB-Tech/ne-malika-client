@@ -26,9 +26,13 @@ import type {
 
 import type {
   AdminBannerDto,
+  AdminGenerateBannerDto,
   AdminShopBannersControllerListParams,
+  AdminTranslateBannerDto,
+  BannerAiPriceDto,
   BannerDto,
   CreateBannerDto,
+  GeneratedBannerDto,
   ModerateBannerDto,
   PaginatedShopBannersDto,
   ReorderBannersDto,
@@ -406,6 +410,228 @@ export const useAdminBannersControllerRemove = <TError = ErrorType<void>,
         TContext
       > => {
       return useMutation(getAdminBannersControllerRemoveMutationOptions(options), queryClient);
+    }
+    /**
+ * @summary Во сколько обходится генерация. Администратору — без списания
+ */
+export const adminBannerAiControllerPrice = (
+
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<BannerAiPriceDto>(
+      {url: `/api/v1/admin/banners/ai/price`, method: 'GET', signal
+    },
+      options);
+    }
+
+
+
+
+export const getAdminBannerAiControllerPriceQueryKey = () => {
+    return [
+    `/api/v1/admin/banners/ai/price`
+    ] as const;
+    }
+
+
+export const getAdminBannerAiControllerPriceQueryOptions = <TData = Awaited<ReturnType<typeof adminBannerAiControllerPrice>>, TError = ErrorType<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminBannerAiControllerPrice>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getAdminBannerAiControllerPriceQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof adminBannerAiControllerPrice>>> = ({ signal }) => adminBannerAiControllerPrice(requestOptions, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof adminBannerAiControllerPrice>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type AdminBannerAiControllerPriceQueryResult = NonNullable<Awaited<ReturnType<typeof adminBannerAiControllerPrice>>>
+export type AdminBannerAiControllerPriceQueryError = ErrorType<unknown>
+
+
+export function useAdminBannerAiControllerPrice<TData = Awaited<ReturnType<typeof adminBannerAiControllerPrice>>, TError = ErrorType<unknown>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminBannerAiControllerPrice>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof adminBannerAiControllerPrice>>,
+          TError,
+          Awaited<ReturnType<typeof adminBannerAiControllerPrice>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAdminBannerAiControllerPrice<TData = Awaited<ReturnType<typeof adminBannerAiControllerPrice>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminBannerAiControllerPrice>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof adminBannerAiControllerPrice>>,
+          TError,
+          Awaited<ReturnType<typeof adminBannerAiControllerPrice>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAdminBannerAiControllerPrice<TData = Awaited<ReturnType<typeof adminBannerAiControllerPrice>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminBannerAiControllerPrice>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Во сколько обходится генерация. Администратору — без списания
+ */
+
+export function useAdminBannerAiControllerPrice<TData = Awaited<ReturnType<typeof adminBannerAiControllerPrice>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminBannerAiControllerPrice>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getAdminBannerAiControllerPriceQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+/**
+ * Модель разбирает выбранный магазин — название, разделы каталога, товары и их фотографии — и сама придумывает, что нарисовать и как назвать баннер. Ссылка ведёт на страницу магазина.
+ * @summary Нарисовать баннер магазину на русском
+ */
+export const adminBannerAiControllerGenerateRu = (
+    adminGenerateBannerDto: BodyType<AdminGenerateBannerDto>,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<GeneratedBannerDto>(
+      {url: `/api/v1/admin/banners/ai/ru`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: adminGenerateBannerDto, signal
+    },
+      options);
+    }
+
+
+
+
+export const getAdminBannerAiControllerGenerateRuMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminBannerAiControllerGenerateRu>>, TError,{data: BodyType<AdminGenerateBannerDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof adminBannerAiControllerGenerateRu>>, TError,{data: BodyType<AdminGenerateBannerDto>}, TContext> => {
+
+const mutationKey = ['adminBannerAiControllerGenerateRu'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminBannerAiControllerGenerateRu>>, {data: BodyType<AdminGenerateBannerDto>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  adminBannerAiControllerGenerateRu(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AdminBannerAiControllerGenerateRuMutationResult = NonNullable<Awaited<ReturnType<typeof adminBannerAiControllerGenerateRu>>>
+    export type AdminBannerAiControllerGenerateRuMutationBody = BodyType<AdminGenerateBannerDto>
+    export type AdminBannerAiControllerGenerateRuMutationError = ErrorType<void>
+
+    /**
+ * @summary Нарисовать баннер магазину на русском
+ */
+export const useAdminBannerAiControllerGenerateRu = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminBannerAiControllerGenerateRu>>, TError,{data: BodyType<AdminGenerateBannerDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof adminBannerAiControllerGenerateRu>>,
+        TError,
+        {data: BodyType<AdminGenerateBannerDto>},
+        TContext
+      > => {
+      return useMutation(getAdminBannerAiControllerGenerateRuMutationOptions(options), queryClient);
+    }
+    /**
+ * Рисует ту же картинку с узбекскими надписями: вёрстка, фон и товары остаются прежними.
+ * @summary Перевести принятый баннер на узбекский
+ */
+export const adminBannerAiControllerGenerateUz = (
+    adminTranslateBannerDto: BodyType<AdminTranslateBannerDto>,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<GeneratedBannerDto>(
+      {url: `/api/v1/admin/banners/ai/uz`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: adminTranslateBannerDto, signal
+    },
+      options);
+    }
+
+
+
+
+export const getAdminBannerAiControllerGenerateUzMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminBannerAiControllerGenerateUz>>, TError,{data: BodyType<AdminTranslateBannerDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof adminBannerAiControllerGenerateUz>>, TError,{data: BodyType<AdminTranslateBannerDto>}, TContext> => {
+
+const mutationKey = ['adminBannerAiControllerGenerateUz'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminBannerAiControllerGenerateUz>>, {data: BodyType<AdminTranslateBannerDto>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  adminBannerAiControllerGenerateUz(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AdminBannerAiControllerGenerateUzMutationResult = NonNullable<Awaited<ReturnType<typeof adminBannerAiControllerGenerateUz>>>
+    export type AdminBannerAiControllerGenerateUzMutationBody = BodyType<AdminTranslateBannerDto>
+    export type AdminBannerAiControllerGenerateUzMutationError = ErrorType<void>
+
+    /**
+ * @summary Перевести принятый баннер на узбекский
+ */
+export const useAdminBannerAiControllerGenerateUz = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminBannerAiControllerGenerateUz>>, TError,{data: BodyType<AdminTranslateBannerDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof adminBannerAiControllerGenerateUz>>,
+        TError,
+        {data: BodyType<AdminTranslateBannerDto>},
+        TContext
+      > => {
+      return useMutation(getAdminBannerAiControllerGenerateUzMutationOptions(options), queryClient);
     }
     /**
  * @summary Баннеры продавцов: очередь модерации и архив

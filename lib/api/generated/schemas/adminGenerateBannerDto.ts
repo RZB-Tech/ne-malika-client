@@ -6,10 +6,12 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export interface GenerateBannerDto {
+export interface AdminGenerateBannerDto {
   /**
      * Какие товары показать на баннере. Пусто — возьмём последние опубликованные товары магазина.
      * @maxItems 3
      */
   productIds?: number[];
+  /** Магазин, для которого рисуем баннер */
+  shopId: number;
 }

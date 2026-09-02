@@ -7,6 +7,6 @@
  */
 
 export interface TranslateBannerDto {
-  /** Ключ русского баннера из POST /seller/banners/ai/ru — тот, который понравился */
+  /** Ключ русского баннера из POST .../ai/ru — тот, который понравился */
   photoKey: string;
 }

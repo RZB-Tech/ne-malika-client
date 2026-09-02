@@ -6,10 +6,9 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export interface GenerateBannerDto {
-  /**
-     * Какие товары показать на баннере. Пусто — возьмём последние опубликованные товары магазина.
-     * @maxItems 3
-     */
-  productIds?: number[];
+export interface AdminTranslateBannerDto {
+  /** Ключ русского баннера из POST .../ai/ru — тот, который понравился */
+  photoKey: string;
+  /** Тот же магазин, что и на первом шаге */
+  shopId: number;
 }
