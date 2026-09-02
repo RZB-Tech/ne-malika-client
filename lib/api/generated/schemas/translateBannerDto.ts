@@ -6,13 +6,7 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export type AdminAiUsageControllerListOperation = typeof AdminAiUsageControllerListOperation[keyof typeof AdminAiUsageControllerListOperation];
-
-
-export const AdminAiUsageControllerListOperation = {
-  prompt: 'prompt',
-  description: 'description',
-  image: 'image',
-  autofill: 'autofill',
-  banner: 'banner',
-} as const;
+export interface TranslateBannerDto {
+  /** Ключ русского баннера из POST /seller/banners/ai/ru — тот, который понравился */
+  photoKey: string;
+}

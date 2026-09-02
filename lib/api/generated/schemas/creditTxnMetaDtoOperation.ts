@@ -17,4 +17,5 @@ export const CreditTxnMetaDtoOperation = {
   description: 'description',
   image: 'image',
   autofill: 'autofill',
+  banner: 'banner',
 } as const;

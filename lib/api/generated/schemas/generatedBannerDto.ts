@@ -6,13 +6,14 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export type AdminAiUsageControllerListOperation = typeof AdminAiUsageControllerListOperation[keyof typeof AdminAiUsageControllerListOperation];
-
-
-export const AdminAiUsageControllerListOperation = {
-  prompt: 'prompt',
-  description: 'description',
-  image: 'image',
-  autofill: 'autofill',
-  banner: 'banner',
-} as const;
+export interface GeneratedBannerDto {
+  /** Ключ картинки в S3 */
+  key: string;
+  /** Готовый адрес картинки */
+  url: string;
+  /**
+     * Остаток кредитов после списания. null — списания не было
+     * @nullable
+     */
+  balance: number | null;
+}

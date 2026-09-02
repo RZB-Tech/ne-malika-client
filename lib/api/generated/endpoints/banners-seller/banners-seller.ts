@@ -25,8 +25,12 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  BannerAiPriceDto,
   BannerDto,
   CreateShopBannerDto,
+  GenerateBannerDto,
+  GeneratedBannerDto,
+  TranslateBannerDto,
   UpdateShopBannerDto
 } from '../../schemas';
 
@@ -337,4 +341,226 @@ export const useSellerBannersControllerRemove = <TError = ErrorType<void>,
         TContext
       > => {
       return useMutation(getSellerBannersControllerRemoveMutationOptions(options), queryClient);
+    }
+    /**
+ * @summary Сколько стоит генерация баннера и хватает ли кредитов
+ */
+export const sellerBannerAiControllerPrice = (
+
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<BannerAiPriceDto>(
+      {url: `/api/v1/seller/banners/ai/price`, method: 'GET', signal
+    },
+      options);
+    }
+
+
+
+
+export const getSellerBannerAiControllerPriceQueryKey = () => {
+    return [
+    `/api/v1/seller/banners/ai/price`
+    ] as const;
+    }
+
+
+export const getSellerBannerAiControllerPriceQueryOptions = <TData = Awaited<ReturnType<typeof sellerBannerAiControllerPrice>>, TError = ErrorType<void>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof sellerBannerAiControllerPrice>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getSellerBannerAiControllerPriceQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof sellerBannerAiControllerPrice>>> = ({ signal }) => sellerBannerAiControllerPrice(requestOptions, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof sellerBannerAiControllerPrice>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type SellerBannerAiControllerPriceQueryResult = NonNullable<Awaited<ReturnType<typeof sellerBannerAiControllerPrice>>>
+export type SellerBannerAiControllerPriceQueryError = ErrorType<void>
+
+
+export function useSellerBannerAiControllerPrice<TData = Awaited<ReturnType<typeof sellerBannerAiControllerPrice>>, TError = ErrorType<void>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof sellerBannerAiControllerPrice>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof sellerBannerAiControllerPrice>>,
+          TError,
+          Awaited<ReturnType<typeof sellerBannerAiControllerPrice>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useSellerBannerAiControllerPrice<TData = Awaited<ReturnType<typeof sellerBannerAiControllerPrice>>, TError = ErrorType<void>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof sellerBannerAiControllerPrice>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof sellerBannerAiControllerPrice>>,
+          TError,
+          Awaited<ReturnType<typeof sellerBannerAiControllerPrice>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useSellerBannerAiControllerPrice<TData = Awaited<ReturnType<typeof sellerBannerAiControllerPrice>>, TError = ErrorType<void>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof sellerBannerAiControllerPrice>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Сколько стоит генерация баннера и хватает ли кредитов
+ */
+
+export function useSellerBannerAiControllerPrice<TData = Awaited<ReturnType<typeof sellerBannerAiControllerPrice>>, TError = ErrorType<void>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof sellerBannerAiControllerPrice>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getSellerBannerAiControllerPriceQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+/**
+ * Берёт название магазина, его разделы каталога и до трёх товаров с фотографиями. Не нравится — вызовите ещё раз, каждый вызов платный.
+ * @summary Нарисовать баннер на русском
+ */
+export const sellerBannerAiControllerGenerateRu = (
+    generateBannerDto: BodyType<GenerateBannerDto>,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<GeneratedBannerDto>(
+      {url: `/api/v1/seller/banners/ai/ru`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: generateBannerDto, signal
+    },
+      options);
+    }
+
+
+
+
+export const getSellerBannerAiControllerGenerateRuMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof sellerBannerAiControllerGenerateRu>>, TError,{data: BodyType<GenerateBannerDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof sellerBannerAiControllerGenerateRu>>, TError,{data: BodyType<GenerateBannerDto>}, TContext> => {
+
+const mutationKey = ['sellerBannerAiControllerGenerateRu'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof sellerBannerAiControllerGenerateRu>>, {data: BodyType<GenerateBannerDto>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  sellerBannerAiControllerGenerateRu(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SellerBannerAiControllerGenerateRuMutationResult = NonNullable<Awaited<ReturnType<typeof sellerBannerAiControllerGenerateRu>>>
+    export type SellerBannerAiControllerGenerateRuMutationBody = BodyType<GenerateBannerDto>
+    export type SellerBannerAiControllerGenerateRuMutationError = ErrorType<void>
+
+    /**
+ * @summary Нарисовать баннер на русском
+ */
+export const useSellerBannerAiControllerGenerateRu = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof sellerBannerAiControllerGenerateRu>>, TError,{data: BodyType<GenerateBannerDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof sellerBannerAiControllerGenerateRu>>,
+        TError,
+        {data: BodyType<GenerateBannerDto>},
+        TContext
+      > => {
+      return useMutation(getSellerBannerAiControllerGenerateRuMutationOptions(options), queryClient);
+    }
+    /**
+ * Рисует ту же картинку с узбекскими надписями: вёрстка, фон и товары остаются прежними. Вызывается после того, как русский вариант устроил.
+ * @summary Перевести принятый баннер на узбекский
+ */
+export const sellerBannerAiControllerGenerateUz = (
+    translateBannerDto: BodyType<TranslateBannerDto>,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<GeneratedBannerDto>(
+      {url: `/api/v1/seller/banners/ai/uz`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: translateBannerDto, signal
+    },
+      options);
+    }
+
+
+
+
+export const getSellerBannerAiControllerGenerateUzMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof sellerBannerAiControllerGenerateUz>>, TError,{data: BodyType<TranslateBannerDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof sellerBannerAiControllerGenerateUz>>, TError,{data: BodyType<TranslateBannerDto>}, TContext> => {
+
+const mutationKey = ['sellerBannerAiControllerGenerateUz'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof sellerBannerAiControllerGenerateUz>>, {data: BodyType<TranslateBannerDto>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  sellerBannerAiControllerGenerateUz(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SellerBannerAiControllerGenerateUzMutationResult = NonNullable<Awaited<ReturnType<typeof sellerBannerAiControllerGenerateUz>>>
+    export type SellerBannerAiControllerGenerateUzMutationBody = BodyType<TranslateBannerDto>
+    export type SellerBannerAiControllerGenerateUzMutationError = ErrorType<void>
+
+    /**
+ * @summary Перевести принятый баннер на узбекский
+ */
+export const useSellerBannerAiControllerGenerateUz = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof sellerBannerAiControllerGenerateUz>>, TError,{data: BodyType<TranslateBannerDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof sellerBannerAiControllerGenerateUz>>,
+        TError,
+        {data: BodyType<TranslateBannerDto>},
+        TContext
+      > => {
+      return useMutation(getSellerBannerAiControllerGenerateUzMutationOptions(options), queryClient);
     }

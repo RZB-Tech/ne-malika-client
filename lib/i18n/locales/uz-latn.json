@@ -560,6 +560,26 @@
         "type": "JPEG, PNG yoki WebP to‘g‘ri keladi",
         "size": "Fayl 10 MB dan katta",
         "resolution": "{sizes} o‘lchami yoki shu nisbatda karrali kattarog‘i to‘g‘ri keladi"
+      },
+      "ai": {
+        "title": "Bannerni chizdirish",
+        "hint": "Model bannerni do‘kon nomi, katalog bo‘limlari va so‘nggi mahsulotlar bo‘yicha yig‘adi. Avval ruscha variant — yoqsa, xuddi shu ko‘rinishda o‘zbekchasini tayyorlaymiz.",
+        "accent": "Banner nima haqida",
+        "accentPlaceholder": "Noutbuklar kuzgi chegirmasi",
+        "makeRu": "Ruschasini chizdirish",
+        "againRu": "Qaytadan chizdirish",
+        "makeUz": "O‘zbekchasini tayyorlash",
+        "uzLocked": "Avval ruscha bannerni chizdiring",
+        "working": "Model chizmoqda — bu bir daqiqagacha vaqt oladi",
+        "done": {
+          "ru": "Ruscha banner tayyor",
+          "uz": "O‘zbekcha variant tayyor"
+        },
+        "left": "{balance} kredit qoldi",
+        "price": "Har bir rasm uchun {price} kredit",
+        "balance": "Balans: {balance}",
+        "noCredits": "Kredit yetarli emas",
+        "failed": "Bannerni chizib bo‘lmadi"
       }
     },
     "credits": {

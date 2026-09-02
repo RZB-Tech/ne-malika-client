@@ -18,16 +18,18 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { ShopPicker } from "@/components/admin/shop-picker";
 import { useT } from "@/components/providers/i18n-provider";
-import { localeNames, locales, type Locale } from "@/lib/i18n/config";
+import { localeNames } from "@/lib/i18n/config";
 import {
   BANNER_ASPECT_CSS,
   BANNER_FORMATS_LABEL,
+  BANNER_LOCALES,
   BANNER_MIME_TYPES,
   bannerPhotoKey,
   checkBannerImage,
   expiryFromInput,
   expiryToInput,
   type Banner,
+  type BannerLocale,
 } from "@/lib/api/banners";
 import type { AdminShopRow } from "@/lib/api/types";
 import { apiErrorMessage } from "@/lib/api/errors";
@@ -46,9 +48,9 @@ interface Slot {
   preview: string;
 }
 
-type Slots = Record<Locale, Slot | null>;
+type Slots = Record<BannerLocale, Slot | null>;
 
-const EMPTY_SLOTS: Slots = { ru: null, "uz-Latn": null, "uz-Cyrl": null };
+const EMPTY_SLOTS: Slots = { ru: null, "uz-Latn": null };
 
 export function BannerFormDialog({
   target,
@@ -103,7 +105,7 @@ function FormBody({
   const objectUrls = useRef<string[]>([]);
   useEffect(() => () => objectUrls.current.forEach((url) => URL.revokeObjectURL(url)), []);
 
-  const pick = async (locale: Locale, file: File) => {
+  const pick = async (locale: BannerLocale, file: File) => {
     const problem = await checkBannerImage(file);
     if (problem) {
       toast.error(t(`admin.banners.err.${problem}`, { sizes: BANNER_FORMATS_LABEL }));
@@ -114,11 +116,11 @@ function FormBody({
     setSlots((s) => ({ ...s, [locale]: { file, preview } }));
   };
 
-  const copyToAll = (from: Locale) => {
+  const copyToAll = (from: BannerLocale) => {
     setSlots((s) => {
       const source = s[from];
       if (!source) return s;
-      return { ru: source, "uz-Latn": source, "uz-Cyrl": source };
+      return { ru: source, "uz-Latn": source };
     });
     toast.success(t("admin.banners.copiedToAll"));
   };
@@ -130,24 +132,22 @@ function FormBody({
       toast.error(t("admin.banners.needTitle"));
       return;
     }
-    if (locales.some((l) => !slots[l])) {
+    if (BANNER_LOCALES.some((l) => !slots[l])) {
       toast.error(t("admin.banners.needImages"));
       return;
     }
 
     setSaving(true);
     try {
-      const [photoRu, photoUzLatn, photoUzCyrl] = await Promise.all([
+      const [photoRu, photoUzLatn] = await Promise.all([
         resolveKey(slots.ru!),
         resolveKey(slots["uz-Latn"]!),
-        resolveKey(slots["uz-Cyrl"]!),
       ]);
 
       const data = {
         title: title.trim(),
         photoRu,
         photoUzLatn,
-        photoUzCyrl,
         linkUrl: linkUrl.trim(),
         isActive,
         shopId,
@@ -232,7 +232,7 @@ function FormBody({
 
       <div className="flex flex-col gap-3">
         <Label>{t("admin.banners.images")}</Label>
-        {locales.map((locale) => (
+        {BANNER_LOCALES.map((locale) => (
           <SlotPicker
             key={locale}
             label={localeNames[locale]}
@@ -373,11 +373,11 @@ function SlotPicker({
 }
 
 function storedSlots(banner: Banner): Slots {
-  const slot = (locale: Locale): Slot => {
+  const slot = (locale: BannerLocale): Slot => {
     const key = bannerPhotoKey(banner, locale);
     return { key, preview: photoUrl(key) ?? "" };
   };
-  return { ru: slot("ru"), "uz-Latn": slot("uz-Latn"), "uz-Cyrl": slot("uz-Cyrl") };
+  return { ru: slot("ru"), "uz-Latn": slot("uz-Latn") };
 }
 
 function resolveKey(slot: Slot): Promise<string> {

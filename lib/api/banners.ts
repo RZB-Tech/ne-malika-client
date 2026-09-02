@@ -31,12 +31,30 @@ export const BANNER_MIME_TYPES = ["image/jpeg", "image/png", "image/webp"] as co
 
 export const BANNER_MAX_BYTES = 10 * 1024 * 1024;
 
-export type BannerPhotos = Pick<PublicBannerDto, "photoRu" | "photoUzLatn" | "photoUzCyrl">;
+export type BannerPhotos = Pick<PublicBannerDto, "photoRu" | "photoUzLatn">;
 
+/**
+ * Языки, на которых баннер рисуют. Их два, тогда как языков интерфейса три:
+ * узбекская кириллица отдельной плашки не получает и показывается латиницей.
+ * Формы загрузки ходят по этому списку, а не по `locales`, — иначе продавец
+ * искал бы третий слот, которого на сервере уже нет.
+ */
+export const BANNER_LOCALES = ["ru", "uz-Latn"] as const satisfies readonly Locale[];
+
+export type BannerLocale = (typeof BANNER_LOCALES)[number];
+
+/**
+ * Картинок у баннера две, а языков интерфейса три.
+ *
+ * Отдельной плашки на узбекской кириллице не рисуют: текст акции нарисован
+ * прямо на картинке, и третий её вариант приходилось бы заказывать дизайнеру
+ * ради письменности, а не ради языка. Читателю кириллицы показываем узбекскую
+ * латиницу, а не русскую версию: язык для него важнее начертания.
+ */
 const PHOTO_FIELD: Record<Locale, keyof BannerPhotos> = {
   ru: "photoRu",
   "uz-Latn": "photoUzLatn",
-  "uz-Cyrl": "photoUzCyrl",
+  "uz-Cyrl": "photoUzLatn",
 };
 
 export function bannerPhotoKey(banner: BannerPhotos, locale: Locale): string {

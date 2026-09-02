@@ -12,7 +12,6 @@ export interface AdminBannerDto {
   title: string;
   photoRu: string;
   photoUzLatn: string;
-  photoUzCyrl: string;
   /** @nullable */
   linkUrl: string | null;
   isActive: boolean;

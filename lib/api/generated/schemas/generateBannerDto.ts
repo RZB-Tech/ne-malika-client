@@ -6,13 +6,15 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export type AdminAiUsageControllerListOperation = typeof AdminAiUsageControllerListOperation[keyof typeof AdminAiUsageControllerListOperation];
-
-
-export const AdminAiUsageControllerListOperation = {
-  prompt: 'prompt',
-  description: 'description',
-  image: 'image',
-  autofill: 'autofill',
-  banner: 'banner',
-} as const;
+export interface GenerateBannerDto {
+  /**
+     * Какие товары показать на баннере. Пусто — возьмём последние опубликованные товары магазина.
+     * @maxItems 3
+     */
+  productIds?: number[];
+  /**
+     * О чём баннер. Пусто — модель напишет текст по названию магазина и его товарам.
+     * @maxLength 200
+     */
+  accent?: string;
+}

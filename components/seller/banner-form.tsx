@@ -9,15 +9,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useT } from "@/components/providers/i18n-provider";
-import { localeNames, locales, type Locale } from "@/lib/i18n/config";
+import { localeNames } from "@/lib/i18n/config";
 import {
   BANNER_ASPECT_CSS,
   BANNER_FORMATS_LABEL,
+  BANNER_LOCALES,
   BANNER_MIME_TYPES,
   bannerPhotoKey,
   checkBannerImage,
   type Banner,
+  type BannerLocale,
 } from "@/lib/api/banners";
+import { BannerAiPanel } from "./banner-ai-panel";
 import { apiErrorMessage } from "@/lib/api/errors";
 import { photoUrl } from "@/lib/api/photo";
 import { uploadPhoto } from "@/lib/api/upload";
@@ -34,9 +37,9 @@ interface Slot {
   preview: string;
 }
 
-type Slots = Record<Locale, Slot | null>;
+type Slots = Record<BannerLocale, Slot | null>;
 
-const EMPTY_SLOTS: Slots = { ru: null, "uz-Latn": null, "uz-Cyrl": null };
+const EMPTY_SLOTS: Slots = { ru: null, "uz-Latn": null };
 
 export function BannerForm({ banner }: { banner: Banner | null }) {
   const { t } = useT();
@@ -53,7 +56,7 @@ export function BannerForm({ banner }: { banner: Banner | null }) {
   const objectUrls = useRef<string[]>([]);
   useEffect(() => () => objectUrls.current.forEach((url) => URL.revokeObjectURL(url)), []);
 
-  const pick = async (locale: Locale, file: File) => {
+  const pick = async (locale: BannerLocale, file: File) => {
     const problem = await checkBannerImage(file);
     if (problem) {
       toast.error(t(`seller.banner.err.${problem}`, { sizes: BANNER_FORMATS_LABEL }));
@@ -64,13 +67,18 @@ export function BannerForm({ banner }: { banner: Banner | null }) {
     setSlots((s) => ({ ...s, [locale]: { file, preview } }));
   };
 
-  const copyToAll = (from: Locale) => {
+  const copyToAll = (from: BannerLocale) => {
     setSlots((s) => {
       const source = s[from];
       if (!source) return s;
-      return { ru: source, "uz-Latn": source, "uz-Cyrl": source };
+      return { ru: source, "uz-Latn": source };
     });
     toast.success(t("seller.banner.copiedToAll"));
+  };
+
+  /** Нарисованное моделью уже лежит в хранилище — в слот кладём готовый ключ. */
+  const applyGenerated = (locale: BannerLocale, key: string) => {
+    setSlots((s) => ({ ...s, [locale]: { key, preview: photoUrl(key) ?? "" } }));
   };
 
   const dirty = !banner || changedFrom(banner, title, linkUrl, slots);
@@ -82,7 +90,7 @@ export function BannerForm({ banner }: { banner: Banner | null }) {
       toast.error(t("seller.banner.needTitle"));
       return;
     }
-    if (locales.some((l) => !slots[l])) {
+    if (BANNER_LOCALES.some((l) => !slots[l])) {
       toast.error(t("seller.banner.needImages"));
       return;
     }
@@ -95,7 +103,6 @@ export function BannerForm({ banner }: { banner: Banner | null }) {
         title: title.trim(),
         photoRu: keys.ru,
         photoUzLatn: keys["uz-Latn"],
-        photoUzCyrl: keys["uz-Cyrl"],
         linkUrl: linkUrl.trim(),
       };
 
@@ -108,7 +115,6 @@ export function BannerForm({ banner }: { banner: Banner | null }) {
       setSlots((s) => ({
         ru: { key: keys.ru, preview: s.ru?.preview ?? "" },
         "uz-Latn": { key: keys["uz-Latn"], preview: s["uz-Latn"]?.preview ?? "" },
-        "uz-Cyrl": { key: keys["uz-Cyrl"], preview: s["uz-Cyrl"]?.preview ?? "" },
       }));
 
       await queryClient.invalidateQueries({
@@ -151,7 +157,13 @@ export function BannerForm({ banner }: { banner: Banner | null }) {
               {t("seller.banner.hint", { sizes: BANNER_FORMATS_LABEL })}
             </p>
           </div>
-          {locales.map((locale) => (
+          <BannerAiPanel
+            currentRuKey={slots.ru?.key}
+            onGenerated={applyGenerated}
+            disabled={saving}
+          />
+
+          {BANNER_LOCALES.map((locale) => (
             <SlotPicker
               key={locale}
               label={localeNames[locale]}
@@ -276,23 +288,19 @@ function changedFrom(banner: Banner, title: string, linkUrl: string, slots: Slot
   return (
     title.trim() !== banner.title ||
     linkUrl.trim() !== (banner.linkUrl ?? "") ||
-    locales.some((l) => slots[l]?.key !== bannerPhotoKey(banner, l))
+    BANNER_LOCALES.some((l) => slots[l]?.key !== bannerPhotoKey(banner, l))
   );
 }
 
 function storedSlots(banner: Banner): Slots {
-  const slot = (locale: Locale): Slot => {
+  const slot = (locale: BannerLocale): Slot => {
     const key = bannerPhotoKey(banner, locale);
     return { key, preview: photoUrl(key) ?? "" };
   };
-  return {
-    ru: slot("ru"),
-    "uz-Latn": slot("uz-Latn"),
-    "uz-Cyrl": slot("uz-Cyrl"),
-  };
+  return { ru: slot("ru"), "uz-Latn": slot("uz-Latn") };
 }
 
-async function resolveSlotKeys(slots: Slots): Promise<Record<Locale, string>> {
+async function resolveSlotKeys(slots: Slots): Promise<Record<BannerLocale, string>> {
   const started = new Map<Slot, Promise<string>>();
 
   const keyOf = (slot: Slot): Promise<string> => {
@@ -305,11 +313,7 @@ async function resolveSlotKeys(slots: Slots): Promise<Record<Locale, string>> {
     return pending;
   };
 
-  const [ru, uzLatn, uzCyrl] = await Promise.all([
-    keyOf(slots.ru!),
-    keyOf(slots["uz-Latn"]!),
-    keyOf(slots["uz-Cyrl"]!),
-  ]);
+  const [ru, uzLatn] = await Promise.all([keyOf(slots.ru!), keyOf(slots["uz-Latn"]!)]);
 
-  return { ru, "uz-Latn": uzLatn, "uz-Cyrl": uzCyrl };
+  return { ru, "uz-Latn": uzLatn };
 }

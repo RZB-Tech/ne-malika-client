@@ -11,7 +11,6 @@ export interface PublicBannerDto {
   title: string;
   photoRu: string;
   photoUzLatn: string;
-  photoUzCyrl: string;
   /** @nullable */
   linkUrl: string | null;
 }

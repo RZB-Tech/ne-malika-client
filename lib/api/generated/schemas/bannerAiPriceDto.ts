@@ -6,13 +6,14 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export type AdminAiUsageControllerListOperation = typeof AdminAiUsageControllerListOperation[keyof typeof AdminAiUsageControllerListOperation];
-
-
-export const AdminAiUsageControllerListOperation = {
-  prompt: 'prompt',
-  description: 'description',
-  image: 'image',
-  autofill: 'autofill',
-  banner: 'banner',
-} as const;
+export interface BannerAiPriceDto {
+  /** Во сколько кредитов обойдётся одна картинка */
+  price: number;
+  /** Хватает ли кредитов и позволяет ли тариф */
+  allowed: boolean;
+  /**
+     * Доступный остаток кредитов магазина
+     * @nullable
+     */
+  balance: number | null;
+}
