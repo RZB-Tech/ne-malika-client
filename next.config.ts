@@ -8,20 +8,37 @@ import type { NextConfig } from "next";
  * открывается в iframe. DENY убил бы вход через Telegram в вебе.
  */
 
-/** Origin бэкенда: с него идут и запросы, и картинки товаров. */
-function apiOrigin(): string | null {
-  const raw = process.env.NEXT_PUBLIC_API_URL?.trim();
-  if (!raw) return null;
+function originOf(raw: string | undefined): string | null {
+  const value = raw?.trim();
+  if (!value) return null;
   try {
-    return new URL(raw).origin;
+    return new URL(value).origin;
   } catch {
     return null;
   }
 }
 
-const API = apiOrigin();
+/** Origin бэкенда: с него идут и запросы, и картинки товаров. */
+const API = originOf(process.env.NEXT_PUBLIC_API_URL);
+
+/**
+ * Хранилище — это два разных хоста, и путать их нельзя.
+ *
+ * Читаются картинки с публичного домена (NEXT_PUBLIC_S3_PUBLIC_BASE) — это
+ * img-src. Кладётся файл по presigned-форме из POST /seller/uploads, а её
+ * uploadUrl ведёт на сырой эндпоинт бакета — это connect-src. Домен для
+ * чтения в connect-src загрузку не спасёт.
+ *
+ * Значения по умолчанию боевые: список хостов CSP вшивается в сборку и
+ * окружением запущенного контейнера уже не правится, так что пустая
+ * переменная молча ломала бы прод.
+ */
+const S3_PUBLIC = originOf(process.env.NEXT_PUBLIC_S3_PUBLIC_BASE) ?? "https://static.nemalika.uz";
+const S3_UPLOAD = "https://s3.uz-2.srvstorage.uz";
 
 const TELEGRAM = "https://telegram.org";
+/** Аватарки из Telegram-логина: photo_url ведёт на t.me/i/userpic/... */
+const TME = "https://t.me";
 const METRIKA = "https://mc.yandex.ru";
 const YASTATIC = "https://yastatic.net";
 const SUGGEST = "https://suggest-maps.yandex.ru";
@@ -48,12 +65,9 @@ const scriptSrc = [
   TELEGRAM,
   METRIKA,
   YASTATIC,
-  // HMR и source maps в dev работают через eval. В прод-сборку не попадает.
   ...(DEV ? ["'unsafe-eval'"] : []),
 ];
 
-// Webvisor Метрики поднимает свой iframe; вход через Telegram открывается
-// popup'ом (window.open), а на него frame-src не распространяется.
 const frameSrc = ["'self'", METRIKA];
 
 const connectSrc = [
@@ -62,25 +76,21 @@ const connectSrc = [
   YASTATIC,
   SUGGEST,
   API,
-  // Канал дозагрузки next dev.
+  S3_UPLOAD,
   ...(DEV ? ["ws:", "http://localhost:*"] : []),
 ].filter(Boolean);
 
-const imgSrc = ["'self'", "data:", "blob:", METRIKA, API].filter(Boolean);
+const imgSrc = ["'self'", "data:", "blob:", METRIKA, API, S3_PUBLIC, TME].filter(Boolean);
 
 const csp = [
   `default-src 'self'`,
   `script-src ${scriptSrc.join(" ")}`,
-  // Tailwind и style={{...}} дают инлайновые стили — без 'unsafe-inline'
-  // страница останется без оформления.
   `style-src 'self' 'unsafe-inline'`,
   `img-src ${imgSrc.join(" ")}`,
-  // next/font кладёт шрифты Google к себе при сборке, наружу они не ходят.
   `font-src 'self' data:`,
   `connect-src ${connectSrc.join(" ")}`,
   `frame-src ${frameSrc.join(" ")}`,
   `frame-ancestors ${FRAME_ANCESTORS.join(" ")}`,
-  // sw.js для пуш-уведомлений.
   `worker-src 'self' blob:`,
   `manifest-src 'self'`,
   `base-uri 'self'`,
@@ -90,14 +100,9 @@ const csp = [
 
 const securityHeaders = [
   { key: "Content-Security-Policy", value: `${csp};` },
-  // includeSubDomains намеренно нет: под nemalika.uz живут поддомены, которые
-  // этой сборке не видны, и один не переведённый на HTTPS станет недоступен
-  // на год вперёд. Добавлять — только проверив их все.
   { key: "Strict-Transport-Security", value: "max-age=31536000" },
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-  // Камеру, микрофон и геолокацию сайт не использует — забираем их у страницы
-  // целиком, чтобы их не мог запросить чужой скрипт, если такой сюда попадёт.
   { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
   { key: "X-DNS-Prefetch-Control", value: "on" },
 ];
@@ -106,7 +111,6 @@ const nextConfig: NextConfig = {
   allowedDevOrigins: ["*.ngrok-free.dev", "*.ngrok.io", "*.trycloudflare.com"],
   distDir: process.env.NEXT_DIST_DIR || ".next",
   output: process.env.NEXT_STANDALONE === "1" ? "standalone" : undefined,
-  // Версия фреймворка в ответе нужна только тому, кто подбирает под неё эксплойт.
   poweredByHeader: false,
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
