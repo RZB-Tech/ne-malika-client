@@ -4043,6 +4043,7 @@
         "tags": ["banners-admin"]
       },
       "post": {
+        "description": "Без shopId — баннер площадки в общей карусели. С shopId баннер выдан магазину: модерацию проходить не нужно, владелец получает уведомление, а показывается такой баннер по правилам баннеров магазинов. expiresAt задаёт срок, после которого баннер скрывается сам.",
         "operationId": "AdminBannersController_create",
         "parameters": [],
         "requestBody": {
@@ -4065,6 +4066,15 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "Одна из картинок не загружена"
+          },
+          "404": {
+            "description": "Магазин не найден"
+          },
+          "409": {
+            "description": "У магазина уже есть баннер"
           }
         },
         "security": [
@@ -4072,7 +4082,7 @@
             "access-token": []
           }
         ],
-        "summary": "Добавить баннер на главную",
+        "summary": "Добавить баннер на главную или выдать его магазину",
         "tags": ["banners-admin"]
       }
     },
@@ -4119,6 +4129,7 @@
     },
     "/api/v1/admin/banners/{id}": {
       "patch": {
+        "description": "Работает и для баннеров площадки, и для выданных магазинам: так меняется срок показа (expiresAt: null снимает срок) и владелец (shopId: null возвращает баннер площадке).",
         "operationId": "AdminBannersController_update",
         "parameters": [
           {
@@ -4152,7 +4163,7 @@
             }
           },
           "404": {
-            "description": "Баннер не найден"
+            "description": "Баннер или магазин не найден"
           }
         },
         "security": [
@@ -7574,6 +7585,12 @@
             "type": "number",
             "example": 0
           },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "Срок показа: после этой метки баннер скрыт. null — бессрочно"
+          },
           "shopId": {
             "type": "number",
             "nullable": true,
@@ -7612,6 +7629,7 @@
           "linkUrl",
           "isActive",
           "sortOrder",
+          "expiresAt",
           "shopId",
           "status",
           "rejectReason",
@@ -7653,6 +7671,19 @@
             "type": "boolean",
             "default": true,
             "description": "Выключенный баннер остаётся в админке, но не показывается"
+          },
+          "shopId": {
+            "type": "number",
+            "nullable": true,
+            "example": 12,
+            "description": "Кому принадлежит баннер: id магазина — баннер выдан магазину и показывается по правилам баннеров магазинов, пусто — баннер площадки"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "example": "2026-10-01T00:00:00.000Z",
+            "description": "Когда баннер сам скроется с витрины. Пусто — показывается бессрочно. Прошедшая дата скрывает баннер сразу, из админки он не исчезает"
           },
           "sortOrder": {
             "type": "number",
@@ -7712,6 +7743,19 @@
             "type": "boolean",
             "default": true,
             "description": "Выключенный баннер остаётся в админке, но не показывается"
+          },
+          "shopId": {
+            "type": "number",
+            "nullable": true,
+            "example": 12,
+            "description": "Кому принадлежит баннер: id магазина — баннер выдан магазину и показывается по правилам баннеров магазинов, пусто — баннер площадки"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "example": "2026-10-01T00:00:00.000Z",
+            "description": "Когда баннер сам скроется с витрины. Пусто — показывается бессрочно. Прошедшая дата скрывает баннер сразу, из админки он не исчезает"
           },
           "sortOrder": {
             "type": "number",
@@ -7824,6 +7868,12 @@
             "type": "number",
             "example": 0
           },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "Срок показа: после этой метки баннер скрыт. null — бессрочно"
+          },
           "shopId": {
             "type": "number",
             "nullable": true,
@@ -7866,6 +7916,7 @@
           "linkUrl",
           "isActive",
           "sortOrder",
+          "expiresAt",
           "shopId",
           "status",
           "rejectReason",

@@ -20,8 +20,18 @@ import { useAdminMutation } from "@/components/admin/use-admin-mutation";
 import { BannerFormDialog } from "@/components/admin/banner-form-dialog";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { useT } from "@/components/providers/i18n-provider";
-import { BANNER_ASPECT_CSS, BANNER_FORMATS_LABEL, type Banner } from "@/lib/api/banners";
+import {
+  BANNER_ASPECT_CSS,
+  BANNER_FORMATS_LABEL,
+  bannerExpired,
+  type Banner,
+} from "@/lib/api/banners";
 import { photoUrl } from "@/lib/api/photo";
+import { formatDate } from "@/lib/format";
+import { cn } from "@/lib/utils";
+import type { Paginated, AdminShopRow } from "@/lib/api/types";
+import { devFallbackPage, devShops } from "@/lib/api/dev-fixtures";
+import { useAdminShopsControllerList } from "@/lib/api/generated/endpoints/shops-admin/shops-admin";
 import {
   getAdminBannersControllerFindAllQueryKey,
   useAdminBannersControllerFindAll,
@@ -31,7 +41,7 @@ import {
 } from "@/lib/api/generated/endpoints/banners-admin/banners-admin";
 
 export default function AdminBanners() {
-  const { t } = useT();
+  const { t, locale } = useT();
   const run = useAdminMutation();
 
   const [editing, setEditing] = useState<Banner | null | undefined>(undefined);
@@ -39,6 +49,17 @@ export default function AdminBanners() {
   const { data, isLoading, isError } = useAdminBannersControllerFindAll({
     query: { retry: false },
   });
+
+  const shopsQuery = useAdminShopsControllerList(
+    { limit: 100 },
+    {
+      query: {
+        select: (raw) => raw as unknown as Paginated<AdminShopRow>,
+        retry: false,
+      },
+    },
+  );
+  const shops = devFallbackPage(shopsQuery.data, devShops).data;
 
   const updateBanner = useAdminBannersControllerUpdate();
   const removeBanner = useAdminBannersControllerRemove();
@@ -146,6 +167,19 @@ export default function AdminBanners() {
                       <Badge variant="secondary">{t("admin.banners.hidden")}</Badge>
                     )}
                   </div>
+                  {banner.expiresAt && (
+                    <p
+                      className={cn(
+                        "tabular mt-1 text-xs",
+                        bannerExpired(banner) ? "text-destructive" : "text-muted-foreground",
+                      )}
+                    >
+                      {t(bannerExpired(banner) ? "admin.banners.expired" : "admin.banners.until", {
+                        date: formatDate(banner.expiresAt, locale),
+                      })}
+                    </p>
+                  )}
+
                   {banner.linkUrl ? (
                     <a
                       href={banner.linkUrl}
@@ -200,7 +234,11 @@ export default function AdminBanners() {
         </div>
       )}
 
-      <BannerFormDialog target={editing} onOpenChange={(open) => !open && setEditing(undefined)} />
+      <BannerFormDialog
+        target={editing}
+        shops={shops}
+        onOpenChange={(open) => !open && setEditing(undefined)}
+      />
     </div>
   );
 }

@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { ShopPicker } from "@/components/admin/shop-picker";
 import { useT } from "@/components/providers/i18n-provider";
 import { localeNames, locales, type Locale } from "@/lib/i18n/config";
 import {
@@ -24,13 +25,17 @@ import {
   BANNER_MIME_TYPES,
   bannerPhotoKey,
   checkBannerImage,
+  expiryFromInput,
+  expiryToInput,
   type Banner,
 } from "@/lib/api/banners";
+import type { AdminShopRow } from "@/lib/api/types";
 import { apiErrorMessage } from "@/lib/api/errors";
 import { photoUrl } from "@/lib/api/photo";
 import { uploadPhoto } from "@/lib/api/upload";
 import {
   getAdminBannersControllerFindAllQueryKey,
+  getAdminShopBannersControllerListQueryKey,
   useAdminBannersControllerCreate,
   useAdminBannersControllerUpdate,
 } from "@/lib/api/generated/endpoints/banners-admin/banners-admin";
@@ -47,23 +52,38 @@ const EMPTY_SLOTS: Slots = { ru: null, "uz-Latn": null, "uz-Cyrl": null };
 
 export function BannerFormDialog({
   target,
+  shops,
   onOpenChange,
 }: {
   target: Banner | null | undefined;
+  shops: AdminShopRow[];
   onOpenChange: (open: boolean) => void;
 }) {
   return (
     <Dialog open={target !== undefined} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
         {target !== undefined && (
-          <FormBody key={target?.id ?? "new"} banner={target} onDone={() => onOpenChange(false)} />
+          <FormBody
+            key={target?.id ?? "new"}
+            banner={target}
+            shops={shops}
+            onDone={() => onOpenChange(false)}
+          />
         )}
       </DialogContent>
     </Dialog>
   );
 }
 
-function FormBody({ banner, onDone }: { banner: Banner | null; onDone: () => void }) {
+function FormBody({
+  banner,
+  shops,
+  onDone,
+}: {
+  banner: Banner | null;
+  shops: AdminShopRow[];
+  onDone: () => void;
+}) {
   const { t } = useT();
   const queryClient = useQueryClient();
 
@@ -73,8 +93,12 @@ function FormBody({ banner, onDone }: { banner: Banner | null; onDone: () => voi
   const [title, setTitle] = useState(banner?.title ?? "");
   const [linkUrl, setLinkUrl] = useState(banner?.linkUrl ?? "");
   const [isActive, setIsActive] = useState(banner?.isActive ?? true);
+  const [shopId, setShopId] = useState<number | null>(banner?.shopId ?? null);
+  const [expiry, setExpiry] = useState(() => expiryToInput(banner?.expiresAt));
   const [slots, setSlots] = useState<Slots>(() => (banner ? storedSlots(banner) : EMPTY_SLOTS));
   const [saving, setSaving] = useState(false);
+
+  const shopName = shops.find((shop) => shop.id === shopId)?.name;
 
   const objectUrls = useRef<string[]>([]);
   useEffect(() => () => objectUrls.current.forEach((url) => URL.revokeObjectURL(url)), []);
@@ -126,6 +150,8 @@ function FormBody({ banner, onDone }: { banner: Banner | null; onDone: () => voi
         photoUzCyrl,
         linkUrl: linkUrl.trim(),
         isActive,
+        shopId,
+        expiresAt: expiry ? expiryFromInput(expiry) : null,
       };
 
       if (banner) {
@@ -134,10 +160,20 @@ function FormBody({ banner, onDone }: { banner: Banner | null; onDone: () => voi
         await createMutation.mutateAsync({ data });
       }
 
-      await queryClient.invalidateQueries({
-        queryKey: getAdminBannersControllerFindAllQueryKey(),
-      });
-      toast.success(t(banner ? "admin.banners.updated" : "admin.banners.created"));
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: getAdminBannersControllerFindAllQueryKey(),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: getAdminShopBannersControllerListQueryKey(),
+        }),
+      ]);
+      const issued = shopId !== null && (banner?.shopId ?? null) !== shopId;
+      toast.success(
+        issued
+          ? t("admin.banners.issued", { shop: shopName ?? shopId })
+          : t(banner ? "admin.banners.updated" : "admin.banners.created"),
+      );
       onDone();
     } catch (err) {
       toast.error(apiErrorMessage(err, t, "admin.banners.saveFailed"));
@@ -168,6 +204,32 @@ function FormBody({ banner, onDone }: { banner: Banner | null; onDone: () => voi
         <p className="text-xs text-muted-foreground">{t("admin.banners.nameHint")}</p>
       </div>
 
+      <div className="flex flex-col gap-1.5">
+        <div className="flex items-center justify-between gap-2">
+          <Label>{t("admin.banners.shop")}</Label>
+          {shopId !== null && (
+            <Button
+              type="button"
+              size="sm"
+              variant="ghost"
+              className="h-auto px-2 py-1 text-xs"
+              onClick={() => setShopId(null)}
+            >
+              {t("admin.banners.shopClear")}
+            </Button>
+          )}
+        </div>
+        <ShopPicker
+          shops={shops}
+          value={shopId}
+          onChange={setShopId}
+          emptyHint={t("admin.banners.noShops")}
+        />
+        <p className="text-xs text-muted-foreground">
+          {t(shopId === null ? "admin.banners.shopHintPlatform" : "admin.banners.shopHintShop")}
+        </p>
+      </div>
+
       <div className="flex flex-col gap-3">
         <Label>{t("admin.banners.images")}</Label>
         {locales.map((locale) => (
@@ -190,6 +252,30 @@ function FormBody({ banner, onDone }: { banner: Banner | null; onDone: () => voi
           placeholder="/product/12"
         />
         <p className="text-xs text-muted-foreground">{t("admin.banners.linkHint")}</p>
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        <div className="flex items-center justify-between gap-2">
+          <Label htmlFor="banner-expiry">{t("admin.banners.expiry")}</Label>
+          {expiry !== "" && (
+            <Button
+              type="button"
+              size="sm"
+              variant="ghost"
+              className="h-auto px-2 py-1 text-xs"
+              onClick={() => setExpiry("")}
+            >
+              {t("admin.banners.expiryClear")}
+            </Button>
+          )}
+        </div>
+        <Input
+          id="banner-expiry"
+          type="date"
+          value={expiry}
+          onChange={(e) => setExpiry(e.target.value)}
+        />
+        <p className="text-xs text-muted-foreground">{t("admin.banners.expiryHint")}</p>
       </div>
 
       <label className="flex cursor-pointer items-center justify-between gap-4 rounded-lg border border-border p-3">

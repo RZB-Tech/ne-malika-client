@@ -17,6 +17,11 @@ export interface BannerDto {
   linkUrl: string | null;
   isActive: boolean;
   sortOrder: number;
+  /**
+     * Срок показа: после этой метки баннер скрыт. null — бессрочно
+     * @nullable
+     */
+  expiresAt: string | null;
   /** @nullable */
   shopId: number | null;
   status: BannerDtoStatus;

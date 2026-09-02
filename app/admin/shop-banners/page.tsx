@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Check, ImagePlus, X } from "@/components/icons";
+import { Check, ImagePlus, Pencil, X } from "@/components/icons";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AdminPageHeader } from "@/components/admin/page-header";
+import { BannerFormDialog } from "@/components/admin/banner-form-dialog";
 import {
   BannerModerateDialog,
   type BannerModerationTarget,
@@ -16,9 +17,18 @@ import { BannerStatusBadge } from "@/components/shared/badges";
 import { Pagination } from "@/components/shared/pagination";
 import { useT } from "@/components/providers/i18n-provider";
 import { formatDate } from "@/lib/format";
+import { cn } from "@/lib/utils";
 import { localeShort, locales, type Locale } from "@/lib/i18n/config";
-import { BANNER_ASPECT_CSS, bannerImageUrl, type AdminBanner } from "@/lib/api/banners";
+import {
+  BANNER_ASPECT_CSS,
+  bannerExpired,
+  bannerImageUrl,
+  type AdminBanner,
+} from "@/lib/api/banners";
+import { devFallbackPage, devShops } from "@/lib/api/dev-fixtures";
+import type { AdminShopRow, Paginated } from "@/lib/api/types";
 import { useAdminShopBannersControllerList } from "@/lib/api/generated/endpoints/banners-admin/banners-admin";
+import { useAdminShopsControllerList } from "@/lib/api/generated/endpoints/shops-admin/shops-admin";
 import type { AdminShopBannersControllerListStatus } from "@/lib/api/generated/schemas";
 
 const TABS = ["pending", "approved", "rejected", "all"] as const satisfies readonly (
@@ -40,11 +50,23 @@ export default function AdminShopBanners() {
   const [tab, setTab] = useState<Tab>("pending");
   const [page, setPage] = useState(1);
   const [moderating, setModerating] = useState<BannerModerationTarget | null>(null);
+  const [editing, setEditing] = useState<AdminBanner | null | undefined>(undefined);
 
   const { data, isLoading, isError } = useAdminShopBannersControllerList(
     { page, limit: 20, status: tab === "all" ? undefined : tab },
     { query: { retry: false } },
   );
+
+  const shopsQuery = useAdminShopsControllerList(
+    { limit: 100 },
+    {
+      query: {
+        select: (raw) => raw as unknown as Paginated<AdminShopRow>,
+        retry: false,
+      },
+    },
+  );
+  const shops = devFallbackPage(shopsQuery.data, devShops).data;
 
   const banners = data?.data ?? [];
   const meta = data?.meta;
@@ -99,6 +121,7 @@ export default function AdminShopBanners() {
                 key={banner.id}
                 banner={banner}
                 locale={locale}
+                onEdit={() => setEditing(banner)}
                 onDecide={(decision) => setModerating({ banner, decision })}
               />
             ))}
@@ -114,6 +137,12 @@ export default function AdminShopBanners() {
       />
 
       <BannerModerateDialog target={moderating} onClose={() => setModerating(null)} />
+
+      <BannerFormDialog
+        target={editing}
+        shops={shops}
+        onOpenChange={(open) => !open && setEditing(undefined)}
+      />
     </div>
   );
 }
@@ -121,10 +150,12 @@ export default function AdminShopBanners() {
 function BannerCard({
   banner,
   locale,
+  onEdit,
   onDecide,
 }: {
   banner: AdminBanner;
   locale: Locale;
+  onEdit: () => void;
   onDecide: (decision: "approved" | "rejected") => void;
 }) {
   const { t } = useT();
@@ -184,6 +215,19 @@ function BannerCard({
                 })}
               </p>
             )}
+            {banner.expiresAt && (
+              <p
+                className={cn(
+                  "tabular text-xs",
+                  bannerExpired(banner) ? "text-destructive" : "text-muted-foreground",
+                )}
+              >
+                {t(
+                  bannerExpired(banner) ? "admin.shopBanners.expired" : "admin.shopBanners.until",
+                  { date: formatDate(banner.expiresAt, locale) },
+                )}
+              </p>
+            )}
             {banner.moderatedAt && (
               <p className="tabular text-xs text-muted-foreground">
                 {t("admin.shopBanners.moderatedAt", {
@@ -195,6 +239,10 @@ function BannerCard({
         </div>
 
         <div className="flex shrink-0 flex-wrap gap-2">
+          <Button size="sm" variant="ghost" className="gap-1.5" onClick={onEdit}>
+            <Pencil className="size-3.5" />
+            {t("common.edit")}
+          </Button>
           {banner.status !== "approved" && (
             <Button
               size="sm"

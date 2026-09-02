@@ -47,6 +47,29 @@ export function bannerImageUrl(banner: BannerPhotos, locale: Locale): string | n
   return photoUrl(bannerPhotoKey(banner, locale));
 }
 
+/**
+ * Срок показа хранится точкой во времени, а в админке выбирается днём:
+ * выбранный день баннер ещё отрабатывает целиком и гаснет в его конце.
+ */
+export function expiryToInput(iso: string | null | undefined): string {
+  if (!iso) return "";
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return "";
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${date.getFullYear()}-${month}-${day}`;
+}
+
+export function expiryFromInput(value: string): string | null {
+  const [year, month, day] = value.split("-").map(Number);
+  if (!year || !month || !day) return null;
+  return new Date(year, month - 1, day, 23, 59, 59, 999).toISOString();
+}
+
+export function bannerExpired(banner: { expiresAt?: string | null }): boolean {
+  return Boolean(banner.expiresAt) && new Date(banner.expiresAt!).getTime() <= Date.now();
+}
+
 export type BannerImageProblem = "type" | "size" | "resolution";
 
 export async function checkBannerImage(file: File): Promise<BannerImageProblem | null> {

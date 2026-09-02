@@ -151,7 +151,8 @@ export function useAdminBannersControllerFindAll<TData = Awaited<ReturnType<type
 
 
 /**
- * @summary Добавить баннер на главную
+ * Без shopId — баннер площадки в общей карусели. С shopId баннер выдан магазину: модерацию проходить не нужно, владелец получает уведомление, а показывается такой баннер по правилам баннеров магазинов. expiresAt задаёт срок, после которого баннер скрывается сам.
+ * @summary Добавить баннер на главную или выдать его магазину
  */
 export const adminBannersControllerCreate = (
     createBannerDto: BodyType<CreateBannerDto>,
@@ -170,7 +171,7 @@ export const adminBannersControllerCreate = (
 
 
 
-export const getAdminBannersControllerCreateMutationOptions = <TError = ErrorType<unknown>,
+export const getAdminBannersControllerCreateMutationOptions = <TError = ErrorType<void>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminBannersControllerCreate>>, TError,{data: BodyType<CreateBannerDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
 ): UseMutationOptions<Awaited<ReturnType<typeof adminBannersControllerCreate>>, TError,{data: BodyType<CreateBannerDto>}, TContext> => {
 
@@ -199,12 +200,12 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type AdminBannersControllerCreateMutationResult = NonNullable<Awaited<ReturnType<typeof adminBannersControllerCreate>>>
     export type AdminBannersControllerCreateMutationBody = BodyType<CreateBannerDto>
-    export type AdminBannersControllerCreateMutationError = ErrorType<unknown>
+    export type AdminBannersControllerCreateMutationError = ErrorType<void>
 
     /**
- * @summary Добавить баннер на главную
+ * @summary Добавить баннер на главную или выдать его магазину
  */
-export const useAdminBannersControllerCreate = <TError = ErrorType<unknown>,
+export const useAdminBannersControllerCreate = <TError = ErrorType<void>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminBannersControllerCreate>>, TError,{data: BodyType<CreateBannerDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof adminBannersControllerCreate>>,
@@ -279,6 +280,7 @@ export const useAdminBannersControllerReorder = <TError = ErrorType<void>,
       return useMutation(getAdminBannersControllerReorderMutationOptions(options), queryClient);
     }
     /**
+ * Работает и для баннеров площадки, и для выданных магазинам: так меняется срок показа (expiresAt: null снимает срок) и владелец (shopId: null возвращает баннер площадке).
  * @summary Изменить баннер
  */
 export const adminBannersControllerUpdate = (
