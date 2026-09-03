@@ -37,8 +37,15 @@ const S3_PUBLIC = originOf(process.env.NEXT_PUBLIC_S3_PUBLIC_BASE) ?? "https://s
 const S3_UPLOAD = "https://s3.uz-2.srvstorage.uz";
 
 const TELEGRAM = "https://telegram.org";
-/** Аватарки из Telegram-логина: photo_url ведёт на t.me/i/userpic/... */
+/** Аватарки из Telegram-логина: photo_url ведёт на t.me/i/userpic/..., откуда идёт 302-редирект на CDN telesco.pe */
 const TME = "https://t.me";
+const TELEGRAM_CDN = [
+  "https://*.telesco.pe",
+  "https://telesco.pe",
+  "https://*.telegram.org",
+  "https://*.cdn-telegram.org",
+  "https://cdn-telegram.org",
+];
 const METRIKA = "https://mc.yandex.ru";
 const YASTATIC = "https://yastatic.net";
 const SUGGEST = "https://suggest-maps.yandex.ru";
@@ -80,7 +87,16 @@ const connectSrc = [
   ...(DEV ? ["ws:", "http://localhost:*"] : []),
 ].filter(Boolean);
 
-const imgSrc = ["'self'", "data:", "blob:", METRIKA, API, S3_PUBLIC, TME].filter(Boolean);
+const imgSrc = [
+  "'self'",
+  "data:",
+  "blob:",
+  METRIKA,
+  API,
+  S3_PUBLIC,
+  TME,
+  ...TELEGRAM_CDN,
+].filter(Boolean);
 
 const csp = [
   `default-src 'self'`,

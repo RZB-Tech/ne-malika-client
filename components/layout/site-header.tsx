@@ -108,11 +108,11 @@ export function SiteHeader() {
   const { user, isAuthenticated, isHydrated } = useAuth();
   const { roots } = useCategories();
   const [isCompact, setIsCompact] = useState(false);
-  const username = user?.telegramUsername as string | null | undefined;
-  const photo = user?.telegramPhoto as string | null | undefined;
-  const accountLabel = username
-    ? `@${username}`
-    : user?.fullname.trim().split(/\s+/)[0] || t("nav.account");
+  const username = (user?.telegramUsername as string | null | undefined)?.replace(/^@/, "");
+  const rawPhoto = user?.telegramPhoto as unknown;
+  const photo = typeof rawPhoto === "string" && rawPhoto.length > 0 ? rawPhoto : null;
+  const accountLabel =
+    user?.fullname?.trim().split(/\s+/)[0] || username || t("nav.account");
 
   useEffect(() => {
     let animationFrame = 0;
