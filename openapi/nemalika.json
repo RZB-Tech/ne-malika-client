@@ -1236,8 +1236,6 @@
               "default": "newest",
               "type": "string",
               "enum": [
-                "price_asc",
-                "price_desc",
                 "newest",
                 "random"
               ]

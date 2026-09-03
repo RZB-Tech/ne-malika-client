@@ -10,8 +10,6 @@ export type ProductCardsControllerFindAllSort = typeof ProductCardsControllerFin
 
 
 export const ProductCardsControllerFindAllSort = {
-  price_asc: 'price_asc',
-  price_desc: 'price_desc',
   newest: 'newest',
   random: 'random',
 } as const;

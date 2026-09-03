@@ -8,7 +8,6 @@ import { PageContainer } from "@/components/layout/page-container";
 import { StatusPanel } from "@/components/shared/status-panel";
 import { ProductCard } from "@/components/product/product-card";
 import { ProductGrid, ProductGridSkeleton } from "@/components/product/product-grid";
-import { CatalogToolbar } from "./catalog-toolbar";
 import { useCatalogFilters } from "./use-catalog-filters";
 import { useT } from "@/components/providers/i18n-provider";
 import { findCategory, useCategories } from "@/lib/api/categories";
@@ -40,8 +39,6 @@ export function CatalogView({
     category,
     setCategory,
     subCategoryId,
-    sort,
-    setSort,
   } = useCatalogFilters();
 
   const [seed] = useState(() => initialSeed ?? randomCatalogSeed());
@@ -51,22 +48,13 @@ export function CatalogView({
       limit: PAGE_SIZE,
       q: q || undefined,
       ...(subCategoryId ? { category_id: subCategoryId } : category ? { category } : {}),
-      // Порядок по умолчанию: без запроса — вперемешку с постоянным зерном,
-      // с запросом — по новизне. Явный выбор пользователя это правило отменяет.
-      ...(sort !== "default"
-        ? { sort }
-        : q
-          ? { sort: "newest" as const }
-          : { sort: "random" as const, seed }),
+      // Без поискового запроса товары идут вперемешку с постоянным зерном, с запросом — по новизне
+      ...(q ? { sort: "newest" as const } : { sort: "random" as const, seed }),
     }),
-    [q, category, subCategoryId, sort, seed],
+    [q, category, subCategoryId, seed],
   );
 
-  const isInitialParams =
-    !q &&
-    !category &&
-    subCategoryId == null &&
-    sort === "default";
+  const isInitialParams = !q && !category && subCategoryId == null;
 
   const listQuery = useInfiniteQuery({
     queryKey: ["/api/v1/product-cards", "infinite", params] as const,
@@ -94,7 +82,7 @@ export function CatalogView({
     [data],
   );
 
-  const filterKey = `${q}|${category}|${subCategoryId}|${sort}`;
+  const filterKey = `${q}|${category}|${subCategoryId}`;
   const [autoLoads, setAutoLoads] = useState(0);
   const [prevFilterKey, setPrevFilterKey] = useState(filterKey);
   if (filterKey !== prevFilterKey) {
@@ -146,12 +134,6 @@ export function CatalogView({
           </button>
         </div>
       )}
-
-      <CatalogToolbar
-        className="mb-6"
-        sort={sort}
-        onSortChange={setSort}
-      />
 
       {isError ? (
         <StatusPanel

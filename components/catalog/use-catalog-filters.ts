@@ -3,15 +3,6 @@
 import { useCallback, useMemo } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-/**
- * default — порядок, который витрина выбирает сама: без запроса товары идут
- * вперемешку, с запросом — по новизне. Явный выбор пользователя это правило
- * отменяет.
- */
-export const CATALOG_SORTS = ["default", "newest", "price_asc", "price_desc"] as const;
-
-export type CatalogSort = (typeof CATALOG_SORTS)[number];
-
 export function useCatalogFilters() {
   const router = useRouter();
   const pathname = usePathname();
@@ -21,11 +12,6 @@ export function useCatalogFilters() {
   const category = searchParams.get("category")?.trim() || null;
   const subParam = searchParams.get("sub");
   const subCategoryId = subParam ? Number(subParam) : null;
-
-  const sortParam = searchParams.get("sort");
-  const sort: CatalogSort = CATALOG_SORTS.includes(sortParam as CatalogSort)
-    ? (sortParam as CatalogSort)
-    : "default";
 
   const setParams = useCallback(
     (patch: Record<string, string | null>) => {
@@ -52,11 +38,6 @@ export function useCatalogFilters() {
     [setParams],
   );
 
-  const setSort = useCallback(
-    (value: CatalogSort) => setParams({ sort: value === "default" ? null : value }),
-    [setParams],
-  );
-
   return useMemo(
     () => ({
       q,
@@ -64,9 +45,7 @@ export function useCatalogFilters() {
       setCategory,
       subCategoryId,
       setSubCategory,
-      sort,
-      setSort,
     }),
-    [q, category, setCategory, subCategoryId, setSubCategory, sort, setSort],
+    [q, category, setCategory, subCategoryId, setSubCategory],
   );
 }
