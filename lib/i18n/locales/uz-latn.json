@@ -1064,7 +1064,8 @@
         "prompt": "Foto bo‘yicha prompt",
         "description": "Tavsifni tahrirlash",
         "image": "Rasm generatsiyasi",
-        "autofill": "Kartochkani to‘ldirish"
+        "autofill": "Kartochkani to‘ldirish",
+        "banner": "Banner yaratish"
       },
       "colUser": "Kim",
       "colShop": "Do‘kon",
@@ -1088,7 +1089,21 @@
       "freeBadge": "obuna bo‘yicha bepul",
       "freeQuota": "oylik norma hisobidan",
       "freeUnlimited": "tarif cheklovsizligi hisobidan",
-      "spentHint": "«Pullik so‘rovlar sarfi» — kreditlar yechilgan qism: marja shunga qarshi hisoblanadi. OpenRouter’dagi to‘liq sarf — uch cho‘ntakning yig‘indisi."
+      "spentHint": "«Pullik so‘rovlar sarfi» — kreditlar yechilgan qism: marja shunga qarshi hisoblanadi. OpenRouter’dagi to‘liq sarf — uch cho‘ntakning yig‘indisi.",
+      "searchPlaceholder": "Foydalanuvchi, do‘kon, model bo‘yicha qidiruv...",
+      "filterPlatform": "Platforma xarajati",
+      "resetFilters": "Filtrlarni tozalash",
+      "foundTotal": "Topilgan yozuvlar: {count}",
+      "periodLabel": "Davr",
+      "periodAll": "Barcha vaqt",
+      "periodToday": "Bugun",
+      "period7d": "7 kun",
+      "period30d": "30 kun",
+      "sortLabel": "Saralash",
+      "sortNewest": "Avval yangilari",
+      "sortOldest": "Avval eskilari",
+      "sortCostDesc": "Qimmatroqlari ($)",
+      "sortCreditsDesc": "Kreditlar bo‘yicha"
     },
     "settings": {
       "subtitle": "Platforma sozlamalari. Barcha sotuvchilar uchun darhol qo‘llanadi.",

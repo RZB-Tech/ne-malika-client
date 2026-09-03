@@ -192,7 +192,7 @@ export interface SubscriptionPaymentRow {
 
 export interface AiUsageRow {
   id: number;
-  operation: "prompt" | "description" | "image" | "autofill";
+  operation: "prompt" | "description" | "image" | "autofill" | "banner";
   model: string | null;
   images: number;
   usd: number | null;

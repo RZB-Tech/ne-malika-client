@@ -2326,6 +2326,24 @@
             }
           },
           {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "description": "Поисковый запрос (пользователь, @username, магазин, модель)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "model",
+            "required": false,
+            "in": "query",
+            "description": "Модель нейросети",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "shopId",
             "required": false,
             "in": "query",
@@ -2363,10 +2381,69 @@
             "name": "free",
             "required": false,
             "in": "query",
-            "description": "true — только бесплатные по подписке, false — только те, за которые списаны кредиты. Запросы администратора не бесплатные: у них нет магазина, ищите их по shopId",
+            "description": "true — только бесплатные по подписке, false — только те, за которые списаны кредиты.",
             "schema": {
               "example": true,
               "type": "boolean"
+            }
+          },
+          {
+            "name": "platform",
+            "required": false,
+            "in": "query",
+            "description": "true — только расходы платформы (без привязки к магазину)",
+            "schema": {
+              "example": true,
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "description": "Быстрый фильтр периода",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "all",
+                "today",
+                "7d",
+                "30d"
+              ]
+            }
+          },
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "description": "Начальная дата периода, YYYY-MM-DD",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": false,
+            "in": "query",
+            "description": "Конечная дата периода, YYYY-MM-DD",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "required": false,
+            "in": "query",
+            "description": "Сортировка",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "newest",
+                "oldest",
+                "cost_desc",
+                "cost_asc",
+                "credits_desc"
+              ]
             }
           }
         ],

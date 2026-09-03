@@ -1,9 +1,19 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { RotateCcw, Search, X } from "@/components/icons";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -22,25 +32,57 @@ import {
 } from "@/lib/api/generated/endpoints/ai-usage-admin/ai-usage-admin";
 import { devAiUsage, devFallbackPage, usingDevData } from "@/lib/api/dev-fixtures";
 import type { AiUsageRow, AiUsageTotals, Paginated } from "@/lib/api/types";
+import type {
+  AdminAiUsageControllerListOperation,
+  AdminAiUsageControllerListPeriod,
+  AdminAiUsageControllerListSort,
+} from "@/lib/api/generated/schemas";
 
-const OPERATIONS = ["prompt", "description", "image", "autofill"] as const;
-type Operation = (typeof OPERATIONS)[number];
+const OPERATIONS: AdminAiUsageControllerListOperation[] = [
+  "prompt",
+  "description",
+  "image",
+  "autofill",
+  "banner",
+];
 
-const PAYERS = ["free", "paid"] as const;
-type Payer = (typeof PAYERS)[number];
+type Payer = "all" | "free" | "paid" | "platform";
 
 export default function AdminAiUsage() {
   const { t, locale } = useT();
   const [page, setPage] = useState(1);
-  const [operation, setOperation] = useState<Operation | null>(null);
-  const [payer, setPayer] = useState<Payer | null>(null);
+  const [q, setQ] = useState("");
+  const [operation, setOperation] = useState<AdminAiUsageControllerListOperation | null>(null);
+  const [payer, setPayer] = useState<Payer>("all");
+  const [period, setPeriod] = useState<AdminAiUsageControllerListPeriod>("all");
+  const [sort, setSort] = useState<AdminAiUsageControllerListSort>("newest");
+
+  const hasActiveFilters =
+    Boolean(q.trim()) ||
+    operation !== null ||
+    payer !== "all" ||
+    period !== "all" ||
+    sort !== "newest";
+
+  const resetAllFilters = () => {
+    setQ("");
+    setOperation(null);
+    setPayer("all");
+    setPeriod("all");
+    setSort("newest");
+    setPage(1);
+  };
 
   const { data, isLoading, isError } = useAdminAiUsageControllerList(
     {
       page,
       limit: 20,
+      q: q.trim() || undefined,
       operation: operation ?? undefined,
-      free: payer === null ? undefined : payer === "free",
+      free: payer === "free" ? true : payer === "paid" ? false : undefined,
+      platform: payer === "platform" ? true : undefined,
+      period: period === "all" ? undefined : period,
+      sort: sort === "newest" ? undefined : sort,
     },
     {
       query: {
@@ -56,13 +98,24 @@ export default function AdminAiUsage() {
   const totals = totalsQuery.data as unknown as AiUsageTotals | undefined;
 
   const pageData = useMemo(() => {
-    const fixtures = devAiUsage.filter(
-      (r) =>
-        (!operation || r.operation === operation) &&
-        (payer === null || Boolean(r.free) === (payer === "free")),
-    );
+    const fixtures = devAiUsage.filter((r) => {
+      if (operation && r.operation !== operation) return false;
+      if (payer === "free" && !r.free) return false;
+      if (payer === "paid" && (r.free || !r.shopId)) return false;
+      if (payer === "platform" && r.shopId) return false;
+      if (q.trim()) {
+        const query = q.trim().toLowerCase();
+        const matchesUser = (r.userName ?? "").toLowerCase().includes(query);
+        const matchesUsername = (r.userUsername ?? "").toLowerCase().includes(query);
+        const matchesShop = (r.shopName ?? "").toLowerCase().includes(query);
+        const matchesModel = (r.model ?? "").toLowerCase().includes(query);
+        if (!matchesUser && !matchesUsername && !matchesShop && !matchesModel) return false;
+      }
+      return true;
+    });
     return devFallbackPage(data, fixtures);
-  }, [data, operation, payer]);
+  }, [data, operation, payer, q]);
+
   const rows = pageData.data;
   const isDevData = usingDevData(data?.data);
 
@@ -76,7 +129,7 @@ export default function AdminAiUsage() {
     <div className="flex flex-col gap-6">
       <AdminPageHeader title={t("admin.aiUsage.title")} subtitle={t("admin.aiUsage.subtitle")} />
 
-      {}
+      {/* Основные показатели */}
       <div className="grid gap-3 sm:grid-cols-4">
         <StatCard
           label={t("admin.aiUsage.statRequests")}
@@ -100,7 +153,7 @@ export default function AdminAiUsage() {
         />
       </div>
 
-      {}
+      {/* Разбивка расходов */}
       <div className="grid gap-3 sm:grid-cols-3">
         <StatCard
           label={t("admin.aiUsage.statSpentFree")}
@@ -123,56 +176,165 @@ export default function AdminAiUsage() {
 
       <p className="text-xs text-muted-foreground">{t("admin.aiUsage.spentHint")}</p>
 
-      <div className="flex flex-col gap-2">
-        <div className="flex flex-wrap gap-2">
-          <FilterChip
-            active={operation === null}
-            onClick={() => {
-              setOperation(null);
-              setPage(1);
-            }}
-          >
-            {t("admin.aiUsage.filterAll")}
-          </FilterChip>
-          {OPERATIONS.map((op) => (
-            <FilterChip
-              key={op}
-              active={operation === op}
-              onClick={() => {
-                setOperation(op);
+      {/* Панель поиска и фильтров */}
+      <Card className="flex flex-col gap-4 p-4">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          {/* Поле поиска */}
+          <div className="relative min-w-[280px] flex-1">
+            <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              value={q}
+              onChange={(e) => {
+                setQ(e.target.value);
+                setPage(1);
+              }}
+              placeholder={t("admin.aiUsage.searchPlaceholder")}
+              className="pr-9 pl-9"
+            />
+            {q && (
+              <button
+                type="button"
+                onClick={() => {
+                  setQ("");
+                  setPage(1);
+                }}
+                className="absolute top-1/2 right-2.5 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
+                <X className="size-4" />
+              </button>
+            )}
+          </div>
+
+          {/* Выпадающие списки: период и сортировка */}
+          <div className="flex flex-wrap items-center gap-2">
+            <Select
+              value={period}
+              onValueChange={(val) => {
+                setPeriod(val as AdminAiUsageControllerListPeriod);
                 setPage(1);
               }}
             >
-              {t(`admin.aiUsage.op.${op}`)}
-            </FilterChip>
-          ))}
+              <SelectTrigger className="h-9 w-[140px] text-xs">
+                <SelectValue placeholder={t("admin.aiUsage.periodLabel")} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t("admin.aiUsage.periodAll")}</SelectItem>
+                <SelectItem value="today">{t("admin.aiUsage.periodToday")}</SelectItem>
+                <SelectItem value="7d">{t("admin.aiUsage.period7d")}</SelectItem>
+                <SelectItem value="30d">{t("admin.aiUsage.period30d")}</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select
+              value={sort}
+              onValueChange={(val) => {
+                setSort(val as AdminAiUsageControllerListSort);
+                setPage(1);
+              }}
+            >
+              <SelectTrigger className="h-9 w-[170px] text-xs">
+                <SelectValue placeholder={t("admin.aiUsage.sortLabel")} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="newest">{t("admin.aiUsage.sortNewest")}</SelectItem>
+                <SelectItem value="oldest">{t("admin.aiUsage.sortOldest")}</SelectItem>
+                <SelectItem value="cost_desc">{t("admin.aiUsage.sortCostDesc")}</SelectItem>
+                <SelectItem value="credits_desc">{t("admin.aiUsage.sortCreditsDesc")}</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {hasActiveFilters && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={resetAllFilters}
+                className="h-9 gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+              >
+                <RotateCcw className="size-3.5" />
+                {t("admin.aiUsage.resetFilters")}
+              </Button>
+            )}
+          </div>
         </div>
 
-        {}
-        <div className="flex flex-wrap gap-2">
-          <FilterChip
-            active={payer === null}
-            onClick={() => {
-              setPayer(null);
-              setPage(1);
-            }}
-          >
-            {t("admin.aiUsage.filterAll")}
-          </FilterChip>
-          {PAYERS.map((p) => (
+        {/* Чипы фильтрации по операциям и типу списания */}
+        <div className="flex flex-col gap-2.5 border-t border-border/60 pt-3">
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="mr-1 text-xs font-medium text-muted-foreground">
+              {t("admin.aiUsage.colOperation")}:
+            </span>
             <FilterChip
-              key={p}
-              active={payer === p}
+              active={operation === null}
               onClick={() => {
-                setPayer(p);
+                setOperation(null);
                 setPage(1);
               }}
             >
-              {p === "free" ? t("admin.aiUsage.filterFree") : t("admin.aiUsage.filterPaid")}
+              {t("admin.aiUsage.filterAll")}
             </FilterChip>
-          ))}
+            {OPERATIONS.map((op) => (
+              <FilterChip
+                key={op}
+                active={operation === op}
+                onClick={() => {
+                  setOperation(op);
+                  setPage(1);
+                }}
+              >
+                {t(`admin.aiUsage.op.${op}`)}
+              </FilterChip>
+            ))}
+          </div>
+
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="mr-1 text-xs font-medium text-muted-foreground">
+              {t("admin.aiUsage.colCost")}:
+            </span>
+            <FilterChip
+              active={payer === "all"}
+              onClick={() => {
+                setPayer("all");
+                setPage(1);
+              }}
+            >
+              {t("admin.aiUsage.filterAll")}
+            </FilterChip>
+            <FilterChip
+              active={payer === "free"}
+              onClick={() => {
+                setPayer("free");
+                setPage(1);
+              }}
+            >
+              {t("admin.aiUsage.filterFree")}
+            </FilterChip>
+            <FilterChip
+              active={payer === "paid"}
+              onClick={() => {
+                setPayer("paid");
+                setPage(1);
+              }}
+            >
+              {t("admin.aiUsage.filterPaid")}
+            </FilterChip>
+            <FilterChip
+              active={payer === "platform"}
+              onClick={() => {
+                setPayer("platform");
+                setPage(1);
+              }}
+            >
+              {t("admin.aiUsage.filterPlatform")}
+            </FilterChip>
+          </div>
         </div>
-      </div>
+
+        {/* Счётчик найденных строк */}
+        <div className="flex items-center justify-between text-xs text-muted-foreground">
+          <span>{t("admin.aiUsage.foundTotal", { count: pageData.meta.total })}</span>
+        </div>
+      </Card>
 
       {isError && !isDevData && (
         <Card className="border-destructive/40 bg-destructive/5 p-4 text-sm">
@@ -186,6 +348,7 @@ export default function AdminAiUsage() {
         </Card>
       )}
 
+      {/* Таблица результатов */}
       <Card className="overflow-hidden p-0">
         <div className="overflow-x-auto">
           <Table>
@@ -229,16 +392,25 @@ export default function AdminAiUsage() {
                         )}
                       </TableCell>
                       <TableCell className="text-sm">
-                        {t(`admin.aiUsage.op.${r.operation}`)}
-                        {r.images > 0 && (
-                          <span className="tabular text-muted-foreground"> ×{r.images}</span>
+                        <div className="flex items-center gap-1.5">
+                          <span>{t(`admin.aiUsage.op.${r.operation}`)}</span>
+                          {r.images > 0 && (
+                            <Badge variant="secondary" className="px-1.5 py-0 text-[11px] tabular">
+                              ×{r.images}
+                            </Badge>
+                          )}
+                        </div>
+                        {r.model && (
+                          <div className="font-mono text-[11px] text-muted-foreground">
+                            {r.model}
+                          </div>
                         )}
                       </TableCell>
                       <TableCell className="tabular text-right text-sm text-muted-foreground">
                         {r.usd === null ? t("admin.aiUsage.costUnknown") : `$${r.usd.toFixed(4)}`}
                       </TableCell>
                       <TableCell className="text-right text-sm">
-                        <span className="tabular">
+                        <span className="tabular font-medium">
                           {r.credits}
                           {r.estimated && (
                             <span
@@ -249,7 +421,6 @@ export default function AdminAiUsage() {
                             </span>
                           )}
                         </span>
-                        {}
                         {r.free && (
                           <div className="mt-0.5 text-xs font-normal text-primary">
                             {t("admin.aiUsage.freeBadge")}
@@ -326,8 +497,8 @@ function FilterChip({
       onClick={onClick}
       className={
         active
-          ? "rounded-full bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground"
-          : "rounded-full bg-muted px-3 py-1.5 text-sm text-muted-foreground hover:bg-muted/70"
+          ? "rounded-full bg-primary px-2.5 py-1 text-xs font-medium text-primary-foreground shadow-xs transition-colors"
+          : "rounded-full bg-muted px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted/80 hover:text-foreground"
       }
     >
       {children}

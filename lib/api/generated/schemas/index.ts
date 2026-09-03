@@ -13,6 +13,8 @@ export * from './addFavoriteDto';
 export * from './adminActivityDto';
 export * from './adminAiUsageControllerListOperation';
 export * from './adminAiUsageControllerListParams';
+export * from './adminAiUsageControllerListPeriod';
+export * from './adminAiUsageControllerListSort';
 export * from './adminBannerDto';
 export * from './adminBannerDtoStatus';
 export * from './adminBroadcastsControllerCountAudience';

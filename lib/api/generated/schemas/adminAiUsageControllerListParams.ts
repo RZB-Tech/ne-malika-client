@@ -6,6 +6,8 @@
  * OpenAPI spec version: 1.0.0
  */
 import type { AdminAiUsageControllerListOperation } from './adminAiUsageControllerListOperation';
+import type { AdminAiUsageControllerListPeriod } from './adminAiUsageControllerListPeriod';
+import type { AdminAiUsageControllerListSort } from './adminAiUsageControllerListSort';
 
 export type AdminAiUsageControllerListParams = {
 /**
@@ -20,6 +22,14 @@ page?: number;
  */
 limit?: number;
 /**
+ * Поисковый запрос (пользователь, @username, магазин, модель)
+ */
+q?: string;
+/**
+ * Модель нейросети
+ */
+model?: string;
+/**
  * Только по одному магазину
  */
 shopId?: number;
@@ -32,7 +42,27 @@ userId?: number;
  */
 operation?: AdminAiUsageControllerListOperation;
 /**
- * true — только бесплатные по подписке, false — только те, за которые списаны кредиты. Запросы администратора не бесплатные: у них нет магазина, ищите их по shopId
+ * true — только бесплатные по подписке, false — только те, за которые списаны кредиты.
  */
 free?: boolean;
+/**
+ * true — только расходы платформы (без привязки к магазину)
+ */
+platform?: boolean;
+/**
+ * Быстрый фильтр периода
+ */
+period?: AdminAiUsageControllerListPeriod;
+/**
+ * Начальная дата периода, YYYY-MM-DD
+ */
+from?: string;
+/**
+ * Конечная дата периода, YYYY-MM-DD
+ */
+to?: string;
+/**
+ * Сортировка
+ */
+sort?: AdminAiUsageControllerListSort;
 };
