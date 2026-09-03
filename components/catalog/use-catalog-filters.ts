@@ -2,7 +2,6 @@
 
 import { useCallback, useMemo } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import type { ProductState } from "@/lib/api/types";
 
 /**
  * default — порядок, который витрина выбирает сама: без запроса товары идут
@@ -13,18 +12,6 @@ export const CATALOG_SORTS = ["default", "newest", "price_asc", "price_desc"] as
 
 export type CatalogSort = (typeof CATALOG_SORTS)[number];
 
-export interface CatalogFilterValues {
-  priceMin: number | null;
-  priceMax: number | null;
-  state: ProductState | null;
-}
-
-function parsePrice(raw: string | null): number | null {
-  if (!raw) return null;
-  const value = Number(raw);
-  return Number.isFinite(value) && value >= 0 ? value : null;
-}
-
 export function useCatalogFilters() {
   const router = useRouter();
   const pathname = usePathname();
@@ -34,13 +21,6 @@ export function useCatalogFilters() {
   const category = searchParams.get("category")?.trim() || null;
   const subParam = searchParams.get("sub");
   const subCategoryId = subParam ? Number(subParam) : null;
-
-  const priceMin = parsePrice(searchParams.get("min"));
-  const priceMax = parsePrice(searchParams.get("max"));
-
-  const stateParam = searchParams.get("state");
-  const state: ProductState | null =
-    stateParam === "new" || stateParam === "old" ? stateParam : null;
 
   const sortParam = searchParams.get("sort");
   const sort: CatalogSort = CATALOG_SORTS.includes(sortParam as CatalogSort)
@@ -77,26 +57,6 @@ export function useCatalogFilters() {
     [setParams],
   );
 
-  const setFilters = useCallback(
-    (values: CatalogFilterValues) =>
-      setParams({
-        min: values.priceMin === null ? null : String(values.priceMin),
-        max: values.priceMax === null ? null : String(values.priceMax),
-        state: values.state,
-      }),
-    [setParams],
-  );
-
-  const resetFilters = useCallback(
-    () => setParams({ min: null, max: null, state: null }),
-    [setParams],
-  );
-
-  // Считаем только то, что задал пользователь в панели фильтров: категория
-  // и запрос видны на экране сами по себе, дублировать их счётчиком незачем.
-  const activeCount =
-    (priceMin !== null ? 1 : 0) + (priceMax !== null ? 1 : 0) + (state !== null ? 1 : 0);
-
   return useMemo(
     () => ({
       q,
@@ -104,29 +64,9 @@ export function useCatalogFilters() {
       setCategory,
       subCategoryId,
       setSubCategory,
-      priceMin,
-      priceMax,
-      state,
       sort,
       setSort,
-      setFilters,
-      resetFilters,
-      activeCount,
     }),
-    [
-      q,
-      category,
-      setCategory,
-      subCategoryId,
-      setSubCategory,
-      priceMin,
-      priceMax,
-      state,
-      sort,
-      setSort,
-      setFilters,
-      resetFilters,
-      activeCount,
-    ],
+    [q, category, setCategory, subCategoryId, setSubCategory, sort, setSort],
   );
 }

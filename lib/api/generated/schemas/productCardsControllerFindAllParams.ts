@@ -6,7 +6,6 @@
  * OpenAPI spec version: 1.0.0
  */
 import type { ProductCardsControllerFindAllSort } from './productCardsControllerFindAllSort';
-import type { ProductCardsControllerFindAllState } from './productCardsControllerFindAllState';
 
 export type ProductCardsControllerFindAllParams = {
 /**
@@ -28,15 +27,6 @@ ids?: string[];
  * Текстовый поиск по name/description
  */
 q?: string;
-/**
- * @minimum 0
- */
-price_min?: number;
-/**
- * @minimum 0
- */
-price_max?: number;
-state?: ProductCardsControllerFindAllState;
 shop_id?: number;
 /**
  * id категории; товары подкатегорий тоже попадут в выдачу

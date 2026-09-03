@@ -1199,38 +1199,6 @@
             }
           },
           {
-            "name": "price_min",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "minimum": 0,
-              "example": 100,
-              "type": "number"
-            }
-          },
-          {
-            "name": "price_max",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "minimum": 0,
-              "example": 1500,
-              "type": "number"
-            }
-          },
-          {
-            "name": "state",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "new",
-                "old"
-              ]
-            }
-          },
-          {
             "name": "shop_id",
             "required": false,
             "in": "query",

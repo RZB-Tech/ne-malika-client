@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { Loader2, RefreshCw, RotateCcw, SearchX, TriangleAlert, X } from "@/components/icons";
+import { Loader2, RefreshCw, SearchX, TriangleAlert, X } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { PageContainer } from "@/components/layout/page-container";
 import { StatusPanel } from "@/components/shared/status-panel";
@@ -40,14 +40,8 @@ export function CatalogView({
     category,
     setCategory,
     subCategoryId,
-    priceMin,
-    priceMax,
-    state,
     sort,
     setSort,
-    setFilters,
-    resetFilters,
-    activeCount,
   } = useCatalogFilters();
 
   const [seed] = useState(() => initialSeed ?? randomCatalogSeed());
@@ -57,9 +51,6 @@ export function CatalogView({
       limit: PAGE_SIZE,
       q: q || undefined,
       ...(subCategoryId ? { category_id: subCategoryId } : category ? { category } : {}),
-      ...(priceMin === null ? {} : { price_min: priceMin }),
-      ...(priceMax === null ? {} : { price_max: priceMax }),
-      ...(state ? { state } : {}),
       // Порядок по умолчанию: без запроса — вперемешку с постоянным зерном,
       // с запросом — по новизне. Явный выбор пользователя это правило отменяет.
       ...(sort !== "default"
@@ -68,16 +59,13 @@ export function CatalogView({
           ? { sort: "newest" as const }
           : { sort: "random" as const, seed }),
     }),
-    [q, category, subCategoryId, priceMin, priceMax, state, sort, seed],
+    [q, category, subCategoryId, sort, seed],
   );
 
   const isInitialParams =
     !q &&
     !category &&
     subCategoryId == null &&
-    priceMin === null &&
-    priceMax === null &&
-    state === null &&
     sort === "default";
 
   const listQuery = useInfiniteQuery({
@@ -106,7 +94,7 @@ export function CatalogView({
     [data],
   );
 
-  const filterKey = `${q}|${category}|${subCategoryId}|${priceMin}|${priceMax}|${state}|${sort}`;
+  const filterKey = `${q}|${category}|${subCategoryId}|${sort}`;
   const [autoLoads, setAutoLoads] = useState(0);
   const [prevFilterKey, setPrevFilterKey] = useState(filterKey);
   if (filterKey !== prevFilterKey) {
@@ -161,11 +149,7 @@ export function CatalogView({
 
       <CatalogToolbar
         className="mb-6"
-        values={{ priceMin, priceMax, state }}
         sort={sort}
-        activeCount={activeCount}
-        onApply={setFilters}
-        onReset={resetFilters}
         onSortChange={setSort}
       />
 
@@ -189,14 +173,6 @@ export function CatalogView({
           icon={<SearchX className="size-5" />}
           title={t("catalog.emptyTitle")}
           description={t("catalog.emptyText")}
-          action={
-            activeCount > 0 ? (
-              <Button type="button" variant="outline" onClick={resetFilters}>
-                <RotateCcw data-icon="inline-start" />
-                {t("common.resetAll")}
-              </Button>
-            ) : undefined
-          }
         />
       ) : (
         <>
