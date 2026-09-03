@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Suspense, useEffect, useState } from "react";
 import {
+  Armchair,
   Cpu,
   HardDrive,
   Heart,
@@ -107,6 +108,7 @@ export function SiteHeader() {
   const { t, locale } = useT();
   const { user, isAuthenticated, isHydrated } = useAuth();
   const { roots } = useCategories();
+  const furnitureRoot = roots.find((r) => r.slug === "furniture");
   const [isCompact, setIsCompact] = useState(false);
   const username = (user?.telegramUsername as string | null | undefined)?.replace(/^@/, "");
   const rawPhoto = user?.telegramPhoto as unknown;
@@ -229,18 +231,32 @@ export function SiteHeader() {
       >
         <div className="mx-auto flex h-10 w-full max-w-site items-center px-5 sm:px-8">
           <nav className="no-scrollbar flex min-w-0 items-center gap-1 overflow-x-auto">
-            {roots.length > 0
-              ? roots.slice(0, QUICK_CATEGORIES).map((root) => (
-                  <Link
-                    key={root.id}
-                    href={`/?category=${root.slug}`}
-                    className="flex shrink-0 items-center gap-1.5 rounded-md px-2 py-1 text-[13px] text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                  >
-                    <CategoryIcon name={root.icon} className="size-4" />
-                    {root.name[locale]}
-                  </Link>
-                ))
-              : FALLBACK_QUICK_CATEGORIES.map((item) => {
+            {roots.length > 0 ? (
+              <>
+                {roots
+                  .filter((root) => root.slug !== "furniture")
+                  .slice(0, QUICK_CATEGORIES)
+                  .map((root) => (
+                    <Link
+                      key={root.id}
+                      href={`/?category=${root.slug}`}
+                      className="flex shrink-0 items-center gap-1.5 rounded-md px-2 py-1 text-[13px] text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                    >
+                      <CategoryIcon name={root.icon} className="size-4" />
+                      {root.name[locale]}
+                    </Link>
+                  ))}
+                <Link
+                  href={furnitureRoot ? `/?category=${furnitureRoot.slug}` : "/?category=furniture"}
+                  className="flex shrink-0 items-center gap-1.5 rounded-md px-2 py-1 text-[13px] text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                >
+                  <Armchair className="size-4" />
+                  {t("nav.furniture")}
+                </Link>
+              </>
+            ) : (
+              <>
+                {FALLBACK_QUICK_CATEGORIES.map((item) => {
                   const Icon = item.icon;
 
                   return (
@@ -254,6 +270,15 @@ export function SiteHeader() {
                     </Link>
                   );
                 })}
+                <Link
+                  href="/?category=furniture"
+                  className="flex shrink-0 items-center gap-1.5 rounded-md px-2 py-1 text-[13px] text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                >
+                  <Armchair className="size-4" />
+                  {t("nav.furniture")}
+                </Link>
+              </>
+            )}
           </nav>
 
           <div className="ml-auto flex shrink-0 items-center gap-1 pl-3">
