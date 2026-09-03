@@ -64,53 +64,45 @@ export function SubscriptionCredits() {
             <TableBody>
               {isLoading
                 ? Array.from({ length: 3 }, (_, i) => (
-                    <TableRow key={i} className="hover:bg-transparent">
-                      <TableCell colSpan={5}>
-                        <Skeleton className="h-6 w-full" />
-                      </TableCell>
-                    </TableRow>
-                  ))
+                  <TableRow key={i} className="hover:bg-transparent">
+                    <TableCell colSpan={5}>
+                      <Skeleton className="h-6 w-full" />
+                    </TableCell>
+                  </TableRow>
+                ))
                 : rows.map((txn) => (
-                    <TableRow key={txn.id} className="hover:bg-transparent">
-                      <TableCell className="tabular align-top text-sm whitespace-nowrap">
-                        {formatDate(txn.createdAt, locale)}
-                      </TableCell>
+                  <TableRow key={txn.id} className="hover:bg-transparent">
+                    <TableCell className="tabular align-top text-sm whitespace-nowrap">
+                      {formatDate(txn.createdAt, locale)}
+                    </TableCell>
 
-                      <TableCell className="align-top text-sm">
-                        {t(`seller.credits.kind.${txn.kind}`)}
-                      </TableCell>
+                    <TableCell className="align-top text-sm">
+                      {t(`seller.credits.kind.${txn.kind}`)}
+                    </TableCell>
 
-                      <TableCell
-                        className={cn(
-                          "tabular align-top text-right text-sm whitespace-nowrap",
-                          txn.amount > 0 && "text-success",
-                        )}
-                      >
-                        {txn.amount > 0 ? "+" : "−"}
-                        {formatPrice(Math.abs(txn.amount), locale)}
-                      </TableCell>
+                    <TableCell
+                      className={cn(
+                        "tabular align-top text-right text-sm whitespace-nowrap",
+                        txn.amount > 0 && "text-success",
+                      )}
+                    >
+                      {txn.amount > 0 ? "+" : "−"}
+                      {formatPrice(Math.abs(txn.amount), locale)}
+                    </TableCell>
 
-                      <TableCell className="align-top">
-                        <Reason txn={txn} />
-                      </TableCell>
+                    <TableCell className="align-top">
+                      <Reason txn={txn} />
+                    </TableCell>
 
-                      <TableCell className="align-top text-right">
-                        <div className="tabular text-sm">
-                          {formatPrice(txn.balanceAfter, locale)}
-                        </div>
-                        {txn.subscriptionAfter !== null && txn.subscriptionAfter > 0 && (
-                          <div className="text-xs text-muted-foreground">
-                            {t("seller.subscription.creditsSubscription")}:{" "}
-                            <span className="tabular">
-                              {formatPrice(txn.subscriptionAfter, locale)}
-                            </span>
-                          </div>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                    <TableCell className="align-top text-right">
+                      <div className="tabular text-sm font-medium">
+                        {formatPrice(txn.balanceAfter, locale)}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
 
-              {}
+              { }
               {!isLoading && !isError && rows.length === 0 && (
                 <TableRow className="hover:bg-transparent">
                   <TableCell
@@ -147,7 +139,7 @@ function Reason({ txn }: { txn: CreditTxnDto }) {
     ? t(`seller.credits.promo.${meta.promo}`, { plan }).trim()
     : meta?.operation
       ? t(`seller.credits.op.${meta.operation}`) +
-        (meta.images && meta.images > 1 ? ` ×${meta.images}` : "")
+      (meta.images && meta.images > 1 ? ` ×${meta.images}` : "")
       : (txn.note ?? t("seller.credits.noNote"));
 
   const details: string[] = [];
