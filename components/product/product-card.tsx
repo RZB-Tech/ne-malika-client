@@ -80,7 +80,7 @@ export const ProductCard = memo(function ProductCard({ product }: { product: Pro
           )}
         </div>
 
-        {}
+        { }
         <div className="flex flex-col gap-1 pt-2.5">
           <div className="flex flex-wrap items-baseline gap-x-2">
             <span className="tabular text-base font-bold text-foreground">
@@ -103,9 +103,6 @@ export const ProductCard = memo(function ProductCard({ product }: { product: Pro
           </div>
 
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
-            <span className="min-w-0 max-w-full truncate font-medium text-foreground/70">
-              {product.brand}
-            </span>
             <AvailabilityBadge
               status={product.availability}
               className="shrink-0 px-1.5 py-0 text-[11px]"
