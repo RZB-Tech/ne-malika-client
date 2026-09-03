@@ -22,16 +22,41 @@ export function ProductImage({
   iconClassName?: string;
   fit?: "cover" | "contain" | "natural";
 }) {
+  const [currentSrc, setCurrentSrc] = useState(src);
   const [failed, setFailed] = useState(false);
+  const [triedFallback, setTriedFallback] = useState(false);
 
-  const [shown, setShown] = useState(src);
-  if (src !== shown) {
-    setShown(src);
+  if (src !== currentSrc && !triedFallback) {
+    setCurrentSrc(src);
     setFailed(false);
+    setTriedFallback(false);
   }
 
+  const handleImageError = () => {
+    if (!triedFallback && currentSrc) {
+      setTriedFallback(true);
+      if (currentSrc.includes("/api/v1/files/")) {
+        const key = currentSrc.split("/api/v1/files/")[1];
+        if (key) {
+          setCurrentSrc(`https://static.nemalika.uz/${key}`);
+          return;
+        }
+      } else if (currentSrc.includes("static.nemalika.uz/")) {
+        const key = currentSrc.split("static.nemalika.uz/")[1];
+        if (key) {
+          const origin = (process.env.NEXT_PUBLIC_API_URL ?? "https://api.nemalika.uz")
+            .replace(/\/+$/, "")
+            .replace(/\/api\/v1$/, "");
+          setCurrentSrc(`${origin}/api/v1/files/${key}`);
+          return;
+        }
+      }
+    }
+    setFailed(true);
+  };
+
   const iconName = getCategory(categorySlug)?.icon ?? "Box";
-  const showImage = Boolean(src) && !failed;
+  const showImage = Boolean(currentSrc) && !failed;
   const natural = fit === "natural";
 
   return (
@@ -61,22 +86,22 @@ export function ProductImage({
       {showImage && natural ? (
         /* eslint-disable-next-line @next/next/no-img-element */
         <img
-          src={src!}
+          src={currentSrc!}
           alt={alt ?? ""}
           className="relative z-10 block h-auto w-full"
-          onError={() => setFailed(true)}
+          onError={handleImageError}
         />
       ) : showImage ? (
         <>
           {fit === "contain" && <div className="absolute inset-0 z-[5] bg-muted" />}
           <img
-            src={src!}
+            src={currentSrc!}
             alt={alt ?? ""}
             className={cn(
               "absolute inset-0 z-10 h-full w-full",
               fit === "contain" ? "object-contain" : "object-cover",
             )}
-            onError={() => setFailed(true)}
+            onError={handleImageError}
           />
         </>
       ) : (
