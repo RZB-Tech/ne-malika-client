@@ -98,7 +98,7 @@ export function SubscriptionCredits() {
                         <div className="tabular text-sm">
                           {formatPrice(txn.balanceAfter, locale)}
                         </div>
-                        {Boolean(txn.subscriptionAfter && txn.subscriptionAfter > 0) && (
+                        {txn.subscriptionAfter !== null && txn.subscriptionAfter > 0 && (
                           <div className="text-xs text-muted-foreground">
                             {t("seller.subscription.creditsSubscription")}:{" "}
                             <span className="tabular">
