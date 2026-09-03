@@ -163,6 +163,7 @@ export interface AdminSubscriptionRow {
   active: boolean;
   until: string | null;
   daysLeft: number | null;
+  creditsBalance?: number;
   subscriptionCredits: number;
   lastPaidAt: string | null;
   stuckPrepared: boolean;

@@ -157,15 +157,13 @@ function ActivateBody({
         />
       </div>
 
-      <p className="text-xs text-warning">
-        {target.active && target.until
-          ? t("seller.subscription.warnUpgrade", {
-              date: formatDate(target.until, locale),
-            })
-          : t("seller.subscription.warnBurn", {
-              credits: formatNumber(target.subscriptionCredits, locale),
-            })}
-      </p>
+      {target.active && target.until && (
+        <p className="text-xs text-warning">
+          {t("seller.subscription.warnUpgrade", {
+            date: formatDate(target.until, locale),
+          })}
+        </p>
+      )}
 
       <DialogFooter>
         <Button variant="outline" onClick={onDone} disabled={activate.isPending}>

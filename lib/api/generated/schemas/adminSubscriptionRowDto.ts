@@ -27,7 +27,9 @@ export interface AdminSubscriptionRowDto {
   until: string | null;
   /** @nullable */
   daysLeft: number | null;
-  /** Подписочные кредиты магазина */
+  /** Кредиты на балансе магазина */
+  creditsBalance: number;
+  /** Подписочные кредиты магазина (дублирует creditsBalance) */
   subscriptionCredits: number;
   /**
      * Когда прошла последняя успешная оплата

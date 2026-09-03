@@ -314,9 +314,8 @@ export default function AdminSubscriptions() {
                       )}
                     </TableCell>
 
-                    {}
-                    <TableCell className="tabular text-right text-sm">
-                      {formatPrice(row.subscriptionCredits, locale)}
+                    <TableCell className="tabular text-right text-sm font-medium">
+                      {formatPrice(row.creditsBalance ?? row.subscriptionCredits, locale)}
                     </TableCell>
 
                     <TableCell className="tabular whitespace-nowrap text-sm text-muted-foreground">

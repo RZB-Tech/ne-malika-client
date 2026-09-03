@@ -9521,9 +9521,13 @@
             "type": "number",
             "nullable": true
           },
+          "creditsBalance": {
+            "type": "number",
+            "description": "Кредиты на балансе магазина"
+          },
           "subscriptionCredits": {
             "type": "number",
-            "description": "Подписочные кредиты магазина"
+            "description": "Подписочные кредиты магазина (дублирует creditsBalance)"
           },
           "lastPaidAt": {
             "type": "string",
@@ -9552,6 +9556,7 @@
           "active",
           "until",
           "daysLeft",
+          "creditsBalance",
           "subscriptionCredits",
           "lastPaidAt",
           "stuckPrepared",
