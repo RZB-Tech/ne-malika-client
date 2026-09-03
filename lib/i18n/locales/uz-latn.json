@@ -595,7 +595,7 @@
     },
     "credits": {
       "title": "Kreditlar tarixi",
-      "subtitle": "Ikkala hisobdagi — obuna va sotib olingan — har bir qo‘shish va yechish",
+      "subtitle": "Do‘kon kreditlari kirimi va chiqimi tarixi",
       "colDate": "Qachon",
       "colKind": "Amal",
       "colAmount": "Kredit",

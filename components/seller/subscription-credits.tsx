@@ -144,9 +144,6 @@ function Reason({ txn }: { txn: CreditTxnDto }) {
 
   const details: string[] = [];
   if (meta?.free) details.push(t(`seller.credits.free.${meta.free}`));
-  if (meta?.fromSubscription) {
-    details.push(t("seller.credits.fromSubscription", { count: meta.fromSubscription }));
-  }
   if (meta?.fixed) details.push(t("seller.credits.fixed"));
   if (txn.note && headline !== txn.note) details.push(txn.note);
 
