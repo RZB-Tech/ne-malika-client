@@ -39,17 +39,11 @@ export function SubscriptionPlans({ subscription }: { subscription: SellerSubscr
   const topId = plans.at(-1)?.id;
   const secondId = plans.length >= 3 ? plans.at(-2)?.id : undefined;
 
-  const warning = !subscription.active
-    ? subscription.subscriptionCredits > 0
-      ? t("seller.subscription.warnBurn", {
-          credits: formatPrice(subscription.subscriptionCredits, locale),
-        })
-      : null
-    : subscription.until
-      ? t("seller.subscription.warnUpgrade", {
-          date: formatDate(subscription.until, locale),
-        })
-      : null;
+  const warning = subscription.active && subscription.until
+    ? t("seller.subscription.warnUpgrade", {
+        date: formatDate(subscription.until, locale),
+      })
+    : null;
 
   const pay = async (plan: PaidPlan, provider: CreateCheckoutDtoProvider) => {
     setBusy(plan);

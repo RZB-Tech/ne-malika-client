@@ -363,8 +363,8 @@
       "creditsSubscriptionHint": "Har bir to‘lovda beriladi. Keyingi to‘lovgacha obuna tugab qolsa — kuyib ketadi.",
       "creditsOwn": "Sotib olingan kreditlar",
       "creditsOwnHint": "Alohida to‘langan va administrator qo‘shgan kreditlar. Hech qachon kuymaydi.",
-      "creditsAvailable": "Hozir mavjud",
-      "creditsAvailableHint": "Sotib olinganlar va mavjud obuna kreditlari, bajarilayotgan so‘rovlar band qilgani chegirilgan holda.",
+      "creditsAvailable": "Generatsiya uchun mavjud",
+      "creditsAvailableHint": "Rasm, tavsif va bannerlar yaratish uchun mavjud kreditlar",
       "creditsReserved": "So‘rovlar band qilgan",
       "creditsLocked": "Tugagan tarif qulflab qo‘ygan",
       "creditsUnit": "{count} kredit",
@@ -430,7 +430,10 @@
       "invoiceFailed": "Hisobni yuborib bo‘lmadi",
       "invoiceHint": "Hisob Click’ga bog‘langan raqamga keladi. Obuna tasdiqdan so‘ng darhol yoqiladi.",
       "payClick": "Click orqali toʻlash",
-      "payPayme": "Payme orqali toʻlash"
+      "payPayme": "Payme orqali toʻlash",
+      "creditsTotal": "Kreditlar balansi",
+      "creditsTotalHint": "Do‘konning barcha kreditlari (ro‘yxatdan o‘tish va obuna bo‘yicha)",
+      "creditsUnifiedHint": "Ro‘yxatdan o‘tishdagi 300 ta kredit va obuna kreditlari yagona balansda birlashtirilgan va tarif tugaganda ham kuyib ketmaydi."
     },
     "plans": {
       "title": "Tariflar",

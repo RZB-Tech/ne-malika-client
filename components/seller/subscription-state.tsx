@@ -91,40 +91,29 @@ export function SubscriptionState({ subscription }: { subscription: SellerSubscr
           {t("seller.subscription.credits")}
         </div>
 
-        <div className="mt-4 grid gap-4 sm:grid-cols-3">
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <Amount
-            label={t("seller.subscription.creditsSubscription")}
-            hint={t("seller.subscription.creditsSubscriptionHint")}
-            value={s.subscriptionCredits}
-          />
-          <Amount
-            label={t("seller.subscription.creditsOwn")}
-            hint={t("seller.subscription.creditsOwnHint")}
-            value={s.creditsBalance}
+            label={t("seller.subscription.creditsTotal")}
+            hint={t("seller.subscription.creditsTotalHint")}
+            value={(s.creditsBalance ?? 0) + (s.subscriptionCredits ?? 0)}
+            accent
           />
           <Amount
             label={t("seller.subscription.creditsAvailable")}
             hint={t("seller.subscription.creditsAvailableHint")}
             value={s.available}
-            accent
           />
         </div>
 
-        <div className="mt-4 space-y-1 border-t pt-4 text-xs text-muted-foreground">
-          <p>{t("seller.subscription.creditsSpendOrder")}</p>
-          {s.creditsReserved > 0 && (
-            <p>
-              {t("seller.subscription.creditsReserved")}:{" "}
-              <span className="tabular">{formatPrice(s.creditsReserved, locale)}</span>
-            </p>
-          )}
-          {}
-          {!s.active && s.subscriptionCredits > 0 && (
-            <p className="text-warning">
-              {t("seller.subscription.creditsLocked")}:{" "}
-              <span className="tabular">{formatPrice(s.subscriptionCredits, locale)}</span>
-            </p>
-          )}
+        {s.creditsReserved > 0 && (
+          <div className="mt-3 text-xs text-muted-foreground">
+            {t("seller.subscription.creditsReserved")}:{" "}
+            <span className="tabular font-medium">{formatPrice(s.creditsReserved, locale)}</span>
+          </div>
+        )}
+
+        <div className="mt-4 border-t pt-3 text-xs text-muted-foreground">
+          <p>{t("seller.subscription.creditsUnifiedHint")}</p>
         </div>
       </Card>
 
