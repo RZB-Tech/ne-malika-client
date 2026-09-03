@@ -579,7 +579,13 @@
         "noCredits": "Kredit yetarli emas",
         "failed": "Bannerni chizib bo‘lmadi",
         "needShop": "Avval do‘konni tanlang — model nima chizishni shundan tushunadi",
-        "freeForAdmin": "Kredit yechilmaydi"
+        "freeForAdmin": "Kredit yechilmaydi",
+        "productsTitle": "Bannerdagi mahsulotlar",
+        "productsHint": "Do‘koningizdan 2 tadan 6 tagacha mahsulot tanlang yoki avtotanlovni qoldiring",
+        "productsAuto": "Do‘kon mahsulotlarini avtomatik tanlash",
+        "productsSelected": "Tanlandi: {count} / 6",
+        "productsLimit": "Ko‘pi bilan 6 ta mahsulot",
+        "productsEmpty": "Do‘konda hali chop etilgan mahsulotlar yo‘q"
       }
     },
     "credits": {

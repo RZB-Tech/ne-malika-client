@@ -8710,7 +8710,7 @@
         "type": "object",
         "properties": {
           "productIds": {
-            "maxItems": 3,
+            "maxItems": 6,
             "example": [
               10,
               12
@@ -8778,7 +8778,7 @@
         "type": "object",
         "properties": {
           "productIds": {
-            "maxItems": 3,
+            "maxItems": 6,
             "example": [
               10,
               12

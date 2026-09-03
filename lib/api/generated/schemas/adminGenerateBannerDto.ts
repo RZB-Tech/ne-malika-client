@@ -9,7 +9,7 @@
 export interface AdminGenerateBannerDto {
   /**
      * Какие товары показать на баннере. Пусто — возьмём последние опубликованные товары магазина.
-     * @maxItems 3
+     * @maxItems 6
      */
   productIds?: number[];
   /** Магазин, для которого рисуем баннер */
