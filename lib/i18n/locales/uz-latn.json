@@ -64,7 +64,8 @@
     "logoutFailed": "Chiqib bo‘lmadi",
     "actionFailed": "Amalni bajarib bo‘lmadi",
     "showMore": "To‘liq ko‘rsatish",
-    "showLess": "Yig‘ish"
+    "showLess": "Yig‘ish",
+    "all": "Barchasi"
   },
   "nav": {
     "catalog": "Katalog",

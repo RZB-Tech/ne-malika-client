@@ -64,7 +64,8 @@
     "logoutFailed": "Чиқиб бўлмади",
     "actionFailed": "Амални бажариб бўлмади",
     "showMore": "Тўлиқ кўрсатиш",
-    "showLess": "Йиғиш"
+    "showLess": "Йиғиш",
+    "all": "Барчаси"
   },
   "nav": {
     "catalog": "Каталог",

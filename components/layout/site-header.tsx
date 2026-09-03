@@ -10,6 +10,7 @@ import {
   Heart,
   Keyboard,
   Laptop,
+  LayoutGrid,
   MessageSquare,
   Monitor,
   Package,
@@ -231,6 +232,14 @@ export function SiteHeader() {
       >
         <div className="mx-auto flex h-10 w-full max-w-site items-center px-5 sm:px-8">
           <nav className="no-scrollbar flex min-w-0 items-center gap-1 overflow-x-auto">
+            <Link
+              href="/"
+              className="flex shrink-0 items-center gap-1.5 rounded-md px-2 py-1 text-[13px] text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            >
+              <LayoutGrid className="size-4" />
+              {t("common.all")}
+            </Link>
+
             {roots.length > 0 ? (
               <>
                 {roots
