@@ -10,7 +10,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useT } from "@/components/providers/i18n-provider";
 import { apiErrorMessage } from "@/lib/api/errors";
 import { planLabel, planRank } from "@/lib/api/subscription";
-import { PAYME_ENABLED } from "@/lib/payments";
 import { formatDate, formatPrice } from "@/lib/format";
 import { GOALS, reachGoal } from "@/lib/metrika";
 import { cn } from "@/lib/utils";
@@ -96,7 +95,6 @@ export function SubscriptionPlans({ subscription }: { subscription: SellerSubscr
               key={plan.id}
               plan={plan}
               current={subscription.active && subscription.plan === plan.id}
-              renewable={subscription.active}
               top={plan.id === topId}
               second={plan.id === secondId}
               busy={busy === plan.id}
@@ -115,7 +113,6 @@ export function SubscriptionPlans({ subscription }: { subscription: SellerSubscr
 function PlanCard({
   plan,
   current,
-  renewable,
   top,
   second,
   busy,
@@ -124,7 +121,6 @@ function PlanCard({
 }: {
   plan: SubscriptionPlanDto;
   current: boolean;
-  renewable: boolean;
   top: boolean;
   second: boolean;
   busy: boolean;
@@ -194,41 +190,27 @@ function PlanCard({
         />
       </ul>
 
-      <div className={cn("mt-5 gap-2", PAYME_ENABLED ? "grid grid-cols-2" : "block")}>
+      <div className="mt-5 grid grid-cols-2 gap-2">
         <Button
-          className={cn(
-            "w-full min-w-0 px-2 text-xs shadow-sm sm:text-sm",
-            PAYME_ENABLED &&
-              "border-[#0065ff] bg-[#0065ff] text-white hover:border-[#0055d6] hover:bg-[#0055d6] focus-visible:border-[#0065ff] focus-visible:ring-[#0065ff]/40",
-          )}
-          variant={PAYME_ENABLED ? "default" : current || !renewable ? "default" : "outline"}
+          className="w-full min-w-0 border-[#0065ff] bg-[#0065ff] px-2 text-xs text-white shadow-sm hover:border-[#0055d6] hover:bg-[#0055d6] focus-visible:border-[#0065ff] focus-visible:ring-[#0065ff]/40 sm:text-sm"
+          variant="default"
           disabled={disabled}
           onClick={() => onPay("click")}
         >
           {busy && <Loader2 className="size-4 animate-spin" />}
           <span className="truncate">
-            {busy
-              ? t("seller.subscription.paying")
-              : PAYME_ENABLED
-                ? t("seller.subscription.payClick")
-                : current
-                  ? t("seller.subscription.renew")
-                  : renewable
-                    ? t("seller.subscription.change")
-                    : t("seller.subscription.pay")}
+            {busy ? t("seller.subscription.paying") : t("seller.subscription.payClick")}
           </span>
         </Button>
 
-        {PAYME_ENABLED && (
-          <Button
-            className="w-full min-w-0 border-[#00c0c9] bg-[#00c0c9] px-2 text-xs text-white shadow-sm hover:border-[#00aeb6] hover:bg-[#00aeb6] focus-visible:border-[#00c0c9] focus-visible:ring-[#00c0c9]/40 sm:text-sm"
-            variant="default"
-            disabled={disabled}
-            onClick={() => onPay("payme")}
-          >
-            <span className="truncate">{t("seller.subscription.payPayme")}</span>
-          </Button>
-        )}
+        <Button
+          className="w-full min-w-0 border-[#00c0c9] bg-[#00c0c9] px-2 text-xs text-white shadow-sm hover:border-[#00aeb6] hover:bg-[#00aeb6] focus-visible:border-[#00c0c9] focus-visible:ring-[#00c0c9]/40 sm:text-sm"
+          variant="default"
+          disabled={disabled}
+          onClick={() => onPay("payme")}
+        >
+          <span className="truncate">{t("seller.subscription.payPayme")}</span>
+        </Button>
       </div>
     </Card>
   );
