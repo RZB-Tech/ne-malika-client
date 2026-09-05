@@ -104,7 +104,7 @@ function AssistantSession() {
           aria-label={t("assistant.open")}
           title={t("assistant.open")}
           className={cn(
-            "assistant-launcher group/assistant fixed right-4 bottom-[calc(4.5rem+env(safe-area-inset-bottom))] z-40 flex size-16 cursor-pointer items-center justify-center rounded-full outline-none transition-[box-shadow,transform] focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 focus-visible:ring-offset-background sm:w-auto sm:gap-2 sm:border sm:border-border sm:bg-card/95 sm:py-1 sm:pr-5 sm:pl-1 sm:shadow-lg sm:backdrop-blur md:right-6 md:bottom-6 motion-safe:hover:-translate-y-1 motion-safe:active:scale-95",
+            "assistant-launcher group/assistant fixed right-4 bottom-[calc(4.5rem+env(safe-area-inset-bottom))] z-40 flex size-16 cursor-pointer items-center justify-center rounded-full outline-none transition-[box-shadow,transform] focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 focus-visible:ring-offset-background sm:w-auto sm:gap-2 sm:border sm:border-border sm:bg-card/95 sm:py-1 sm:pr-5 sm:pl-1 sm:shadow-lg sm:backdrop-blur md:right-6 md:bottom-6 motion-safe:active:scale-95",
             compareVisible && "bottom-[calc(10rem+env(safe-area-inset-bottom))] md:bottom-28",
           )}
         >
