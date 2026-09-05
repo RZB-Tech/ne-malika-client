@@ -15,7 +15,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Textarea } from "@/components/ui/textarea";
+import { InputGroup, InputGroupAddon, InputGroupTextarea } from "@/components/ui/input-group";
 import { Separator } from "@/components/ui/separator";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { ProductImage } from "@/components/shared/product-image";
@@ -299,7 +299,6 @@ function AssistantSession() {
             <div ref={bottom} />
           </div>
         </ScrollArea>
-        <Separator />
         <form
           className="flex shrink-0 flex-col gap-2 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
           onSubmit={(event) => {
@@ -312,15 +311,15 @@ function AssistantSession() {
               <FieldLabel htmlFor="assistant-message" className="sr-only">
                 {t("assistant.inputLabel")}
               </FieldLabel>
-              <div className="flex items-end gap-2">
-                <Textarea
+              <InputGroup>
+                <InputGroupTextarea
                   id="assistant-message"
                   value={draft}
                   onChange={(event) => setDraft(event.target.value)}
                   maxLength={MESSAGE_MAX}
-                  rows={2}
+                  rows={1}
                   placeholder={t("assistant.placeholder")}
-                  className="max-h-28 min-h-12 flex-1 resize-none"
+                  className="max-h-36"
                   onKeyDown={(event) => {
                     if (
                       event.key === "Enter" &&
@@ -333,17 +332,19 @@ function AssistantSession() {
                     }
                   }}
                 />
-                <Button
-                  type="submit"
-                  size="icon"
-                  className="mb-1 shrink-0"
-                  disabled={!!pending || !draft.trim()}
-                  aria-label={t("assistant.send")}
-                  title={t("assistant.send")}
-                >
-                  <Send />
-                </Button>
-              </div>
+                <InputGroupAddon align="inline-end">
+                  <Button
+                    type="submit"
+                    size="icon"
+                    className="size-11 rounded-full"
+                    disabled={!!pending || !draft.trim()}
+                    aria-label={t("assistant.send")}
+                    title={t("assistant.send")}
+                  >
+                    {pending ? <Loader2 className="motion-safe:animate-spin" /> : <Send />}
+                  </Button>
+                </InputGroupAddon>
+              </InputGroup>
             </Field>
           </FieldGroup>
           <p className="text-center text-[11px] leading-relaxed text-muted-foreground">
