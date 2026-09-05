@@ -18,7 +18,7 @@ import { TelegramIcon } from "@/components/icons/telegram-icon";
 import { useT } from "@/components/providers/i18n-provider";
 import { useAuth } from "@/lib/api/auth";
 import { initials } from "@/lib/format";
-import { SUPPORT_HANDLE, SUPPORT_URL } from "@/lib/telegram";
+import { SUPPORT_URL } from "@/lib/telegram";
 import { cn } from "@/lib/utils";
 
 export function UserMenu({ trigger }: { trigger?: ReactNode } = {}) {
@@ -52,7 +52,7 @@ export function UserMenu({ trigger }: { trigger?: ReactNode } = {}) {
         asChild={Boolean(trigger)}
         className={cn(
           !trigger &&
-          "ml-1 rounded-full outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+            "ml-1 rounded-full outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
         )}
       >
         {trigger ?? (

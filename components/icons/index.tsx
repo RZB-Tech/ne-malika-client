@@ -7,7 +7,6 @@ import {
   ArmchairIcon,
   ArrowDownRight01Icon,
   ArrowLeft01Icon,
-  ArrowRight01Icon,
   ArrowUpDownIcon,
   ArrowUpRight01Icon,
   BalanceScaleIcon,
@@ -39,7 +38,6 @@ import {
   DiscIcon,
   EyeIcon,
   Fan01Icon,
-  FilterHorizontalIcon,
   FavouriteIcon,
   Flag02Icon,
   GamepadIcon,
@@ -62,7 +60,6 @@ import {
   Login01Icon,
   Logout01Icon,
   MagicWand01Icon,
-  Menu01Icon,
   Message01Icon,
   MessageAdd01Icon,
   MinusSignIcon,
@@ -87,7 +84,6 @@ import {
   Setting07Icon,
   Shield01Icon,
   ShieldBanIcon,
-  ShoppingBasket01Icon,
   SidebarLeft01Icon,
   SmartPhone01Icon,
   SparklesIcon,
@@ -127,7 +123,6 @@ export const Bot = make(AiBrain01Icon, "Bot");
 export const Armchair = make(ArmchairIcon, "Armchair");
 export const ArrowDownRight = make(ArrowDownRight01Icon, "ArrowDownRight");
 export const ArrowLeft = make(ArrowLeft01Icon, "ArrowLeft");
-export const ArrowRight = make(ArrowRight01Icon, "ArrowRight");
 export const ArrowUpDown = make(ArrowUpDownIcon, "ArrowUpDown");
 export const ArrowUpRight = make(ArrowUpRight01Icon, "ArrowUpRight");
 export const Ban = make(BanIcon, "Ban");
@@ -146,7 +141,6 @@ export const ChevronDown = make(ChevronDownSrc, "ChevronDown");
 export const ChevronDownIcon = ChevronDown;
 export const ChevronLeft = make(ChevronLeftSrc, "ChevronLeft");
 export const ChevronRight = make(ChevronRightSrc, "ChevronRight");
-export const ChevronRightIcon = ChevronRight;
 export const ChevronUp = make(ChevronUpSrc, "ChevronUp");
 export const ChevronUpIcon = ChevronUp;
 export const CircleAlert = make(AlertCircleIcon, "CircleAlert");
@@ -161,7 +155,6 @@ export const Disc = make(DiscIcon, "Disc");
 export const ExternalLink = make(LinkSquare02Icon, "ExternalLink");
 export const Eye = make(EyeIcon, "Eye");
 export const Fan = make(Fan01Icon, "Fan");
-export const Filter = make(FilterHorizontalIcon, "Filter");
 export const Flag = make(Flag02Icon, "Flag");
 export const Gamepad2 = make(GamepadIcon, "Gamepad2");
 export const Handshake = make(HandshakeIcon, "Handshake");
@@ -186,7 +179,6 @@ export const LogIn = make(Login01Icon, "LogIn");
 export const LogOut = make(Logout01Icon, "LogOut");
 export const MapPin = make(Location01Icon, "MapPin");
 export const MemoryStick = make(RamMemoryIcon, "MemoryStick");
-export const Menu = make(Menu01Icon, "Menu");
 export const MessageSquare = make(Message01Icon, "MessageSquare");
 export const MessageSquarePlus = make(MessageAdd01Icon, "MessageSquarePlus");
 export const Microchip = make(ChipIcon, "Microchip");
@@ -214,7 +206,6 @@ export const Server = make(ServerStack01Icon, "Server");
 export const Settings = make(Setting07Icon, "Settings");
 export const ShieldCheck = make(Shield01Icon, "ShieldCheck");
 export const ShieldOff = make(ShieldBanIcon, "ShieldOff");
-export const ShoppingBasket = make(ShoppingBasket01Icon, "ShoppingBasket");
 export const Smartphone = make(SmartPhone01Icon, "Smartphone");
 export const Sparkles = make(SparklesIcon, "Sparkles");
 export const Speaker = make(SpeakerIcon, "Speaker");

@@ -10,10 +10,6 @@ export type PaidPlan = Exclude<SubscriptionPlan, "free">;
 
 export type BannerModerationStatus = "pending" | "approved" | "rejected";
 
-export type SubscriptionPaymentStatus = "pending" | "prepared" | "paid" | "cancelled" | "failed";
-
-export type PaymentProvider = "click" | "payme" | "manual";
-
 export interface PaginationMeta {
   page: number;
   limit: number;
@@ -167,27 +163,6 @@ export interface AdminSubscriptionRow {
   subscriptionCredits: number;
   lastPaidAt: string | null;
   stuckPrepared: boolean;
-  needsManualReview: boolean;
-}
-
-export interface SubscriptionPaymentRow {
-  id: number;
-  provider: PaymentProvider;
-  plan: SubscriptionPlan;
-  amount: number;
-  status: SubscriptionPaymentStatus;
-  merchantBillingId: number;
-  activatedFrom: string | null;
-  activatedUntil: string | null;
-  grantedCredits: number | null;
-  burnedCredits: number | null;
-  paidAt: string | null;
-  cancelledAt: string | null;
-  createdAt: string;
-  note: string | null;
-  errorNote: string | null;
-  reversed: boolean;
-  refundedByProvider: boolean;
   needsManualReview: boolean;
 }
 

@@ -37,16 +37,6 @@ async function registration(): Promise<ServiceWorkerRegistration> {
   return navigator.serviceWorker.ready;
 }
 
-export interface PushConfig {
-  enabled: boolean;
-  publicKey: string | null;
-}
-
-export async function fetchPushConfig(): Promise<PushConfig> {
-  const { data } = await axiosInstance.get<PushConfig>("/api/v1/push/config");
-  return data;
-}
-
 export async function subscribeToPush(
   publicKey: string,
   confirmation?: { title: string; body: string },

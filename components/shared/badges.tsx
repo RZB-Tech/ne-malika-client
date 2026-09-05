@@ -98,16 +98,3 @@ export function RoleBadge({ role, className }: { role: UserRole; className?: str
     </Badge>
   );
 }
-
-export function DiscountBadge({ percent, className }: { percent: number; className?: string }) {
-  return (
-    <Badge
-      className={cn(
-        "border-transparent bg-destructive text-white font-semibold tabular",
-        className,
-      )}
-    >
-      −{percent}%
-    </Badge>
-  );
-}

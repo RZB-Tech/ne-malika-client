@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useT } from "@/components/providers/i18n-provider";
 import { useChats, type ChatRole } from "@/lib/api/chats";
-import type { ChatDto } from "@/lib/api/generated/schemas";
 import { ChatList } from "./chat-list";
 import { ChatThread } from "./chat-thread";
 import { cn } from "@/lib/utils";
@@ -63,5 +62,3 @@ export function ChatPanel({
     </div>
   );
 }
-
-export type { ChatDto };

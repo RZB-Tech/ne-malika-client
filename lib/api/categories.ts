@@ -1,9 +1,6 @@
 "use client";
-
-import { useMemo } from "react";
 import { useCategoriesControllerFindAll } from "@/lib/api/generated/endpoints/categories/categories";
 import type { CategoryDto } from "@/lib/api/generated/schemas";
-import type { Locale } from "@/lib/i18n/config";
 
 export function useCategories() {
   const query = useCategoriesControllerFindAll({
@@ -33,16 +30,4 @@ export function findCategory(
     if (child) return { category: child, root };
   }
   return undefined;
-}
-
-export function useCategoryLabel(id: number | null | undefined, locale: Locale): string {
-  const { roots } = useCategories();
-  return useMemo(() => {
-    const found = findCategory(roots, id);
-    if (!found) return "";
-    const { category, root } = found;
-    return category.id === root.id
-      ? root.name[locale]
-      : `${root.name[locale]} · ${category.name[locale]}`;
-  }, [roots, id, locale]);
 }

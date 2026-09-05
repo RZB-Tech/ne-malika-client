@@ -2,8 +2,6 @@ import type { Locale } from "@/lib/i18n/config";
 import type { AdminBannerDto, BannerDto, PublicBannerDto } from "./generated/schemas";
 import { photoUrl } from "./photo";
 
-export type { BannerModerationStatus } from "./types";
-
 export type Banner = BannerDto;
 
 export type AdminBanner = AdminBannerDto;

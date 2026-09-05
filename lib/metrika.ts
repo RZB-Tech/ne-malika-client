@@ -41,8 +41,6 @@ function readId(): string | null {
 /** null — счётчик выключен. Строкой, потому что ym принимает и число, и строку. */
 export const METRIKA_ID: string | null = readId();
 
-export const METRIKA_ENABLED = METRIKA_ID !== null;
-
 declare global {
   interface Window {
     ym?: (counter: string | number, method: string, ...args: unknown[]) => void;
@@ -99,14 +97,6 @@ export function hit(url: string, referer?: string): void {
 /** Достижение цели. params попадают в отчёт «Параметры визитов». */
 export function reachGoal(goal: Goal, params?: Record<string, unknown>): void {
   call("reachGoal", goal, params);
-}
-
-/**
- * Параметры визита — разрезы, по которым потом фильтруются отчёты
- * (язык интерфейса, роль вошедшего).
- */
-export function setParams(params: Record<string, unknown>): void {
-  call("params", params);
 }
 
 /** Идентификатор вошедшего: склеивает визиты одного человека с разных устройств. */

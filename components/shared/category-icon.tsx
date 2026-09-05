@@ -77,7 +77,3 @@ export function CategoryIcon({
   const Icon = (name && map[name]) || Box;
   return <Icon className={className} strokeWidth={strokeWidth} />;
 }
-
-export function getCategoryIcon(name: string): AppIcon {
-  return map[name] ?? Box;
-}

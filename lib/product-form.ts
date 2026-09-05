@@ -20,33 +20,3 @@ export function withBrandModel(
     ...specs,
   ];
 }
-
-export interface ProductFormValues {
-  name: string;
-  description: string;
-  photos: string[];
-  price: number | null;
-  state: "new" | "old";
-  categoryId: number | null;
-  specs: SpecPair[];
-}
-
-export function buildProductPayload(values: ProductFormValues): {
-  name: string;
-  description: string | undefined;
-  photos: string[];
-  price: number | null;
-  state: "new" | "old";
-  categoryId: number | undefined;
-  characteristics: SpecPair[];
-} {
-  return {
-    name: values.name.trim(),
-    description: values.description.trim() || undefined,
-    photos: values.photos,
-    price: values.price,
-    state: values.state,
-    categoryId: values.categoryId ?? undefined,
-    characteristics: cleanSpecs(values.specs),
-  };
-}

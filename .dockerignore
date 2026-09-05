@@ -1,5 +1,7 @@
 node_modules
 .next
+.next-*
+graphify-out
 out
 build
 coverage
@@ -21,5 +23,6 @@ yarn-error.log*
 *.tsbuildinfo
 Dockerfile
 docker-compose.yml
+docker-compose.prod.yml
 .dockerignore
 README.md

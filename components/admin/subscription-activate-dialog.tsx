@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/select";
 import { useAdminMutation } from "@/components/admin/use-admin-mutation";
 import { useT } from "@/components/providers/i18n-provider";
-import { formatDate, formatNumber } from "@/lib/format";
+import { formatDate } from "@/lib/format";
 import { PAID_PLANS, isPaidPlan, planLabel } from "@/lib/api/subscription";
 import type { PaidPlan, SubscriptionPlan } from "@/lib/api/types";
 import {
