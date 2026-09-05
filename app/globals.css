@@ -238,6 +238,68 @@
   }
 }
 
+@layer components {
+  .assistant-avatar__body {
+    filter: drop-shadow(0 3px 3px rgb(48 67 148 / 22%));
+  }
+
+  .assistant-avatar__eyes {
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  .assistant-avatar__glow {
+    opacity: 0.65;
+    transform-origin: center;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .assistant-avatar[data-animated="true"] .assistant-avatar__body {
+      animation: assistant-float 5s ease-in-out infinite;
+    }
+
+    .assistant-avatar[data-animated="true"] .assistant-avatar__eyes {
+      animation: assistant-blink 7s ease-in-out infinite;
+    }
+
+    .assistant-avatar[data-animated="true"] .assistant-avatar__glow {
+      animation: assistant-glow 5s ease-in-out infinite;
+    }
+  }
+
+  @keyframes assistant-float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-2px);
+    }
+  }
+
+  @keyframes assistant-blink {
+    0%,
+    42%,
+    46%,
+    100% {
+      transform: scaleY(1);
+    }
+    44% {
+      transform: scaleY(0.12);
+    }
+  }
+
+  @keyframes assistant-glow {
+    0%,
+    100% {
+      opacity: 0.65;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+}
+
 @layer utilities {
   .font-heading {
     font-family: var(--font-heading), var(--font-sans), system-ui, sans-serif;

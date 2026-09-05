@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ArrowUpRight, Bot, Loader2, RotateCcw, Send, Sparkles, X } from "@/components/icons";
+import { ArrowUpRight, Loader2, RotateCcw, Send, Sparkles, X } from "@/components/icons";
 import { useT } from "@/components/providers/i18n-provider";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,6 +26,7 @@ import { priceText } from "@/lib/format";
 import { ASSISTANT_SEEN_KEY, MESSAGE_MAX } from "@/lib/assistant/conversation";
 import { cn } from "@/lib/utils";
 import { useAssistant } from "./use-assistant";
+import { AssistantAvatar } from "./assistant-avatar";
 
 export function SiteAssistant() {
   const { locale } = useT();
@@ -97,19 +98,21 @@ function AssistantSession() {
   return (
     <Dialog open={open} onOpenChange={changeOpen}>
       <DialogTrigger asChild>
-        <Button
+        <button
           ref={trigger}
-          size="lg"
+          type="button"
           aria-label={t("assistant.open")}
           title={t("assistant.open")}
           className={cn(
-            "fixed right-4 bottom-[calc(4.5rem+env(safe-area-inset-bottom))] z-40 h-12 rounded-full shadow-lg md:right-6 md:bottom-6",
+            "assistant-launcher group/assistant fixed right-4 bottom-[calc(4.5rem+env(safe-area-inset-bottom))] z-40 flex size-16 cursor-pointer items-center justify-center rounded-full outline-none transition-[box-shadow,transform] focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 focus-visible:ring-offset-background sm:w-auto sm:gap-2 sm:border sm:border-border sm:bg-card/95 sm:py-1 sm:pr-5 sm:pl-1 sm:shadow-lg sm:backdrop-blur md:right-6 md:bottom-6 motion-safe:hover:-translate-y-1 motion-safe:active:scale-95",
             compareVisible && "bottom-[calc(10rem+env(safe-area-inset-bottom))] md:bottom-28",
           )}
         >
-          <Bot data-icon="inline-start" />
-          <span className="hidden sm:inline">{t("assistant.launcher")}</span>
-        </Button>
+          <AssistantAvatar animated />
+          <span className="hidden text-sm font-medium text-foreground sm:inline">
+            {t("assistant.launcher")}
+          </span>
+        </button>
       </DialogTrigger>
       <DialogContent
         showCloseButton={false}
@@ -124,9 +127,7 @@ function AssistantSession() {
         }}
       >
         <header className="flex shrink-0 items-center gap-3 p-4">
-          <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-            <Bot className="size-6" />
-          </span>
+          <AssistantAvatar className="size-11" />
           <div className="min-w-0 flex-1">
             <DialogTitle ref={heading} tabIndex={-1} className="outline-none">
               {t("assistant.title")}
