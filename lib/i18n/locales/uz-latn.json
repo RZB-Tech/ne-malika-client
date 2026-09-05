@@ -1645,5 +1645,31 @@
     "emptyText": "So‘rovni o‘zgartirib ko‘ring.",
     "errorTitle": "Do‘konlar katalogi ishlamayapti",
     "loadError": "Do‘konlarni yuklab bo‘lmadi. Ulanishni tekshirib, qayta urinib ko‘ring."
+  },
+  "assistant": {
+    "title": "neMalika hamrohi",
+    "subtitle": "Texnika tanlash uchun AI-yordamchi",
+    "launcher": "Tanlashda yordam kerakmi?",
+    "open": "AI-yordamchini ochish",
+    "close": "Yordamchini yopish",
+    "reset": "Yangi suhbat boshlash",
+    "conversation": "Yordamchi bilan suhbat",
+    "you": "Siz",
+    "welcome": "Salom! Sizga mos texnikani birga topamiz.",
+    "intro": "Texnikani tushunishga, byudjetingizga mos variantlarni tanlashga va neMalika bilan tanishishga yordam beraman. Nimadan boshlaymiz?",
+    "starters": {
+      "choose": "Texnika tanlash",
+      "build": "Kompyuter yig‘ishga yordam",
+      "explore": "Saytda nimalar bor?"
+    },
+    "inputLabel": "AI-yordamchiga xabar",
+    "placeholder": "Masalan: o‘qish uchun 5 mln so‘mgacha noutbuk",
+    "send": "Xabar yuborish",
+    "thinking": "So‘rovingizni ko‘rib chiqyapman…",
+    "note": "AI xato qilishi mumkin. Narx va mavjudlikni sotuvchidan aniqlang.",
+    "error": "Javob olinmadi. Qayta urinib ko‘ring — suhbat saqlandi.",
+    "rateLimit": "Xabarlar juda ko‘p. Bir daqiqa kutib, qayta urinib ko‘ring.",
+    "unavailable": "Yordamchi vaqtincha ishlamayapti. Katalogda qidirishni davom ettirishingiz mumkin.",
+    "retry": "Qayta urinish"
   }
 }
