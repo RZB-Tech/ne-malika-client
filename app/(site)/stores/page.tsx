@@ -29,8 +29,6 @@ export const metadata: Metadata = {
 };
 
 export default async function StoresPage() {
-  // Как и главная: страницу собираем на запрос, а не в сборке — иначе в CI,
-  // где API недоступен, в прод уедет пустой список с пустой разметкой.
   await connection();
   const initial = await getPublicShops();
 

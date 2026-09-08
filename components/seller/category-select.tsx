@@ -103,7 +103,7 @@ export function CategorySelect({
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={t("category.search")}
-            className="h-9 border-0 px-0 shadow-none focus-visible:ring-0"
+            className="h-9 rounded-none border-0 px-0 shadow-none bg-transparent hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 dark:bg-transparent dark:hover:bg-transparent dark:focus-visible:bg-transparent"
           />
         </div>
 
