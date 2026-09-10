@@ -1,7 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { ShieldCheck, ShieldOff, Store, UserX, RotateCcw } from "@/components/icons";
+import {
+  RotateCcw,
+  ShieldCheck,
+  ShieldOff,
+  Store,
+  Trash2,
+  UserX,
+} from "@/components/icons";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -27,6 +34,7 @@ import {
   getAdminUsersControllerListQueryKey,
   useAdminUsersControllerBlock,
   useAdminUsersControllerList,
+  useAdminUsersControllerRemove,
   useAdminUsersControllerSetRole,
   useAdminUsersControllerUnblock,
 } from "@/lib/api/generated/endpoints/users-admin/users-admin";
@@ -52,6 +60,7 @@ export default function AdminUsers() {
   const blockMutation = useAdminUsersControllerBlock();
   const unblockMutation = useAdminUsersControllerUnblock();
   const roleMutation = useAdminUsersControllerSetRole();
+  const removeMutation = useAdminUsersControllerRemove();
 
   const pageData = devFallbackPage(data, devUsers);
   const rows = pageData.data;
@@ -89,6 +98,18 @@ export default function AdminUsers() {
       errorKey: "common.actionFailed",
     });
     if (ok) setOpened(null);
+  };
+
+  const remove = async (id: number) => {
+    const ok = await run(() => removeMutation.mutateAsync({ id }), {
+      invalidate: [getAdminUsersControllerListQueryKey()],
+      successKey: "admin.users.removed",
+      errorKey: "common.actionFailed",
+    });
+    if (!ok) return;
+
+    setOpened(null);
+    if (rows.length === 1 && page > 1) setPage((current) => current - 1);
   };
 
   const demotedRole = (u: { shopId: number | null }): UserRole => (u.shopId ? "seller" : "user");
@@ -130,6 +151,17 @@ export default function AdminUsers() {
             onConfirm: (reason) => block(u.id, reason),
           },
         },
+    {
+      label: t("admin.users.remove"),
+      icon: Trash2,
+      destructive: true,
+      withConfirm: {
+        title: t("admin.users.removeTitle"),
+        description: t("admin.users.removeText", { name: u.fullname }),
+        confirmLabel: t("admin.users.remove"),
+        onConfirm: () => remove(u.id),
+      },
+    },
   ];
 
   return (
@@ -241,6 +273,7 @@ export default function AdminUsers() {
         onBlock={block}
         onUnblock={unblock}
         onSetRole={setRole}
+        onRemove={remove}
       />
     </div>
   );

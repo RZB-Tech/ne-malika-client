@@ -239,6 +239,68 @@ export function useAdminUsersControllerGetOne<TData = Awaited<ReturnType<typeof 
 
 
 /**
+ * @summary Удалить пользователя вместе с его магазином, товарами и пользовательскими данными
+ */
+export const adminUsersControllerRemove = (
+    id: number,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<void>(
+      {url: `/api/v1/admin/users/${id}`, method: 'DELETE', signal
+    },
+      options);
+    }
+
+
+
+
+export const getAdminUsersControllerRemoveMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminUsersControllerRemove>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof adminUsersControllerRemove>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['adminUsersControllerRemove'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminUsersControllerRemove>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  adminUsersControllerRemove(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AdminUsersControllerRemoveMutationResult = NonNullable<Awaited<ReturnType<typeof adminUsersControllerRemove>>>
+
+    export type AdminUsersControllerRemoveMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Удалить пользователя вместе с его магазином, товарами и пользовательскими данными
+ */
+export const useAdminUsersControllerRemove = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminUsersControllerRemove>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof adminUsersControllerRemove>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getAdminUsersControllerRemoveMutationOptions(options), queryClient);
+    }
+    /**
  * @summary Выдать или снять права администратора
  */
 export const adminUsersControllerSetRole = (

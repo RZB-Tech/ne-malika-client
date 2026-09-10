@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { RotateCcw, ShieldCheck, ShieldOff, Store, UserX } from "@/components/icons";
+import { RotateCcw, ShieldCheck, ShieldOff, Store, Trash2, UserX } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { AbolishDialog } from "@/components/admin/abolish-dialog";
 import { EntityStatusBadge } from "@/components/admin/entity-status-badge";
 import { RoleBadge } from "@/components/shared/badges";
+import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import {
   DetailDrawer,
   DetailNote,
@@ -28,12 +29,14 @@ export function UserDrawer({
   onBlock,
   onUnblock,
   onSetRole,
+  onRemove,
 }: {
   user: AdminUserRow | null;
   onOpenChange: (open: boolean) => void;
   onBlock: (id: number, reason: string) => Promise<void>;
   onUnblock: (id: number) => Promise<void>;
   onSetRole: (id: number, role: UserRole) => Promise<void>;
+  onRemove: (id: number) => Promise<void>;
 }) {
   const { t, locale } = useT();
 
@@ -120,6 +123,21 @@ export function UserDrawer({
                 </Button>
               </AbolishDialog>
             )}
+
+            <ConfirmDialog
+              title={t("admin.users.removeTitle")}
+              description={t("admin.users.removeText", { name: user.fullname })}
+              confirmLabel={t("admin.users.remove")}
+              destructive
+              onConfirm={() => onRemove(user.id)}
+            >
+              <Button
+                variant="ghost"
+                className={`col-span-2 ${drawerAction.danger}`}
+              >
+                <Trash2 className="size-4" /> {t("admin.users.remove")}
+              </Button>
+            </ConfirmDialog>
           </>
         )
       }

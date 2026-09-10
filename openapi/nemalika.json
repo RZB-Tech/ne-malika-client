@@ -196,6 +196,33 @@
         "tags": [
           "users-admin"
         ]
+      },
+      "delete": {
+        "operationId": "AdminUsersController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Удалить пользователя вместе с его магазином, товарами и пользовательскими данными",
+        "tags": [
+          "users-admin"
+        ]
       }
     },
     "/api/v1/admin/users/{id}/role": {
