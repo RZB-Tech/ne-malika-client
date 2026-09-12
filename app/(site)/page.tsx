@@ -3,6 +3,8 @@ import { connection } from "next/server";
 import { Suspense } from "react";
 import { BannerCarousel } from "@/components/home/banner-carousel";
 import { CatalogView } from "@/components/catalog/catalog-view";
+import { PageContainer } from "@/components/layout/page-container";
+import { ProductGridSkeleton } from "@/components/product/product-grid";
 import { getBanners, getPublicProducts } from "@/lib/api/server";
 import { randomCatalogSeed } from "@/lib/catalog-seed";
 import type { Paginated, PublicProductCard } from "@/lib/api/types";
@@ -61,7 +63,27 @@ const jsonLd = [
   },
 ];
 
-export default async function HomePage() {
+export default function HomePage() {
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
+      />
+      <Suspense
+        fallback={
+          <PageContainer className="py-8">
+            <ProductGridSkeleton count={10} />
+          </PageContainer>
+        }
+      >
+        <HomeContent />
+      </Suspense>
+    </>
+  );
+}
+
+async function HomeContent() {
   await connection();
   const seed = randomCatalogSeed();
 
@@ -72,10 +94,6 @@ export default async function HomePage() {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
-      />
       <BannerCarousel banners={banners} />
       <Suspense>
         <CatalogView

@@ -35,14 +35,9 @@ export const ProductCard = memo(function ProductCard({ product }: { product: Pro
   useEffect(() => {
     if (!hovered || photos.length < 2 || !canAutoplay()) return;
 
-    for (const url of photos.slice(1)) {
-      const preload = new Image();
-      preload.src = url;
-    }
-
     const id = setInterval(() => setActive((i) => (i + 1) % photos.length), PHOTO_INTERVAL_MS);
     return () => clearInterval(id);
-  }, [hovered, photos.length]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [hovered, photos.length]);
 
   const leave = () => {
     setHovered(false);
@@ -60,7 +55,7 @@ export const ProductCard = memo(function ProductCard({ product }: { product: Pro
         <CompareButton product={snapshot} />
       </div>
 
-      <Link href={`/product/${product.id}`} className="flex flex-1 flex-col">
+      <Link href={`/product/${product.id}`} prefetch={false} className="flex flex-1 flex-col">
         <div className="relative overflow-hidden rounded-2xl bg-muted sm:min-h-0 sm:flex-1">
           <ProductImage
             hue={product.hue}

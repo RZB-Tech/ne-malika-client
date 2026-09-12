@@ -36,6 +36,8 @@ export function StoreAvatar({
         /* eslint-disable-next-line @next/next/no-img-element */
         <img
           src={src!}
+          loading="lazy"
+          decoding="async"
           alt={name}
           className="h-full w-full object-cover"
           onError={() => setFailed(true)}

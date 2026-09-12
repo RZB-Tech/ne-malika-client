@@ -79,6 +79,7 @@ export function ProductDetail({ product, store }: { product: Product; store: Sto
                       <ProductImage
                         hue={g.hue}
                         src={g.src}
+                        sizes="76px"
                         alt={product.name}
                         categorySlug={product.categorySlug}
                         fit="contain"
@@ -103,6 +104,8 @@ export function ProductDetail({ product, store }: { product: Product; store: Sto
                     <ProductImage
                       hue={gallery[active]?.hue ?? product.hue}
                       src={gallery[active]?.src}
+                      sizes="(max-width: 639px) 100vw, (max-width: 1023px) 550px, 640px"
+                      eager
                       alt={product.name}
                       categorySlug={product.categorySlug}
                       fit="contain"

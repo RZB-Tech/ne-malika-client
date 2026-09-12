@@ -7,6 +7,7 @@ import { PageContainer } from "@/components/layout/page-container";
 import { useT } from "@/components/providers/i18n-provider";
 import { BANNER_ASPECT_CSS, bannerImageUrl, type PublicBanner } from "@/lib/api/banners";
 import { cn } from "@/lib/utils";
+import { ResponsiveImage } from "@/components/shared/responsive-image";
 
 const AUTOPLAY_MS = 6000;
 
@@ -148,9 +149,10 @@ function BannerSlide({
   eager: boolean;
 }) {
   const image = src ? (
-    /* eslint-disable-next-line @next/next/no-img-element */
-    <img
+    <ResponsiveImage
       src={src}
+      fill
+      sizes="(max-width: 639px) 92vw, (max-width: 1023px) 86vw, (max-width: 1504px) 82vw, 1181px"
       alt={banner.title}
       loading={eager ? "eager" : "lazy"}
       fetchPriority={eager ? "high" : "auto"}
@@ -163,7 +165,10 @@ function BannerSlide({
 
   return (
     <div
-      className={cn("shrink-0 snap-start overflow-hidden rounded-2xl bg-muted", SLIDE_WIDTH)}
+      className={cn(
+        "relative shrink-0 snap-start overflow-hidden rounded-2xl bg-muted",
+        SLIDE_WIDTH,
+      )}
       style={{ aspectRatio: BANNER_ASPECT_CSS }}
     >
       {banner.linkUrl ? (

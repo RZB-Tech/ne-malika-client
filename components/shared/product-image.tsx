@@ -4,6 +4,8 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { CategoryIcon } from "./category-icon";
 import { getCategory } from "@/lib/data";
+import { ResponsiveImage } from "./responsive-image";
+import { PRODUCT_CARD_SIZES } from "@/lib/image-config";
 
 export function ProductImage({
   hue,
@@ -13,6 +15,8 @@ export function ProductImage({
   className,
   iconClassName,
   fit = "cover",
+  sizes = PRODUCT_CARD_SIZES,
+  eager = false,
 }: {
   hue: number;
   categorySlug: string;
@@ -21,12 +25,16 @@ export function ProductImage({
   className?: string;
   iconClassName?: string;
   fit?: "cover" | "contain" | "natural";
+  sizes?: string;
+  eager?: boolean;
 }) {
+  const [previousSrc, setPreviousSrc] = useState(src);
   const [currentSrc, setCurrentSrc] = useState(src);
   const [failed, setFailed] = useState(false);
   const [triedFallback, setTriedFallback] = useState(false);
 
-  if (src !== currentSrc && !triedFallback) {
+  if (src !== previousSrc) {
+    setPreviousSrc(src);
     setCurrentSrc(src);
     setFailed(false);
     setTriedFallback(false);
@@ -87,6 +95,8 @@ export function ProductImage({
         /* eslint-disable-next-line @next/next/no-img-element */
         <img
           src={currentSrc!}
+          loading={eager ? "eager" : "lazy"}
+          decoding="async"
           alt={alt ?? ""}
           className="relative z-10 block h-auto w-full"
           onError={handleImageError}
@@ -94,8 +104,12 @@ export function ProductImage({
       ) : showImage ? (
         <>
           {fit === "contain" && <div className="absolute inset-0 z-[5] bg-muted" />}
-          <img
+          <ResponsiveImage
             src={currentSrc!}
+            fill
+            sizes={sizes}
+            loading={eager ? "eager" : "lazy"}
+            fetchPriority={eager ? "high" : "auto"}
             alt={alt ?? ""}
             className={cn(
               "absolute inset-0 z-10 h-full w-full",

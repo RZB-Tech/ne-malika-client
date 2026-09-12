@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { imageRemotePatterns } from "./lib/image-config";
 
 /**
  * Заголовки безопасности.
@@ -87,16 +88,9 @@ const connectSrc = [
   ...(DEV ? ["ws:", "http://localhost:*"] : []),
 ].filter(Boolean);
 
-const imgSrc = [
-  "'self'",
-  "data:",
-  "blob:",
-  METRIKA,
-  API,
-  S3_PUBLIC,
-  TME,
-  ...TELEGRAM_CDN,
-].filter(Boolean);
+const imgSrc = ["'self'", "data:", "blob:", METRIKA, API, S3_PUBLIC, TME, ...TELEGRAM_CDN].filter(
+  Boolean,
+);
 
 const csp = [
   `default-src 'self'`,
@@ -128,6 +122,11 @@ const nextConfig: NextConfig = {
   distDir: process.env.NEXT_DIST_DIR || ".next",
   output: process.env.NEXT_STANDALONE === "1" ? "standalone" : undefined,
   poweredByHeader: false,
+  images: {
+    remotePatterns: imageRemotePatterns,
+    formats: ["image/webp"],
+    minimumCacheTTL: 86400,
+  },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },
