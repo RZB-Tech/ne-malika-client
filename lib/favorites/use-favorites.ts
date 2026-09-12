@@ -1,12 +1,11 @@
 "use client";
 
 import { useCallback, useSyncExternalStore } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   getFavoritesControllerFindMineQueryKey,
   useFavoritesControllerAdd,
   useFavoritesControllerClear,
-  useFavoritesControllerFindMine,
   useFavoritesControllerRemove,
   useFavoritesControllerSync,
 } from "@/lib/api/generated/endpoints/me-favorites/me-favorites";
@@ -14,6 +13,7 @@ import type { FavoriteDto } from "@/lib/api/generated/schemas";
 import { useAuth } from "@/lib/api/auth";
 import type { ProductSnapshot } from "@/lib/product-snapshot";
 import { useRemoteBackedList } from "@/lib/remote-backed-list";
+import { fetchAllFavorites } from "./fetch-favorites";
 import {
   addLocalFavorite,
   clearLocalFavorites,
@@ -46,10 +46,11 @@ export function useFavorites() {
 
   const enabled = isHydrated && isAuthenticated;
 
-  const remote = useFavoritesControllerFindMine(
-    { limit: MAX_LOCAL_FAVORITES },
-    { query: { enabled } },
-  );
+  const remote = useQuery({
+    queryKey: [...getFavoritesControllerFindMineQueryKey(), "all", user?.id],
+    enabled,
+    queryFn: ({ signal }) => fetchAllFavorites(signal),
+  });
 
   const { mutateAsync: syncFavorites } = useFavoritesControllerSync();
   const { mutateAsync: addRemote } = useFavoritesControllerAdd();

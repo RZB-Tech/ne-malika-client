@@ -3,7 +3,8 @@ import axios, {
   type AxiosRequestConfig,
   type InternalAxiosRequestConfig,
 } from "axios";
-import { clearAuth, getAccessToken, setAccessToken } from "./token-store";
+import { clearAuth, getAccessToken, setAuth } from "./token-store";
+import type { AuthResponseDto } from "./generated/schemas";
 import { defaultLocale, locales, STORAGE_KEY, type Locale } from "@/lib/i18n/config";
 
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
@@ -39,19 +40,35 @@ function readLocale(): string {
 
 const REFRESH_URL = "/api/v1/auth/refresh";
 
-let refreshPromise: Promise<string | null> | null = null;
+let refreshPromise: Promise<AuthResponseDto | null> | null = null;
 
-async function runRefresh(): Promise<string | null> {
+// Startup, ordinary requests and SSE must share one refresh operation.
+export function refreshAuthSession(): Promise<AuthResponseDto | null> {
+  if (!refreshPromise) {
+    refreshPromise = runRefresh().finally(() => {
+      refreshPromise = null;
+    });
+  }
+  return refreshPromise;
+}
+
+async function runRefresh(): Promise<AuthResponseDto | null> {
+  const previousToken = getAccessToken();
   try {
-    const { data } = await axios.post<{ accessToken: string }>(
+    const { data } = await axios.post<AuthResponseDto>(
       REFRESH_URL,
       {},
-      { baseURL: API_BASE_URL, withCredentials: true },
+      { baseURL: API_BASE_URL, withCredentials: true, timeout: 10_000 },
     );
-    setAccessToken(data.accessToken);
-    return data.accessToken;
+    if (getAccessToken() !== previousToken) return null;
+    setAuth(data.accessToken, data.user);
+    return data;
   } catch (err) {
-    if (axios.isAxiosError(err) && err.response?.status === 401) {
+    if (
+      getAccessToken() === previousToken &&
+      axios.isAxiosError(err) &&
+      err.response?.status === 401
+    ) {
       clearAuth();
     }
     return null;
@@ -70,9 +87,7 @@ axiosInstance.interceptors.response.use(
 
     if (status === 401 && original && !original._retried && !isAuthCall) {
       original._retried = true;
-      refreshPromise = refreshPromise ?? runRefresh();
-      const newToken = await refreshPromise;
-      refreshPromise = null;
+      const newToken = (await refreshAuthSession())?.accessToken;
 
       if (newToken) {
         original.headers.set("Authorization", `Bearer ${newToken}`);

@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { API_BASE_URL } from "./mutator";
+import { API_BASE_URL, refreshAuthSession } from "./mutator";
 import { getAccessToken } from "./token-store";
 import { useAuth } from "./auth";
 import { CHATS_KEY } from "./chats";
@@ -46,6 +46,16 @@ export function useChatStream(): void {
           credentials: "include",
         });
 
+        if (response.status === 401) {
+          await response.body?.cancel();
+          if (!(await refreshAuthSession())) stopped = true;
+          return;
+        }
+        if (response.status === 403) {
+          await response.body?.cancel();
+          stopped = true;
+          return;
+        }
         if (!response.ok || !response.body) {
           throw new Error(`поток не открылся: ${response.status}`);
         }

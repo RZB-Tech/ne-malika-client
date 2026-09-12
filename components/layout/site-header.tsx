@@ -114,8 +114,7 @@ export function SiteHeader() {
   const username = (user?.telegramUsername as string | null | undefined)?.replace(/^@/, "");
   const rawPhoto = user?.telegramPhoto as unknown;
   const photo = typeof rawPhoto === "string" && rawPhoto.length > 0 ? rawPhoto : null;
-  const accountLabel =
-    user?.fullname?.trim().split(/\s+/)[0] || username || t("nav.account");
+  const accountLabel = user?.fullname?.trim().split(/\s+/)[0] || username || t("nav.account");
 
   useEffect(() => {
     let animationFrame = 0;
@@ -149,7 +148,6 @@ export function SiteHeader() {
           isCompact ? "h-16" : "h-17",
         )}
       >
-        <Logo showText={false} className="md:hidden" />
         <Logo className="mr-1 hidden md:inline-flex" />
 
         <div className="min-w-0 flex-1 md:hidden">
@@ -367,7 +365,8 @@ function MessagesAction() {
         variant="ghost"
         size="lg"
         title={t("nav.messages")}
-        className={cn(ACTION_CLASS, "hidden md:flex")}
+        aria-label={t("nav.messages")}
+        className={cn(ACTION_CLASS, "flex size-9 p-0 md:h-13 md:w-16")}
       >
         <ActionBody icon={MessageSquare} label={t("nav.messages")} count={unread} />
       </Button>

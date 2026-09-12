@@ -1,15 +1,22 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useSyncExternalStore } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import {
   authControllerLogout,
-  authControllerRefresh,
   authControllerTelegramAuth,
   authControllerWidgetAuth,
 } from "./generated/endpoints/auth/auth";
 import type { AuthResponseDto, TelegramWidgetDto } from "./generated/schemas";
 import { DEV_ROLE } from "./dev-fixtures";
 import { clearAuth, getAccessToken, getCurrentUser, setAuth, subscribe } from "./token-store";
+import { refreshAuthSession } from "./mutator";
 
 export type TelegramUser = TelegramWidgetDto;
 
@@ -38,6 +45,7 @@ function readMiniAppInitData(): string | null {
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [sessionReady, setSessionReady] = useState(Boolean(DEV_ROLE));
   const user = useSyncExternalStore(subscribe, getCurrentUser, () => null);
   const token = useSyncExternalStore(subscribe, getAccessToken, () => null);
   const hydrated = useSyncExternalStore(
@@ -58,16 +66,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return res;
   }, []);
 
-  const refreshSession = useCallback(async () => {
-    try {
-      const res = await authControllerRefresh();
-      setAuth(res.accessToken, res.user);
-      return res;
-    } catch (err) {
-      console.error("[auth] session refresh failed:", err);
-      return null;
-    }
-  }, []);
+  const refreshSession = useCallback(() => refreshAuthSession(), []);
 
   const logout = useCallback(async () => {
     try {
@@ -87,7 +86,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     wa?.expand?.();
 
     if (getAccessToken()) {
-      void refreshSession();
+      void refreshSession().finally(() => setSessionReady(true));
       return;
     }
 
@@ -112,25 +111,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const initData = readMiniAppInitData();
     if (initData) {
-      loginWithInitData(initData).catch((err) => {
-        console.error("[auth] Mini App initData login failed:", err);
-      });
+      loginWithInitData(initData)
+        .catch((err) => {
+          console.error("[auth] Mini App initData login failed:", err);
+        })
+        .finally(() => setSessionReady(true));
       return;
     }
 
-    authControllerRefresh()
-      .then((res) => setAuth(res.accessToken, res.user))
-      .catch((err) => {
-        console.error("[auth] guest refresh failed:", err);
-      });
+    void refreshSession().finally(() => setSessionReady(true));
   }, [loginWithInitData, refreshSession]);
 
   const value: AuthContextValue = {
     user,
-    isAuthenticated: Boolean(token),
+    isAuthenticated: sessionReady && Boolean(token),
     isSeller: user?.role === "seller",
     isAdmin: user?.role === "admin",
-    isHydrated: hydrated,
+    isHydrated: hydrated && sessionReady,
     isTelegramMiniApp: readMiniAppInitData() !== null,
     loginWithInitData,
     loginWithTelegramUser,

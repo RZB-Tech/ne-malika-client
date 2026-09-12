@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { isAxiosError } from "axios";
 
 export function QueryProvider({ children }: { children: React.ReactNode }) {
   const [client] = useState(
@@ -10,7 +11,12 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
         defaultOptions: {
           queries: {
             staleTime: 30_000,
-            retry: 1,
+            retry: (failureCount, error) => {
+              const status = isAxiosError(error) ? error.response?.status : undefined;
+              if (status && status >= 400 && status < 500 && status !== 408 && status !== 429)
+                return false;
+              return failureCount < 1;
+            },
             refetchOnWindowFocus: false,
           },
         },
