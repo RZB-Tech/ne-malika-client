@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -30,6 +30,15 @@ export function AbolishDialog({
   const [open, setOpen] = useState(false);
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
+  const reasonRef = useRef<HTMLTextAreaElement>(null);
+
+  const handleOpenChange = (nextOpen: boolean) => {
+    setOpen(nextOpen);
+    if (nextOpen) {
+      setReason("");
+      requestAnimationFrame(() => reasonRef.current?.focus());
+    }
+  };
 
   const confirm = async () => {
     if (reason.trim().length < 5) {
@@ -49,14 +58,22 @@ export function AbolishDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent
+        className="sm:max-w-md"
+        onOpenAutoFocus={(event) => {
+          event.preventDefault();
+          reasonRef.current?.focus();
+        }}
+        onCloseAutoFocus={(event) => event.preventDefault()}
+      >
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           {description && <DialogDescription>{description}</DialogDescription>}
         </DialogHeader>
         <Textarea
+          ref={reasonRef}
           value={reason}
           onChange={(e) => setReason(e.target.value)}
           rows={3}
