@@ -8,3 +8,7 @@ allowBuilds:
   # собирать из исходников не требуется.
   sharp: false
   unrs-resolver: false
+
+# Vaul и radix-ui должны использовать один экземпляр Dialog/FocusScope.
+overrides:
+  "vaul>@radix-ui/react-dialog": 1.1.23
