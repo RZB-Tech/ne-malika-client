@@ -34,12 +34,15 @@ const THEME_INIT = `(function(){try{var d=localStorage.getItem('theme')==='dark'
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "neMalika — маркетплейс компьютерной техники",
+    default: "neMalika — маркетплейс компьютерной техники на рынке Малика в Ташкенте",
     template: "%s · neMalika",
   },
   description:
-    "Витрина компьютерной техники: комплектующие, готовые сборки и периферия от проверенных магазинов. Поиск, фильтры и связь с продавцом напрямую в Telegram.",
-  verification: { yandex: "f7605f24203c66e8" },
+    "Витрина компьютерной техники: ноутбуки, ПК, комплектующие и периферия от магазинов рынка Малика в Ташкенте. Актуальные цены, сравнение и связь с продавцом напрямую в Telegram.",
+  verification: {
+    yandex: "f7605f24203c66e8",
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined,
+  },
   appleWebApp: { capable: true, title: "neMalika", statusBarStyle: "default" },
 };
 

@@ -13,7 +13,8 @@ import { SITE_NAME, SITE_URL, SITE_DESCRIPTION, SITE_KEYWORDS, absoluteUrl } fro
 
 export const metadata: Metadata = {
   title: {
-    absolute: "neMalika — компьютерный рынок Малика (Malika) в Ташкенте онлайн",
+    absolute:
+      "neMalika — компьютерный рынок Малика в Ташкенте онлайн: ноутбуки, видеокарты, ПК",
   },
   description: SITE_DESCRIPTION,
   keywords: SITE_KEYWORDS,

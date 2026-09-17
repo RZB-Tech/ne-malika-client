@@ -27,19 +27,23 @@ const PRELOAD_MARGIN = "600px 0px";
 export function CatalogView({
   initialData,
   seed: initialSeed,
+  forcedCategory,
 }: {
   initialData?: Paginated<PublicProductCard>;
   seed?: string;
+  forcedCategory?: string;
 } = {}) {
   const { t, locale } = useT();
   const { roots } = useCategories();
 
   const {
     q,
-    category,
+    category: filterCategory,
     setCategory,
     subCategoryId,
   } = useCatalogFilters();
+
+  const category = forcedCategory ?? filterCategory;
 
   const [seed] = useState(() => initialSeed ?? randomCatalogSeed());
 

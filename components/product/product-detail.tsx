@@ -55,6 +55,36 @@ export function ProductDetail({ product, store }: { product: Product; store: Sto
 
   return (
     <PageContainer className="py-6">
+      <nav
+        aria-label="Хлебные крошки"
+        className="mb-5 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground"
+      >
+        <Link href="/" className="transition-colors hover:text-foreground">
+          Главная
+        </Link>
+        <span className="text-muted-foreground/50">/</span>
+        {product.categorySlug && (
+          <>
+            <Link
+              href={`/category/${product.categorySlug}`}
+              className="transition-colors hover:text-foreground"
+            >
+              {product.categoryName || product.categorySlug}
+            </Link>
+            <span className="text-muted-foreground/50">/</span>
+          </>
+        )}
+        <Link
+          href={`/store/${store.slug}`}
+          className="transition-colors hover:text-foreground"
+        >
+          {store.name}
+        </Link>
+        <span className="text-muted-foreground/50">/</span>
+        <span className="max-w-[220px] truncate font-medium text-foreground sm:max-w-md">
+          {product.name}
+        </span>
+      </nav>
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
         <div className="min-w-0">
           {}

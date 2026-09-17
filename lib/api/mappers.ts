@@ -64,6 +64,7 @@ function toProduct(
     slug: String(pc.id),
     name: pc.name,
     categorySlug: ("categorySlug" in pc ? pc.categorySlug : null) ?? "",
+    categoryName: ("categoryNameRu" in pc ? pc.categoryNameRu : null) ?? undefined,
     subcategory: "",
     brand: shopName,
     model: "",

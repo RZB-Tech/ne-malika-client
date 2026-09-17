@@ -1,6 +1,7 @@
 import "server-only";
 
 import type {
+  CategoryDto,
   PublicBannerDto,
   PublicShopListItemDto,
   ShopsControllerFindAllSort,
@@ -59,9 +60,11 @@ export function getPublicProducts(
     seed?: string;
     shopId?: number;
     categoryId?: number;
+    category?: string;
+    q?: string;
   } = {},
 ): Promise<Paginated<PublicProductCard> | null> {
-  const { page = 1, limit = 24, sort = "newest", seed, shopId, categoryId } = params;
+  const { page = 1, limit = 24, sort = "newest", seed, shopId, categoryId, category, q } = params;
   const qs = new URLSearchParams({
     page: String(page),
     limit: String(limit),
@@ -69,8 +72,14 @@ export function getPublicProducts(
     ...(seed ? { seed } : {}),
     ...(shopId ? { shop_id: String(shopId) } : {}),
     ...(categoryId ? { category_id: String(categoryId) } : {}),
+    ...(category ? { category } : {}),
+    ...(q ? { q } : {}),
   }).toString();
   return getJson<Paginated<PublicProductCard>>(`/product-cards?${qs}`, seed ? 0 : 120);
+}
+
+export async function getPublicCategories(): Promise<CategoryDto[]> {
+  return (await getJson<CategoryDto[]>("/categories", 3600)) ?? [];
 }
 
 export async function getBanners(): Promise<PublicBannerDto[]> {

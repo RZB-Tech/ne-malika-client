@@ -24,7 +24,7 @@ import { cn } from "@/lib/utils";
 const EXIT_MS = 200;
 
 function categoryHref(root: CategoryDto, child?: CategoryDto): string {
-  return child ? `/?category=${root.slug}&sub=${child.id}` : `/?category=${root.slug}`;
+  return child ? `/category/${root.slug}?sub=${child.id}` : `/category/${root.slug}`;
 }
 
 export function CatalogMenu() {

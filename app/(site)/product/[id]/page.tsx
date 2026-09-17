@@ -42,33 +42,58 @@ export async function generateMetadata({
     return { title: "Товар не найден", robots: { index: false, follow: true } };
   }
 
+  const isOld = product.state === "old";
+  const stateBadge = isOld ? " (б/у)" : "";
+  const priceFormatted =
+    product.price === null
+      ? "цена договорная"
+      : `${new Intl.NumberFormat("ru-RU").format(Number(product.price))} сум`;
+
+  const title = `Купить ${product.name}${stateBadge} в Ташкенте — ${priceFormatted} на рынке Малика | ${SITE_NAME}`;
+
   const priceLine =
     product.price === null
       ? "Цена договорная."
-      : `Цена ${new Intl.NumberFormat("ru-RU").format(Number(product.price))} сум.`;
+      : `Цена ${priceFormatted}.`;
   const specs = specsSummary(product.characteristics);
-  const descBase =
-    markdownToPlainText(product.description ?? "") ||
-    `${product.name} — купить на рынке Малика (Malika) в Ташкенте.`;
-  const description = [
-    descBase,
-    specs && `Характеристики: ${specs}.`,
-    `${priceLine} Продавец: ${product.shopName}. Рынок Малика, Ташкент.`,
-  ]
-    .filter(Boolean)
-    .join(" ")
-    .slice(0, 300);
+  const descLead = `Купить ${product.name}${stateBadge} в Ташкенте на компьютерном рынке Малика (Malika). ${priceLine} Магазин: ${product.shopName}.`;
+  const descTail = specs
+    ? `Характеристики: ${specs}. Гарантия, прямая связь с магазином в Telegram.`
+    : (markdownToPlainText(product.description ?? "").slice(0, 120) ||
+       "Гарантия, актуальные цены, прямая связь с магазином в Telegram.");
+  const description = `${descLead} ${descTail}`.slice(0, 300);
+
+  const keywords = [
+    product.name,
+    `купить ${product.name}`,
+    `${product.name} цена`,
+    `${product.name} Ташкент`,
+    `${product.name} на Малике`,
+    "рынок Малика",
+    "компьютерный рынок Ташкент",
+    ...(product.categoryNameRu
+      ? [
+          product.categoryNameRu,
+          `купить ${product.categoryNameRu} Ташкент`,
+          `${product.categoryNameRu} Малика`,
+        ]
+      : []),
+    product.shopName,
+  ];
 
   const url = absoluteUrl(`/product/${product.id}`);
   const image = photoUrl(product.photos?.[0]);
 
   return {
-    title: product.name,
+    title: {
+      absolute: title,
+    },
     description,
+    keywords,
     alternates: { canonical: url },
     openGraph: {
       type: "website",
-      title: `${product.name} · ${SITE_NAME}`,
+      title: `Купить ${product.name}${stateBadge} в Ташкенте — ${SITE_NAME}`,
       description,
       url,
       siteName: SITE_NAME,
@@ -77,7 +102,7 @@ export async function generateMetadata({
     },
     twitter: {
       card: image ? "summary_large_image" : "summary",
-      title: product.name,
+      title: `Купить ${product.name}${stateBadge} в Ташкенте`,
       description,
       images: image ? [image] : undefined,
     },
@@ -134,13 +159,34 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
         storeViews: 0,
       };
 
+  const brandName =
+    raw.characteristics?.find(
+      (c) => c.key.toLowerCase() === "бренд" || c.key.toLowerCase() === "brand",
+    )?.value?.trim() ||
+    raw.shopName ||
+    SITE_NAME;
+
+  const modelName = raw.characteristics?.find(
+    (c) => c.key.toLowerCase() === "модель" || c.key.toLowerCase() === "model",
+  )?.value?.trim();
+
+  const validUntil = new Date(Date.now() + 180 * 24 * 60 * 60 * 1000)
+    .toISOString()
+    .split("T")[0];
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
     name: raw.name,
     description: raw.description ? markdownToPlainText(raw.description) : undefined,
-    image: (raw.photos ?? []).map((k) => photoUrl(k)).filter(Boolean),
+    image: (raw.photos ?? []).map((k) => photoUrl(k)).filter((u): u is string => Boolean(u)),
     sku: String(raw.id),
+    mpn: modelName || String(raw.id),
+    brand: {
+      "@type": "Brand",
+      name: brandName,
+    },
+    category: raw.categoryNameRu || undefined,
     additionalProperty: (raw.characteristics ?? []).map((c) => ({
       "@type": "PropertyValue",
       name: c.key,
@@ -153,9 +199,18 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
             "@type": "Offer",
             price: Number(raw.price),
             priceCurrency: "UZS",
+            priceValidUntil: validUntil,
+            itemCondition:
+              raw.state === "new"
+                ? "https://schema.org/NewCondition"
+                : "https://schema.org/UsedCondition",
             availability: "https://schema.org/InStock",
             url: absoluteUrl(`/product/${raw.id}`),
-            seller: { "@type": "Organization", name: raw.shopName },
+            seller: {
+              "@type": "Organization",
+              name: raw.shopName,
+              url: absoluteUrl(`/store/${raw.shopId}`),
+            },
           },
     // Оценка уже показана на странице звёздами — без этого блока поисковик
     // её не видит и звёзд в выдаче не рисует. Без отзывов блок не выводим:
@@ -172,19 +227,42 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
         : undefined,
   };
 
+  const breadcrumbItems: {
+    "@type": string;
+    position: number;
+    name: string;
+    item?: string;
+  }[] = [
+    { "@type": "ListItem", position: 1, name: SITE_NAME, item: absoluteUrl("/") },
+  ];
+
+  if (raw.categoryNameRu && raw.categorySlug) {
+    breadcrumbItems.push({
+      "@type": "ListItem",
+      position: breadcrumbItems.length + 1,
+      name: raw.categoryNameRu,
+      item: absoluteUrl(`/category/${raw.categorySlug}`),
+    });
+  }
+
+  breadcrumbItems.push({
+    "@type": "ListItem",
+    position: breadcrumbItems.length + 1,
+    name: raw.shopName,
+    item: absoluteUrl(`/store/${raw.shopId}`),
+  });
+
+  breadcrumbItems.push({
+    "@type": "ListItem",
+    position: breadcrumbItems.length + 1,
+    name: raw.name,
+    item: absoluteUrl(`/product/${raw.id}`),
+  });
+
   const breadcrumbsLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
-    itemListElement: [
-      { "@type": "ListItem", position: 1, name: SITE_NAME, item: absoluteUrl("/") },
-      {
-        "@type": "ListItem",
-        position: 2,
-        name: raw.shopName,
-        item: absoluteUrl(`/store/${raw.shopId}`),
-      },
-      { "@type": "ListItem", position: 3, name: raw.name },
-    ],
+    itemListElement: breadcrumbItems,
   };
 
   return (
