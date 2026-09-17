@@ -129,7 +129,10 @@ function FormBody({
     try {
       const data = {
         name: name.trim(),
-        description: description.trim() || undefined,
+        description:
+          editing && description.trim() === (editing.description ?? "").trim()
+            ? undefined
+            : description.trim(),
         photos: await resolvePhotoKeys(photos),
         price: priceNum,
         state,

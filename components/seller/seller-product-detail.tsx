@@ -143,7 +143,8 @@ export function SellerProductDetail({ id }: { id: number }) {
         id,
         data: {
           name: name.trim(),
-          description: description.trim() || undefined,
+          description:
+            description.trim() === (row.description ?? "").trim() ? undefined : description.trim(),
           photos: photoKeys,
           price: priceNum,
           state,

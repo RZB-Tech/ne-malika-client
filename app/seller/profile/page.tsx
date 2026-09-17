@@ -115,10 +115,19 @@ export default function SellerProfile() {
 
       const payload = {
         name: name.trim(),
-        description: description.trim() || undefined,
-        address: address.trim() || undefined,
-        contact: phone.trim() || undefined,
-        telegramLink: tgUsername ? telegramUrl(tgUsername) : undefined,
+        description:
+          shop && description.trim() === (shop.description ?? "").trim()
+            ? undefined
+            : description.trim(),
+        address:
+          shop && address.trim() === (shop.address ?? "").trim() ? undefined : address.trim(),
+        contact: shop && phone.trim() === (shop.contact ?? "").trim() ? undefined : phone.trim(),
+        telegramLink:
+          shop && tgUsername === parseTelegramUsername(shop.telegramLink ?? "")
+            ? undefined
+            : tgUsername
+              ? telegramUrl(tgUsername)
+              : "",
         workSchedule: toWorkSchedule(hours),
         photo,
       };

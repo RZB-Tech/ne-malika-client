@@ -1,8 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useSyncExternalStore } from "react";
+import { getCurrentUser, getSessionVersion, subscribe } from "@/lib/api/token-store";
 
-const syncedUsers = new Set<string>();
+const syncedLists = new Set<string>();
+let syncSession = getSessionVersion();
 
 export function useRemoteBackedList<TItem extends { id: number }, TDto>({
   listKey,
@@ -35,23 +37,36 @@ export function useRemoteBackedList<TItem extends { id: number }, TDto>({
   removeRemote: (id: number) => Promise<unknown>;
   clearRemote: () => Promise<unknown>;
 }) {
+  const session = useSyncExternalStore(subscribe, getSessionVersion, () => 0);
+  const isCurrent = useCallback(
+    () => getSessionVersion() === session && getCurrentUser()?.id === user?.id,
+    [session, user?.id],
+  );
+
   useEffect(() => {
     const userId = user?.id;
-    if (!enabled || userId === undefined) return;
+    if (!enabled || userId === undefined || !isCurrent()) return;
+    if (syncSession !== session) {
+      syncedLists.clear();
+      syncSession = session;
+    }
 
-    const key = `${listKey}:${userId}`;
-    if (syncedUsers.has(key)) return;
+    const key = `${listKey}:${session}:${userId}`;
+    if (syncedLists.has(key)) return;
 
     const items = getLocal();
-    syncedUsers.add(key);
+    syncedLists.add(key);
     if (items.length === 0) return;
 
     sync(items)
-      .then(() => invalidate())
+      .then(() => {
+        if (!isCurrent()) return;
+        return invalidate();
+      })
       .catch(() => {
-        syncedUsers.delete(key);
+        syncedLists.delete(key);
       });
-  }, [enabled, user?.id, listKey, getLocal, sync, invalidate]);
+  }, [enabled, user?.id, listKey, getLocal, removeLocal, sync, invalidate, session, isCurrent]);
 
   const items = useMemo(() => {
     if (!enabled) return local;
@@ -60,20 +75,22 @@ export function useRemoteBackedList<TItem extends { id: number }, TDto>({
 
   const remove = useCallback(
     async (id: number) => {
+      if (!isCurrent()) return;
       removeLocal(id);
       if (!enabled) return;
       await removeRemote(id).catch(() => undefined);
-      await invalidate();
+      if (isCurrent()) await invalidate();
     },
-    [enabled, removeLocal, removeRemote, invalidate],
+    [enabled, removeLocal, removeRemote, invalidate, isCurrent],
   );
 
   const clear = useCallback(async () => {
+    if (!isCurrent()) return;
     clearLocal();
     if (!enabled) return;
     await clearRemote().catch(() => undefined);
-    await invalidate();
-  }, [enabled, clearLocal, clearRemote, invalidate]);
+    if (isCurrent()) await invalidate();
+  }, [enabled, clearLocal, clearRemote, invalidate, isCurrent]);
 
   return {
     items,

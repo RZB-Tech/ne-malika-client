@@ -7,6 +7,7 @@ const USER_KEY = "nemalika.user";
 
 let accessToken: string | null = null;
 let currentUser: AuthUserDto | null = null;
+let sessionVersion = 0;
 
 type Listener = () => void;
 const listeners = new Set<Listener>();
@@ -43,7 +44,14 @@ export function getCurrentUser(): AuthUserDto | null {
   return currentUser;
 }
 
+export function getSessionVersion(): number {
+  return sessionVersion;
+}
+
 export function setAuth(token: string | null, user: AuthUserDto | null) {
+  if (currentUser?.id !== user?.id || Boolean(accessToken) !== Boolean(token)) {
+    sessionVersion++;
+  }
   accessToken = token;
   currentUser = user;
   if (typeof window !== "undefined") {
@@ -55,16 +63,8 @@ export function setAuth(token: string | null, user: AuthUserDto | null) {
   emit();
 }
 
-export function setAccessToken(token: string | null) {
-  accessToken = token;
-  if (typeof window !== "undefined") {
-    if (token) window.localStorage.setItem(TOKEN_KEY, token);
-    else window.localStorage.removeItem(TOKEN_KEY);
-  }
-  emit();
-}
-
 export function clearAuth() {
+  sessionVersion++;
   setAuth(null, null);
 }
 

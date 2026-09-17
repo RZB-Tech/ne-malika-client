@@ -48,6 +48,7 @@ function DrawerBody({ side, onClose }: { side: "buyer" | "seller"; onClose: () =
   const { t } = useT();
   const { data, isPending } = useChats(side);
   const [activeId, setActiveId] = useState<number | null>(null);
+  const [drafts, setDrafts] = useState<Map<number, string>>(new Map());
 
   const chats = data?.data ?? [];
   const active = chats.find((chat) => chat.id === activeId) ?? null;
@@ -76,7 +77,22 @@ function DrawerBody({ side, onClose }: { side: "buyer" | "seller"; onClose: () =
       )}
 
       {active ? (
-        <ChatThread chat={active} side={side} className="min-h-0 flex-1" hideHeader />
+        <ChatThread
+          key={active.id}
+          chat={active}
+          side={side}
+          draft={drafts.get(active.id) ?? ""}
+          onDraftChange={(value) => {
+            setDrafts((previous) => {
+              const next = new Map(previous);
+              if (value) next.set(active.id, value);
+              else next.delete(active.id);
+              return next;
+            });
+          }}
+          className="min-h-0 flex-1"
+          hideHeader
+        />
       ) : (
         <>
           <div className="min-h-0 flex-1 overflow-y-auto">

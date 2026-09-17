@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import { Loader2, Undo2, Wand2 } from "@/components/icons";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -33,12 +34,27 @@ export function FixDescriptionButton({
   const { t } = useT();
   const [busy, setBusy] = useState(false);
 
+  const current = useRef({ signature: "", revision: 0, active: false, text, onResult });
+  const signature = JSON.stringify([text, name, photo?.id, photo?.url, disabled]);
+  useLayoutEffect(() => {
+    if (current.current.signature !== signature) current.current.revision += 1;
+    Object.assign(current.current, { signature, active: true, text, onResult });
+  });
+  useLayoutEffect(
+    () => () => {
+      current.current.active = false;
+    },
+    [],
+  );
+
   const [revision, setRevision] = useState<{
     before: string;
     after: string;
+    version: number;
+    signature: string;
   } | null>(null);
 
-  const canUndo = revision !== null && text === revision.after;
+  const canUndo = revision !== null && signature === revision.signature && text === revision.after;
 
   const run = async () => {
     if (!photo) {
@@ -46,11 +62,15 @@ export function FixDescriptionButton({
       return;
     }
 
+    if (busy || disabled) return;
+    const startedRevision = current.current.revision;
+    const isCurrent = () => current.current.active && current.current.revision === startedRevision;
     setBusy(true);
     try {
       let key = photo.key;
       if (!key) {
         key = await uploadPhoto(dataUrlToBlob(photo.url));
+        if (!isCurrent()) return;
         onPhotoStored?.(photo.id, key);
       }
 
@@ -61,19 +81,25 @@ export function FixDescriptionButton({
         name: name?.trim() || undefined,
       })) as unknown as { text: string };
 
-      onResult(result.text);
-      setRevision({ before, after: result.text });
+      if (!isCurrent()) return;
+      flushSync(() => current.current.onResult(result.text));
+      setRevision({
+        before,
+        after: result.text,
+        version: current.current.revision,
+        signature: current.current.signature,
+      });
       toast.success(t("ai.description.done"));
     } catch (err) {
-      toast.error(apiErrorMessage(err, t, "ai.description.failed"));
+      if (isCurrent()) toast.error(apiErrorMessage(err, t, "ai.description.failed"));
     } finally {
-      setBusy(false);
+      if (current.current.active) setBusy(false);
     }
   };
 
   const undo = () => {
-    if (!revision) return;
-    onResult(revision.before);
+    if (!revision || !canUndo || current.current.revision !== revision.version) return;
+    current.current.onResult(revision.before);
     setRevision(null);
   };
 

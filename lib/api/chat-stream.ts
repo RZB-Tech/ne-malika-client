@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { API_BASE_URL, refreshAuthSession } from "./mutator";
-import { getAccessToken } from "./token-store";
+import { getAccessToken, getSessionVersion, subscribe } from "./token-store";
 import { useAuth } from "./auth";
 import { CHATS_KEY } from "./chats";
 
@@ -15,6 +15,7 @@ const STALE_MS = 60_000;
 export function useChatStream(): void {
   const queryClient = useQueryClient();
   const { isAuthenticated, isHydrated } = useAuth();
+  const session = useSyncExternalStore(subscribe, getSessionVersion, () => 0);
 
   useEffect(() => {
     if (!isHydrated || !isAuthenticated) return;
@@ -25,8 +26,18 @@ export function useChatStream(): void {
     let current: AbortController | null = null;
     let lastFrameAt = 0;
 
+    const isCurrent = () => !stopped && getSessionVersion() === session;
+    const stop = () => {
+      stopped = true;
+      clearTimeout(retryTimer);
+      current?.abort();
+    };
+    const unsubscribe = subscribe(() => {
+      if (getSessionVersion() !== session) stop();
+    });
+
     const invalidate = () => {
-      void queryClient.invalidateQueries({ queryKey: [CHATS_KEY] });
+      if (isCurrent()) void queryClient.invalidateQueries({ queryKey: [CHATS_KEY] });
     };
 
     const connect = async () => {
@@ -46,9 +57,19 @@ export function useChatStream(): void {
           credentials: "include",
         });
 
+        if (!isCurrent()) {
+          await response.body?.cancel();
+          return;
+        }
         if (response.status === 401) {
           await response.body?.cancel();
-          if (!(await refreshAuthSession())) stopped = true;
+          if (!isCurrent()) return;
+          const refreshed = await refreshAuthSession();
+          if (!isCurrent()) return;
+          if (!refreshed) {
+            if (!getAccessToken()) stopped = true;
+            else throw new Error("Session refresh unavailable");
+          }
           return;
         }
         if (response.status === 403) {
@@ -68,7 +89,7 @@ export function useChatStream(): void {
 
         for (;;) {
           const { value, done } = await reader.read();
-          if (done) break;
+          if (done || !isCurrent()) break;
 
           lastFrameAt = Date.now();
           buffer += value;
@@ -131,13 +152,12 @@ export function useChatStream(): void {
     run();
 
     return () => {
-      stopped = true;
-      clearTimeout(retryTimer);
-      current?.abort();
+      stop();
+      unsubscribe();
       document.removeEventListener("visibilitychange", wake);
       window.removeEventListener("online", wake);
     };
-  }, [isAuthenticated, isHydrated, queryClient]);
+  }, [isAuthenticated, isHydrated, queryClient, session]);
 }
 
 class NoTokenYet extends Error {}

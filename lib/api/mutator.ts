@@ -1,9 +1,10 @@
 import axios, {
+  CanceledError as AxiosCanceledError,
   type AxiosError,
   type AxiosRequestConfig,
   type InternalAxiosRequestConfig,
 } from "axios";
-import { clearAuth, getAccessToken, setAuth } from "./token-store";
+import { clearAuth, getAccessToken, getSessionVersion, setAuth } from "./token-store";
 import type { AuthResponseDto } from "./generated/schemas";
 import { defaultLocale, locales, STORAGE_KEY, type Locale } from "@/lib/i18n/config";
 
@@ -14,14 +15,27 @@ export const axiosInstance = axios.create({
   withCredentials: true,
 });
 
-axiosInstance.interceptors.request.use((config: InternalAxiosRequestConfig) => {
+type SessionRequestConfig = InternalAxiosRequestConfig & {
+  _sessionVersion?: number;
+  _retried?: boolean;
+};
+
+function assertSession(session: number | undefined): asserts session {
+  if (session !== undefined && session !== getSessionVersion()) {
+    throw new AxiosCanceledError("Session changed");
+  }
+}
+
+axiosInstance.interceptors.request.use((config: SessionRequestConfig) => {
+  config._sessionVersion ??= getSessionVersion();
+  assertSession(config._sessionVersion);
   const token = getAccessToken();
   if (token) {
     config.headers.set("Authorization", `Bearer ${token}`);
   }
   config.headers.set("Accept-Language", readLocale());
   return config;
-});
+}, undefined, { synchronous: true });
 
 let localeCache: string | null = null;
 
@@ -40,19 +54,23 @@ function readLocale(): string {
 
 const REFRESH_URL = "/api/v1/auth/refresh";
 
-let refreshPromise: Promise<AuthResponseDto | null> | null = null;
+let refreshOperation: { session: number; promise: Promise<AuthResponseDto | null> } | null = null;
 
-// Startup, ordinary requests and SSE must share one refresh operation.
 export function refreshAuthSession(): Promise<AuthResponseDto | null> {
-  if (!refreshPromise) {
-    refreshPromise = runRefresh().finally(() => {
-      refreshPromise = null;
-    });
+  const session = getSessionVersion();
+  if (!refreshOperation || refreshOperation.session !== session) {
+    const operation = {
+      session,
+      promise: runRefresh(session).finally(() => {
+        if (refreshOperation === operation) refreshOperation = null;
+      }),
+    };
+    refreshOperation = operation;
   }
-  return refreshPromise;
+  return refreshOperation.promise;
 }
 
-async function runRefresh(): Promise<AuthResponseDto | null> {
+async function runRefresh(session: number): Promise<AuthResponseDto | null> {
   const previousToken = getAccessToken();
   try {
     const { data } = await axios.post<AuthResponseDto>(
@@ -60,11 +78,12 @@ async function runRefresh(): Promise<AuthResponseDto | null> {
       {},
       { baseURL: API_BASE_URL, withCredentials: true, timeout: 10_000 },
     );
-    if (getAccessToken() !== previousToken) return null;
+    if (getSessionVersion() !== session || getAccessToken() !== previousToken) return null;
     setAuth(data.accessToken, data.user);
     return data;
   } catch (err) {
     if (
+      getSessionVersion() === session &&
       getAccessToken() === previousToken &&
       axios.isAxiosError(err) &&
       err.response?.status === 401
@@ -76,18 +95,22 @@ async function runRefresh(): Promise<AuthResponseDto | null> {
 }
 
 axiosInstance.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    assertSession((response.config as SessionRequestConfig)._sessionVersion);
+    return response;
+  },
   async (error: AxiosError) => {
-    const original = error.config as
-      (InternalAxiosRequestConfig & { _retried?: boolean }) | undefined;
+    const original = error.config as SessionRequestConfig | undefined;
+    assertSession(original?._sessionVersion);
 
     const status = error.response?.status;
     const url = original?.url ?? "";
-    const isAuthCall = url.includes("/auth/refresh") || url.includes("/auth/telegram");
+    const isAuthCall = url.includes("/auth/");
 
     if (status === 401 && original && !original._retried && !isAuthCall) {
       original._retried = true;
       const newToken = (await refreshAuthSession())?.accessToken;
+      assertSession(original._sessionVersion);
 
       if (newToken) {
         original.headers.set("Authorization", `Bearer ${newToken}`);
@@ -108,11 +131,16 @@ export const customInstance = <T>(
   options?: AxiosRequestConfig,
 ): Promise<T> => {
   const source = axios.CancelToken.source();
-  const promise = axiosInstance({
+  const request: AxiosRequestConfig & { _sessionVersion: number } = {
     ...config,
     ...options,
+    _sessionVersion: getSessionVersion(),
     cancelToken: source.token,
-  }).then(({ data }) => data as T);
+  };
+  const promise = axiosInstance(request).then(({ data }) => {
+    assertSession(request._sessionVersion);
+    return data as T;
+  });
 
   // @ts-expect-error attach cancel for orval's react-query cancellation.
   promise.cancel = () => source.cancel("Query was cancelled");

@@ -41,7 +41,7 @@ export function CatalogView({
     category: filterCategory,
     setCategory,
     subCategoryId,
-  } = useCatalogFilters();
+  } = useCatalogFilters(forcedCategory);
 
   const category = forcedCategory ?? filterCategory;
 

@@ -15,7 +15,7 @@ import {
 } from "./generated/endpoints/auth/auth";
 import type { AuthResponseDto, TelegramWidgetDto } from "./generated/schemas";
 import { DEV_ROLE } from "./dev-fixtures";
-import { clearAuth, getAccessToken, getCurrentUser, setAuth, subscribe } from "./token-store";
+import { clearAuth, getAccessToken, getCurrentUser, getSessionVersion, setAuth, subscribe } from "./token-store";
 import { refreshAuthSession } from "./mutator";
 
 export type TelegramUser = TelegramWidgetDto;
@@ -55,13 +55,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 
   const loginWithInitData = useCallback(async (initData: string) => {
+    const session = getSessionVersion();
     const res = await authControllerTelegramAuth({ initData });
+    if (getSessionVersion() !== session) throw new Error("Session changed");
     setAuth(res.accessToken, res.user);
     return res;
   }, []);
 
   const loginWithTelegramUser = useCallback(async (tgUser: TelegramUser) => {
+    const session = getSessionVersion();
     const res = await authControllerWidgetAuth(tgUser);
+    if (getSessionVersion() !== session) throw new Error("Session changed");
     setAuth(res.accessToken, res.user);
     return res;
   }, []);

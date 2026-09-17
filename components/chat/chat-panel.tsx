@@ -49,8 +49,18 @@ export function ChatPanel({
       <div className={cn("min-w-0 flex-1", active ? "flex" : "hidden md:flex")}>
         {active ? (
           <ChatThread
+            key={active.id}
             chat={active}
             side={role}
+            draft={drafts.get(active.id) ?? ""}
+            onDraftChange={(value) => {
+              setDrafts((previous) => {
+                const next = new Map(previous);
+                if (value) next.set(active.id, value);
+                else next.delete(active.id);
+                return next;
+              });
+            }}
             onBack={() => select(null)}
             className="min-h-0 w-full"
           />

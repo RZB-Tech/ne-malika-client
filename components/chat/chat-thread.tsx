@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Bot, Check, CheckDouble, Send } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -14,25 +14,49 @@ import { ChatConversationHeader } from "./chat-conversation-header";
 
 const MESSAGE_MAX = 2000;
 
-export function ChatThread({
-  chat,
-  side,
-  className,
-  onBack,
-  hideHeader = false,
-}: {
+export function ChatThread(props: ChatThreadProps) {
+  return <ChatThreadBody key={`${props.side}:${props.chat.id}`} {...props} />;
+}
+
+interface ChatThreadProps {
   chat: ChatDto;
   side: "buyer" | "seller";
   className?: string;
   onBack?: () => void;
   hideHeader?: boolean;
-}) {
+  draft?: string;
+  onDraftChange?: (value: string) => void;
+}
+
+function ChatThreadBody({
+  chat,
+  side,
+  className,
+  onBack,
+  hideHeader = false,
+  draft,
+  onDraftChange,
+}: ChatThreadProps) {
   const { t, locale } = useT();
   const { data, isPending } = useChatMessages(chat.id);
   const send = useSendMessage(chat.id, side);
 
-  const [text, setText] = useState("");
+  const [localText, setLocalText] = useState("");
+  const text = draft ?? localText;
+  const setText = onDraftChange ?? setLocalText;
   const bottom = useRef<HTMLDivElement | null>(null);
+  const composer = useRef({ text, revision: 0, active: false });
+  useLayoutEffect(() => {
+    if (composer.current.text !== text) composer.current.revision += 1;
+    composer.current.text = text;
+    composer.current.active = true;
+  }, [text]);
+  useLayoutEffect(
+    () => () => {
+      composer.current.active = false;
+    },
+    [],
+  );
 
   const messages = data ? [...data.data].reverse() : [];
   const lastId = messages.at(-1)?.id;
@@ -45,8 +69,14 @@ export function ChatThread({
     e.preventDefault();
     const value = text.trim();
     if (!value || send.isPending) return;
+    composer.current.text = "";
+    const revision = ++composer.current.revision;
     setText("");
-    send.mutate(value, { onError: () => setText(value) });
+    send.mutate(value, {
+      onError: () => {
+        if (composer.current.active && composer.current.revision === revision) setText(value);
+      },
+    });
   };
 
   return (

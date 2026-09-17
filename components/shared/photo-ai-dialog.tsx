@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Check, ImagePlus, Sparkles, Wand2, X } from "@/components/icons";
 import { toast } from "sonner";
 import {
@@ -88,17 +88,25 @@ interface StoredImage extends Generated {
   createdAt: string;
 }
 
-export function PhotoAiDialog({
-  photo,
-  onClose,
-  onApply,
-  onPhotoStored,
-}: {
+interface PhotoAiDialogProps {
   photo: UploadedPhoto | null;
   onClose: () => void;
   onApply: (replacement: UploadedPhoto[]) => void;
   onPhotoStored?: (photoId: string, key: string) => void;
-}) {
+}
+
+export function PhotoAiDialog(props: PhotoAiDialogProps) {
+  return props.photo ? (
+    <PhotoAiSession key={props.photo.id} {...props} photo={props.photo} />
+  ) : null;
+}
+
+function PhotoAiSession({
+  photo,
+  onClose,
+  onApply,
+  onPhotoStored,
+}: PhotoAiDialogProps & { photo: UploadedPhoto }) {
   const { t } = useT();
   const [prompt, setPrompt] = useState("");
   const [count, setCount] = useState<number>(2);
@@ -116,19 +124,25 @@ export function PhotoAiDialog({
   const describeMutation = useImageGenControllerDescribe();
   const generateMutation = useImageGenControllerGenerate();
 
-  const open = photo !== null;
+  const active = useRef(false);
+  const promptRevision = useRef(0);
+  const referenceRevision = useRef(0);
 
-  const [shownPhoto, setShownPhoto] = useState(photo);
-  if (photo && photo.id !== shownPhoto?.id) {
-    setShownPhoto(photo);
-    setPrompt("");
-    setResults([]);
-    setPicked(new Set());
-    setReference(null);
-    setSavedKey(null);
-  }
+  useLayoutEffect(() => {
+    active.current = true;
+    return () => {
+      active.current = false;
+    };
+  }, []);
 
-  const photoKey = shownPhoto?.key ?? savedKey ?? undefined;
+  useEffect(() => {
+    return () => {
+      if (reference) URL.revokeObjectURL(reference.url);
+    };
+  }, [reference]);
+
+  const open = true;
+  const photoKey = photo.key ?? savedKey ?? undefined;
   const size = SIZES[format][tier];
 
   const quotaQuery = useImageGenControllerBalance({
@@ -156,29 +170,34 @@ export function PhotoAiDialog({
   }, [results, history]);
 
   const close = () => {
+    active.current = false;
     setPicked(new Set());
     onClose();
   };
 
   const changeStyle = (next: GenerateImagesDtoStyle) => {
+    promptRevision.current += 1;
     setStyle(next);
     setFormat(next === "photo" ? "square" : "portrait");
   };
 
   const describe = async () => {
-    if (!photoKey) return;
+    if (!active.current || !photoKey) return;
+    const revision = promptRevision.current;
     try {
       const res = (await describeMutation.mutateAsync({
         data: { photoKey, referenceKey: reference?.key, style },
       })) as unknown as { prompt: string };
+      if (!active.current || promptRevision.current !== revision) return;
       setPrompt(res.prompt);
     } catch (err) {
+      if (!active.current) return;
       toast.error(apiErrorMessage(err, t, "admin.photoAi.promptFailed"));
     }
   };
 
   const generate = async () => {
-    if (!photoKey) return;
+    if (!active.current || !photoKey) return;
     if (prompt.trim().length < 3) {
       toast.error(t("admin.photoAi.promptEmpty"));
       return;
@@ -195,15 +214,18 @@ export function PhotoAiDialog({
           referenceKey: reference?.key,
         },
       })) as unknown as Generated[];
+      if (!active.current) return;
       setResults((prev) => [...res, ...prev]);
       setPicked(new Set());
       await Promise.all([quotaQuery.refetch(), historyQuery.refetch()]);
     } catch (err) {
+      if (!active.current) return;
       toast.error(apiErrorMessage(err, t, "admin.photoAi.generateFailed"));
     }
   };
 
   const apply = () => {
+    if (!active.current) return;
     const chosen = gallery.filter((r) => picked.has(r.key));
     if (chosen.length === 0) {
       toast.error(t("admin.photoAi.pickAtLeastOne"));
@@ -214,29 +236,36 @@ export function PhotoAiDialog({
   };
 
   const storePhoto = async () => {
-    if (!photo || photo.key || savedKey) return;
+    if (!active.current || photo.key || savedKey || savingPhoto) return;
     setSavingPhoto(true);
     try {
       const key = await uploadPhoto(dataUrlToBlob(photo.url));
+      if (!active.current) return;
       setSavedKey(key);
       onPhotoStored?.(photo.id, key);
     } catch (err) {
-      toast.error(apiErrorMessage(err, t, "admin.photoAi.savePhotoFailed"));
+      if (active.current) toast.error(apiErrorMessage(err, t, "admin.photoAi.savePhotoFailed"));
     } finally {
-      setSavingPhoto(false);
+      if (active.current) setSavingPhoto(false);
     }
   };
 
   const pickReference = async (file: File | undefined) => {
-    if (!file) return;
+    if (!file || !active.current) return;
+    const revision = ++referenceRevision.current;
+    promptRevision.current += 1;
     setUploading(true);
     try {
       const key = await uploadPhoto(file);
+      if (!active.current || referenceRevision.current !== revision) return;
+      promptRevision.current += 1;
       setReference({ key, url: URL.createObjectURL(file) });
     } catch (err) {
-      toast.error(apiErrorMessage(err, t, "admin.photoAi.referenceFailed"));
+      if (active.current && referenceRevision.current === revision) {
+        toast.error(apiErrorMessage(err, t, "admin.photoAi.referenceFailed"));
+      }
     } finally {
-      setUploading(false);
+      if (active.current && referenceRevision.current === revision) setUploading(false);
     }
   };
 
@@ -256,7 +285,7 @@ export function PhotoAiDialog({
           <DialogDescription>{t("admin.photoAi.subtitle")}</DialogDescription>
         </DialogHeader>
 
-        {!shownPhoto || !photoKey ? (
+        {!photo || !photoKey ? (
           <div className="space-y-3">
             <p className="text-sm text-muted-foreground">{t("admin.photoAi.unsaved")}</p>
             <Button type="button" className="gap-2" onClick={storePhoto} disabled={savingPhoto}>
@@ -268,7 +297,7 @@ export function PhotoAiDialog({
           <div className="space-y-4">
             <div className="flex gap-4">
               <img
-                src={shownPhoto.url}
+                src={photo.url}
                 alt={t("admin.photoAi.sourceAlt")}
                 className="size-28 shrink-0 rounded-xl bg-muted object-cover ring-1 ring-foreground/10"
               />
@@ -295,7 +324,10 @@ export function PhotoAiDialog({
                   id="ai-prompt"
                   rows={4}
                   value={prompt}
-                  onChange={(e) => setPrompt(e.target.value)}
+                  onChange={(e) => {
+                    promptRevision.current += 1;
+                    setPrompt(e.target.value);
+                  }}
                   placeholder={t("admin.photoAi.promptPlaceholder")}
                 />
               </div>
@@ -320,7 +352,11 @@ export function PhotoAiDialog({
                     variant="ghost"
                     size="sm"
                     className="gap-1.5 text-xs"
-                    onClick={() => setReference(null)}
+                    onClick={() => {
+                      referenceRevision.current += 1;
+                      promptRevision.current += 1;
+                      setReference(null);
+                    }}
                   >
                     <X className="size-3.5" />
                     {t("admin.photoAi.referenceRemove")}

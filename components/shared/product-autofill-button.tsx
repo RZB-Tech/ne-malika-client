@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import { toast } from "sonner";
 import { Loader2, Sparkles, Undo2 } from "@/components/icons";
 import { Button } from "@/components/ui/button";
@@ -51,7 +52,36 @@ export function ProductAutofillButton<T>({
 }) {
   const { t, locale } = useT();
   const [busy, setBusy] = useState(false);
-  const [before, setBefore] = useState<T | null>(null);
+  const [before, setBefore] = useState<{
+    snapshot: T;
+    revision: number;
+    signature: string;
+  } | null>(null);
+  const current = useRef({
+    signature: "",
+    revision: 0,
+    active: false,
+    snapshot,
+    onApply,
+    onRestore,
+  });
+  const signature = JSON.stringify([
+    snapshot,
+    name,
+    context,
+    photos.map((p) => [p.id, p.url]),
+    disabled,
+  ]);
+  useLayoutEffect(() => {
+    if (current.current.signature !== signature) current.current.revision += 1;
+    Object.assign(current.current, { signature, active: true, snapshot, onApply, onRestore });
+  });
+  useLayoutEffect(
+    () => () => {
+      current.current.active = false;
+    },
+    [],
+  );
 
   const priceQuery = useProductAutofillControllerPrice({
     query: { retry: false, staleTime: 30_000 },
@@ -116,7 +146,10 @@ export function ProductAutofillButton<T>({
       return;
     }
 
+    if (busy || disabled || blocked) return;
+    const startedRevision = current.current.revision;
     setBusy(true);
+    setBefore(null);
     try {
       const keys: string[] = [];
       for (const photo of photos.slice(0, MAX_PHOTOS)) {
@@ -125,11 +158,12 @@ export function ProductAutofillButton<T>({
           continue;
         }
         const key = await uploadPhoto(dataUrlToBlob(photo.url));
+        if (!current.current.active) return;
         onPhotoStored?.(photo.id, key);
         keys.push(key);
       }
 
-      const captured = snapshot;
+      if (!current.current.active) return;
       const result = await productAutofillControllerFill({
         photoKeys: keys,
         name: name.trim(),
@@ -141,22 +175,41 @@ export function ProductAutofillButton<T>({
         state: context.state,
       });
 
-      onApply(result);
-      setBefore(captured);
+      if (!current.current.active) return;
+      if (current.current.revision !== startedRevision) {
+        const message =
+          locale === "ru"
+            ? "Поля изменены во время запроса. Заменить текущие значения результатом AI?"
+            : locale === "uz-Cyrl"
+              ? "Сўров пайтида майдонлар ўзгарди. Жорий қийматлар AI натижаси билан алмаштирилсинми?"
+              : "So‘rov paytida maydonlar o‘zgardi. Joriy qiymatlar AI natijasi bilan almashtirilsinmi?";
+        if (!window.confirm(message)) {
+          await priceQuery.refetch();
+          return;
+        }
+      }
+      const captured = current.current.snapshot;
+      flushSync(() => current.current.onApply(result));
+      setBefore({
+        snapshot: captured,
+        revision: current.current.revision,
+        signature: current.current.signature,
+      });
       const fresh = await priceQuery.refetch();
+      if (!current.current.active) return;
       toast.success(t("ai.autofill.done"), {
         description: filledNote(result, fresh.data?.freeLimit ?? quota?.freeLimit),
       });
     } catch (err) {
-      toast.error(apiErrorMessage(err, t, "ai.autofill.failed"));
+      if (current.current.active) toast.error(apiErrorMessage(err, t, "ai.autofill.failed"));
     } finally {
-      setBusy(false);
+      if (current.current.active) setBusy(false);
     }
   };
 
   const undo = () => {
-    if (before === null) return;
-    onRestore(before);
+    if (before === null || current.current.revision !== before.revision) return;
+    current.current.onRestore(before.snapshot);
     setBefore(null);
     toast.success(t("ai.autofill.restored"));
   };
@@ -176,7 +229,7 @@ export function ProductAutofillButton<T>({
         {busy ? t("ai.autofill.working") : t("ai.autofill.action")}
       </Button>
 
-      {before !== null && (
+      {before !== null && signature === before.signature && (
         <Button
           type="button"
           variant="ghost"

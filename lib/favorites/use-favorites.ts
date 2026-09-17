@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useSyncExternalStore } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   getFavoritesControllerFindMineQueryKey,
@@ -11,6 +11,7 @@ import {
 } from "@/lib/api/generated/endpoints/me-favorites/me-favorites";
 import type { FavoriteDto } from "@/lib/api/generated/schemas";
 import { useAuth } from "@/lib/api/auth";
+import { getSessionVersion, subscribe } from "@/lib/api/token-store";
 import type { ProductSnapshot } from "@/lib/product-snapshot";
 import { useRemoteBackedList } from "@/lib/remote-backed-list";
 import { fetchAllFavorites } from "./fetch-favorites";
@@ -41,6 +42,7 @@ function fromRemote(dto: FavoriteDto): FavoriteProduct {
 export function useFavorites() {
   const { user, isAuthenticated, isHydrated } = useAuth();
   const queryClient = useQueryClient();
+  const session = useSyncExternalStore(subscribe, getSessionVersion, () => 0);
 
   const local = useSyncExternalStore(subscribeLocalFavorites, getLocalFavorites, getEmptyFavorites);
 
@@ -51,6 +53,14 @@ export function useFavorites() {
     enabled,
     queryFn: ({ signal }) => fetchAllFavorites(signal),
   });
+  useEffect(() => {
+    const unsubscribe = subscribe(() => {
+      if (getSessionVersion() !== session) {
+        queryClient.removeQueries({ queryKey: [...getFavoritesControllerFindMineQueryKey(), "all"] });
+      }
+    });
+    return unsubscribe;
+  }, [queryClient, session]);
 
   const { mutateAsync: syncFavorites } = useFavoritesControllerSync();
   const { mutateAsync: addRemote } = useFavoritesControllerAdd();
@@ -96,21 +106,24 @@ export function useFavorites() {
   });
 
   const has = useCallback(
-    (id: number) => list.items.some((p) => p.id === id) || local.some((p) => p.id === id),
-    [list.items, local],
+    (id: number) => list.items.some((p) => p.id === id),
+    [list.items],
   );
 
   const add = useCallback(
     async (product: ProductSnapshot) => {
-      const added = addLocalFavorite(product);
-      if (!added) return false;
-      if (enabled) {
-        await addRemote({ data: { product_card_id: product.id } }).catch(() => undefined);
+      if (getSessionVersion() !== session) return false;
+      if (!enabled) return addLocalFavorite(product);
+      try {
+        await addRemote({ data: { product_card_id: product.id } });
+        if (getSessionVersion() !== session) return false;
         await invalidate();
+        return getSessionVersion() === session;
+      } catch {
+        return false;
       }
-      return true;
     },
-    [enabled, addRemote, invalidate],
+    [enabled, addRemote, invalidate, session],
   );
 
   const { remove: removeItem } = list;
