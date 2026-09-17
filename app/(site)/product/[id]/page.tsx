@@ -28,6 +28,17 @@ function specsSummary(
     .join(" · ");
 }
 
+function priceValidUntil(createdAt?: string): string {
+  if (createdAt) {
+    const d = new Date(createdAt);
+    if (!Number.isNaN(d.getTime())) {
+      d.setMonth(d.getMonth() + 6);
+      return d.toISOString().split("T")[0];
+    }
+  }
+  return "2027-12-31";
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -170,9 +181,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
     (c) => c.key.toLowerCase() === "модель" || c.key.toLowerCase() === "model",
   )?.value?.trim();
 
-  const validUntil = new Date(Date.now() + 180 * 24 * 60 * 60 * 1000)
-    .toISOString()
-    .split("T")[0];
+  const validUntil = priceValidUntil(raw.createdAt);
 
   const jsonLd = {
     "@context": "https://schema.org",

@@ -21,6 +21,9 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const category = getCategory(slug);
+  if (!category) {
+    return { title: "Категория не найдена", robots: { index: false, follow: true } };
+  }
 
   const categoryName = category?.name.ru || slug;
   const url = absoluteUrl(`/category/${slug}`);
@@ -71,6 +74,7 @@ export default async function CategoryPage({
 }) {
   const { slug } = await params;
   const category = getCategory(slug);
+  if (!category) notFound();
 
   const categoryName = category?.name.ru || slug;
   const initial = await getPublicProducts({ category: slug, limit: 24, sort: "newest" });

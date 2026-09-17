@@ -19,6 +19,7 @@ export function ChatPanel({
   const { t } = useT();
   const { data, isPending } = useChats(role);
   const [activeId, setActiveId] = useState<number | null>(null);
+  const [drafts, setDrafts] = useState<Map<number, string>>(new Map());
 
   const chats = data?.data ?? [];
   const active = chats.find((chat) => chat.id === activeId) ?? null;
