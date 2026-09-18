@@ -5,11 +5,15 @@ import { isAxiosError } from "axios";
 import { askAssistant, type AssistantMessage } from "@/lib/api/assistant";
 import {
   isAssistantReply,
+  isFallbackReply,
   readConversation,
   requestHistory,
   saveConversation,
 } from "@/lib/assistant/conversation";
 import type { Locale } from "@/lib/i18n/config";
+
+const MAX_CLIENT_ATTEMPTS = 2;
+const RETRY_DELAY_MS = 1000;
 
 export function useAssistant(locale: Locale, pathname: string) {
   const [messages, setMessages] = useState<AssistantMessage[]>([]);
@@ -40,24 +44,60 @@ export function useAssistant(locale: Locale, pathname: string) {
       .slice(-4)
       .map((product) => product.id);
     const productIds = [...new Set([...(pageId ? [Number(pageId)] : []), ...recentProducts])];
+
     try {
-      const reply = await askAssistant(
-        requestHistory(messages, text),
-        productIds,
-        controller.signal,
-      );
-      if (request.current !== controller) return;
-      if (!isAssistantReply(reply)) throw new Error("Invalid assistant response");
-      const next: AssistantMessage[] = [
-        ...messages,
-        { role: "user", content: text },
-        { role: "assistant", content: reply.message, reply },
-      ].slice(-12) as AssistantMessage[];
-      setMessages(next);
-      saveConversation(locale, next);
-    } catch (error) {
-      if (request.current === controller && !controller.signal.aborted) {
-        setFailed({ text, status: isAxiosError(error) ? error.response?.status : undefined });
+      for (let attempt = 0; attempt < MAX_CLIENT_ATTEMPTS; attempt++) {
+        try {
+          const reply = await askAssistant(
+            requestHistory(messages, text),
+            productIds,
+            controller.signal,
+          );
+          if (request.current !== controller || controller.signal.aborted) return;
+          if (!isAssistantReply(reply)) throw new Error("Invalid assistant response");
+
+          // If the server returned a generic fallback (indicating a backend failure),
+          // retry once automatically before surfacing an error to the user.
+          if (isFallbackReply(reply) && attempt < MAX_CLIENT_ATTEMPTS - 1) {
+            await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS));
+            if (request.current !== controller || controller.signal.aborted) return;
+            continue;
+          }
+
+          if (isFallbackReply(reply)) {
+            setFailed({ text, status: 502 });
+            return;
+          }
+
+          const next: AssistantMessage[] = [
+            ...messages,
+            { role: "user", content: text },
+            { role: "assistant", content: reply.message, reply },
+          ].slice(-12) as AssistantMessage[];
+          setMessages(next);
+          saveConversation(locale, next);
+          return;
+        } catch (error) {
+          if (controller.signal.aborted || request.current !== controller) return;
+          const status = isAxiosError(error) ? error.response?.status : undefined;
+          const isRetryable =
+            status === 408 ||
+            status === 429 ||
+            status === 500 ||
+            status === 502 ||
+            status === 503 ||
+            status === 504 ||
+            !status; // network/connection error
+
+          if (isRetryable && attempt < MAX_CLIENT_ATTEMPTS - 1) {
+            await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS));
+            if (request.current !== controller || controller.signal.aborted) return;
+            continue;
+          }
+
+          setFailed({ text, status });
+          return;
+        }
       }
     } finally {
       if (request.current === controller) {

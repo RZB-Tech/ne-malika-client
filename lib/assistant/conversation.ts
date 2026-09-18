@@ -7,6 +7,20 @@ const MAX_HISTORY = 12;
 const MAX_AGE = 24 * 60 * 60 * 1000;
 const SAFE_LINKS = new Set(["/", "/stores", "/compare", "/account?tab=favorites", "/messages"]);
 
+
+export function isFallbackReply(reply: unknown): boolean {
+  if (!reply || typeof reply !== "object") return false;
+  const r = reply as { message?: unknown; products?: unknown };
+  if (Array.isArray(r.products) && r.products.length > 0) return false;
+  if (typeof r.message !== "string") return false;
+  const trimmed = r.message.trim();
+  return (
+    trimmed.startsWith("Сейчас не удалось сформировать подробный ответ") ||
+    trimmed.startsWith("Hozir batafsil javob tayyorlab bo‘lmadi") ||
+    trimmed.startsWith("Ҳозир батафсил жавоб тайёрлаб бўлмади")
+  );
+}
+
 export function isAssistantReply(value: unknown): value is AssistantReply {
   if (!value || typeof value !== "object") return false;
   const reply = value as AssistantReply;
@@ -75,7 +89,16 @@ export function readConversation(locale: Locale): AssistantMessage[] {
       )
     )
       return [];
-    return saved.messages;
+    let clean = saved.messages;
+    while (clean.length >= 2) {
+      const last = clean[clean.length - 1];
+      if (last.reply && isFallbackReply(last.reply)) {
+        clean = clean.slice(0, -2);
+      } else {
+        break;
+      }
+    }
+    return clean;
   } catch {
     return [];
   }
