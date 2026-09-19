@@ -28,6 +28,8 @@ q?: string;
  */
 status?: AdminProductCardsControllerFindAllStatus;
 shop_id?: number;
+/** Фильтр по категории */
+category_id?: number;
 /**
  * Только товары без категории
  */

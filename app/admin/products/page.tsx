@@ -37,6 +37,9 @@ import { photoUrl } from "@/lib/api/photo";
 import { useAdminShopsControllerList } from "@/lib/api/generated/endpoints/shops-admin/shops-admin";
 import { devAdminProducts, devFallbackPage, devShops, usingDevData } from "@/lib/api/dev-fixtures";
 import type { AdminProductRow, AdminShopRow, EntityStatus, Paginated } from "@/lib/api/types";
+import { useCategories } from "@/lib/api/categories";
+import type { CategoryDto } from "@/lib/api/generated/schemas";
+import type { Locale } from "@/lib/i18n/config";
 
 const TABS: {
   value: string;
@@ -64,11 +67,25 @@ const TABS: {
   },
 ];
 
+function flattenCategories(roots: CategoryDto[], locale: Locale) {
+  return roots.flatMap((root) => {
+    const children = root.children.length > 0 ? root.children : [root];
+    return children.map((category) => ({
+      id: category.id,
+      label:
+        category.id === root.id
+          ? root.name[locale]
+          : `${root.name[locale]} · ${category.name[locale]}`,
+    }));
+  });
+}
+
 export default function AdminProducts() {
   const { t, locale } = useT();
   const run = useAdminMutation();
   const [q, setQ] = useState("");
   const [tab, setTab] = useState("all");
+  const [categoryId, setCategoryId] = useState<number | null>(null);
   const [page, setPage] = useState(1);
   const [opened, setOpened] = useState<AdminProductRow | null>(null);
   const [form, setForm] = useState<ProductFormTarget | null>(null);
@@ -76,9 +93,17 @@ export default function AdminProducts() {
   const active = TABS.find((x) => x.value === tab);
   const status = active?.status;
   const uncategorized = active?.uncategorized;
+  const { roots: categories, isLoading: categoriesLoading } = useCategories();
 
   const { data, isLoading } = useAdminProductCardsControllerFindAll(
-    { page, limit: 20, q: q.trim() || undefined, status, uncategorized },
+    {
+      page,
+      limit: 20,
+      q: q.trim() || undefined,
+      status,
+      uncategorized,
+      category_id: categoryId ?? undefined,
+    },
     {
       query: {
         select: (raw) => raw as unknown as Paginated<AdminProductRow>,
@@ -107,10 +132,11 @@ export default function AdminProducts() {
       (p) =>
         (!status || p.status === status) &&
         (!uncategorized || !p.categoryId) &&
+        (!categoryId || p.categoryId === categoryId) &&
         (!q.trim() || p.name.toLowerCase().includes(q.trim().toLowerCase())),
     );
     return devFallbackPage(data, fixtures);
-  }, [data, status, uncategorized, q]);
+  }, [data, status, uncategorized, categoryId, q]);
 
   const rows = pageData.data;
 
@@ -220,6 +246,25 @@ export default function AdminProducts() {
             className="pl-9"
           />
         </div>
+
+        <select
+          value={categoryId ?? ""}
+          disabled={categoriesLoading}
+          onChange={(event) => {
+            const value = event.target.value;
+            setCategoryId(value ? Number(value) : null);
+            setPage(1);
+          }}
+          aria-label="Фильтр по категории"
+          className="h-10 min-w-52 rounded-xl border-0 bg-muted/60 px-3 text-sm outline-none transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring/40 disabled:opacity-50"
+        >
+          <option value="">Все категории</option>
+          {flattenCategories(categories, locale).map((category) => (
+            <option key={category.id} value={category.id}>
+              {category.label}
+            </option>
+          ))}
+        </select>
       </div>
 
       {uncategorized && (
