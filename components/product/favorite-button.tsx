@@ -3,7 +3,7 @@
 import { Heart } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { useT } from "@/components/providers/i18n-provider";
-import { useFavorites } from "@/lib/favorites/use-favorites";
+import { useFavorites } from "@/components/providers/favorites-provider";
 import { GOALS, reachGoal } from "@/lib/metrika";
 import type { ProductSnapshot } from "@/lib/product-snapshot";
 import { cn } from "@/lib/utils";

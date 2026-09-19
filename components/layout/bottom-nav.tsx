@@ -7,8 +7,8 @@ import { LogoMark } from "@/components/shared/logo";
 import { LoginDialog } from "@/components/auth/login-dialog";
 import { useT } from "@/components/providers/i18n-provider";
 import { useAuth } from "@/lib/api/auth";
-import { useFavorites } from "@/lib/favorites/use-favorites";
-import { useCompare } from "@/lib/compare/use-compare";
+import { useFavorites } from "@/components/providers/favorites-provider";
+import { useCompare } from "@/components/providers/compare-provider";
 import { openCatalog } from "./catalog-bus";
 import { cn } from "@/lib/utils";
 

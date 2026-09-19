@@ -4,6 +4,8 @@ import NextTopLoader from "nextjs-toploader";
 import "./globals.css";
 import { I18nProvider } from "@/components/providers/i18n-provider";
 import { QueryProvider } from "@/components/providers/query-provider";
+import { FavoritesProvider } from "@/components/providers/favorites-provider";
+import { CompareProvider } from "@/components/providers/compare-provider";
 import { ChatStream } from "@/components/providers/chat-stream";
 import { Metrika } from "@/components/providers/metrika";
 import { AuthProvider } from "@/lib/api/auth";
@@ -77,11 +79,15 @@ export default function RootLayout({
         <QueryProvider>
           <AuthProvider>
             <I18nProvider>
-              <TooltipProvider delayDuration={200}>
-                <ChatStream />
-                {children}
-                <Toaster position="top-center" richColors />
-              </TooltipProvider>
+              <FavoritesProvider>
+                <CompareProvider>
+                  <TooltipProvider delayDuration={200}>
+                    <ChatStream />
+                    {children}
+                    <Toaster position="top-center" richColors />
+                  </TooltipProvider>
+                </CompareProvider>
+              </FavoritesProvider>
             </I18nProvider>
           </AuthProvider>
         </QueryProvider>

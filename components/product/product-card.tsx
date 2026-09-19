@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { memo, useEffect, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { ProductImage } from "@/components/shared/product-image";
 import { ContactSellerButton } from "@/components/product/contact-seller-button";
 import { FavoriteButton } from "@/components/product/favorite-button";
@@ -26,7 +26,7 @@ function canAutoplay(): boolean {
 
 export const ProductCard = memo(function ProductCard({ product }: { product: Product }) {
   const { t, locale } = useT();
-  const snapshot = productToSnapshot(product);
+  const snapshot = useMemo(() => productToSnapshot(product), [product]);
 
   const photos = product.photoUrls ?? [];
   const [active, setActive] = useState(0);
@@ -39,15 +39,16 @@ export const ProductCard = memo(function ProductCard({ product }: { product: Pro
     return () => clearInterval(id);
   }, [hovered, photos.length]);
 
-  const leave = () => {
+  const enter = useCallback(() => setHovered(true), []);
+  const leave = useCallback(() => {
     setHovered(false);
     setActive(0);
-  };
+  }, []);
 
   return (
     <div
       className="group relative isolate flex flex-col rounded-2xl bg-card p-2 sm:h-[var(--product-card-h)]"
-      onMouseEnter={() => setHovered(true)}
+      onMouseEnter={enter}
       onMouseLeave={leave}
     >
       <div className="absolute top-2 right-2 z-20 flex flex-col gap-1.5">

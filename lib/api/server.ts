@@ -75,7 +75,7 @@ export function getPublicProducts(
     ...(category ? { category } : {}),
     ...(q ? { q } : {}),
   }).toString();
-  return getJson<Paginated<PublicProductCard>>(`/product-cards?${qs}`, seed ? 0 : 120);
+  return getJson<Paginated<PublicProductCard>>(`/product-cards?${qs}`, 60);
 }
 
 export async function getPublicCategories(): Promise<CategoryDto[]> {

@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { connection } from "next/server";
 import { Suspense } from "react";
 import { BannerCarousel } from "@/components/home/banner-carousel";
 import { CatalogView } from "@/components/catalog/catalog-view";
@@ -64,6 +63,8 @@ const jsonLd = [
   },
 ];
 
+export const revalidate = 60;
+
 export default function HomePage() {
   return (
     <>
@@ -85,7 +86,6 @@ export default function HomePage() {
 }
 
 async function HomeContent() {
-  await connection();
   const seed = randomCatalogSeed();
 
   const [initial, banners] = await Promise.all([

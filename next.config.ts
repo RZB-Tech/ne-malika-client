@@ -187,13 +187,22 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  compress: true,
   allowedDevOrigins: ["*.ngrok-free.dev", "*.ngrok.io", "*.trycloudflare.com"],
   distDir: process.env.NEXT_DIST_DIR || ".next",
   output: process.env.NEXT_STANDALONE === "1" ? "standalone" : undefined,
   poweredByHeader: false,
+  experimental: {
+    optimizePackageImports: [
+      "@hugeicons/react",
+      "@hugeicons/core-free-icons",
+      "radix-ui",
+      "sonner",
+    ],
+  },
   images: {
     remotePatterns: imageRemotePatterns,
-    formats: ["image/webp"],
+    formats: ["image/avif", "image/webp"],
     minimumCacheTTL: 86400,
   },
   async headers() {

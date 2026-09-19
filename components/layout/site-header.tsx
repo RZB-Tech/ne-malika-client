@@ -33,8 +33,8 @@ import { CatalogMenu } from "./catalog-menu";
 import { useT } from "@/components/providers/i18n-provider";
 import { useAuth } from "@/lib/api/auth";
 import { useCategories } from "@/lib/api/categories";
-import { useFavorites } from "@/lib/favorites/use-favorites";
-import { useCompare } from "@/lib/compare/use-compare";
+import { useFavorites } from "@/components/providers/favorites-provider";
+import { useCompare } from "@/components/providers/compare-provider";
 import type { Locale } from "@/lib/i18n/config";
 import { initials } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -143,10 +143,7 @@ export function SiteHeader() {
       className="sticky top-0 z-50 mx-auto w-full max-w-site bg-card [overflow-anchor:none] md:rounded-b-3xl"
     >
       <div
-        className={cn(
-          "mx-auto flex w-full max-w-site items-center gap-2 px-5 transition-[height] duration-200 ease-out sm:gap-3 sm:px-8",
-          isCompact ? "h-16" : "h-17",
-        )}
+        className="mx-auto flex h-16 w-full max-w-site items-center gap-2 px-5 sm:gap-3 sm:px-8"
       >
         <Logo className="mr-1 hidden md:inline-flex" />
 
@@ -224,8 +221,8 @@ export function SiteHeader() {
       <div
         aria-hidden={isCompact}
         className={cn(
-          "hidden overflow-hidden transition-[height,opacity] duration-300 ease-in-out motion-reduce:transition-none lg:block",
-          isCompact ? "h-0 pointer-events-none opacity-0" : "h-10 opacity-100",
+          "hidden overflow-hidden transition-opacity duration-200 lg:block",
+          isCompact ? "h-0 pointer-events-none opacity-0 invisible" : "h-10 opacity-100",
         )}
       >
         <div className="mx-auto flex h-10 w-full max-w-site items-center px-5 sm:px-8">
@@ -301,8 +298,8 @@ export function SiteHeader() {
       <div
         aria-hidden={isCompact}
         className={cn(
-          "relative mx-auto hidden w-full max-w-site overflow-hidden rounded-b-3xl bg-primary transition-[height,opacity] duration-300 ease-in-out motion-reduce:transition-none md:block",
-          isCompact ? "h-0 pointer-events-none opacity-0" : "h-18 opacity-100",
+          "relative mx-auto hidden w-full max-w-site overflow-hidden rounded-b-3xl bg-primary transition-opacity duration-200 md:block",
+          isCompact ? "h-0 pointer-events-none opacity-0 invisible" : "h-18 opacity-100",
         )}
       >
         <Image

@@ -4,7 +4,7 @@ import { Scale } from "@/components/icons";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useT } from "@/components/providers/i18n-provider";
-import { useCompare } from "@/lib/compare/use-compare";
+import { useCompare } from "@/components/providers/compare-provider";
 import type { ProductSnapshot } from "@/lib/product-snapshot";
 import { cn } from "@/lib/utils";
 
