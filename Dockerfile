@@ -23,6 +23,7 @@ ARG NEXT_PUBLIC_TELEGRAM_BOT_ID
 ARG NEXT_PUBLIC_TELEGRAM_BOT_USERNAME
 ARG NEXT_PUBLIC_SUPPORT_TELEGRAM
 ARG NEXT_PUBLIC_YANDEX_METRIKA_ID
+ARG NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
 
 # Все NEXT_PUBLIC_* вшиваются в бандл здесь, на этапе build. Не переданные
 # сюда переменные до сайта не доедут: подставить их окружением запущенного

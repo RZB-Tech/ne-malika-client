@@ -1,106 +1,92 @@
-import type { Metadata } from "next";
+import Link from "next/link";
 import { Suspense } from "react";
+import { notFound, permanentRedirect } from "next/navigation";
 import { BannerCarousel } from "@/components/home/banner-carousel";
 import { CatalogView } from "@/components/catalog/catalog-view";
 import { PageContainer } from "@/components/layout/page-container";
-import { ProductGridSkeleton } from "@/components/product/product-grid";
 import { getBanners, getPublicProducts } from "@/lib/api/server";
-import { randomCatalogSeed } from "@/lib/catalog-seed";
-import type { Paginated, PublicProductCard } from "@/lib/api/types";
 import { serializeJsonLd } from "@/lib/json-ld";
-import { SITE_NAME, SITE_URL, SITE_DESCRIPTION, SITE_KEYWORDS, absoluteUrl } from "@/lib/seo";
+import { SITE_NAME, SITE_URL, SITE_DESCRIPTION, absoluteUrl } from "@/lib/seo";
+import { catalogMetadata, first, pageNumber, pageHref, type SearchParams } from "@/lib/catalog-seo";
 
-export const metadata: Metadata = {
-  title: {
-    absolute:
-      "neMalika — компьютерный рынок Малика в Ташкенте онлайн: ноутбуки, видеокарты, ПК",
-  },
-  description: SITE_DESCRIPTION,
-  keywords: SITE_KEYWORDS,
-  alternates: { canonical: absoluteUrl("/") },
-  openGraph: {
-    type: "website",
-    title: "neMalika — рынок Малика (Malika) в Ташкенте онлайн",
-    description: SITE_DESCRIPTION,
-    url: SITE_URL,
-    siteName: SITE_NAME,
-    locale: "ru_RU",
-  },
-};
-
+type Props = { searchParams: Promise<SearchParams> };
+export async function generateMetadata({ searchParams }: Props) {
+  const query = await searchParams;
+  return catalogMetadata(
+    "Компьютерный рынок Малика в Ташкенте онлайн",
+    SITE_DESCRIPTION,
+    "/",
+    pageNumber(first(query.page)),
+    Boolean(first(query.q).trim() || first(query.category) || first(query.sub)),
+  );
+}
 const jsonLd = [
   {
     "@context": "https://schema.org",
-    "@type": "OnlineStore",
+    "@type": "Organization",
+    "@id": `${SITE_URL}/#organization`,
     name: SITE_NAME,
     url: SITE_URL,
-    description: SITE_DESCRIPTION,
-    areaServed: { "@type": "City", name: "Tashkent" },
-    location: {
-      "@type": "Place",
-      name: "Компьютерный рынок Малика (Malika)",
-      address: {
-        "@type": "PostalAddress",
-        addressLocality: "Ташкент",
-        addressCountry: "UZ",
-      },
-    },
+    logo: absoluteUrl("/icon-512.png"),
   },
   {
     "@context": "https://schema.org",
     "@type": "WebSite",
+    "@id": `${SITE_URL}/#website`,
     name: SITE_NAME,
+    alternateName: "НеМалика",
     url: SITE_URL,
     inLanguage: "ru",
-    potentialAction: {
-      "@type": "SearchAction",
-      target: {
-        "@type": "EntryPoint",
-        urlTemplate: `${SITE_URL}/?q={search_term_string}`,
-      },
-      "query-input": "required name=search_term_string",
-    },
+    publisher: { "@id": `${SITE_URL}/#organization` },
   },
 ];
-
-export const revalidate = 60;
-
-export default function HomePage() {
+export default async function HomePage({ searchParams }: Props) {
+  const query = await searchParams;
+  const q = first(query.q).trim();
+  const page = pageNumber(first(query.page));
+  if (first(query.category)) {
+    const params = new URLSearchParams();
+    if (q) params.set("q", q);
+    if (first(query.sub)) params.set("sub", first(query.sub));
+    permanentRedirect(
+      pageHref(`/category/${encodeURIComponent(first(query.category))}`, page, params.toString()),
+    );
+  }
+  const [initial, banners] = await Promise.all([
+    getPublicProducts({ page, q, sort: "newest" }),
+    !q && page === 1 ? getBanners() : Promise.resolve([]),
+  ]);
+  if (!initial) throw new Error("Catalogue unavailable");
+  if (page > Math.max(1, initial.meta.totalPages)) notFound();
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
       />
-      <Suspense
-        fallback={
-          <PageContainer className="py-8">
-            <ProductGridSkeleton count={10} />
-          </PageContainer>
-        }
-      >
-        <HomeContent />
-      </Suspense>
-    </>
-  );
-}
-
-async function HomeContent() {
-  const seed = randomCatalogSeed();
-
-  const [initial, banners] = await Promise.all([
-    getPublicProducts({ sort: "random", seed }),
-    getBanners(),
-  ]);
-
-  return (
-    <>
-      <BannerCarousel banners={banners} />
+      {!q && page === 1 && <BannerCarousel banners={banners} />}
+      <PageContainer className="pt-6">
+        <h1 className="font-heading text-2xl font-bold sm:text-3xl">
+          {q ? `Результаты поиска: ${q}` : "Компьютерный рынок Малика онлайн"}
+          {page > 1 ? ` — страница ${page}` : ""}
+        </h1>
+        <p className="mt-3 max-w-3xl text-sm text-muted-foreground">
+          Ноутбуки, компьютеры, комплектующие и периферия от магазинов рынка Малика в Ташкенте.
+          Сравнивайте предложения и связывайтесь с продавцами напрямую.
+        </p>
+        <nav
+          aria-label="Разделы каталога"
+          className="mt-4 flex flex-wrap gap-4 text-sm text-primary"
+        >
+          <Link href="/category">Все категории</Link>
+          <Link href="/category/laptops">Ноутбуки</Link>
+          <Link href="/category/pc-parts">Комплектующие</Link>
+          <Link href="/category/services">IT-услуги</Link>
+          <Link href="/stores">Магазины</Link>
+        </nav>
+      </PageContainer>
       <Suspense>
-        <CatalogView
-          initialData={initial as Paginated<PublicProductCard> | undefined}
-          seed={seed}
-        />
+        <CatalogView initialData={initial} initialQuery={q} />
       </Suspense>
     </>
   );

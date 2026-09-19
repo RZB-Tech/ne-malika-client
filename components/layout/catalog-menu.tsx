@@ -20,11 +20,12 @@ import { onOpenCatalog } from "./catalog-bus";
 import type { CategoryDto } from "@/lib/api/generated/schemas";
 import type { Locale } from "@/lib/i18n/config";
 import { cn } from "@/lib/utils";
+import { categoryEntries } from "@/lib/catalog-seo";
 
 const EXIT_MS = 200;
 
 function categoryHref(root: CategoryDto, child?: CategoryDto): string {
-  return child ? `/category/${root.slug}?sub=${child.id}` : `/category/${root.slug}`;
+  return categoryEntries([root]).find((entry) => entry.category.id === (child ?? root).id)!.href;
 }
 
 export function CatalogMenu() {

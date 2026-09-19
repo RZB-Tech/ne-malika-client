@@ -23,8 +23,6 @@ export function FavoriteButton({
   const active = has(product.id);
   const label = active ? t("favorites.remove") : t("favorites.add");
 
-  // Цель только на добавление: снятие сердечка — не интерес к товару, а отказ,
-  // и в одной цели с добавлением оно бы обнуляло смысл цифры.
   const click = () => {
     if (!active) reachGoal(GOALS.favoriteAdd, { productId: Number(product.id) || undefined });
     void toggle(product);

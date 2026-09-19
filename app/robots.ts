@@ -7,12 +7,12 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/admin", "/seller", "/account", "/compare", "/register", "/api/"],
+        disallow: ["/admin", "/seller", "/api/", "/go/"],
       },
       {
         userAgent: "Yandex",
         allow: "/",
-        disallow: ["/admin", "/seller", "/account", "/compare", "/register", "/api/"],
+        disallow: ["/admin", "/seller", "/api/", "/go/"],
         other: {
           "Clean-param": ["seed /", "visitor_id /"],
         },

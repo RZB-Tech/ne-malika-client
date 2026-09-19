@@ -11,7 +11,7 @@ import { Metrika } from "@/components/providers/metrika";
 import { AuthProvider } from "@/lib/api/auth";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
-import { SITE_URL } from "@/lib/seo";
+import { SITE_URL, SITE_DESCRIPTION, SITE_NAME, absoluteUrl } from "@/lib/seo";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -36,11 +36,29 @@ const THEME_INIT = `(function(){try{var d=localStorage.getItem('theme')==='dark'
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "neMalika — маркетплейс компьютерной техники на рынке Малика в Ташкенте",
+    default: "neMalika — компьютерный рынок Малика в Ташкенте",
     template: "%s · neMalika",
   },
-  description:
-    "Витрина компьютерной техники: ноутбуки, ПК, комплектующие и периферия от магазинов рынка Малика в Ташкенте. Актуальные цены, сравнение и связь с продавцом напрямую в Telegram.",
+  description: SITE_DESCRIPTION,
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 },
+  },
+  openGraph: {
+    type: "website",
+    siteName: SITE_NAME,
+    locale: "ru_RU",
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
+    images: [{ url: absoluteUrl("/social-image"), width: 1200, height: 630, alt: SITE_NAME }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
+    images: [absoluteUrl("/social-image")],
+  },
   verification: {
     yandex: "f7605f24203c66e8",
     google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined,

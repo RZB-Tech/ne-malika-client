@@ -1,7 +1,7 @@
-import { NextResponse } from "next/server";
-import { getPublicProducts } from "@/lib/api/server";
+import { connection, NextResponse } from "next/server";
+import { getPublicProducts, getPublicCategories } from "@/lib/api/server";
 import { photoUrl } from "@/lib/api/photo";
-import { categories } from "@/lib/data";
+import { categoryEntries } from "@/lib/catalog-seo";
 import { markdownToPlainText } from "@/lib/markdown";
 import { SITE_NAME, SITE_URL, absoluteUrl } from "@/lib/seo";
 
@@ -27,36 +27,56 @@ function formatDate(date: Date): string {
 }
 
 export async function GET() {
-  // Загружаем актуальные опубликованные товары для YML фида Яндекса
-  const productsResponse = await getPublicProducts({ limit: 100, sort: "newest" });
-  const products = productsResponse?.data ?? [];
+  await connection();
+  // Never publish a partial or empty successful feed after an upstream failure.
+  const [productsResponse, roots] = await Promise.all([
+    getPublicProducts({ limit: 100, sort: "newest" }),
+    getPublicCategories(),
+  ]);
+  if (!productsResponse) return new NextResponse("Catalogue unavailable", { status: 503 });
+  const products = [...productsResponse.data];
+  for (let page = 2; page <= productsResponse.meta.totalPages; page += 4) {
+    const pages = await Promise.all(
+      Array.from(
+        { length: Math.min(4, productsResponse.meta.totalPages - page + 1) },
+        (_, offset) => getPublicProducts({ page: page + offset, limit: 100, sort: "newest" }),
+      ),
+    );
+    if (pages.some((result) => !result))
+      return new NextResponse("Catalogue unavailable", { status: 503 });
+    for (const result of pages) products.push(...result!.data);
+  }
+  const categories = categoryEntries(roots);
 
   const now = formatDate(new Date());
 
   const categoriesXml = categories
     .map(
-      (c, index) =>
-        `      <category id="${index + 1}">${escapeXml(c.name.ru)}</category>`,
+      ({ category, path }) =>
+        `      <category id="${category.id}"${path.length > 1 ? ` parentId="${path[path.length - 2].id}"` : ""}>${escapeXml(category.name.ru)}</category>`,
     )
     .join("\n");
 
-  const categoryMap = new Map<string, number>();
-  categories.forEach((c, idx) => {
-    categoryMap.set(c.slug, idx + 1);
-  });
+  const categoryIds = new Set(categories.map((entry) => entry.category.id));
 
-  const offersXml = products
-    .filter((p) => p.price !== null && Number(p.price) > 0)
+  const offersXml = [...new Map(products.map((p) => [p.id, p])).values()]
+    .filter(
+      (p) =>
+        p.price !== null &&
+        Number.isFinite(Number(p.price)) &&
+        Number(p.price) > 0 &&
+        p.categoryId != null &&
+        categoryIds.has(p.categoryId),
+    )
     .map((p) => {
       const url = absoluteUrl(`/product/${p.id}`);
       const picture = p.photos?.[0] ? photoUrl(p.photos[0]) : null;
       const desc = markdownToPlainText(p.description ?? "").slice(0, 500);
-      const catId = p.categorySlug ? categoryMap.get(p.categorySlug) ?? 1 : 1;
+      const catId = p.categoryId;
 
-      const brand =
-        p.characteristics?.find(
-          (c) => c.key.toLowerCase() === "бренд" || c.key.toLowerCase() === "brand",
-        )?.value?.trim() || p.shopName;
+      const brand = p.characteristics
+        ?.find((c) => c.key.toLowerCase() === "бренд" || c.key.toLowerCase() === "brand")
+        ?.value?.trim();
 
       return `    <offer id="${p.id}" available="true">
       <url>${escapeXml(url)}</url>
@@ -65,11 +85,8 @@ export async function GET() {
       <categoryId>${catId}</categoryId>
       ${picture ? `<picture>${escapeXml(picture)}</picture>` : ""}
       <name>${escapeXml(p.name)}</name>
-      <vendor>${escapeXml(brand)}</vendor>
+      ${brand ? `<vendor>${escapeXml(brand)}</vendor>` : ""}
       <description>${escapeXml(desc || p.name)}</description>
-      <store>true</store>
-      <pickup>true</pickup>
-      <delivery>true</delivery>
     </offer>`;
     })
     .join("\n");

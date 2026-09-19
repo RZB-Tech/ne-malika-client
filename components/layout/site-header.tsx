@@ -142,9 +142,7 @@ export function SiteHeader() {
       data-compact={isCompact}
       className="sticky top-0 z-50 mx-auto w-full max-w-site bg-card [overflow-anchor:none] md:rounded-b-3xl"
     >
-      <div
-        className="mx-auto flex h-16 w-full max-w-site items-center gap-2 px-5 sm:gap-3 sm:px-8"
-      >
+      <div className="mx-auto flex h-16 w-full max-w-site items-center gap-2 px-5 sm:gap-3 sm:px-8">
         <Logo className="mr-1 hidden md:inline-flex" />
 
         <div className="min-w-0 flex-1 md:hidden">
@@ -243,7 +241,7 @@ export function SiteHeader() {
                   .map((root) => (
                     <Link
                       key={root.id}
-                      href={`/?category=${root.slug}`}
+                      href={`/category/${root.slug}`}
                       className="flex shrink-0 items-center gap-1.5 rounded-md px-2 py-1 text-[13px] text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                     >
                       <CategoryIcon name={root.icon} className="size-4" />
@@ -251,7 +249,7 @@ export function SiteHeader() {
                     </Link>
                   ))}
                 <Link
-                  href={furnitureRoot ? `/?category=${furnitureRoot.slug}` : "/?category=furniture"}
+                  href={furnitureRoot ? `/category/${furnitureRoot.slug}` : "/category/furniture"}
                   className="flex shrink-0 items-center gap-1.5 rounded-md px-2 py-1 text-[13px] text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                 >
                   <Armchair className="size-4" />
@@ -275,7 +273,7 @@ export function SiteHeader() {
                   );
                 })}
                 <Link
-                  href="/?category=furniture"
+                  href="/category/furniture"
                   className="flex shrink-0 items-center gap-1.5 rounded-md px-2 py-1 text-[13px] text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                 >
                   <Armchair className="size-4" />

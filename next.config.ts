@@ -206,7 +206,13 @@ const nextConfig: NextConfig = {
     minimumCacheTTL: 86400,
   },
   async headers() {
-    return [{ source: "/:path*", headers: securityHeaders }];
+    return [
+      { source: "/:path*", headers: securityHeaders },
+      ...["admin", "seller", "account", "messages", "compare", "register", "go"].map((segment) => ({
+        source: `/${segment}/:path*`,
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
+      })),
+    ];
   },
 };
 

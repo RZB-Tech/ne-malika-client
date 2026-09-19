@@ -27,6 +27,8 @@ import { StatusPanel } from "@/components/shared/status-panel";
 import { StoreCard } from "@/components/store/store-card";
 import { useT } from "@/components/providers/i18n-provider";
 import { cn } from "@/lib/utils";
+import { pageNumber } from "@/lib/catalog-seo";
+import { PaginationLinks } from "@/components/catalog/pagination-links";
 import { shopsControllerFindAll } from "@/lib/api/generated/endpoints/shops-public/shops-public";
 import {
   ShopsControllerFindAllSort,
@@ -50,11 +52,20 @@ function isSort(value: string | null): value is ShopsControllerFindAllSort {
   return value !== null && (SORTS as string[]).includes(value);
 }
 
-export function StoresView({ initialData }: { initialData?: PaginatedPublicShopsDto }) {
+export function StoresView({
+  initialData,
+  initialQuery = "",
+  initialSort = "products",
+}: {
+  initialData?: PaginatedPublicShopsDto;
+  initialQuery?: string;
+  initialSort?: ShopsControllerFindAllSort;
+}) {
   const { t } = useT();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const page = pageNumber(searchParams.get("page"));
 
   const q = searchParams.get("q")?.trim() ?? "";
   const sortParam = searchParams.get("sort");
@@ -63,6 +74,7 @@ export function StoresView({ initialData }: { initialData?: PaginatedPublicShops
   const setParams = useCallback(
     (patch: Record<string, string | null>) => {
       const next = new URLSearchParams(searchParams.toString());
+      next.delete("page");
       for (const [key, value] of Object.entries(patch)) {
         if (!value) next.delete(key);
         else next.set(key, value);
@@ -90,20 +102,21 @@ export function StoresView({ initialData }: { initialData?: PaginatedPublicShops
 
   const params = useMemo(() => ({ limit: PAGE_SIZE, sort, ...(q ? { q } : {}) }), [q, sort]);
 
-  const isInitialParams = !q && sort === "products";
+  const isInitialParams =
+    q === initialQuery && sort === initialSort && initialData?.meta.page === page;
 
   const { data, isLoading, isError, hasNextPage, isFetchingNextPage, fetchNextPage, refetch } =
     useInfiniteQuery({
-      queryKey: ["/api/v1/shops", "infinite", params] as const,
+      queryKey: ["/api/v1/shops", "infinite", params, page] as const,
       queryFn: ({ pageParam, signal }) =>
         shopsControllerFindAll({ ...params, page: pageParam }, undefined, signal),
-      initialPageParam: 1,
+      initialPageParam: page,
       getNextPageParam: (last) =>
         last.meta.page < last.meta.totalPages ? last.meta.page + 1 : undefined,
       staleTime: 5 * 60_000,
       refetchOnWindowFocus: false,
       initialData:
-        isInitialParams && initialData ? { pages: [initialData], pageParams: [1] } : undefined,
+        isInitialParams && initialData ? { pages: [initialData], pageParams: [page] } : undefined,
     });
 
   const shops = useMemo(() => (data?.pages ?? []).flatMap((p) => p.data), [data]);
@@ -214,6 +227,7 @@ export function StoresView({ initialData }: { initialData?: PaginatedPublicShops
               ))}
             </div>
 
+            <PaginationLinks page={page} totalPages={data?.pages[0]?.meta.totalPages ?? 0} />
             {hasNextPage && (
               <div className="mt-8 flex justify-center">
                 <div ref={sentinelRef} aria-hidden className="h-px w-px" />

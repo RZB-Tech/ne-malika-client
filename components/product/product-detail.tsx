@@ -28,7 +28,15 @@ import { productToSnapshot } from "@/lib/product-snapshot";
 import { type Product, type Store } from "@/lib/data";
 import { cn } from "@/lib/utils";
 
-export function ProductDetail({ product, store }: { product: Product; store: Store }) {
+export function ProductDetail({
+  product,
+  store,
+  categoryHref,
+}: {
+  product: Product;
+  store: Store;
+  categoryHref?: string;
+}) {
   const { t, locale } = useT();
   const [active, setActive] = useState(0);
   const [zoomed, setZoomed] = useState<number | null>(null);
@@ -63,21 +71,15 @@ export function ProductDetail({ product, store }: { product: Product; store: Sto
           Главная
         </Link>
         <span className="text-muted-foreground/50">/</span>
-        {product.categorySlug && (
+        {categoryHref && (
           <>
-            <Link
-              href={`/category/${product.categorySlug}`}
-              className="transition-colors hover:text-foreground"
-            >
+            <Link href={categoryHref} className="transition-colors hover:text-foreground">
               {product.categoryName || product.categorySlug}
             </Link>
             <span className="text-muted-foreground/50">/</span>
           </>
         )}
-        <Link
-          href={`/store/${store.slug}`}
-          className="transition-colors hover:text-foreground"
-        >
+        <Link href={`/store/${store.slug}`} className="transition-colors hover:text-foreground">
           {store.name}
         </Link>
         <span className="text-muted-foreground/50">/</span>

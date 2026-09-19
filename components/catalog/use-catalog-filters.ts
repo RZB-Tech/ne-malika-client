@@ -3,7 +3,7 @@
 import { useCallback, useMemo } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-export function useCatalogFilters(forcedCategory?: string) {
+export function useCatalogFilters() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -16,6 +16,7 @@ export function useCatalogFilters(forcedCategory?: string) {
   const setParams = useCallback(
     (patch: Record<string, string | null>, destination = pathname) => {
       const next = new URLSearchParams(searchParams.toString());
+      next.delete("page");
       for (const [key, value] of Object.entries(patch)) {
         if (value === null || value === "") next.delete(key);
         else next.set(key, value);
@@ -30,8 +31,11 @@ export function useCatalogFilters(forcedCategory?: string) {
 
   const setCategory = useCallback(
     (slug: string | null) =>
-      setParams({ category: slug, sub: null }, forcedCategory ? "/category" : pathname),
-    [setParams, forcedCategory, pathname],
+      setParams(
+        { category: null, sub: null },
+        slug ? `/category/${encodeURIComponent(slug)}` : "/",
+      ),
+    [setParams],
   );
 
   const setSubCategory = useCallback(

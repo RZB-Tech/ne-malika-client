@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Store, Tag } from "@/components/icons";
+import { LayoutGrid, Store, Tag } from "@/components/icons";
 import { TelegramIcon } from "@/components/icons/telegram-icon";
 import { LanguageSwitch } from "@/components/shared/language-switch";
 import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
@@ -17,6 +17,13 @@ export function SiteFooter() {
     <footer className="mt-auto border-t border-border bg-card">
       {}
       <PageContainer className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 border-b border-border py-5">
+        <Link
+          href="/category"
+          className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+        >
+          <LayoutGrid className="size-4 text-muted-foreground" />
+          {t("nav.catalog")}
+        </Link>
         <Link
           href="/stores"
           className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-foreground transition-colors outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/40"

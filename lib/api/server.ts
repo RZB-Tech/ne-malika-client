@@ -26,6 +26,7 @@ async function getJson<T>(path: string, revalidateSec: number): Promise<T | null
     const res = await fetch(`${API}${path}`, {
       ...fetchOpts(revalidateSec),
       headers: { accept: "application/json" },
+      signal: AbortSignal.timeout(15000),
     });
     if (!res.ok) return null;
     return (await res.json()) as T;
@@ -38,10 +39,17 @@ async function getEntityJson<T>(path: string, revalidateSec: number): Promise<T 
   const res = await fetch(`${API}${path}`, {
     ...fetchOpts(revalidateSec),
     headers: { accept: "application/json" },
+    signal: AbortSignal.timeout(15000),
   });
   if (res.status === 404) return null;
   if (!res.ok) throw new Error(`GET ${path} → ${res.status}`);
   return (await res.json()) as T;
+}
+
+async function getRequiredJson<T>(path: string, revalidateSec: number): Promise<T> {
+  const result = await getEntityJson<T>(path, revalidateSec);
+  if (result === null) throw new Error(`Required catalogue endpoint missing: ${path}`);
+  return result;
 }
 
 export function getPublicProduct(id: number): Promise<PublicProductCard | null> {
@@ -79,7 +87,7 @@ export function getPublicProducts(
 }
 
 export async function getPublicCategories(): Promise<CategoryDto[]> {
-  return (await getJson<CategoryDto[]>("/categories", 3600)) ?? [];
+  return getRequiredJson<CategoryDto[]>("/categories", 3600);
 }
 
 export async function getBanners(): Promise<PublicBannerDto[]> {
@@ -87,7 +95,7 @@ export async function getBanners(): Promise<PublicBannerDto[]> {
 }
 
 export async function getAllProductIds(): Promise<{ id: number; updatedAt: string }[]> {
-  return (await getJson<{ id: number; updatedAt: string }[]>("/product-cards/sitemap", 3600)) ?? [];
+  return getRequiredJson<{ id: number; updatedAt: string }[]>("/product-cards/sitemap", 3600);
 }
 
 export function getPublicShops(
@@ -104,5 +112,5 @@ export function getPublicShops(
 }
 
 export async function getAllShopIds(): Promise<{ id: number; updatedAt: string }[]> {
-  return (await getJson<{ id: number; updatedAt: string }[]>("/shops/sitemap", 3600)) ?? [];
+  return getRequiredJson<{ id: number; updatedAt: string }[]>("/shops/sitemap", 3600);
 }

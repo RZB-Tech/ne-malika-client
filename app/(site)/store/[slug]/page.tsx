@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { StoreDetail } from "@/components/store/store-detail";
 import { getPublicShop } from "@/lib/api/server";
 import { mapProductRow, mapShop } from "@/lib/api/mappers";
@@ -21,7 +21,7 @@ const DAY_URLS: Record<WorkScheduleEntry["day"], string> = {
 
 function parseId(slug: string): number | null {
   const id = Number(slug);
-  return Number.isFinite(id) && id > 0 ? id : null;
+  return /^\d+$/.test(slug) && Number.isSafeInteger(id) && id > 0 ? id : null;
 }
 
 function shopDescription(
@@ -47,7 +47,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const id = parseId(slug);
-  if (id === null) return {};
+  if (id === null) notFound();
 
   const shop = await getPublicShop(id);
   if (!shop) {
@@ -87,6 +87,7 @@ export default async function StorePage({ params }: { params: Promise<{ slug: st
 
   const shop = await getPublicShop(id);
   if (!shop) notFound();
+  if (slug !== String(shop.id)) permanentRedirect(`/store/${shop.id}`);
 
   const store = mapShop(shop);
   const products = (shop.productCards ?? []).map((pc) => mapProductRow(pc, shop.name));
@@ -115,7 +116,10 @@ export default async function StorePage({ params }: { params: Promise<{ slug: st
       // location приходит парой [широта, долгота]; без обеих координат
       // блок geo только путает разметку.
       geo:
-        shop.location?.length === 2
+        shop.location?.length === 2 &&
+        shop.location.every(Number.isFinite) &&
+        Math.abs(shop.location[0]) <= 90 &&
+        Math.abs(shop.location[1]) <= 180
           ? {
               "@type": "GeoCoordinates",
               latitude: shop.location[0],
@@ -131,7 +135,11 @@ export default async function StorePage({ params }: { params: Promise<{ slug: st
           }))
         : undefined,
       aggregateRating:
-        shop.ratingCount && shop.ratingCount > 0
+        shop.ratingCount &&
+        shop.ratingCount > 0 &&
+        Number.isFinite(shop.ratingAvg) &&
+        (shop.ratingAvg ?? 0) >= 1 &&
+        (shop.ratingAvg ?? 0) <= 5
           ? {
               "@type": "AggregateRating",
               ratingValue: Number((shop.ratingAvg ?? 0).toFixed(1)),

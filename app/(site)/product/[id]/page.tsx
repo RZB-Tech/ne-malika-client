@@ -1,10 +1,16 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { ProductDetail } from "@/components/product/product-detail";
 import { ProductRail } from "@/components/product/product-rail";
 import { TrackProductView } from "@/components/product/track-product-view";
 import { PageContainer } from "@/components/layout/page-container";
-import { getPublicProduct, getPublicProducts, getPublicShop } from "@/lib/api/server";
+import {
+  getPublicProduct,
+  getPublicProducts,
+  getPublicShop,
+  getPublicCategories,
+} from "@/lib/api/server";
+import { categoryEntries } from "@/lib/catalog-seo";
 import { mapPublicProductCard, mapShop } from "@/lib/api/mappers";
 import { photoUrl } from "@/lib/api/photo";
 import { markdownToPlainText } from "@/lib/markdown";
@@ -28,17 +34,6 @@ function specsSummary(
     .join(" · ");
 }
 
-function priceValidUntil(createdAt?: string): string {
-  if (createdAt) {
-    const d = new Date(createdAt);
-    if (!Number.isNaN(d.getTime())) {
-      d.setMonth(d.getMonth() + 6);
-      return d.toISOString().split("T")[0];
-    }
-  }
-  return "2027-12-31";
-}
-
 export async function generateMetadata({
   params,
 }: {
@@ -46,7 +41,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { id } = await params;
   const numId = Number(id);
-  if (!Number.isFinite(numId)) return {};
+  if (!/^\d+$/.test(id) || !Number.isSafeInteger(numId) || numId < 1) notFound();
 
   const product = await getPublicProduct(numId);
   if (!product) {
@@ -60,19 +55,16 @@ export async function generateMetadata({
       ? "цена договорная"
       : `${new Intl.NumberFormat("ru-RU").format(Number(product.price))} сум`;
 
-  const title = `Купить ${product.name}${stateBadge} в Ташкенте — ${priceFormatted} на рынке Малика | ${SITE_NAME}`;
+  const title = `${product.name}${stateBadge} — купить в Ташкенте · ${SITE_NAME}`;
 
-  const priceLine =
-    product.price === null
-      ? "Цена договорная."
-      : `Цена ${priceFormatted}.`;
+  const priceLine = product.price === null ? "Цена договорная." : `Цена ${priceFormatted}.`;
   const specs = specsSummary(product.characteristics);
   const descLead = `Купить ${product.name}${stateBadge} в Ташкенте на компьютерном рынке Малика (Malika). ${priceLine} Магазин: ${product.shopName}.`;
   const descTail = specs
-    ? `Характеристики: ${specs}. Гарантия, прямая связь с магазином в Telegram.`
-    : (markdownToPlainText(product.description ?? "").slice(0, 120) ||
-       "Гарантия, актуальные цены, прямая связь с магазином в Telegram.");
-  const description = `${descLead} ${descTail}`.slice(0, 300);
+    ? `Характеристики: ${specs}.`
+    : markdownToPlainText(product.description ?? "").slice(0, 120) ||
+      "Свяжитесь с продавцом, чтобы уточнить наличие и условия покупки.";
+  const description = `${descLead} ${descTail}`.slice(0, 200);
 
   const keywords = [
     product.name,
@@ -123,20 +115,25 @@ export async function generateMetadata({
 export default async function ProductPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const numId = Number(id);
-  if (!Number.isFinite(numId)) notFound();
+  if (!/^\d+$/.test(id) || !Number.isSafeInteger(numId) || numId < 1) notFound();
 
   const raw = await getPublicProduct(numId);
   if (!raw) notFound();
+  if (id !== String(raw.id)) permanentRedirect(`/product/${raw.id}`);
 
   const product = mapPublicProductCard(raw);
 
-  const [shopRaw, storeList, categoryList] = await Promise.all([
+  const [shopRaw, storeList, categoryList, categories] = await Promise.all([
     getPublicShop(raw.shopId),
     getPublicProducts({ shopId: raw.shopId, limit: RAIL_FETCH, sort: "newest" }),
     raw.categoryId
       ? getPublicProducts({ categoryId: raw.categoryId, limit: RAIL_FETCH, sort: "newest" })
       : Promise.resolve(null),
+    getPublicCategories(),
   ]);
+  const categoryHref = categoryEntries(categories).find(
+    (entry) => entry.category.id === raw.categoryId,
+  )?.href;
 
   const fromStore = (storeList?.data ?? [])
     .filter((p) => p.id !== raw.id)
@@ -170,31 +167,30 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
         storeViews: 0,
       };
 
-  const brandName =
-    raw.characteristics?.find(
-      (c) => c.key.toLowerCase() === "бренд" || c.key.toLowerCase() === "brand",
-    )?.value?.trim() ||
-    raw.shopName ||
-    SITE_NAME;
+  const brandName = raw.characteristics
+    ?.find((c) => c.key.toLowerCase() === "бренд" || c.key.toLowerCase() === "brand")
+    ?.value?.trim();
 
-  const modelName = raw.characteristics?.find(
-    (c) => c.key.toLowerCase() === "модель" || c.key.toLowerCase() === "model",
-  )?.value?.trim();
-
-  const validUntil = priceValidUntil(raw.createdAt);
+  const modelName = raw.characteristics
+    ?.find((c) => c.key.toLowerCase() === "модель" || c.key.toLowerCase() === "model")
+    ?.value?.trim();
 
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
+    "@id": absoluteUrl(`/product/${raw.id}#product`),
+    url: absoluteUrl(`/product/${raw.id}`),
     name: raw.name,
     description: raw.description ? markdownToPlainText(raw.description) : undefined,
     image: (raw.photos ?? []).map((k) => photoUrl(k)).filter((u): u is string => Boolean(u)),
     sku: String(raw.id),
-    mpn: modelName || String(raw.id),
-    brand: {
-      "@type": "Brand",
-      name: brandName,
-    },
+    model: modelName || undefined,
+    brand: brandName
+      ? {
+          "@type": "Brand",
+          name: brandName,
+        }
+      : undefined,
     category: raw.categoryNameRu || undefined,
     additionalProperty: (raw.characteristics ?? []).map((c) => ({
       "@type": "PropertyValue",
@@ -202,13 +198,12 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
       value: c.value,
     })),
     offers:
-      raw.price === null
+      raw.price === null || !Number.isFinite(Number(raw.price)) || Number(raw.price) < 0
         ? undefined
         : {
             "@type": "Offer",
             price: Number(raw.price),
             priceCurrency: "UZS",
-            priceValidUntil: validUntil,
             itemCondition:
               raw.state === "new"
                 ? "https://schema.org/NewCondition"
@@ -221,11 +216,14 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
               url: absoluteUrl(`/store/${raw.shopId}`),
             },
           },
-    // Оценка уже показана на странице звёздами — без этого блока поисковик
-    // её не видит и звёзд в выдаче не рисует. Без отзывов блок не выводим:
-    // aggregateRating с нулём Google считает ошибкой разметки.
+    // Only publish a real rating shown on the page. Structured data makes
+    // a result eligible for enhancements; it does not guarantee stars in search.
     aggregateRating:
-      raw.ratingCount && raw.ratingCount > 0
+      raw.ratingCount &&
+      raw.ratingCount > 0 &&
+      Number.isFinite(raw.ratingAvg) &&
+      (raw.ratingAvg ?? 0) >= 1 &&
+      (raw.ratingAvg ?? 0) <= 5
         ? {
             "@type": "AggregateRating",
             ratingValue: Number((raw.ratingAvg ?? 0).toFixed(1)),
@@ -241,16 +239,14 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
     position: number;
     name: string;
     item?: string;
-  }[] = [
-    { "@type": "ListItem", position: 1, name: SITE_NAME, item: absoluteUrl("/") },
-  ];
+  }[] = [{ "@type": "ListItem", position: 1, name: SITE_NAME, item: absoluteUrl("/") }];
 
-  if (raw.categoryNameRu && raw.categorySlug) {
+  if (raw.categoryNameRu && categoryHref) {
     breadcrumbItems.push({
       "@type": "ListItem",
       position: breadcrumbItems.length + 1,
       name: raw.categoryNameRu,
-      item: absoluteUrl(`/category/${raw.categorySlug}`),
+      item: absoluteUrl(categoryHref),
     });
   }
 
@@ -291,7 +287,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
           state: raw.state,
         }}
       />
-      <ProductDetail product={product} store={store} />
+      <ProductDetail product={product} store={store} categoryHref={categoryHref} />
 
       <PageContainer className="pb-12">
         <ProductRail titleKey="product.moreFromStore" products={fromStore} />

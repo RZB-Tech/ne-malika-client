@@ -14,7 +14,9 @@ import { findCategory, useCategories } from "@/lib/api/categories";
 import { productCardsControllerFindAll } from "@/lib/api/generated/endpoints/product-cards-public/product-cards-public";
 import type { ProductCardsControllerFindAllParams } from "@/lib/api/generated/schemas";
 import { mapPublicProductCard } from "@/lib/api/mappers";
-import { randomCatalogSeed } from "@/lib/catalog-seed";
+import { useSearchParams } from "next/navigation";
+import { pageNumber } from "@/lib/catalog-seo";
+import { PaginationLinks } from "./pagination-links";
 import { visitorId } from "@/lib/analytics";
 import type { Paginated, PublicProductCard } from "@/lib/api/types";
 
@@ -26,12 +28,14 @@ const PRELOAD_MARGIN = "600px 0px";
 
 export function CatalogView({
   initialData,
-  seed: initialSeed,
   forcedCategory,
+  forcedSubCategoryId,
+  initialQuery = "",
 }: {
   initialData?: Paginated<PublicProductCard>;
-  seed?: string;
   forcedCategory?: string;
+  forcedSubCategoryId?: number;
+  initialQuery?: string;
 } = {}) {
   const { t, locale } = useT();
   const { roots } = useCategories();
@@ -40,42 +44,47 @@ export function CatalogView({
     q,
     category: filterCategory,
     setCategory,
-    subCategoryId,
-  } = useCatalogFilters(forcedCategory);
+    subCategoryId: filterSubCategoryId,
+  } = useCatalogFilters();
 
   const category = forcedCategory ?? filterCategory;
-
-  const [seed] = useState(() => initialSeed ?? randomCatalogSeed());
+  const subCategoryId = forcedSubCategoryId ?? filterSubCategoryId;
+  const searchParams = useSearchParams();
+  const page = pageNumber(searchParams.get("page"));
 
   const params: ProductCardsControllerFindAllParams = useMemo(
     () => ({
       limit: PAGE_SIZE,
       q: q || undefined,
       ...(subCategoryId ? { category_id: subCategoryId } : category ? { category } : {}),
-      // Без поискового запроса товары идут вперемешку с постоянным зерном, с запросом — по новизне
-      ...(q ? { sort: "newest" as const } : { sort: "random" as const, seed }),
+      // Stable order gives every paginated URL its own reproducible set of products.
+      sort: "newest" as const,
     }),
-    [q, category, subCategoryId, seed],
+    [q, category, subCategoryId],
   );
 
-  const isInitialParams = !q && !category && subCategoryId == null;
+  const isInitialParams =
+    q === initialQuery &&
+    category === (forcedCategory ?? null) &&
+    subCategoryId === (forcedSubCategoryId ?? null) &&
+    initialData?.meta.page === page;
 
   const listQuery = useInfiniteQuery({
-    queryKey: ["/api/v1/product-cards", "infinite", params] as const,
+    queryKey: ["/api/v1/product-cards", "infinite", params, page] as const,
     queryFn: ({ pageParam, signal }) =>
       productCardsControllerFindAll(
         { ...params, page: pageParam, visitor_id: visitorId() ?? undefined },
         undefined,
         signal,
       ) as unknown as Promise<Paginated<PublicProductCard>>,
-    initialPageParam: 1,
+    initialPageParam: page,
     getNextPageParam: (last) =>
       last.meta.page < last.meta.totalPages ? last.meta.page + 1 : undefined,
     staleTime: 2 * 60_000,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
     initialData:
-      isInitialParams && initialData ? { pages: [initialData], pageParams: [1] } : undefined,
+      isInitialParams && initialData ? { pages: [initialData], pageParams: [page] } : undefined,
   });
 
   const { data, isLoading, isError, hasNextPage, isFetchingNextPage, fetchNextPage, refetch } =
@@ -86,7 +95,7 @@ export function CatalogView({
     [data],
   );
 
-  const filterKey = `${q}|${category}|${subCategoryId}`;
+  const filterKey = `${q}|${category}|${subCategoryId}|${page}`;
   const [autoLoads, setAutoLoads] = useState(0);
   const [prevFilterKey, setPrevFilterKey] = useState(filterKey);
   if (filterKey !== prevFilterKey) {
@@ -167,6 +176,7 @@ export function CatalogView({
               <ProductCard key={p.id} product={p} />
             ))}
           </ProductGrid>
+          <PaginationLinks page={page} totalPages={data?.pages[0]?.meta.totalPages ?? 0} />
 
           {isFetchingNextPage && <ProductGridSkeleton count={5} className="mt-4" />}
 
