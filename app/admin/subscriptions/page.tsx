@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import {
   Ban,
+  CheckCircle2,
   Clock,
   ExternalLink,
   History,
@@ -13,6 +14,7 @@ import {
 } from "@/components/icons";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -28,6 +30,7 @@ import { AdminPageHeader } from "@/components/admin/page-header";
 import { useAdminMutation } from "@/components/admin/use-admin-mutation";
 import { EntityStatusBadge } from "@/components/admin/entity-status-badge";
 import { DetailDrawer, DetailNote } from "@/components/admin/detail-drawer";
+import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { RowActionsMenu, RowContextMenu, type RowAction } from "@/components/admin/row-actions";
 import {
   SubscriptionActivateDialog,
@@ -39,9 +42,11 @@ import { useT } from "@/components/providers/i18n-provider";
 import { cn } from "@/lib/utils";
 import { formatDate, formatPrice } from "@/lib/format";
 import { planLabel } from "@/lib/api/subscription";
+import { axiosInstance } from "@/lib/api/mutator";
 import type { AdminSubscriptionRow, Paginated } from "@/lib/api/types";
 import {
   getAdminSubscriptionsControllerListQueryKey,
+  getAdminShopSubscriptionControllerPaymentsQueryKey,
   useAdminShopSubscriptionControllerCancel,
   useAdminShopSubscriptionControllerPayments,
   useAdminSubscriptionsControllerList,
@@ -54,6 +59,7 @@ import type {
 const EXPIRING_DAYS = 7;
 
 type Tab = "all" | "start" | "pro" | "max" | "expiring" | "free" | "review";
+type PaymentReviewAction = "mark_resolved" | "grant_paid_subscription";
 
 const TABS: readonly {
   value: Tab;
@@ -136,6 +142,34 @@ export default function AdminSubscriptions() {
   const openPayments = (row: AdminSubscriptionRow) => {
     setPaymentsPage(1);
     setPaymentsShop({ id: row.shopId, name: row.shopName });
+  };
+
+  const resolvePaymentReview = (shopId: number, paymentId: number, action: PaymentReviewAction) => {
+    const grant = action === "grant_paid_subscription";
+    return run(
+      () =>
+        axiosInstance.post(
+          `/api/v1/admin/shops/${shopId}/subscription/payments/${paymentId}/review`,
+          {
+            action,
+            reason: t(
+              grant
+                ? "admin.subscriptions.reviewGrantReason"
+                : "admin.subscriptions.reviewResolvedReason",
+            ),
+          },
+        ),
+      {
+        invalidate: [
+          getAdminSubscriptionsControllerListQueryKey(),
+          getAdminShopSubscriptionControllerPaymentsQueryKey(shopId),
+        ],
+        successKey: grant
+          ? "admin.subscriptions.reviewGranted"
+          : "admin.subscriptions.reviewResolved",
+        errorKey: "admin.subscriptions.actionFailed",
+      },
+    );
   };
 
   const actionsFor = (row: AdminSubscriptionRow): RowAction[] => [
@@ -327,14 +361,28 @@ export default function AdminSubscriptions() {
                     <TableCell>
                       <div className="flex flex-wrap gap-1.5">
                         {row.needsManualReview && (
-                          <Badge
-                            variant="outline"
-                            className="gap-1 border-transparent bg-destructive/12 font-medium text-destructive"
-                            title={t("admin.subscriptions.reviewHint")}
-                          >
-                            <TriangleAlert className="size-3" />
-                            {t("admin.subscriptions.needsReview")}
-                          </Badge>
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            <Badge
+                              variant="outline"
+                              className="gap-1 border-transparent bg-destructive/12 font-medium text-destructive"
+                              title={t("admin.subscriptions.reviewHint")}
+                            >
+                              <TriangleAlert className="size-3" />
+                              {t("admin.subscriptions.needsReview")}
+                            </Badge>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="xs"
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                openPayments(row);
+                              }}
+                            >
+                              <Wrench />
+                              {t("admin.subscriptions.resolvePayment")}
+                            </Button>
+                          </div>
                         )}
                         {row.stuckPrepared && (
                           <Badge
@@ -388,6 +436,11 @@ export default function AdminSubscriptions() {
         shop={paymentsShop}
         page={paymentsPage}
         onPageChange={setPaymentsPage}
+        onResolve={(paymentId, action) =>
+          paymentsShop
+            ? resolvePaymentReview(paymentsShop.id, paymentId, action)
+            : Promise.resolve(false)
+        }
         onClose={() => setPaymentsShop(null)}
       />
     </div>
@@ -398,11 +451,13 @@ function PaymentsDrawer({
   shop,
   page,
   onPageChange,
+  onResolve,
   onClose,
 }: {
   shop: { id: number; name: string } | null;
   page: number;
   onPageChange: (page: number) => void;
+  onResolve: (paymentId: number, action: PaymentReviewAction) => Promise<boolean>;
   onClose: () => void;
 }) {
   const { t } = useT();
@@ -441,7 +496,7 @@ function PaymentsDrawer({
       ) : (
         <div className="flex flex-col gap-2">
           {payments.map((payment) => (
-            <PaymentCard key={payment.id} payment={payment} />
+            <PaymentCard key={payment.id} payment={payment} onResolve={onResolve} />
           ))}
         </div>
       )}
@@ -456,7 +511,13 @@ function PaymentsDrawer({
   );
 }
 
-function PaymentCard({ payment }: { payment: SubscriptionPaymentDto }) {
+function PaymentCard({
+  payment,
+  onResolve,
+}: {
+  payment: SubscriptionPaymentDto & { isTest?: boolean };
+  onResolve: (paymentId: number, action: PaymentReviewAction) => Promise<boolean>;
+}) {
   const { t, locale } = useT();
 
   return (
@@ -528,13 +589,61 @@ function PaymentCard({ payment }: { payment: SubscriptionPaymentDto }) {
       )}
 
       {payment.needsManualReview && (
-        <Badge
-          variant="outline"
-          className="mt-2 gap-1 border-transparent bg-destructive/12 font-medium text-destructive"
-        >
-          <TriangleAlert className="size-3" />
-          {t("seller.subscription.payments.needsReview")}
-        </Badge>
+        <div className="mt-3 rounded-lg border border-destructive/25 bg-destructive/5 p-3">
+          <Badge
+            variant="outline"
+            className="gap-1 border-transparent bg-destructive/12 font-medium text-destructive"
+          >
+            <TriangleAlert className="size-3" />
+            {t("seller.subscription.payments.needsReview")}
+          </Badge>
+
+          <p className="mt-2 text-xs text-muted-foreground">
+            {payment.isTest
+              ? t("admin.subscriptions.reviewTestHint")
+              : payment.status === "paid"
+                ? t("admin.subscriptions.reviewAlreadyPaidHint")
+                : payment.status === "cancelled" && (payment.reversed || payment.refundedByProvider)
+                  ? t("admin.subscriptions.reviewRefundedHint")
+                  : payment.status === "cancelled" && payment.plan === "free"
+                    ? t("admin.subscriptions.reviewUnknownPlanHint")
+                    : t("admin.subscriptions.reviewCheckHint")}
+          </p>
+
+          <div className="mt-3 flex flex-wrap gap-2">
+            {payment.status === "cancelled" &&
+              payment.plan !== "free" &&
+              !payment.reversed &&
+              !payment.refundedByProvider &&
+              !payment.isTest && (
+                <ConfirmDialog
+                  title={t("admin.subscriptions.reviewGrantTitle")}
+                  description={t("admin.subscriptions.reviewGrantText", {
+                    plan: planLabel(payment.plan, t),
+                  })}
+                  confirmLabel={t("admin.subscriptions.reviewGrantButton")}
+                  onConfirm={() => onResolve(payment.id, "grant_paid_subscription")}
+                >
+                  <Button type="button" size="sm">
+                    <Wallet />
+                    {t("admin.subscriptions.reviewGrantButton")}
+                  </Button>
+                </ConfirmDialog>
+              )}
+
+            <ConfirmDialog
+              title={t("admin.subscriptions.reviewResolveTitle")}
+              description={t("admin.subscriptions.reviewResolveText")}
+              confirmLabel={t("admin.subscriptions.reviewResolveButton")}
+              onConfirm={() => onResolve(payment.id, "mark_resolved")}
+            >
+              <Button type="button" variant="outline" size="sm">
+                <CheckCircle2 />
+                {t("admin.subscriptions.reviewResolveButton")}
+              </Button>
+            </ConfirmDialog>
+          </div>
+        </div>
       )}
     </div>
   );
