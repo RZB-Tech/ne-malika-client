@@ -1,8 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Check, Loader2, TriangleAlert, X } from "@/components/icons";
+import { Ban, Check, Loader2, TriangleAlert, X } from "@/components/icons";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -21,15 +22,52 @@ import type {
   SubscriptionPlanDto,
 } from "@/lib/api/generated/schemas";
 import type { PaidPlan } from "@/lib/api/types";
+import { axiosInstance } from "@/lib/api/mutator";
+import { getSellerSubscriptionsControllerStateQueryKey } from "@/lib/api/generated/endpoints/subscriptions-seller/subscriptions-seller";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
-export function SubscriptionPlans({ subscription }: { subscription: SellerSubscriptionDto }) {
+export function SubscriptionPlans({
+  subscription,
+}: {
+  subscription: SellerSubscriptionDto;
+}) {
   const { t, locale } = useT();
   const [busy, setBusy] = useState<PaidPlan | null>(null);
+  const [cancelOpen, setCancelOpen] = useState(false);
+  const [cancelBusy, setCancelBusy] = useState(false);
+  const queryClient = useQueryClient();
 
   const { data, isLoading, isError } = useSubscriptionsControllerPlans({
     query: { retry: false },
   });
   const checkout = useSellerSubscriptionsControllerCheckout();
+
+  const cancelSubscription = async () => {
+    setCancelBusy(true);
+    try {
+      await axiosInstance.post("/api/v1/seller/subscription/cancel", {
+        reason: t("seller.subscription.cancelReason"),
+      });
+      await queryClient.invalidateQueries({
+        queryKey: getSellerSubscriptionsControllerStateQueryKey(),
+      });
+      setCancelOpen(false);
+      toast.success(t("seller.subscription.cancelled"));
+    } catch (error) {
+      toast.error(apiErrorMessage(error, t, "seller.subscription.cancelFailed"));
+    } finally {
+      setCancelBusy(false);
+    }
+  };
 
   const plans = useMemo(
     () => [...(data ?? [])].sort((a, b) => planRank(a.id) - planRank(b.id)),
@@ -38,11 +76,12 @@ export function SubscriptionPlans({ subscription }: { subscription: SellerSubscr
   const topId = plans.at(-1)?.id;
   const secondId = plans.length >= 3 ? plans.at(-2)?.id : undefined;
 
-  const warning = subscription.active && subscription.until
-    ? t("seller.subscription.warnUpgrade", {
-        date: formatDate(subscription.until, locale),
-      })
-    : null;
+  const warning =
+    subscription.active && subscription.until
+      ? t("seller.subscription.warnUpgrade", {
+          date: formatDate(subscription.until, locale),
+        })
+      : null;
 
   const pay = async (plan: PaidPlan, provider: CreateCheckoutDtoProvider) => {
     setBusy(plan);
@@ -67,9 +106,20 @@ export function SubscriptionPlans({ subscription }: { subscription: SellerSubscr
 
       {warning && (
         <Card className="border-warning/40 bg-warning/5 p-4">
-          <div className="flex gap-2 text-sm">
-            <TriangleAlert className="size-4 shrink-0 text-warning" />
-            <p>{warning}</p>
+          <div className="flex flex-col gap-3 text-sm sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex gap-2">
+              <TriangleAlert className="size-4 shrink-0 text-warning" />
+              <p>{warning}</p>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCancelOpen(true)}
+              disabled={cancelBusy}
+            >
+              <Ban data-icon="inline-start" />
+              {t("seller.subscription.cancel")}
+            </Button>
           </div>
         </Card>
       )}
@@ -98,7 +148,7 @@ export function SubscriptionPlans({ subscription }: { subscription: SellerSubscr
               top={plan.id === topId}
               second={plan.id === secondId}
               busy={busy === plan.id}
-              disabled={busy !== null}
+              disabled={busy !== null || (subscription.active && subscription.plan === plan.id)}
               onPay={(provider) => void pay(plan.id, provider)}
             />
           ))}
@@ -106,6 +156,35 @@ export function SubscriptionPlans({ subscription }: { subscription: SellerSubscr
       )}
 
       <p className="text-xs text-muted-foreground">{t("seller.subscription.payHint")}</p>
+
+      <AlertDialog
+        open={cancelOpen}
+        onOpenChange={(open) => !cancelBusy && setCancelOpen(open)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("seller.subscription.cancelTitle")}</AlertDialogTitle>
+            <AlertDialogDescription>{t("seller.subscription.cancelWarning")}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={cancelBusy}>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              disabled={cancelBusy}
+              onClick={(event) => {
+                event.preventDefault();
+                void cancelSubscription();
+              }}
+            >
+              {cancelBusy ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                t("seller.subscription.cancelConfirm")
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
@@ -194,7 +273,7 @@ function PlanCard({
         <Button
           className="w-full min-w-0 border-[#0065ff] bg-[#0065ff] px-2 text-xs text-white shadow-sm hover:border-[#0055d6] hover:bg-[#0055d6] focus-visible:border-[#0065ff] focus-visible:ring-[#0065ff]/40 sm:text-sm"
           variant="default"
-          disabled={disabled}
+          disabled={disabled || current}
           onClick={() => onPay("click")}
         >
           {busy && <Loader2 className="size-4 animate-spin" />}
@@ -206,7 +285,7 @@ function PlanCard({
         <Button
           className="w-full min-w-0 border-[#00c0c9] bg-[#00c0c9] px-2 text-xs text-white shadow-sm hover:border-[#00aeb6] hover:bg-[#00aeb6] focus-visible:border-[#00c0c9] focus-visible:ring-[#00c0c9]/40 sm:text-sm"
           variant="default"
-          disabled={disabled}
+          disabled={disabled || current}
           onClick={() => onPay("payme")}
         >
           <span className="truncate">{t("seller.subscription.payPayme")}</span>
