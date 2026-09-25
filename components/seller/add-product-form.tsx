@@ -26,6 +26,7 @@ import { applyGenerated } from "@/components/shared/apply-generated";
 import { CategorySelect } from "./category-select";
 import { useT } from "@/components/providers/i18n-provider";
 import { useSellerShop } from "@/lib/api/seller";
+import { findCategory, useCategories } from "@/lib/api/categories";
 import { apiErrorMessage } from "@/lib/api/errors";
 import { useSellerProductCardsControllerCreate } from "@/lib/api/generated/endpoints/product-cards-seller/product-cards-seller";
 import { resolvePhotoKeys } from "@/lib/api/upload";
@@ -72,11 +73,12 @@ export function AddProductForm({
   embedded?: boolean;
   onDone?: () => void;
 } = {}) {
-  const { t } = useT();
+  const { t, locale } = useT();
   const router = useRouter();
   const queryClient = useQueryClient();
 
   const { shop, isLoading: shopLoading } = useSellerShop();
+  const { roots: categories } = useCategories();
 
   const createMutation = useSellerProductCardsControllerCreate();
 
@@ -92,10 +94,31 @@ export function AddProductForm({
   const [categoryId, setCategoryId] = useState<number | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [aiPhoto, setAiPhoto] = useState<UploadedPhoto | null>(null);
+  const [step, setStep] = useState<1 | 2 | 3>(1);
 
   const onPriceChange = (raw: string) => setPrice(formatPriceInput(raw));
 
   const shopAbolished = Boolean(shop) && shop!.status !== "active";
+  const selectedCategory = findCategory(categories, categoryId)?.category.name[locale];
+
+  const goNext = () => {
+    if (step === 1) {
+      const priceNum = negotiable ? null : parsePriceInput(price);
+      if (!name.trim() || (!negotiable && !priceNum)) {
+        toast.error(t("seller.add.needNamePrice"));
+        return;
+      }
+      if (!categoryId) {
+        toast.error(t("seller.add.needCategory"));
+        return;
+      }
+    }
+    if (step === 2 && photos.length === 0) {
+      toast.error(t("seller.add.needPhoto"));
+      return;
+    }
+    setStep((current) => Math.min(current + 1, 3) as 1 | 2 | 3);
+  };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -195,86 +218,146 @@ export function AddProductForm({
         </Card>
       )}
 
-      <Card className="p-6">
-        <SectionTitle
-          index={1}
-          action={
-            <ProductAutofillButton
-              photos={photos}
-              name={name}
-              context={{
-                description,
-                characteristics: brandModelSpecs(brand, model, specs),
-                categoryId,
-                state,
-              }}
-              snapshot={{ description, brand, model, specs, categoryId, state }}
-              onApply={(result) => {
-                if (result.description) setDescription(result.description);
-                if (result.brand) setBrand(result.brand);
-                if (result.model) setModel(result.model);
-                if (result.characteristics.length > 0) {
-                  setSpecs(
-                    result.characteristics.map((c) => ({
-                      name: c.key,
-                      value: c.value,
-                    })),
-                  );
+      <div role="group" aria-label={t("seller.add.stepsLabel")} className="grid grid-cols-3 gap-2">
+        {[t("seller.add.section1"), t("seller.add.section3"), t("seller.add.section2")].map(
+          (label, index) => {
+            const current = index + 1;
+            const active = current === step;
+            const complete = current < step;
+            return (
+              <div
+                key={label}
+                aria-current={active ? "step" : undefined}
+                className={`flex min-w-0 items-center gap-2 rounded-xl border px-2.5 py-3 text-xs sm:text-sm ${
+                  active
+                    ? "border-primary bg-primary/10 text-primary"
+                    : complete
+                      ? "border-primary/30 text-foreground"
+                      : "border-border text-muted-foreground"
+                }`}
+              >
+                <span className="grid size-6 shrink-0 place-items-center rounded-full bg-muted font-semibold tabular">
+                  {current}
+                </span>
+                <span className="truncate">{label}</span>
+              </div>
+            );
+          },
+        )}
+      </div>
+
+      {step === 1 && (
+        <Card className="p-4 sm:p-6">
+          <SectionTitle index={1}>{t("seller.add.section1")}</SectionTitle>
+          <div className="grid gap-5">
+            <div className={field}>
+              <Label htmlFor="name">{t("seller.add.name")}</Label>
+              <Input
+                id="name"
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder={t("seller.add.namePlaceholder")}
+              />
+            </div>
+            <div className={field}>
+              <Label>{t("category.label")}</Label>
+              <CategorySelect
+                value={categoryId}
+                onChange={setCategoryId}
+                allowRestricted={shop?.restrictedCategoriesEnabled ?? false}
+              />
+            </div>
+            <div className="grid gap-5 sm:grid-cols-2">
+              <div className={field}>
+                <Label htmlFor="price">
+                  {t("seller.add.price")}, {t("common.currency")}
+                </Label>
+                <Input
+                  id="price"
+                  type="text"
+                  inputMode="numeric"
+                  value={price}
+                  onChange={(e) => onPriceChange(e.target.value)}
+                  placeholder="419 900"
+                  className="tabular"
+                  disabled={negotiable}
+                />
+                <label className="flex cursor-pointer items-center gap-2 pt-1 text-sm text-muted-foreground">
+                  <Checkbox
+                    checked={negotiable}
+                    onCheckedChange={(v) => setNegotiable(v === true)}
+                  />
+                  {t("seller.add.negotiable")}
+                </label>
+              </div>
+              <div className={field}>
+                <Label>{t("seller.add.condition")}</Label>
+                <Select value={state} onValueChange={(v) => setState(v as "new" | "old")}>
+                  <SelectTrigger className="w-full text-base font-normal md:text-sm dark:hover:bg-input/30">
+                    <SelectValue placeholder={t("seller.add.conditionPlaceholder")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="new">{t("seller.add.conditionNew")}</SelectItem>
+                    <SelectItem value="old">{t("seller.add.conditionUsed")}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+        </Card>
+      )}
+
+      {step === 2 && (
+        <Card className="p-4 sm:p-6">
+          <SectionTitle
+            index={2}
+            action={
+              <ProductAutofillButton
+                photos={photos}
+                name={name}
+                context={{
+                  description,
+                  characteristics: brandModelSpecs(brand, model, specs),
+                  categoryId,
+                  state,
+                }}
+                snapshot={{ description, brand, model, specs, categoryId, state }}
+                onApply={(result) => {
+                  if (result.description) setDescription(result.description);
+                  if (result.brand) setBrand(result.brand);
+                  if (result.model) setModel(result.model);
+                  if (result.characteristics.length > 0) {
+                    setSpecs(
+                      result.characteristics.map((c) => ({
+                        name: c.key,
+                        value: c.value,
+                      })),
+                    );
+                  }
+                  if (result.categoryId) setCategoryId(result.categoryId);
+                  if (result.state) setState(result.state);
+                }}
+                onRestore={(before) => {
+                  setDescription(before.description);
+                  setBrand(before.brand);
+                  setModel(before.model);
+                  setSpecs(before.specs);
+                  setCategoryId(before.categoryId);
+                  setState(before.state);
+                }}
+                onPhotoStored={(photoId, key) =>
+                  setPhotos((prev) => prev.map((p) => (p.id === photoId ? { ...p, key } : p)))
                 }
-                if (result.categoryId) setCategoryId(result.categoryId);
-                if (result.state) setState(result.state);
-              }}
-              onRestore={(before) => {
-                setDescription(before.description);
-                setBrand(before.brand);
-                setModel(before.model);
-                setSpecs(before.specs);
-                setCategoryId(before.categoryId);
-                setState(before.state);
-              }}
-              onPhotoStored={(photoId, key) =>
-                setPhotos((prev) => prev.map((p) => (p.id === photoId ? { ...p, key } : p)))
-              }
-              disabled={shopAbolished}
-            />
-          }
-        >
-          {t("seller.add.section1")}
-        </SectionTitle>
-        <div className="grid gap-5">
-          <div className={field}>
-            <Label htmlFor="name">{t("seller.add.name")}</Label>
-            <Input
-              id="name"
-              required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder={t("seller.add.namePlaceholder")}
-            />
-          </div>
-
-          <div className="grid gap-5 sm:grid-cols-2">
-            <div className={field}>
-              <Label htmlFor="brand">{t("seller.add.brand")}</Label>
-              <Input
-                id="brand"
-                value={brand}
-                onChange={(e) => setBrand(e.target.value)}
-                placeholder="NVIDIA"
+                disabled={shopAbolished}
               />
-            </div>
-            <div className={field}>
-              <Label htmlFor="model">{t("seller.add.model")}</Label>
-              <Input
-                id="model"
-                value={model}
-                onChange={(e) => setModel(e.target.value)}
-                placeholder="RTX 4070"
-              />
-            </div>
-          </div>
-
-          <div className={field}>
+            }
+          >
+            {t("seller.add.section3")}
+          </SectionTitle>
+          <PhotoDropzone photos={photos} onChange={setPhotos} onPhotoClick={setAiPhoto} />
+          <p className="mt-2 text-xs text-muted-foreground">{t("admin.form.photoHint")}</p>
+          <div className={`${field} mt-6`}>
             <div className="flex flex-wrap items-center justify-between gap-2">
               <Label htmlFor="desc">{t("seller.add.description")}</Label>
               <FixDescriptionButton
@@ -296,127 +379,151 @@ export function AddProductForm({
             />
             <p className="text-xs text-muted-foreground">{t("ai.description.markdownHint")}</p>
           </div>
-
-          <div className={field}>
-            <Label>{t("category.label")}</Label>
-            <CategorySelect
-              value={categoryId}
-              onChange={setCategoryId}
-              allowRestricted={shop?.restrictedCategoriesEnabled ?? false}
-            />
-          </div>
-
-          <div className="grid gap-5 sm:grid-cols-2">
-            <div className={field}>
-              <Label htmlFor="price">
-                {t("seller.add.price")}, {t("common.currency")}
-              </Label>
-              <Input
-                id="price"
-                type="text"
-                inputMode="numeric"
-                value={price}
-                onChange={(e) => onPriceChange(e.target.value)}
-                placeholder="419 900"
-                className="tabular"
-                disabled={negotiable}
-              />
-              <label className="flex cursor-pointer items-center gap-2 pt-1 text-sm text-muted-foreground">
-                <Checkbox checked={negotiable} onCheckedChange={(v) => setNegotiable(v === true)} />
-                {t("seller.add.negotiable")}
-              </label>
-            </div>
-            <div className={field}>
-              <Label>{t("seller.add.condition")}</Label>
-              <Select value={state} onValueChange={(v) => setState(v as "new" | "old")}>
-                <SelectTrigger className="w-full text-base font-normal md:text-sm dark:hover:bg-input/30">
-                  <SelectValue placeholder={t("seller.add.conditionPlaceholder")} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="new">{t("seller.add.conditionNew")}</SelectItem>
-                  <SelectItem value="old">{t("seller.add.conditionUsed")}</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </div>
-      </Card>
-
-      <Card className="p-6">
-        <SectionTitle index={2}>{t("seller.add.section2")}</SectionTitle>
-        <div className="space-y-3">
-          {specs.map((s, i) => (
-            <div key={i} className="flex items-center gap-3">
-              <Input
-                placeholder={t("seller.add.specName")}
-                value={s.name}
-                onChange={(e) =>
-                  setSpecs((arr) =>
-                    arr.map((x, j) => (j === i ? { ...x, name: e.target.value } : x)),
-                  )
-                }
-              />
-              <Input
-                placeholder={t("seller.add.specValue")}
-                value={s.value}
-                onChange={(e) =>
-                  setSpecs((arr) =>
-                    arr.map((x, j) => (j === i ? { ...x, value: e.target.value } : x)),
-                  )
-                }
-              />
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="shrink-0 text-muted-foreground hover:text-destructive"
-                onClick={() =>
-                  setSpecs((arr) => (arr.length > 1 ? arr.filter((_, j) => j !== i) : arr))
-                }
-              >
-                <Trash2 className="size-4" />
-              </Button>
-            </div>
-          ))}
-        </div>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          className="mt-4 gap-2"
-          onClick={() => setSpecs((arr) => [...arr, { name: "", value: "" }])}
-        >
-          <Plus className="size-4" />
-          {t("seller.add.addSpec")}
-        </Button>
-      </Card>
-
-      <Card className="p-6">
-        <SectionTitle index={3}>{t("seller.add.section3")}</SectionTitle>
-        <PhotoDropzone photos={photos} onChange={setPhotos} onPhotoClick={setAiPhoto} />
-        <p className="mt-2 text-xs text-muted-foreground">{t("admin.form.photoHint")}</p>
-
-        <PhotoAiDialog
-          photo={aiPhoto}
-          onClose={() => setAiPhoto(null)}
-          onApply={(generated) => {
-            const { photos: next, dropped } = applyGenerated(photos, aiPhoto?.id, generated);
-            setPhotos(next);
-            if (dropped > 0) {
-              toast.error(t("admin.photoAi.tooManyPhotos", { count: dropped }));
+          <PhotoAiDialog
+            photo={aiPhoto}
+            onClose={() => setAiPhoto(null)}
+            onApply={(generated) => {
+              const { photos: next, dropped } = applyGenerated(photos, aiPhoto?.id, generated);
+              setPhotos(next);
+              if (dropped > 0) {
+                toast.error(t("admin.photoAi.tooManyPhotos", { count: dropped }));
+              }
+            }}
+            onPhotoStored={(photoId, key) =>
+              setPhotos((prev) => prev.map((p) => (p.id === photoId ? { ...p, key } : p)))
             }
-          }}
-          onPhotoStored={(photoId, key) =>
-            setPhotos((prev) => prev.map((p) => (p.id === photoId ? { ...p, key } : p)))
-          }
-        />
-      </Card>
+          />
+        </Card>
+      )}
 
-      <div className="flex flex-wrap justify-end gap-3 rounded-xl bg-card p-3 ring-1 ring-foreground/10">
-        <Button type="submit" className="gap-2" disabled={submitting || shopAbolished}>
-          <Send className="size-4" />
-          {submitting ? t("common.loading") : t("seller.add.publish")}
-        </Button>
+      {step === 3 && (
+        <Card className="p-4 sm:p-6">
+          <SectionTitle index={3}>{t("seller.add.section2")}</SectionTitle>
+          <div className="mb-6 rounded-xl border bg-muted/30 p-4">
+            <h3 className="mb-3 font-semibold">{t("seller.add.reviewTitle")}</h3>
+            <dl className="grid gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
+              <div className="min-w-0">
+                <dt className="text-muted-foreground">{t("seller.add.name")}</dt>
+                <dd className="break-words font-medium">{name}</dd>
+              </div>
+              <div className="min-w-0">
+                <dt className="text-muted-foreground">{t("category.label")}</dt>
+                <dd className="break-words font-medium">
+                  {selectedCategory ?? t("common.loading")}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-muted-foreground">{t("seller.add.price")}</dt>
+                <dd className="font-medium">
+                  {negotiable ? t("seller.add.negotiable") : `${price} ${t("common.currency")}`}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-muted-foreground">{t("seller.add.section3")}</dt>
+                <dd className="font-medium">
+                  {t("seller.add.reviewPhotosCount", { count: photos.length })}
+                </dd>
+              </div>
+            </dl>
+          </div>
+          <div className="mb-5 grid gap-5 sm:grid-cols-2">
+            <div className={field}>
+              <Label htmlFor="brand">{t("seller.add.brand")}</Label>
+              <Input
+                id="brand"
+                value={brand}
+                onChange={(e) => setBrand(e.target.value)}
+                placeholder="NVIDIA"
+              />
+            </div>
+            <div className={field}>
+              <Label htmlFor="model">{t("seller.add.model")}</Label>
+              <Input
+                id="model"
+                value={model}
+                onChange={(e) => setModel(e.target.value)}
+                placeholder="RTX 4070"
+              />
+            </div>
+          </div>
+          <div className="space-y-3">
+            {specs.map((s, i) => (
+              <div
+                key={i}
+                className="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] sm:items-center sm:gap-3"
+              >
+                <Input
+                  placeholder={t("seller.add.specName")}
+                  value={s.name}
+                  onChange={(e) =>
+                    setSpecs((arr) =>
+                      arr.map((x, j) => (j === i ? { ...x, name: e.target.value } : x)),
+                    )
+                  }
+                />
+                <Input
+                  placeholder={t("seller.add.specValue")}
+                  value={s.value}
+                  onChange={(e) =>
+                    setSpecs((arr) =>
+                      arr.map((x, j) => (j === i ? { ...x, value: e.target.value } : x)),
+                    )
+                  }
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  aria-label={t("common.delete")}
+                  className="shrink-0 text-muted-foreground hover:text-destructive"
+                  onClick={() =>
+                    setSpecs((arr) => (arr.length > 1 ? arr.filter((_, j) => j !== i) : arr))
+                  }
+                >
+                  <Trash2 className="size-4" />
+                </Button>
+              </div>
+            ))}
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="mt-4 gap-2"
+            onClick={() => setSpecs((arr) => [...arr, { name: "", value: "" }])}
+          >
+            <Plus className="size-4" />
+            {t("seller.add.addSpec")}
+          </Button>
+        </Card>
+      )}
+
+      <div
+        className={`sticky z-10 -mx-1 flex items-center justify-between gap-3 rounded-xl bg-background/95 p-3 shadow-lg ring-1 ring-foreground/10 backdrop-blur ${
+          embedded ? "bottom-0" : "bottom-[calc(5rem+env(safe-area-inset-bottom))] md:bottom-0"
+        }`}
+      >
+        {step > 1 ? (
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setStep((current) => (current - 1) as 1 | 2)}
+          >
+            {t("common.back")}
+          </Button>
+        ) : (
+          <span />
+        )}
+        {step < 3 ? (
+          <Button type="button" onClick={goNext}>
+            {t("common.next")}
+          </Button>
+        ) : (
+          <Button type="submit" className="gap-2" disabled={submitting || shopAbolished}>
+            <Send className="size-4" />
+            {submitting ? t("common.loading") : t("seller.add.publish")}
+          </Button>
+        )}
       </div>
     </form>
   );

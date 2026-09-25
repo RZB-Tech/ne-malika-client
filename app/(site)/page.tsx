@@ -1,9 +1,7 @@
-import Link from "next/link";
 import { Suspense } from "react";
 import { notFound, permanentRedirect } from "next/navigation";
 import { BannerCarousel } from "@/components/home/banner-carousel";
 import { CatalogView } from "@/components/catalog/catalog-view";
-import { PageContainer } from "@/components/layout/page-container";
 import { getBanners, getPublicProducts } from "@/lib/api/server";
 import { serializeJsonLd } from "@/lib/json-ld";
 import { SITE_NAME, SITE_URL, SITE_DESCRIPTION, absoluteUrl } from "@/lib/seo";
@@ -65,26 +63,10 @@ export default async function HomePage({ searchParams }: Props) {
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
       />
       {!q && page === 1 && <BannerCarousel banners={banners} />}
-      <PageContainer className="pt-6">
-        <h1 className="font-heading text-2xl font-bold sm:text-3xl">
-          {q ? `Результаты поиска: ${q}` : "Компьютерный рынок Малика онлайн"}
-          {page > 1 ? ` — страница ${page}` : ""}
-        </h1>
-        <p className="mt-3 max-w-3xl text-sm text-muted-foreground">
-          Ноутбуки, компьютеры, комплектующие и периферия от магазинов рынка Малика в Ташкенте.
-          Сравнивайте предложения и связывайтесь с продавцами напрямую.
-        </p>
-        <nav
-          aria-label="Разделы каталога"
-          className="mt-4 flex flex-wrap gap-4 text-sm text-primary"
-        >
-          <Link href="/category">Все категории</Link>
-          <Link href="/category/laptops">Ноутбуки</Link>
-          <Link href="/category/pc-parts">Комплектующие</Link>
-          <Link href="/category/services">IT-услуги</Link>
-          <Link href="/stores">Магазины</Link>
-        </nav>
-      </PageContainer>
+      <h1 className="sr-only">
+        {q ? `Результаты поиска: ${q}` : "Компьютерный рынок Малика онлайн"}
+        {page > 1 ? ` — страница ${page}` : ""}
+      </h1>
       <Suspense>
         <CatalogView initialData={initial} initialQuery={q} />
       </Suspense>
