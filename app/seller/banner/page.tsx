@@ -12,9 +12,7 @@ import { BannerStatusBadge } from "@/components/shared/badges";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { BannerForm } from "@/components/seller/banner-form";
 import { useT } from "@/components/providers/i18n-provider";
-import { BANNER_ASPECT_CSS, bannerExpired, bannerImageUrl, type Banner } from "@/lib/api/banners";
-import { formatDate } from "@/lib/format";
-import { cn } from "@/lib/utils";
+import { BANNER_ASPECT_CSS, bannerImageUrl, type Banner } from "@/lib/api/banners";
 import type { BannerModerationStatus } from "@/lib/api/types";
 import type { Locale } from "@/lib/i18n/config";
 import { useSellerSubscription } from "@/lib/api/subscription";
@@ -172,18 +170,7 @@ function BannerCard({
 
           <p className="text-sm text-muted-foreground">{t(statusText)}</p>
 
-          {banner.expiresAt && (
-            <p
-              className={cn(
-                "tabular text-sm",
-                bannerExpired(banner) ? "text-destructive" : "text-muted-foreground",
-              )}
-            >
-              {t(bannerExpired(banner) ? "seller.banner.expired" : "seller.banner.until", {
-                date: formatDate(banner.expiresAt, locale),
-              })}
-            </p>
-          )}
+          <p className="text-xs text-muted-foreground">{t("seller.banner.subscriptionHint")}</p>
 
           {banner.status === "rejected" && banner.rejectReason && (
             <p className="text-sm text-destructive">

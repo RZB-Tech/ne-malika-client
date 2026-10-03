@@ -567,6 +567,7 @@
       "rejectReason": "Rad etish sababi: {reason}",
       "until": "{date} gacha ko‘rsatiladi",
       "expired": "Ko‘rsatish muddati {date} da tugadi — banner yashirilgan",
+      "subscriptionHint": "Banner faol MAX obunasi tugaguncha ko‘rsatiladi. Obuna uzaytirilganda ko‘rsatish davom etadi.",
       "moderationHint": "Har qanday o‘zgarish bannerni qayta tekshiruvga qaytaradi.",
       "needTitle": "Nomni kiriting (kamida 2 ta belgi)",
       "needImages": "Har bir til uchun rasm yuklang",

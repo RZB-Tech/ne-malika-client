@@ -17,14 +17,8 @@ import { BannerStatusBadge } from "@/components/shared/badges";
 import { Pagination } from "@/components/shared/pagination";
 import { useT } from "@/components/providers/i18n-provider";
 import { formatDate } from "@/lib/format";
-import { cn } from "@/lib/utils";
 import { localeShort, locales, type Locale } from "@/lib/i18n/config";
-import {
-  BANNER_ASPECT_CSS,
-  bannerExpired,
-  bannerImageUrl,
-  type AdminBanner,
-} from "@/lib/api/banners";
+import { BANNER_ASPECT_CSS, bannerImageUrl, type AdminBanner } from "@/lib/api/banners";
 import { devFallbackPage, devShops } from "@/lib/api/dev-fixtures";
 import type { AdminShopRow, Paginated } from "@/lib/api/types";
 import { useAdminShopBannersControllerList } from "@/lib/api/generated/endpoints/banners-admin/banners-admin";
@@ -215,19 +209,7 @@ function BannerCard({
                 })}
               </p>
             )}
-            {banner.expiresAt && (
-              <p
-                className={cn(
-                  "tabular text-xs",
-                  bannerExpired(banner) ? "text-destructive" : "text-muted-foreground",
-                )}
-              >
-                {t(
-                  bannerExpired(banner) ? "admin.shopBanners.expired" : "admin.shopBanners.until",
-                  { date: formatDate(banner.expiresAt, locale) },
-                )}
-              </p>
-            )}
+            <p className="text-xs text-muted-foreground">{t("seller.banner.subscriptionHint")}</p>
             {banner.moderatedAt && (
               <p className="tabular text-xs text-muted-foreground">
                 {t("admin.shopBanners.moderatedAt", {

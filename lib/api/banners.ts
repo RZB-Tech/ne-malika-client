@@ -82,8 +82,16 @@ export function expiryFromInput(value: string): string | null {
   return new Date(year, month - 1, day, 23, 59, 59, 999).toISOString();
 }
 
-export function bannerExpired(banner: { expiresAt?: string | null }): boolean {
-  return Boolean(banner.expiresAt) && new Date(banner.expiresAt!).getTime() <= Date.now();
+export function bannerExpired(banner: {
+  shopId?: number | null;
+  expiresAt?: string | null;
+}): boolean {
+  // У магазина срок задаёт MAX, в том числе для баннеров со старым expiresAt.
+  return (
+    banner.shopId == null &&
+    Boolean(banner.expiresAt) &&
+    new Date(banner.expiresAt!).getTime() <= Date.now()
+  );
 }
 
 export type BannerImageProblem = "type" | "size" | "resolution";

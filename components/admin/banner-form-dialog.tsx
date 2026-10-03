@@ -65,7 +65,7 @@ export function BannerFormDialog({
 }) {
   return (
     <Dialog open={target !== undefined} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
+      <DialogContent className="max-h-[90vh] min-w-0 overflow-x-hidden overflow-y-auto sm:max-w-2xl">
         {target !== undefined && (
           <FormBody
             key={target?.id ?? "new"}
@@ -167,7 +167,7 @@ function FormBody({
         linkUrl: linkUrl.trim(),
         isActive,
         shopId,
-        expiresAt: expiry ? expiryFromInput(expiry) : null,
+        expiresAt: shopId === null && expiry ? expiryFromInput(expiry) : null,
       };
 
       if (banner) {
@@ -199,12 +199,12 @@ function FormBody({
   };
 
   return (
-    <form onSubmit={submit} className="flex flex-col gap-5">
-      <DialogHeader>
+    <form onSubmit={submit} className="flex min-w-0 flex-col gap-5">
+      <DialogHeader className="min-w-0 pr-6">
         <DialogTitle>
           {t(banner ? "admin.banners.editTitle" : "admin.banners.newTitle")}
         </DialogTitle>
-        <DialogDescription>
+        <DialogDescription className="wrap-anywhere">
           {t("admin.banners.formHint", { sizes: BANNER_FORMATS_LABEL })}
         </DialogDescription>
       </DialogHeader>
@@ -279,38 +279,42 @@ function FormBody({
         <p className="text-xs text-muted-foreground">{t("admin.banners.linkHint")}</p>
       </div>
 
-      <div className="flex flex-col gap-1.5">
-        <div className="flex items-center justify-between gap-2">
-          <Label htmlFor="banner-expiry">{t("admin.banners.expiry")}</Label>
-          {expiry !== "" && (
-            <Button
-              type="button"
-              size="sm"
-              variant="ghost"
-              className="h-auto px-2 py-1 text-xs"
-              onClick={() => setExpiry("")}
-            >
-              {t("admin.banners.expiryClear")}
-            </Button>
-          )}
+      {shopId === null ? (
+        <div className="flex flex-col gap-1.5">
+          <div className="flex items-center justify-between gap-2">
+            <Label htmlFor="banner-expiry">{t("admin.banners.expiry")}</Label>
+            {expiry !== "" && (
+              <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                className="h-auto px-2 py-1 text-xs"
+                onClick={() => setExpiry("")}
+              >
+                {t("admin.banners.expiryClear")}
+              </Button>
+            )}
+          </div>
+          <Input
+            id="banner-expiry"
+            type="date"
+            value={expiry}
+            onChange={(e) => setExpiry(e.target.value)}
+          />
+          <p className="text-xs text-muted-foreground">{t("admin.banners.expiryHint")}</p>
         </div>
-        <Input
-          id="banner-expiry"
-          type="date"
-          value={expiry}
-          onChange={(e) => setExpiry(e.target.value)}
-        />
-        <p className="text-xs text-muted-foreground">{t("admin.banners.expiryHint")}</p>
-      </div>
+      ) : (
+        <p className="text-sm text-muted-foreground">{t("seller.banner.subscriptionHint")}</p>
+      )}
 
       <label className="flex cursor-pointer items-center justify-between gap-4 rounded-lg border border-border p-3">
-        <span className="text-sm">
+        <span className="min-w-0 text-sm">
           {t("admin.banners.active")}
           <span className="mt-0.5 block text-xs text-muted-foreground">
             {t("admin.banners.activeHint")}
           </span>
         </span>
-        <Switch checked={isActive} onCheckedChange={setIsActive} />
+        <Switch className="shrink-0" checked={isActive} onCheckedChange={setIsActive} />
       </label>
 
       <DialogFooter>
@@ -340,12 +344,12 @@ function SlotPicker({
   const inputRef = useRef<HTMLInputElement>(null);
 
   return (
-    <div className="flex items-center gap-3 rounded-lg border border-border p-3">
+    <div className="flex min-w-0 flex-wrap items-center gap-3 rounded-lg border border-border p-3">
       <button
         type="button"
         onClick={() => inputRef.current?.click()}
         style={{ aspectRatio: BANNER_ASPECT_CSS }}
-        className="relative w-40 shrink-0 overflow-hidden rounded border border-border bg-muted transition-colors hover:border-primary/50"
+        className="relative w-28 shrink-0 overflow-hidden rounded border border-border bg-muted transition-colors hover:border-primary/50 sm:w-40"
       >
         {slot ? (
           /* eslint-disable-next-line @next/next/no-img-element */
@@ -364,7 +368,7 @@ function SlotPicker({
         </p>
       </div>
 
-      <div className="flex shrink-0 gap-1">
+      <div className="flex w-full flex-wrap justify-end gap-1 sm:w-auto sm:shrink-0">
         {slot && (
           <Button
             type="button"

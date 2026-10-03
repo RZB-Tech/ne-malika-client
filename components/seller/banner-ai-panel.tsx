@@ -166,22 +166,22 @@ export function BannerAiPanel({
   const stopped = disabled || blocked || needsShop || busy !== null;
 
   return (
-    <div className="flex flex-col gap-3 rounded-lg border border-dashed border-border p-3">
+    <div className="flex min-w-0 max-w-full flex-col gap-3 rounded-lg border border-dashed border-border p-3">
       <div className="flex flex-col gap-1.5">
         <p className="flex items-center gap-1.5 text-sm font-medium">
           <Sparkles className="size-4 text-primary" />
           {t("seller.banner.ai.title")}
         </p>
-        <p className="text-xs text-muted-foreground">{t("seller.banner.ai.hint")}</p>
+        <p className="wrap-anywhere text-xs text-muted-foreground">{t("seller.banner.ai.hint")}</p>
       </div>
 
       {availableProducts.length > 0 && (
-        <div className="flex flex-col gap-2 rounded-md border border-border/80 bg-muted/30 p-2.5">
-          <div className="flex items-center justify-between gap-2">
+        <div className="flex min-w-0 flex-col gap-2 rounded-md border border-border/80 bg-muted/30 p-2.5">
+          <div className="flex flex-wrap items-center justify-between gap-2">
             <span className="text-xs font-medium text-foreground">
               {t("seller.banner.ai.productsTitle")}
             </span>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <span className="text-[11px] text-muted-foreground">
                 {selectedProductIds.length > 0
                   ? t("seller.banner.ai.productsSelected", { count: selectedProductIds.length })
@@ -198,11 +198,9 @@ export function BannerAiPanel({
               )}
             </div>
           </div>
-          <p className="text-[11px] text-muted-foreground">
-            {t("seller.banner.ai.productsHint")}
-          </p>
+          <p className="text-[11px] text-muted-foreground">{t("seller.banner.ai.productsHint")}</p>
 
-          <div className="flex max-h-44 flex-col gap-1 overflow-y-auto pr-1">
+          <div className="flex max-h-44 min-w-0 flex-col gap-1 overflow-x-hidden overflow-y-auto pr-1">
             {availableProducts.map((prod) => {
               const checked = selectedProductIds.includes(prod.id);
               return (
@@ -211,7 +209,7 @@ export function BannerAiPanel({
                   type="button"
                   onClick={() => toggleProduct(prod.id)}
                   className={cn(
-                    "flex items-center gap-2.5 rounded-lg border p-1.5 text-left text-xs transition-colors",
+                    "flex w-full min-w-0 items-center gap-2.5 rounded-lg border p-1.5 text-left text-xs transition-colors",
                     checked
                       ? "border-primary bg-primary/5 text-foreground font-medium"
                       : "border-border/60 bg-background text-muted-foreground hover:border-primary/40 hover:text-foreground",
@@ -220,14 +218,20 @@ export function BannerAiPanel({
                   <div className="relative size-8 shrink-0 overflow-hidden rounded border border-border bg-muted">
                     {prod.photo ? (
                       /* eslint-disable-next-line @next/next/no-img-element */
-                      <img src={photoUrl(prod.photo) ?? undefined} alt="" className="size-full object-cover" />
+                      <img
+                        src={photoUrl(prod.photo) ?? undefined}
+                        alt=""
+                        className="size-full object-cover"
+                      />
                     ) : (
                       <span className="grid size-full place-items-center text-[9px] text-muted-foreground">
                         —
                       </span>
                     )}
                   </div>
-                  <span className="min-w-0 flex-1 truncate">{prod.name}</span>
+                  <span className="min-w-0 flex-1 truncate" title={prod.name}>
+                    {prod.name}
+                  </span>
                   <div
                     className={cn(
                       "flex size-4 shrink-0 items-center justify-center rounded border text-[10px]",
@@ -250,7 +254,7 @@ export function BannerAiPanel({
           type="button"
           size="sm"
           variant="outline"
-          className="gap-1.5"
+          className="h-auto max-w-full gap-1.5 py-2 whitespace-normal"
           onClick={() => void run("ru")}
           disabled={stopped}
         >
@@ -268,7 +272,7 @@ export function BannerAiPanel({
           type="button"
           size="sm"
           variant="outline"
-          className="gap-1.5"
+          className="h-auto max-w-full gap-1.5 py-2 whitespace-normal"
           onClick={() => void run("uz-Latn")}
           disabled={stopped || !translatable}
           title={translatable ? undefined : t("seller.banner.ai.uzLocked")}

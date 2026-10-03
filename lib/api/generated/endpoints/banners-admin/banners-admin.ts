@@ -155,7 +155,7 @@ export function useAdminBannersControllerFindAll<TData = Awaited<ReturnType<type
 
 
 /**
- * Без shopId — баннер площадки в общей карусели. С shopId баннер выдан магазину: модерацию проходить не нужно, владелец получает уведомление, а показывается такой баннер по правилам баннеров магазинов. expiresAt задаёт срок, после которого баннер скрывается сам.
+ * Без shopId — баннер площадки в общей карусели. С shopId баннер выдан магазину: модерацию проходить не нужно, владелец получает уведомление, а показывается такой баннер по правилам баннеров магазинов. Баннер магазина показывается до окончания активной подписки MAX. expiresAt задаёт срок только для баннеров площадки.
  * @summary Добавить баннер на главную или выдать его магазину
  */
 export const adminBannersControllerCreate = (
@@ -284,7 +284,7 @@ export const useAdminBannersControllerReorder = <TError = ErrorType<void>,
       return useMutation(getAdminBannersControllerReorderMutationOptions(options), queryClient);
     }
     /**
- * Работает и для баннеров площадки, и для выданных магазинам: так меняется срок показа (expiresAt: null снимает срок) и владелец (shopId: null возвращает баннер площадке).
+ * Работает и для баннеров площадки, и для выданных магазинам. expiresAt меняет срок только для площадки; для магазина он сбрасывается в null, показ зависит от активной подписки MAX. shopId: null возвращает баннер площадке.
  * @summary Изменить баннер
  */
 export const adminBannersControllerUpdate = (

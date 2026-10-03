@@ -17,7 +17,7 @@ export interface BannerDto {
   isActive: boolean;
   sortOrder: number;
   /**
-     * Срок показа: после этой метки баннер скрыт. null — бессрочно
+     * Срок показа баннера площадки; null — бессрочно. Для магазина срок определяет активная подписка MAX, сохранённое expiresAt не учитывается
      * @nullable
      */
   expiresAt: string | null;
