@@ -20,7 +20,7 @@ export function AddProductDialog() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl">
+      <DialogContent className="max-h-[90vh] min-w-0 overflow-x-hidden overflow-y-auto sm:max-w-xl">
         <DialogHeader>
           <DialogTitle>{t("seller.add.title")}</DialogTitle>
           <DialogDescription>{t("seller.add.subtitle")}</DialogDescription>
