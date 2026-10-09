@@ -1,11 +1,13 @@
 import { Suspense } from "react";
 import { notFound, permanentRedirect } from "next/navigation";
+import { connection } from "next/server";
 import { BannerCarousel } from "@/components/home/banner-carousel";
 import { CatalogView } from "@/components/catalog/catalog-view";
 import { getBanners, getPublicProducts } from "@/lib/api/server";
 import { serializeJsonLd } from "@/lib/json-ld";
 import { SITE_NAME, SITE_URL, SITE_DESCRIPTION, absoluteUrl } from "@/lib/seo";
 import { catalogMetadata, first, pageNumber, pageHref, type SearchParams } from "@/lib/catalog-seo";
+import { randomCatalogSeed } from "@/lib/catalog-seed";
 
 type Props = { searchParams: Promise<SearchParams> };
 export async function generateMetadata({ searchParams }: Props) {
@@ -50,8 +52,11 @@ export default async function HomePage({ searchParams }: Props) {
       pageHref(`/category/${encodeURIComponent(first(query.category))}`, page, params.toString()),
     );
   }
+  // A full reload starts a new shuffled catalogue, not a cached/build-time order.
+  await connection();
+  const seed = randomCatalogSeed();
   const [initial, banners] = await Promise.all([
-    getPublicProducts({ page, q, sort: "newest" }),
+    getPublicProducts({ page, q, sort: q ? "newest" : "random", seed: q ? undefined : seed }),
     !q && page === 1 ? getBanners() : Promise.resolve([]),
   ]);
   if (!initial) throw new Error("Catalogue unavailable");
@@ -68,7 +73,7 @@ export default async function HomePage({ searchParams }: Props) {
         {page > 1 ? ` — страница ${page}` : ""}
       </h1>
       <Suspense>
-        <CatalogView initialData={initial} initialQuery={q} />
+        <CatalogView initialData={initial} initialQuery={q} initialSeed={seed} />
       </Suspense>
     </>
   );

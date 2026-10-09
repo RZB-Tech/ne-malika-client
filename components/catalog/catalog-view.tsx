@@ -31,11 +31,13 @@ export function CatalogView({
   forcedCategory,
   forcedSubCategoryId,
   initialQuery = "",
+  initialSeed,
 }: {
   initialData?: Paginated<PublicProductCard>;
   forcedCategory?: string;
   forcedSubCategoryId?: number;
   initialQuery?: string;
+  initialSeed?: string;
 } = {}) {
   const { t, locale } = useT();
   const { roots } = useCategories();
@@ -51,23 +53,28 @@ export function CatalogView({
   const subCategoryId = forcedSubCategoryId ?? filterSubCategoryId;
   const searchParams = useSearchParams();
   const page = pageNumber(searchParams.get("page"));
+  // Keep the SSR seed through client pagination; a full reload mounts a fresh seed.
+  const [seed] = useState(initialSeed);
+  const shuffled = Boolean(seed) && !q && !category && !subCategoryId;
 
   const params: ProductCardsControllerFindAllParams = useMemo(
     () => ({
       limit: PAGE_SIZE,
       q: q || undefined,
       ...(subCategoryId ? { category_id: subCategoryId } : category ? { category } : {}),
-      // Stable order gives every paginated URL its own reproducible set of products.
-      sort: "newest" as const,
+      sort: shuffled ? ("random" as const) : ("newest" as const),
+      seed: shuffled ? seed : undefined,
     }),
-    [q, category, subCategoryId],
+    [q, category, subCategoryId, shuffled, seed],
   );
 
   const isInitialParams =
     q === initialQuery &&
     category === (forcedCategory ?? null) &&
     subCategoryId === (forcedSubCategoryId ?? null) &&
-    initialData?.meta.page === page;
+    initialData?.meta.page === page &&
+    // A client navigation may bring SSR data for a different shuffle. Do not mix it in.
+    (!shuffled || seed === initialSeed);
 
   const listQuery = useInfiniteQuery({
     queryKey: ["/api/v1/product-cards", "infinite", params, page] as const,

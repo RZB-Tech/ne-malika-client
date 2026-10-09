@@ -83,7 +83,7 @@ export function getPublicProducts(
     ...(category ? { category } : {}),
     ...(q ? { q } : {}),
   }).toString();
-  return getJson<Paginated<PublicProductCard>>(`/product-cards?${qs}`, 60);
+  return getJson<Paginated<PublicProductCard>>(`/product-cards?${qs}`, sort === "random" ? 0 : 60);
 }
 
 export async function getPublicCategories(): Promise<CategoryDto[]> {
