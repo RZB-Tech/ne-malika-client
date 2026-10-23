@@ -1175,6 +1175,8 @@
       "progressLong": "deyarli tayyor, katta o‘lchamlar uzoqroq chiziladi",
       "pickHint": "Yoqqanlarini bosing — bir nechtasini tanlash mumkin.",
       "variantAlt": "Variant",
+      "previewFailed": "Rasm ko‘rinishi yuklanmadi",
+      "previewRetryHint": "Rasmlar saqlangan. Ko‘rinishlarni qayta yuklang — yangi generatsiya va kredit sarfi kerak emas.",
       "apply": "Rasmni almashtirish ({count})",
       "generatedCaption": "AI yaratgan",
       "promptFailed": "Promptni tuzib bo‘lmadi",

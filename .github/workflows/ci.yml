@@ -27,8 +27,8 @@ jobs:
       - name: Lint
         run: pnpm lint
 
-      - name: SEO regression tests
-        run: node --test test/seo.test.mjs
+      - name: UI and SEO regression tests
+        run: node --test test/seo.test.mjs test/add-product-form.test.mjs test/photo-ai-images.test.mjs
 
       - name: Build (dummy env for CI-only build)
         env:

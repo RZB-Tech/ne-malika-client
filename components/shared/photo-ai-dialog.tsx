@@ -35,6 +35,7 @@ import { storedPhoto, type UploadedPhoto } from "@/components/seller/photo-dropz
 import { useT } from "@/components/providers/i18n-provider";
 import { apiErrorMessage } from "@/lib/api/errors";
 import { dataUrlToBlob, uploadPhoto } from "@/lib/api/upload";
+import { photoUrl } from "@/lib/api/photo";
 import { cn } from "@/lib/utils";
 
 type Format = "portrait" | "square";
@@ -120,6 +121,8 @@ function PhotoAiSession({
   const [savedKey, setSavedKey] = useState<string | null>(null);
   const [results, setResults] = useState<Generated[]>([]);
   const [picked, setPicked] = useState<Set<string>>(new Set());
+  const [failedPreviews, setFailedPreviews] = useState<Set<string>>(new Set());
+  const [previewRevision, setPreviewRevision] = useState(0);
 
   const describeMutation = useImageGenControllerDescribe();
   const generateMutation = useImageGenControllerGenerate();
@@ -164,7 +167,8 @@ function PhotoAiSession({
     for (const item of [...results, ...(history ?? [])]) {
       if (seen.has(item.key)) continue;
       seen.add(item.key);
-      out.push({ key: item.key, url: item.url });
+      // Use the same file endpoint as product photos, not the storage/CDN URL.
+      out.push({ key: item.key, url: photoUrl(item.key) ?? item.url });
     }
     return out;
   }, [results, history]);
@@ -226,7 +230,7 @@ function PhotoAiSession({
 
   const apply = () => {
     if (!active.current) return;
-    const chosen = gallery.filter((r) => picked.has(r.key));
+    const chosen = gallery.filter((r) => picked.has(r.key) && !failedPreviews.has(r.key));
     if (chosen.length === 0) {
       toast.error(t("admin.photoAi.pickAtLeastOne"));
       return;
@@ -269,8 +273,23 @@ function PhotoAiSession({
     }
   };
 
+  const previewFailed = (key: string) => {
+    setFailedPreviews((prev) => new Set(prev).add(key));
+    setPicked((prev) => {
+      const next = new Set(prev);
+      next.delete(key);
+      return next;
+    });
+  };
+
+  const retryPreviews = () => {
+    setPreviewRevision((prev) => prev + 1);
+    setFailedPreviews(new Set());
+  };
+
   const toggle = (key: string) =>
     setPicked((prev) => {
+      if (failedPreviews.has(key)) return prev;
       const next = new Set(prev);
       if (next.has(key)) next.delete(key);
       else next.add(key);
@@ -297,7 +316,7 @@ function PhotoAiSession({
           <div className="space-y-4">
             <div className="flex gap-4">
               <img
-                src={photo.url}
+                src={(photo.key && photoUrl(photo.key)) || photo.url}
                 alt={t("admin.photoAi.sourceAlt")}
                 className="size-28 shrink-0 rounded-xl bg-muted object-cover ring-1 ring-foreground/10"
               />
@@ -522,6 +541,8 @@ function PhotoAiSession({
                       key={r.key}
                       type="button"
                       onClick={() => toggle(r.key)}
+                      disabled={failedPreviews.has(r.key)}
+                      aria-pressed={picked.has(r.key)}
                       className={cn(
                         "relative aspect-[3/4] overflow-hidden rounded-xl bg-muted transition-all",
                         picked.has(r.key)
@@ -529,11 +550,23 @@ function PhotoAiSession({
                           : "ring-1 ring-foreground/10 hover:ring-foreground/25",
                       )}
                     >
-                      <img
-                        src={r.url}
-                        alt={t("admin.photoAi.variantAlt")}
-                        className="size-full object-contain"
-                      />
+                      {failedPreviews.has(r.key) ? (
+                        <span className="block px-3 text-xs text-muted-foreground" role="status">
+                          {t("admin.photoAi.previewFailed")}
+                        </span>
+                      ) : (
+                        <img
+                          key={previewRevision}
+                          src={
+                            previewRevision
+                              ? `${r.url}${r.url.includes("?") ? "&" : "?"}previewRetry=${previewRevision}`
+                              : r.url
+                          }
+                          alt={t("admin.photoAi.variantAlt")}
+                          className="size-full object-contain"
+                          onError={() => previewFailed(r.key)}
+                        />
+                      )}
                       {picked.has(r.key) && (
                         <span className="absolute right-1.5 top-1.5 grid size-6 place-items-center rounded-full bg-primary text-primary-foreground">
                           <Check className="size-3.5" />
@@ -542,6 +575,16 @@ function PhotoAiSession({
                     </button>
                   ))}
                 </div>
+                {failedPreviews.size > 0 && (
+                  <div className="flex flex-col items-start gap-2">
+                    <p className="text-sm text-muted-foreground">
+                      {t("admin.photoAi.previewRetryHint")}
+                    </p>
+                    <Button type="button" variant="outline" size="sm" onClick={retryPreviews}>
+                      {t("common.retry")}
+                    </Button>
+                  </div>
+                )}
                 <Button type="button" onClick={apply} className="mt-2" disabled={picked.size === 0}>
                   {t("admin.photoAi.apply", { count: picked.size })}
                 </Button>

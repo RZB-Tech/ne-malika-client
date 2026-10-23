@@ -336,6 +336,37 @@ test("AI applies and restores all fields in the same form and retains uploaded p
   assert.equal(form.find("PhotoDropzone").photos[0].key, "generated/photo");
 });
 
+test("AI technical characteristics become editable rows and persist in the published card", async () => {
+  const form = harness();
+  form.fill();
+  const characteristics = [
+    { key: "Процессор", value: "Ryzen 5" },
+    { key: "Накопитель", value: "SSD 512 ГБ" },
+    { key: "Видеокарта", value: "RTX 5050" },
+    { key: "Видеопамять", value: "8 ГБ" },
+  ];
+  form.find("ProductAutofillButton").onApply({
+    description: "Ноутбук Lenovo LOQ",
+    brand: "Lenovo",
+    model: "LOQ",
+    characteristics,
+    categoryId: 12,
+    state: "new",
+  });
+  assert.deepEqual(
+    form.nodes
+      .filter((node) => node.type === "Input" && node.props["aria-label"] === "seller.add.specName")
+      .map((node) => node.props.value),
+    characteristics.map((item) => item.key),
+  );
+  await form.submit();
+  assert.deepEqual(form.writes[0].data.characteristics, [
+    { key: "Бренд", value: "Lenovo" },
+    { key: "Модель", value: "LOQ" },
+    ...characteristics,
+  ]);
+});
+
 test("characteristic rows, cancel and failed-submit recovery remain usable", async () => {
   const form = harness({ fail: true });
   form.find("Button", (p) => p.children?.at?.(-1) === "seller.add.addSpec").onClick();
